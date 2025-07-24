@@ -1,13 +1,14 @@
-import axios from 'axios';
+// Use fallback for safety (if VITE_API_BASE is undefined)
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 
-const BASE_URL = 'https://api.potterdb.com/v1';
+export const fetchBooks = async () => {
+  const res = await fetch(`${API_BASE}/books`);
+  if (!res.ok) throw new Error("Failed to fetch books");
+  return res.json();
+};
 
-export const getBooks = async () => {
-  try {
-    const res = await axios.get(`${BASE_URL}/books`);
-    return res.data.data;
-  } catch (error) {
-    console.error('API error:', error);
-    return [];
-  }
+export const fetchBookById = async (id) => {
+  const res = await fetch(`${API_BASE}/books/${id}`);
+  if (!res.ok) throw new Error("Book not found");
+  return res.json();
 };

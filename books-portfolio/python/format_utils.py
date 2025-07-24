@@ -1,12 +1,22 @@
+# python/format_utils.py
+
 def format_book_data(book):
-    attrs = book.get("attributes", {})
+    attributes = book.get("attributes", {})
     return {
-        "id": book.get("id"),
+        "title": attributes.get("title"),
+        "author": attributes.get("author"),
+        "summary": attributes.get("summary"),
+        "slug": attributes.get("slug"),
+        "release_date": attributes.get("release_date"),
+        "cover": attributes.get("cover")
+    }
+
+
+def format_chapter_data(chapter):
+    attrs = chapter.get("attributes", {})
+    return {
         "title": attrs.get("title"),
-        "author": attrs.get("author"),
-        "release_date": attrs.get("release_date"),
+        "number": attrs.get("number"),
         "summary": attrs.get("summary"),
-        "pages": attrs.get("pages"),
-        "wiki": attrs.get("wiki"),
-        "cover": attrs.get("cover"),
+        "slug": attrs.get("slug")
     }

@@ -18,7 +18,7 @@ Deploy-ready structure (Vercel for frontend, Render/Heroku for backend)
 
 https://lnlp-databricks-dev-vpc133-shared.cloud.databricks.com/ml/playground?o=3777875552937307
 
-Spotify-portfolio/
+Spotify-project/
 │
 ├── frontend/                        # React frontend app
 │   ├── postcss.config.cjs          # PostCSS config to enable Tailwind
@@ -146,6 +146,19 @@ Part	Platform	Setup
 🌐 Frontend (frontend/)	Vercel	Connect Git repo → Set build to npm run build, output to dist/
 🔌 Backend (server/)	Render	New Web Service → Build: npm install, Start: node index.js
 🧠 Python scripts (python/)	Optional: AWS Lambda or VPS	Run on schedule or via CLI
+
+Disable sparse checkout (recommended for regular repos)
+If you want to manage the whole repo normally, turn off sparse mode:
+git sparse-checkout disable
+
+If you're deploying just the frontend:
+- Set the root directory to frontend/ instead of the entire potify-project/.
+- Make sure your frontend/package.json has the correct build and start scripts.
+- Ensure your .gitignore excludes sensitive files like .env.
+If you're deploying both frontend and backend:
+- Consider using separate deployment targets or platforms 
+(e.g., Vercel for frontend, Render or Railway for backend).
+
 
 authtoken: 30cld4e7W7tdEc6khGLMC8JgWyx_66sMU1HJ63GhJ1tK5xtzS
 cedricksusmerano@gmail.com spotify dev

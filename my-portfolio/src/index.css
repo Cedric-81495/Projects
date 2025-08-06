@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* src/index.css or App.css */
+body {
+  @apply bg-white text-black dark:bg-gray-900 dark:text-white;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+

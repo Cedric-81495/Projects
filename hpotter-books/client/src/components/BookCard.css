@@ -1,0 +1,82 @@
+/* components/BookCard.css */
+.book-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  max-width: 100%;
+}
+
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.book-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  flex: 1;
+}
+
+.book-cover-container {
+  aspect-ratio: 2/3;
+  overflow: hidden;
+  width: 100%;
+  height: 140px; /* Even smaller height to accommodate button */
+}
+
+.book-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.book-info {
+  padding: 0.5rem;
+}
+
+.book-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-card-footer {
+  padding: 0 0.5rem 0.5rem;
+  margin-top: auto;
+}
+
+.read-free-btn {
+  display: block;
+  background-color: #2563eb;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.25rem 0;
+  border-radius: 0.25rem;
+  text-align: center;
+  transition: background-color 0.2s;
+  text-decoration: none;
+}
+
+.read-free-btn:hover {
+  background-color: #1d4ed8;
+}

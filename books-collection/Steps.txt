@@ -1,0 +1,70 @@
+books-portfolio/
+├── client/                     # React frontend
+│   ├── src/
+│   │   ├── components/         # Reusable UI components
+│   │   │   ├── BookCard.jsx
+│   │   │   ├── BookCard.css
+│   │   │   ├── Header.jsx
+│   │   │   └── Footer.jsx
+│   │   ├── pages/              # Page-level views
+│   │   │   ├── HPotterBooks.jsx
+│   │   │   └── BookCardPage.jsx
+│   │   ├── services/           # API calls
+│   │   │   └── api.js
+│   │   ├── styles/             # Global styles
+│   │   │   ├── globals.css
+│   │   │   └── variables.css
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── vite.config.js
+│   ├── index.html
+    ├── .env
+│   └── package.json
+│
+├── server/                    # Node.js + Express + MongoDB backend
+│   ├── models/
+│   │   └── Book.js             # Mongoose schema for book
+│   ├── routes/
+│   │   └── books.js            # Book-related routes (GET / POST / etc.)
+│   ├── controllers/           # Business logic (optional but clean)
+│   │   └── bookController.js
+│   ├── db/                    # MongoDB connection
+│   │   └── connect.js
+│   ├── server.js              # Entry point (Express app)
+    ├── .env 
+│   └── package.json
+│
+├── scripts/                   # Python scripts for fetching & syncing data
+│   ├── fetch_and_save.py
+│   └── format_utils.py        # Utilities for formatting raw API data
+
+C:\Users\Cedric\Documents\Project2025\books-portfolio\client>npm run dev (run frontend)
+C:\Users\Cedric\Documents\Project2025\books-portfolio\python>fetch_and_save.py (Collect data)
+db: https://cloud.mongodb.com/v2/6880a58e84914d6c2cde2cce#/metrics/replicaSet/6880b8cef3dc6e1b9d8ca638/explorer/books_portfolio/chapters/find
+
+
+cd "C:\Users\Cedric\Documents\Project2025"
+mkdir books-portfolio
+cd books-portfolio
+npm create vite@latest client -- --template react
+cd client
+npm install
+npm run dev  # ✅ Your React frontend should now be running
+
+
+npm install -D tailwindcss@latest postcss autoprefixer
+
+[External API] 
+   ↓ Python script (fetch & transform)
+   ↓ Push to MongoDB Atlas (direct or via Node API)
+   ↓ Node.js Express backend (CRUD API)
+   ↓ React frontend (consume backend API)
+
+   cedricsusmerano-GgSFi15l4Dcdhz4S
+
+
+https://api.potterdb.com/v1/books
+
+   Add a connection IP address
+Your current IP address (136.158.66.152) has been added to enable local connectivity. Only an IP address you add to your Access List will be able to connect to your project's cluster
+

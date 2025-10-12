@@ -18,7 +18,8 @@ const Staff = () => {
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/staff", {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/staff`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
 

@@ -12,7 +12,7 @@ const Profile = () => {
   const handlePasswordUpdate = async () => {
     try {
       await axios.put(
-        "http://localhost:3000/api/users/update-password",
+        `${import.meta.env.VITE_API_URL}/api/users/update-password`,
         { password: newPassword },
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );

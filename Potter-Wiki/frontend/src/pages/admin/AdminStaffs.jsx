@@ -29,7 +29,7 @@ const AdminStaffs = () => {
   useEffect(() => {
     const fetchStaffs = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/staff", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setStaffs(res.data);
@@ -77,7 +77,7 @@ const AdminStaffs = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3000/api/staff", newStaffs, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/staff", newStaffs, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = [...staff, res.data];

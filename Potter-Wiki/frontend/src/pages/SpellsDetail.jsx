@@ -16,7 +16,8 @@ const SpellsDetail = () => {
   useEffect(() => {
     const fetchSpells = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/spells", {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/spells`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
         setSpells(res.data);

@@ -20,22 +20,30 @@ const AdminDashboard = () => {
     role: "",
   });
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const adminRes = await axios.get("http://localhost:3000/api/admins", {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
+        const adminRes = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/admins`,
+          {
+            headers: { Authorization: `Bearer ${user?.token}` },
+          }
+        );
 
         let superRes = { data: [] };
         try {
-          superRes = await axios.get("http://localhost:3000/api/admins/super", {
-            headers: { Authorization: `Bearer ${user?.token}` },
-          });
+          superRes = await axios.get(
+            `${import.meta.env.VITE_API_URL}/api/admins/super`,
+            {
+              headers: { Authorization: `Bearer ${user?.token}` },
+            }
+          );
         } catch (superErr) {
-          console.warn("Super admins fetch failed:", superErr.response?.data || superErr.message);
+          console.warn(
+            "Super admins fetch failed:",
+            superErr.response?.data || superErr.message
+          );
         }
-
         const combined = [...adminRes.data, ...superRes.data];
         const uniqueAdmins = Array.from(new Map(combined.map(a => [a._id, a])).values());
         setAdmins(uniqueAdmins);
@@ -61,8 +69,8 @@ const AdminDashboard = () => {
 
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:3000/api/admins/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admins/${id}`, {
+        headers: { Authorization: `Bearer ${user?.token}` },
       });
       setAdmins((prev) => prev.filter((admin) => admin._id !== id));
       alert("Admin deleted successfully!");
@@ -81,7 +89,7 @@ const AdminDashboard = () => {
   const handleUpdate = async (id) => {
     try {
       setLoading(true);
-      await axios.put(`http://localhost:3000/api/admins/${id}`, editForm, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/admins/${id}`, editForm, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = admins.map((admin) =>

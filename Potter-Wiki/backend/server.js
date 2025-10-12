@@ -46,6 +46,12 @@ app.use("/api/admins", adminRoutes);
 //app.use("/api/public", publicRoutes);
 app.use("/api/register", publicRoutes); // you only need this once!
 
-// ✅ Start server
+// Start server prod
+const cors = require('cors');
+app.use(cors({
+  origin: process.env.FRONTEND_URL, // from .env
+  credentials: true,
+}));
+// ✅ Start server local
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

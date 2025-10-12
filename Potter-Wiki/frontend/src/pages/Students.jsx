@@ -17,7 +17,8 @@ const Students = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/students", {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/students`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
 

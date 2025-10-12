@@ -48,10 +48,10 @@ app.get("/", (req, res) => {
 
 // ✅ API routes
 app.use("/api/auth", authRoutes);
-app.use("/api/characters", characterRoutes);
-app.use("/api/spells", spellRoutes);
-app.use("/api/students", studentRoutes);
-app.use("/api/staff", staffRoutes);
+app.use("/api/public/characters", characterRoutes);
+app.use("/api/public/spells", spellRoutes);
+app.use("/api/public/students", studentRoutes);
+app.use("/api//public/staff", staffRoutes);
 app.use("/api/admins", adminRoutes);
 app.use("/api/public", publicRoutes);
 

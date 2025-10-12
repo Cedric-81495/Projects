@@ -43,7 +43,7 @@ app.use("/api/spells", spellRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/admins", adminRoutes);
-app.use("/api/public", publicRoutes);
+//app.use("/api/public", publicRoutes);
 app.use("/api/register", publicRoutes); // you only need this once!
 
 // ✅ Start server

@@ -63,7 +63,7 @@ const AdminSpells = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/spells/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/public/spells/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = spells.filter((char) => char._id !== id);

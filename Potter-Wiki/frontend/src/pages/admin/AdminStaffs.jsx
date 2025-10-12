@@ -104,7 +104,7 @@ const AdminStaffs = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/staff/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/public/staff/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = staff.filter((char) => char._id !== id);

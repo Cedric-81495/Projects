@@ -76,7 +76,7 @@ const AdminStudents = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/students", newStudents, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/public/students`, newStudents, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = [...students, res.data];

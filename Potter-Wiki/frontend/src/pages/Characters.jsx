@@ -15,7 +15,7 @@ const Characters = () => {
   useEffect(() => {
     const fetchCharacters = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/characters`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/public/characters`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
         setCharacters(res.data);

@@ -14,14 +14,14 @@ const importData = async () => {
     await connectDB();
 
     // --- Characters ---
-    //const { data: characters } = await axios.get("https://hp-api.onrender.com/api/characters");
-    //await Character.deleteMany();
-    //const insertedCharacters = await Character.insertMany(characters);
+    const { data: characters } = await axios.get("https://hp-api.onrender.com/api/characters");
+    await Character.deleteMany();
+    const insertedCharacters = await Character.insertMany(characters);
 
-    // --- Spells ---
-    //const { data: spells } = await axios.get("https://hp-api.onrender.com/api/spells");
-    //await Spell.deleteMany();
-    //const insertedSpells = await Spell.insertMany(spells);
+     --- Spells ---
+    const { data: spells } = await axios.get("https://hp-api.onrender.com/api/spells");
+    await Spell.deleteMany();
+    const insertedSpells = await Spell.insertMany(spells);
 
     // --- Students ---
     const { data: students } = await axios.get("https://hp-api.onrender.com/api/characters/students");
@@ -29,15 +29,15 @@ const importData = async () => {
     const insertedStudents = await Student.insertMany(students);
 
     // --- Staff ---
-    //const { data: staff } = await axios.get("https://hp-api.onrender.com/api/characters/staff");
-    //await Staff.deleteMany();
-    //const insertedStaff = await Staff.insertMany(staff);
+    const { data: staff } = await axios.get("https://hp-api.onrender.com/api/characters/staff");
+    await Staff.deleteMany();
+    const insertedStaff = await Staff.insertMany(staff);
 
     console.log("✅ Data Imported!");
-    //console.log(`📚 Characters: ${insertedCharacters.length}`);
-    //console.log(`✨ Spells: ${insertedSpells.length}`);
+    console.log(`📚 Characters: ${insertedCharacters.length}`);
+    console.log(`✨ Spells: ${insertedSpells.length}`);
     console.log(`🎓 Students: ${insertedStudents.length}`);
-    //console.log(`🏫 Staff: ${insertedStaff.length}`);
+    console.log(`🏫 Staff: ${insertedStaff.length}`);
 
     process.exit();
   } catch (err) {

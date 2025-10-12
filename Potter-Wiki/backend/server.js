@@ -43,15 +43,10 @@ app.use("/api/spells", spellRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/admins", adminRoutes);
-//app.use("/api/public", publicRoutes);
+app.use("/api/public", publicRoutes);
 app.use("/api/register", publicRoutes); // you only need this once!
 
-// Start server prod
-const cors = require('cors');
-app.use(cors({
-  origin: process.env.FRONTEND_URL, // from .env
-  credentials: true,
-}));
+
 // ✅ Start server local
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

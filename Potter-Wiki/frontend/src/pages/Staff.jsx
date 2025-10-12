@@ -19,7 +19,7 @@ const Staff = () => {
     const fetchStaff = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/staff`, {
+          `${import.meta.env.VITE_API_URL}/api/public/staff`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
 

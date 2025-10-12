@@ -19,7 +19,7 @@ const AdminCharacters = () => {
   useEffect(() => {
     const fetchCharacters = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/characters`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/public/characters`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setCharacters(res.data);
@@ -53,7 +53,7 @@ const AdminCharacters = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/characters", newCharacter, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/public/characters", newCharacter, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = [...characters, res.data];

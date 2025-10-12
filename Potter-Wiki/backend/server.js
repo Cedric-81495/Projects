@@ -3,6 +3,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+
+// Routes
 import authRoutes from "./routes/authRoutes.js";
 import characterRoutes from "./routes/characterRoutes.js";
 import spellRoutes from "./routes/spellRoutes.js";
@@ -15,9 +17,26 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors());
+
+// ✅ Proper CORS configuration
+app.use(
+  cors({
+    origin: [
+      process.env.FRONTEND_URL || "http://localhost:5173", // allow local dev
+      "https://hpotter-wiki.vercel.app",                   // your Vercel domain
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
+// ✅ Optional: simple test route for Render health check
+app.get("/", (req, res) => {
+  res.send("✅ Potter Wiki Backend is running...");
+});
+
+// ✅ Your API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
 app.use("/api/spells", spellRoutes);
@@ -25,10 +44,8 @@ app.use("/api/students", studentRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/admins", adminRoutes);
 app.use("/api/public", publicRoutes);
-app.use("/api/register", publicRoutes);
-app.use("/api/register", publicRoutes);
+app.use("/api/register", publicRoutes); // you only need this once!
 
-
+// ✅ Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-

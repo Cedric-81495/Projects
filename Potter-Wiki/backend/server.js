@@ -23,7 +23,7 @@ app.use(
   cors({
     origin: [
       process.env.FRONTEND_URL || "http://localhost:5173", // allow local dev
-      "https://hpotter-wiki.vercel.app",                   // your Vercel domain
+      "https://potter-wiki-pedia.vercel.app",                   // your Vercel domain
     ],
     credentials: true,
   })

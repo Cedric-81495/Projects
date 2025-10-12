@@ -1,0 +1,11 @@
+# Ignore the Spotify project folder
+Spotify-project/
+
+# Ignore all node_modules folders anywhere in the repo
+**/node_modules/
+
+# Ignore all .env files
+**/*.env
+
+# Ignore all .txt files
+**/*.txt

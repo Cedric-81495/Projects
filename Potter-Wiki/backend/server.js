@@ -18,25 +18,35 @@ connectDB();
 
 const app = express();
 
-// ✅ Proper CORS configuration
-app.use(
-  cors({
-    origin: [
-      process.env.FRONTEND_URL || "http://localhost:5173", // allow local dev
-      "https://potter-wiki-pedia.vercel.app",                   // your Vercel domain
-    ],
-    credentials: true,
-  })
-);
+// ✅ Robust CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:5173",
+  "https://potter-wiki-pedia.vercel.app"
+];
 
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
+
+// ✅ Handle preflight requests globally
+app.options("*", cors());
+
+// ✅ Parse incoming JSON
 app.use(express.json());
 
-// ✅ Optional: simple test route for Render health check
+// ✅ Health check route
 app.get("/", (req, res) => {
   res.send("✅ Potter Wiki Backend is running...");
 });
 
-// ✅ Your API routes
+// ✅ API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
 app.use("/api/spells", spellRoutes);
@@ -44,9 +54,10 @@ app.use("/api/students", studentRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/admins", adminRoutes);
 app.use("/api/public", publicRoutes);
-app.use("/api/register", publicRoutes); // you only need this once!
 
+// ❌ Duplicate route removed
+// app.use("/api/register", publicRoutes); // Already covered by /api/public
 
-// ✅ Start server local
+// ✅ Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

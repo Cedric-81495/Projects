@@ -1,0 +1,42 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather&display=swap');
+
+/* Tailwind layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global font style */
+body {
+  @apply font-serif bg-[#121212] text-white;
+}
+
+/* Headings */
+h1, h2, h3, h4 {
+  @apply font-bold text-spotify-green;
+}
+
+/* Links */
+a {
+  @apply transition-colors duration-200;
+}
+a:hover {
+  @apply text-spotify-green;
+}
+
+/* Buttons */
+button {
+  @apply transition-colors duration-200;
+}
+button:hover {
+  @apply opacity-90;
+}
+
+/* Utility overrides */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #1DB954;
+  border-radius: 4px;
+}

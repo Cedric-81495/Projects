@@ -17,7 +17,7 @@ const AdminSpells = () => {
   useEffect(() => {
     const fetchSpells = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/public/spells`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/spells`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setSpells(res.data);
@@ -49,7 +49,7 @@ const AdminSpells = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/public/spells`, newSpells, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/spells`, newSpells, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = [...spells, res.data];
@@ -63,7 +63,7 @@ const AdminSpells = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/public/spells/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/spells/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = spells.filter((char) => char._id !== id);

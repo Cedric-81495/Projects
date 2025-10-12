@@ -15,8 +15,8 @@ const StudentsDetail = () => {
     const fetchData = async () => {
       try {
         const [studentRes, allRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL}/api/public/students/${id}`),
-          axios.get(`${import.meta.env.VITE_API_URL}/api/public/students`)
+          axios.get(`${import.meta.env.VITE_API_URL}/api/students/${id}`),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/students`)
         ]);
         setStudent(studentRes.data);
         setAllStudents(Array.isArray(allRes.data?.students) ? allRes.data.students : []);

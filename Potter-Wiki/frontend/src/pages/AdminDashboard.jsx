@@ -24,7 +24,7 @@ const AdminDashboard = () => {
     const fetchAdmins = async () => {
       try {
         const adminRes = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/public/admins`,
+          `${import.meta.env.VITE_API_URL}/api/admins`,
           {
             headers: { Authorization: `Bearer ${user?.token}` },
           }
@@ -33,7 +33,7 @@ const AdminDashboard = () => {
         let superRes = { data: [] };
         try {
           superRes = await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/public/admins/super`,
+            `${import.meta.env.VITE_API_URL}/api/admins/super`,
             {
               headers: { Authorization: `Bearer ${user?.token}` },
             }
@@ -69,7 +69,7 @@ const AdminDashboard = () => {
 
     try {
       setLoading(true);
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/public/admins/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admins/${id}`, {
         headers: { Authorization: `Bearer ${user?.token}` },
       });
       setAdmins((prev) => prev.filter((admin) => admin._id !== id));
@@ -89,7 +89,7 @@ const AdminDashboard = () => {
   const handleUpdate = async (id) => {
     try {
       setLoading(true);
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/public/admins/${id}`, editForm, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/admins/${id}`, editForm, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = admins.map((admin) =>

@@ -76,7 +76,7 @@ const AdminStudents = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/public/students`, newStudents, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/students`, newStudents, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = [...students, res.data];
@@ -103,7 +103,7 @@ const AdminStudents = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/public/students/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/students/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = students.filter((char) => char._id !== id);

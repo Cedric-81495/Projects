@@ -19,7 +19,6 @@ const Characters = () => {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
         setCharacters(res.data);
-        console.log("DOB:", typeof res.dateOfBirth);
       } catch (err) {
         console.error("Failed to fetch characters:", err);
       } finally {
@@ -35,9 +34,9 @@ const Characters = () => {
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // 👇 Scroll to top of page when search yields no results
+  // Scroll to top when no results found
   useEffect(() => {
-    if (filteredCharacters.length === 0) {
+    if (filteredCharacters.length === 0 && searchTerm.trim() !== "") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [searchTerm, filteredCharacters.length]);
@@ -54,10 +53,10 @@ const Characters = () => {
         />
 
         {/* Results */}
-        {filteredCharacters.length === 0 ? (
+        {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (
           <div className="pt-6">
             <p className="text-center text-gray-500 text-sm sm:text-base">
-              
+              No results found for{" "}
               <span className="font-semibold">"{searchTerm}"</span>.
             </p>
           </div>
@@ -65,10 +64,7 @@ const Characters = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 hover:shadow-xl transition-shadow duration-200">
             {filteredCharacters.map((char) => (
               <Link key={char._id} to={`/characters/${char._id}`}>
-                <Card
-                  title={char.name}
-                  description={char.description}
-                />
+                <Card title={char.name} description={char.description} />
               </Link>
             ))}
           </div>

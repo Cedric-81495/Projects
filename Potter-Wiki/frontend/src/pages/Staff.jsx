@@ -9,7 +9,6 @@ import { Link } from "react-router-dom";
 const Staff = () => {
   const [staff, setStaff] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [error] = useState(null);
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +30,6 @@ const Staff = () => {
         setStaff(data);
       } catch (err) {
         console.error("Fetch error:", err);
-        // setError("Failed to load staff.");
       } finally {
         setLoading(false);
       }
@@ -54,7 +52,7 @@ const Staff = () => {
   }, [searchTerm,  filteredStaff.length]);
 
   return (
-     <PageWrapper loading={loading}>
+      <PageWrapper loading={loading}>
       <div className="p-2">
         {/* Search Bar */}
         <SearchBar
@@ -66,7 +64,7 @@ const Staff = () => {
 
         {/* Results */}
         {!loading && filteredStaff.length === 0 && searchTerm.trim() !== "" ? (
-          <div className="pt-6">
+          <div ref={resultsRef} className="mt-4">
             <p className="text-center text-gray-500 text-sm sm:text-base">
               No results found for{" "}
               <span className="font-semibold">"{searchTerm}"</span>.

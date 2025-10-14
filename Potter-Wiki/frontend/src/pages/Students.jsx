@@ -9,7 +9,6 @@ import SearchBar from "./SearchBar"; // Adjusted path if needed
 const Students = () => {
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [error] = useState(null);
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 

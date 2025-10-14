@@ -42,7 +42,7 @@ const Characters = () => {
   }, [searchTerm, filteredCharacters.length]);
 
   return (
-    <PageWrapper loading={loading}>
+  <PageWrapper loading={loading}>
       <div className="p-2">
         {/* Search Bar */}
         <SearchBar
@@ -53,8 +53,8 @@ const Characters = () => {
         />
 
         {/* Results */}
-        {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (
-          <div className="pt-6">
+        {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
+          <div ref={resultsRef} className="mt-4">
             <p className="text-center text-gray-500 text-sm sm:text-base">
               No results found for{" "}
               <span className="font-semibold">"{searchTerm}"</span>.

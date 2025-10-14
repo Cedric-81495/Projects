@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 const Staff = () => {
   const [staff, setStaff] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const resultsRef = useState(null);
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 

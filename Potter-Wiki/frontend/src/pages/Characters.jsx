@@ -53,8 +53,8 @@ const Characters = () => {
         />
 
         {/* Results */}
-        {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
-          <div ref={resultsRef} className="mt-4">
+        {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (
+          <div className="mt-4">
             <p className="text-center text-gray-500 text-sm sm:text-base">
               No results found for{" "}
               <span className="font-semibold">"{searchTerm}"</span>.

@@ -11,7 +11,7 @@ const Spells = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-  const resultsRef = useRef(null); // 👈 Scroll target
+  const resultsRef = useRef(null);
 
   useEffect(() => {
     const fetchSpells = async () => {

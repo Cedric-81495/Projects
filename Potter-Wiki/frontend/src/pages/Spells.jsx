@@ -45,31 +45,31 @@ useEffect(() => {
   return (
     <PageWrapper loading={loading}>
       <div className="p-2">
+        {/* Search Bar */}
         <SearchBar
           label="Search"
-          placeholder="Type a spell name..."
+          placeholder="Type a character name..."
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
 
-        <div ref={resultsRef} className="mt-4">
-          {filteredSpells.length === 0 ? (
-            <div className="pt-6">
-              <p className="text-center text-gray-500 text-sm sm:text-base">
-                No results found for{" "}
-                <span className="font-semibold">"{searchTerm}"</span>.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredSpells.map((spell) => (
-                <Link key={spell._id} to={`/spells/${spell._id}`}>
-                  <Card title={spell.name} description={spell.effect} />
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Results */}
+        {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
+          <div className="pt-6">
+            <p className="text-center text-gray-500 text-sm sm:text-base">
+              No results found for{" "}
+              <span className="font-semibold">"{searchTerm}"</span>.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 hover:shadow-xl transition-shadow duration-200">
+            {filteredSpells.map((char) => (
+              <Link key={char._id} to={`/characters/${char._id}`}>
+                <Card title={char.name} description={char.description} />
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </PageWrapper>
   );

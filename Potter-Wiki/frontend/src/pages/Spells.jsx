@@ -55,7 +55,7 @@ useEffect(() => {
 
         {/* Results */}
         {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
-          <div className="pt-6">
+          <div ref={resultsRef} className="mt-4">
             <p className="text-center text-gray-500 text-sm sm:text-base">
               No results found for{" "}
               <span className="font-semibold">"{searchTerm}"</span>.

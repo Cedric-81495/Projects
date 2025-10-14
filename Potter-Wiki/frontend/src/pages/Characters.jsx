@@ -57,7 +57,7 @@ const Characters = () => {
         {filteredCharacters.length === 0 ? (
           <div className="pt-6">
             <p className="text-center text-gray-500 text-sm sm:text-base">
-              No results found for{" "}
+              
               <span className="font-semibold">"{searchTerm}"</span>.
             </p>
           </div>

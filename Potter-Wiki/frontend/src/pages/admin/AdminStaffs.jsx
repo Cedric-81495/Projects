@@ -5,25 +5,27 @@ import { AuthContext } from "../../context/AuthContext";
 
 const AdminStaffs = () => {
   const { user } = useContext(AuthContext);
-  const [staff, setStaffs] = useState([]);
+  const [staffs, setStaffs] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [newStaffs, setNewStaffs] = useState({
-        name: "",
-        species: "",
-        gender: "",
-        house: "",
-        dateOfBirth: "",
-        yearOfBirth: "",
-        ancestry: "",
-        eyeColour: "",
-        hairColour: "",
-        patronus: "",
-        hogwartsStaff: "",
-        actor: "",
-        alive: "",
-        image: "",
+  const [editingId, setEditingId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [newStaff, setNewStaff] = useState({
+    name: "",
+    species: "",
+    gender: "",
+    house: "",
+    dateOfBirth: "",
+    yearOfBirth: "",
+    ancestry: "",
+    eyeColour: "",
+    hairColour: "",
+    patronus: "",
+    hogwartsStaff: "",
+    actor: "",
+    alive: "",
+    image: "",
   });
 
   useEffect(() => {
@@ -43,62 +45,90 @@ const AdminStaffs = () => {
     fetchStaffs();
   }, [user]);
 
-    useEffect(() => {
-      if (!Array.isArray(staff)) return;
-      const lower = searchTerm.toLowerCase();
-      setFiltered(
-        staff.filter((c) =>
-          [
-            c.name,
-            c.species,
-            c.gender,
-            c.house,
-            c.dateOfBirth,
-            c.yearOfBirth,
-            c.ancestry,
-            c.eyeColour,
-            c.hairColour,
-            c.patronus,
-            c.hogwartsStaff,
-            c.actor,
-            c.alive,
-            c.image,
-            String(c.alive),
-          ]
-            .some((field) => String(field || "").toLowerCase().includes(lower))
-        )
-      );
-    }, [searchTerm, staff]);
+  useEffect(() => {
+    const lower = searchTerm.toLowerCase();
+    setFiltered(
+      staffs.filter((c) =>
+        Object.values(c)
+          .map((v) => String(v || "").toLowerCase())
+          .some((v) => v.includes(lower))
+      )
+    );
+  }, [searchTerm, staffs]);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const handleChange = (e) => {
-    setNewStaffs({ ...newStaffs, [e.target.name]: e.target.value });
+    setNewStaff({ ...newStaff, [e.target.name]: e.target.value });
   };
 
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/staff`, newStaffs, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/staff`, newStaff, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      const updated = [...staff, res.data];
+      const updated = [...staffs, res.data];
       setStaffs(updated);
       setFiltered(updated);
-      setNewStaffs({  name: "",
-                      species: "",
-                      gender: "",
-                      house: "",
-                      dateOfBirth: "",
-                      yearOfBirth: "",
-                      ancestry: "",
-                      eyeColour: "",
-                      hairColour: "",
-                      patronus: "",
-                      hogwartsStaff: "",
-                      actor: "",
-                      alive: "",
-                      image: ""});
+      setNewStaff({
+        name: "",
+        species: "",
+        gender: "",
+        house: "",
+        dateOfBirth: "",
+        yearOfBirth: "",
+        ancestry: "",
+        eyeColour: "",
+        hairColour: "",
+        patronus: "",
+        hogwartsStaff: "",
+        actor: "",
+        alive: "",
+        image: "",
+      });
+      setSuccessMessage("Staff added successfully!");
     } catch (err) {
       console.error("Error adding staff:", err);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/staff/${editingId}`, newStaff, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const updated = staffs.map((s) =>
+        s._id === editingId ? { ...s, ...newStaff } : s
+      );
+      setStaffs(updated);
+      setFiltered(updated);
+      setEditingId(null);
+      setNewStaff({
+        name: "",
+        species: "",
+        gender: "",
+        house: "",
+        dateOfBirth: "",
+        yearOfBirth: "",
+        ancestry: "",
+        eyeColour: "",
+        hairColour: "",
+        patronus: "",
+        hogwartsStaff: "",
+        actor: "",
+        alive: "",
+        image: "",
+      });
+      setSuccessMessage("Staff updated successfully!");
+    } catch (err) {
+      console.error("Error updating staff:", err);
     }
   };
 
@@ -107,49 +137,94 @@ const AdminStaffs = () => {
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/staff/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      const updated = staff.filter((char) => char._id !== id);
+      const updated = staffs.filter((s) => s._id !== id);
       setStaffs(updated);
       setFiltered(updated);
+      setSuccessMessage("Staff deleted successfully!");
     } catch (err) {
       console.error("Error deleting staff:", err);
     }
   };
 
+  const displayValue = (value) =>
+    value?.trim()
+      ? value.trim().charAt(0).toUpperCase() + value.trim().slice(1)
+      : "No data found";
+
+  const displayBoolean = (value) => (value === true ? "Yes" : "No");
+
   return (
     <section className="bg-[#251c5a] p-4 rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold mb-4">Add New Staffs</h3>
-      <form onSubmit={handleAdd} className="grid grid-cols-2 gap-4 mb-6">
-          {["name",
-            "species",
-            "gender",
-            "house",
-            "dateOfBirth",
-            "yearOfBirth",
-            "ancestry",
-            "eyeColour",
-            "hairColour",
-            "patronus",
-            "hogwartsStaff",
-            "actor",
-            "alive",
-            "image"].map((field) => (
+      <h3 className="text-xl font-semibold mb-4">
+        {editingId ? "Edit Staff" : "Add New Staff"}
+      </h3>
+
+      {successMessage && (
+        <div className="mb-4 bg-green-600 text-white px-4 py-2 rounded text-center shadow-md">
+          {successMessage}
+        </div>
+      )}
+
+      <form
+        onSubmit={editingId ? handleUpdate : handleAdd}
+        className="grid grid-cols-2 gap-4 mb-6"
+      >
+        {Object.keys(newStaff).map((field) => (
           <input
             key={field}
             type="text"
             name={field}
             placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            value={newStaffs[field]}
+            value={newStaff[field]}
             onChange={handleChange}
             className="p-2 rounded bg-[#2d246e] text-white"
           />
         ))}
-        <button type="submit" className="col-span-2 bg-green-500 hover:bg-green-600 text-white py-2 rounded">
-          Add Staffs
-        </button>
+
+        <div className="col-span-2 flex gap-3">
+          <button
+            type="submit"
+            className={`${
+              editingId
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-green-500 hover:bg-green-600"
+            } text-white py-2 px-4 rounded`}
+          >
+            {editingId ? "Update Staff" : "Add Staff"}
+          </button>
+
+          {editingId && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+                setNewStaff({
+                  name: "",
+                  species: "",
+                  gender: "",
+                  house: "",
+                  dateOfBirth: "",
+                  yearOfBirth: "",
+                  ancestry: "",
+                  eyeColour: "",
+                  hairColour: "",
+                  patronus: "",
+                  hogwartsStaff: "",
+                  actor: "",
+                  alive: "",
+                  image: "",
+                });
+              }}
+              className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Staffs Records</h3>
+        <h3 className="text-xl font-semibold">Staff Records</h3>
         <input
           type="text"
           placeholder="Search staff..."
@@ -166,22 +241,9 @@ const AdminStaffs = () => {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-[#2d246e] z-10">
               <tr>
-                {["name",
-                  "species",
-                  "gender",
-                  "house",
-                  "dateOfBirth",
-                  "yearOfBirth",
-                  "ancestry",
-                  "eyeColour",
-                  "hairColour",
-                  "patronus",
-                  "hogwartsStaff",
-                  "actor",
-                  "alive",
-                  "image"].map((header) => (
+                {[...Object.keys(newStaff), "actions"].map((header) => (
                   <th key={header} className="p-3 border-b border-gray-600">
-                    {header}
+                    {displayValue(header)}
                   </th>
                 ))}
               </tr>
@@ -189,24 +251,34 @@ const AdminStaffs = () => {
             <tbody>
               {filtered.length > 0 ? (
                 filtered.map((char) => (
-                  <tr key={char._id} className="border-b border-gray-700 hover:bg-[#332b73] transition">
-                    <td className="p-3">{char.name}</td>
-                    <td className="p-3">{char.species}</td>
-                    <td className="p-3">{char.gender}</td>
-                    <td className="p-3">{char.house}</td>
-                    <td className="p-3">{char.dateOfBirth}</td>
-                    <td className="p-3">{char.yearOfBirth}</td>
-                    <td className="p-3">{char.ancestry}</td>
-                    <td className="p-3">{char.eyeColour}</td>
-                    <td className="p-3">{char.hairColour}</td>
-                    <td className="p-3">{char.patronus}</td>
-                    <td className="p-3">{char.hogwartsStaff}</td>
-                    <td className="p-3">{char.actor}</td>
-                    <td className="p-3">{char.alive}</td>
-                    <td className="p-3">{char.image}</td>
+                  <tr
+                    key={char._id}
+                    className="border-b border-gray-700 hover:bg-[#332b73] transition cursor-pointer"
+                    onClick={() => {
+                      setEditingId(char._id);
+                      setNewStaff({ ...char });
+                    }}
+                  >
+                    <td className="p-3">{displayValue(char.name)}</td>
+                    <td className="p-3">{displayValue(char.species)}</td>
+                    <td className="p-3">{displayValue(char.gender)}</td>
+                    <td className="p-3">{displayValue(char.house)}</td>
+                    <td className="p-3">{char.dateOfBirth || "No data found"}</td>
+                    <td className="p-3">{char.yearOfBirth || "No data found"}</td>
+                      <td className="p-3">{displayValue(char.ancestry)}</td>
+                    <td className="p-3">{displayValue(char.eyeColour)}</td>
+                    <td className="p-3">{displayValue(char.hairColour)}</td>
+                    <td className="p-3">{displayValue(char.patronus)}</td>
+                    <td className="p-3">{displayBoolean(char.hogwartsStaff)}</td>
+                    <td className="p-3">{displayValue(char.actor)}</td>
+                    <td className="p-3">{displayBoolean(char.alive)}</td>
+                    <td className="p-3">{char.image?.trim() || "No data found"}</td>
                     <td className="p-3">
                       <button
-                        onClick={() => handleDelete(char._id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(char._id);
+                        }}
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
                       >
                         Delete
@@ -216,8 +288,8 @@ const AdminStaffs = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="p-4 text-center text-gray-400">
-                    No Staffs found.
+                  <td colSpan={Object.keys(newStaff).length + 1} className="p-4 text-center text-gray-400">
+                    No staff found.
                   </td>
                 </tr>
               )}

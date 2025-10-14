@@ -1,10 +1,8 @@
-// File: backend/server.js
+// backend/server.js
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
-
-// Routes
 import authRoutes from "./routes/authRoutes.js";
 import characterRoutes from "./routes/characterRoutes.js";
 import spellRoutes from "./routes/spellRoutes.js";
@@ -12,6 +10,7 @@ import studentRoutes from "./routes/studentRoutes.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
+import registerRoutes from "./routes/registerRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -21,6 +20,7 @@ const app = express();
 // ✅ Robust CORS configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL || "http://localhost:5173",
+  "http://localhost:5173",
   "https://potter-wiki-pedia.vercel.app"
 ];
 
@@ -29,6 +29,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.error("❌ Blocked by CORS:", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
@@ -36,7 +37,11 @@ app.use(cors({
 }));
 
 // ✅ Handle preflight requests globally
-app.options("*", cors());
+//app.options("*", cors());
+//app.options("/*", cors());
+app.options(/.*/, cors());
+
+
 
 // ✅ Parse incoming JSON
 app.use(express.json());
@@ -46,17 +51,17 @@ app.get("/", (req, res) => {
   res.send("✅ Potter Wiki Backend is running...");
 });
 
-// ✅ API routes
+
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
 app.use("/api/spells", spellRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/staff", staffRoutes);
-app.use("/api/admins", adminRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api/register", registerRoutes);
+app.use("/api/admin", adminRoutes);
 
-// ❌ Duplicate route removed
-// app.use("/api/register", publicRoutes); // Already covered by /api/public
+
 
 // ✅ Start server
 const PORT = process.env.PORT || 3000;

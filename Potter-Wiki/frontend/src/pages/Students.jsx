@@ -1,11 +1,10 @@
-// frotend/src/pages/Students.jsx
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
 import { Link } from "react-router-dom";
-import SearchBar from "../pages/SearchBar";
+import SearchBar from "./SearchBar"; // Adjusted path if needed
 
 const Students = () => {
   const [students, setStudents] = useState([]);
@@ -17,14 +16,12 @@ const Students = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/students`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/students`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
 
         console.log("API response:", res.data);
 
-        // Ensure students is always an array
         const data = Array.isArray(res.data?.students)
           ? res.data.students
           : Array.isArray(res.data)
@@ -43,39 +40,52 @@ const Students = () => {
     fetchStudents();
   }, [user]);
 
+  const filteredStudents = students
+    .filter((student) =>
+      student.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // 👇 Scroll to top of page when search yields no results
+  useEffect(() => {
+    if (filteredStudents.length === 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [searchTerm, filteredStudents.length]);
+
   return (
     <PageWrapper loading={loading}>
       <div className="p-2">
         {/* Search Bar */}
         <SearchBar
-            label="Search"
-            placeholder="Type a student name..."
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
+          label="Search"
+          placeholder="Type a student name..."
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
         />
 
         {/* Error Message */}
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
-        {/* Student Cards */}
-        {students.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {students
-              .filter((student) =>
-                student.name.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((student) => (
-                <Link to={`/students/${student._id}`} key={student._id}>
-                  <Card
-                    title={student.name}
-                    description={`House: ${student.house || "Unknown"}`}
-                  />
-                </Link>
-              ))}
+        {/* Results */}
+        {filteredStudents.length === 0 ? (
+          <div className="pt-6">
+            <p className="text-center text-gray-500 text-sm sm:text-base">
+              No results found for{" "}
+              <span className="font-semibold">"{searchTerm}"</span>.
+            </p>
           </div>
         ) : (
-          <p className="text-gray-600">No students found.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+            {filteredStudents.map((student) => (
+              <Link to={`/students/${student._id}`} key={student._id}>
+                <Card
+                  title={student.name}
+                  description={`House: ${student.house || "Unknown"}`}
+                />
+              </Link>
+            ))}
+          </div>
         )}
       </div>
     </PageWrapper>

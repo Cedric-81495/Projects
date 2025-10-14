@@ -18,7 +18,7 @@ const importData = async () => {
     await Character.deleteMany();
     const insertedCharacters = await Character.insertMany(characters);
 
-     --- Spells ---
+    // --- Spells ---
     const { data: spells } = await axios.get("https://hp-api.onrender.com/api/spells");
     await Spell.deleteMany();
     const insertedSpells = await Spell.insertMany(spells);

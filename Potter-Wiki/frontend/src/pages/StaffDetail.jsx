@@ -16,8 +16,7 @@ const StaffDetail = () => {
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/staff`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
         setStaffList(res.data);

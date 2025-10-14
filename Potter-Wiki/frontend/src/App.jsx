@@ -30,6 +30,7 @@ const App = () => {
       location.pathname.startsWith("/spells/") ||
       location.pathname.startsWith("/students/") ||
       location.pathname.startsWith("/staff/") ||
+      location.pathname.startsWith("/dashboard") ||
       ["/login", "/register", "/profile", "/dashboard"].includes(location.pathname);
 
     // Hide Footer on login/register/home
@@ -60,11 +61,7 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
 
           {/* Admin dashboard routes */}
-          <Route path="/dashboard" element={<AdminDashboard />} />
-          <Route path="/dashboard/characters" element={<AdminDashboard />} />
-          <Route path="/dashboard/spells" element={<AdminDashboard />} />
-          <Route path="/dashboard/students" element={<AdminDashboard />} />
-          <Route path="/dashboard/staff" element={<AdminDashboard />} />
+          <Route path="/dashboard/*" element={<AdminDashboard />} />
 
           {/* 404 Fallback */}
           <Route

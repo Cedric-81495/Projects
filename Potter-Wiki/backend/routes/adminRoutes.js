@@ -1,31 +1,65 @@
 // backend/routes/adminRoutes.js
 import express from "express";
+
 import {
-  getAdmins,
-  registerAdmin,
-  deleteAdminUser,
   createSuperAdmin,
+  createAdminBySuperUser,
+  updateAdminBySuperUser,
+  deleteAdminBySuperUser,
   updateAdminRole,
   updateAdminDetails,
-  getSuperAdmins,
-} from "../controllers/adminController.js";
+  deleteAdminUser,
+} from "../controllers/superAdminController.js";
 
 import { protect, admin, isSuperAdmin } from "../middleware/authMiddleware.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
-if (process.env.ALLOW_ADMINUSER_CREATION === "true") {
-  router.post("/register", protect, admin, registerAdmin);
-}
+// 🔸 SuperUser-only CRUD for adminUser accounts
+//
+router.post("/super-admins/admins", protect, isSuperAdmin, createAdminBySuperUser);
+router.put("/super-admins/admins/:id", protect, isSuperAdmin, updateAdminBySuperUser);
+router.delete("/super-admins/admins/:id", protect, isSuperAdmin, deleteAdminBySuperUser);
 
-if (process.env.ALLOW_SUPERUSER_CREATION === "true") {
-  router.post("/super", protect, isSuperAdmin, createSuperAdmin); // Create super admin
-  router.get("/super", getSuperAdmins); // Get super admins
-}
+//
+// 🔸 SuperUser-only logic for superUser accounts
+//
+router.post("/super", async (req, res, next) => {
+  try {
+    const superUserCount = await User.countDocuments({ role: "superUser" });
 
-router.get("/", protect, admin, getAdmins);
-router.put("/:id/role", protect, isSuperAdmin, updateAdminRole); // Update admin role
-router.put("/:id", protect, isSuperAdmin, updateAdminDetails);  // Update admin details
-router.delete("/:id", protect, isSuperAdmin, deleteAdminUser); // Delete any admin or super admin (superUser-only)
+    if (superUserCount > 0) {
+      return protect(req, res, () =>
+        isSuperAdmin(req, res, () => createSuperAdmin(req, res, next))
+      );
+    }
+
+    // No superUser exists yet — allow public creation
+    return createSuperAdmin(req, res, next);
+  } catch (err) {
+    console.error("Error checking superUser count:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ✅ Unified route for all admins (adminUser + superUser)
+router.get("/all", protect, admin, async (req, res) => {
+  try {
+    const users = await User.find({
+      role: { $in: ["adminUser", "superUser"] },
+    }).select("-password");
+
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Error fetching all admins:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/super", protect, isSuperAdmin);
+router.put("/super-admins/:id/role", protect, isSuperAdmin, updateAdminRole);
+router.put("/super-admins/:id", protect, isSuperAdmin, updateAdminDetails);
+router.delete("/super-admins/:id", protect, isSuperAdmin, deleteAdminUser);
 
 export default router;

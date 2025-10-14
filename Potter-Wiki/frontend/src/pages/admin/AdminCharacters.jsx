@@ -9,11 +9,18 @@ const AdminCharacters = () => {
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [editingId, setEditingId] = useState(null);
   const [newCharacter, setNewCharacter] = useState({
     name: "",
     species: "",
     gender: "",
     house: "",
+    dateOfBirth: "",
+    ancestry: "",
+    eyeColour: "",
+    hairColour: "",
+    patronus: "",
   });
 
   useEffect(() => {
@@ -46,22 +53,85 @@ const AdminCharacters = () => {
     );
   }, [searchTerm, characters]);
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const handleChange = (e) => {
     setNewCharacter({ ...newCharacter, [e.target.name]: e.target.value });
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr || !dateStr.includes("-")) return dateStr;
+
+    const [day, month, year] = dateStr.split("-");
+    const isoDate = `${year}-${month}-${day}`; // YYYY-MM-DD
+    const date = new Date(isoDate);
+
+    if (isNaN(date)) return dateStr; // fallback if invalid
+
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/characters`, newCharacter, {
+      const res = await axios.post("http://localhost:3000/api/characters", newCharacter, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = [...characters, res.data];
       setCharacters(updated);
       setFiltered(updated);
-      setNewCharacter({ name: "", species: "", gender: "", house: "" });
+      setNewCharacter({
+        name: "",
+        species: "",
+        gender: "",
+        house: "",
+        dateOfBirth: "",
+        ancestry: "",
+        eyeColour: "",
+        hairColour: "",
+        patronus: "",
+      });
+      setSuccessMessage("Character added successfully!");
     } catch (err) {
       console.error("Error adding character:", err);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/characters/${editingId}`, newCharacter, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const updated = characters.map((char) =>
+        char._id === editingId ? { ...char, ...newCharacter } : char
+      );
+      setCharacters(updated);
+      setFiltered(updated);
+      setEditingId(null);
+      setNewCharacter({
+        name: "",
+        species: "",
+        gender: "",
+        house: "",
+        dateOfBirth: "",
+        ancestry: "",
+        eyeColour: "",
+        hairColour: "",
+        patronus: "",
+      });
+      setSuccessMessage("Character updated successfully!");
+    } catch (err) {
+      console.error("Error updating character:", err);
     }
   };
 
@@ -73,6 +143,7 @@ const AdminCharacters = () => {
       const updated = characters.filter((char) => char._id !== id);
       setCharacters(updated);
       setFiltered(updated);
+      setSuccessMessage("Character deleted successfully!");
     } catch (err) {
       console.error("Error deleting character:", err);
     }
@@ -80,9 +151,31 @@ const AdminCharacters = () => {
 
   return (
     <section className="bg-[#251c5a] p-4 rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold mb-4">Add New Character</h3>
-      <form onSubmit={handleAdd} className="grid grid-cols-2 gap-4 mb-6">
-        {["name", "species", "gender", "house", "dateOfBirth", "ancestry", "eyeColour", "hairColour", "patronus"].map((field) => (
+      <h3 className="text-xl font-semibold mb-4">
+        {editingId ? "Edit Character" : "Add New Character"}
+      </h3>
+
+      {successMessage && (
+        <div className="mb-4 bg-green-600 text-white px-4 py-2 rounded text-center shadow-md">
+          {successMessage}
+        </div>
+      )}
+
+      <form
+        onSubmit={editingId ? handleUpdate : handleAdd}
+        className="grid grid-cols-2 gap-4 mb-6"
+      >
+        {[
+          "name",
+          "species",
+          "gender",
+          "house",
+          "dateOfBirth",
+          "ancestry",
+          "eyeColour",
+          "hairColour",
+          "patronus",
+        ].map((field) => (
           <input
             key={field}
             type="text"
@@ -93,9 +186,42 @@ const AdminCharacters = () => {
             className="p-2 rounded bg-[#2d246e] text-white"
           />
         ))}
-        <button type="submit" className="col-span-2 bg-green-500 hover:bg-green-600 text-white py-2 rounded">
-          Add Character
-        </button>
+
+        <div className="col-span-2 flex gap-3">
+          <button
+            type="submit"
+            className={`${
+              editingId
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-green-500 hover:bg-green-600"
+            } text-white py-2 px-4 rounded`}
+          >
+            {editingId ? "Update Character" : "Add Character"}
+          </button>
+
+          {editingId && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+                setNewCharacter({
+                  name: "",
+                  species: "",
+                  gender: "",
+                  house: "",
+                  dateOfBirth: "",
+                  ancestry: "",
+                  eyeColour: "",
+                  hairColour: "",
+                  patronus: "",
+                });
+              }}
+              className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
       <div className="flex justify-between items-center mb-4">
@@ -116,9 +242,20 @@ const AdminCharacters = () => {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-[#2d246e] z-10">
               <tr>
-                {["name", "species", "gender", "house", "dateOfBirth", "ancestry", "eyeColour", "hairColour", "patronus"].map((header) => (
+                {[
+                  "name",
+                  "species",
+                  "gender",
+                  "house",
+                  "dateOfBirth",
+                  "ancestry",
+                  "eyeColour",
+                  "hairColour",
+                  "patronus",
+                  "actions",
+                ].map((header) => (
                   <th key={header} className="p-3 border-b border-gray-600">
-                    {header}
+                    {header.charAt(0).toUpperCase() + header.slice(1)}
                   </th>
                 ))}
               </tr>
@@ -126,17 +263,68 @@ const AdminCharacters = () => {
             <tbody>
               {filtered.length > 0 ? (
                 filtered.map((char) => (
-                  <tr key={char._id} className="border-b border-gray-700 hover:bg-[#332b73] transition">
-                    <td className="p-3">{char.name}</td>
-                    <td className="p-3">{char.species}</td>
-                    <td className="p-3">{char.gender}</td>
-                    <td className="p-3">{char.house}</td>
-                     <td className="p-3">{char.dateOfBirth}</td>
-                    <td className="p-3">{char.ancestry}</td>
-                    <td className="p-3">{char.eyeColour}</td>
-                    <td className="p-3">{char.hairColour}</td>
-                    <td className="p-3">{char.patronus}</td>
+                  <tr
+                    key={char._id}
+                    className="border-b border-gray-700 hover:bg-[#332b73] transition cursor-pointer"
+                    onClick={() => {
+                      setEditingId(char._id);
+                      setNewCharacter({
+                        name: char.name,
+                        species: char.species,
+                        gender: char.gender,
+                        house: char.house,
+                        dateOfBirth: char.dateOfBirth,
+                        ancestry: char.ancestry,
+                        eyeColour: char.eyeColour,
+                        hairColour: char.hairColour,
+                        patronus: char.patronus,
+                      });
+                    }}
+                  >
                     <td className="p-3">
+                      {char.name?.trim()
+                        ? char.name.trim().charAt(0).toUpperCase() + char.name.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                    <td className="p-3">
+                      {char.species?.trim()
+                        ? char.species.trim().charAt(0).toUpperCase() + char.species.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                    <td className="p-3">
+                      {char.gender?.trim()
+                        ? char.gender.trim().charAt(0).toUpperCase() + char.gender.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                    <td className="p-3">
+                      {char.house?.trim()
+                        ? char.house.trim().charAt(0).toUpperCase() + char.house.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                    <td className="p-3">
+                      {char.dateOfBirth ? formatDate(char.dateOfBirth) : "No data found"}
+                    </td>
+                    <td className="p-3">
+                      {char.ancestry?.trim()
+                        ? char.ancestry.trim().charAt(0).toUpperCase() + char.ancestry.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                     <td className="p-3">
+                      {char.eyeColour?.trim()
+                        ? char.eyeColour.trim().charAt(0).toUpperCase() + char.eyeColour.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                     <td className="p-3">
+                      {char.hairColour?.trim()
+                        ? char.hairColour.trim().charAt(0).toUpperCase() + char.hairColour.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                    <td className="p-3">
+                      {char.patronus?.trim()
+                        ? char.patronus.trim().charAt(0).toUpperCase() + char.patronus.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                     <td className="p-3">
                       <button
                         onClick={() => handleDelete(char._id)}
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"

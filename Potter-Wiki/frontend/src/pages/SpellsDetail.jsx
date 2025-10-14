@@ -16,14 +16,14 @@ const SpellsDetail = () => {
   useEffect(() => {
     const fetchSpells = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/spells`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/spells`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
         setSpells(res.data);
 
         const found = res.data.find((spell) => spell._id === id);
         setSpell(found);
+        window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 scroll to top on load
       } catch (err) {
         console.error("Failed to fetch spells:", err);
       } finally {
@@ -39,15 +39,15 @@ const SpellsDetail = () => {
 
   return (
     <PageWrapper loading={loading}>
-      <div className="flex flex-col items-center mt-[200px]">
+      <div className="flex flex-col items-center px-4 py-10 sm:py-16">
         {spell ? (
           <>
             {/* Spell detail card */}
-            <div className="bg-white/80 backdrop-blur-sm border border-gray-300 p-6 rounded-lg shadow-md max-w-2xl w-full flex flex-col gap-6 items-start">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-900">
+            <div className="bg-white/80 backdrop-blur-sm border border-gray-300 p-6 sm:p-8 rounded-lg shadow-md max-w-2xl w-full flex flex-col gap-6 items-start">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-900 break-words">
                 {spell.name}
               </h2>
-              <div className="space-y-2 text-gray-700 text-base">
+              <div className="space-y-2 text-gray-700 text-base sm:text-lg">
                 <p><strong>Type:</strong> {spell.type}</p>
                 <p><strong>Effect:</strong> {spell.effect}</p>
                 <p><strong>Incantation:</strong> <em>{spell.incantation}</em></p>
@@ -58,41 +58,35 @@ const SpellsDetail = () => {
             </div>
 
             {/* Navigation buttons */}
-            <div className="flex justify-center items-center gap-4 mt-6">
-              <button
-                onClick={() => navigate("/spells")}
-                className="px-5 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
-              >
-                ← Back
-              </button>
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+            <button
+              onClick={() => navigate("/spells")}
+              className="w-[96px] px-2 py-2 text-sm rounded bg-gray-800 text-white hover:bg-gray-700"
+            >
+              ← Back
+            </button>
 
-              <button
-                onClick={() => prevSpell && navigate(`/spells/${prevSpell._id}`)}
-                disabled={!prevSpell}
-                className={`px-4 py-2 rounded min-w-[90px] ${
-                  prevSpell
-                    ? "bg-blue-600 text-white hover:bg-blue-500"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                ← Prev
-              </button>
+            <button
+              onClick={() => prevSpell && navigate(`/spells/${prevSpell._id}`)}
+              disabled={!prevSpell}
+              className="w-[96px] px-2 py-2 text-sm rounded disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed bg-blue-600 text-white hover:bg-blue-500"
+            >
+              ← Prev
+            </button>
 
-              <button
-                onClick={() => nextSpell && navigate(`/spells/${nextSpell._id}`)}
-                disabled={!nextSpell}
-                className={`px-4 py-2 rounded min-w-[90px] ${
-                  nextSpell
-                    ? "bg-blue-600 text-white hover:bg-blue-500"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                Next →
-              </button>
-            </div>
+            <button
+              onClick={() => nextSpell && navigate(`/spells/${nextSpell._id}`)}
+              disabled={!nextSpell}
+              className="w-[96px] px-2 py-2 text-sm rounded disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed bg-blue-600 text-white hover:bg-blue-500"
+            >
+              Next →
+            </button>
+          </div>
           </>
         ) : (
-          <p className="text-center text-gray-600 pt-24">Spell not found</p>
+          <p className="text-center text-gray-600 pt-24 text-base sm:text-lg">
+            Spell not found
+          </p>
         )}
       </div>
     </PageWrapper>

@@ -1,8 +1,9 @@
-// models/Student.js
+// backend/models/Student.js
 import mongoose from "mongoose";
 
 const studentSchema = new mongoose.Schema({
   name: { type: String },
+  alternate_names: [String],
   species: { type: String },
   gender: { type: String },
   house: { type: String },
@@ -17,9 +18,9 @@ const studentSchema = new mongoose.Schema({
   },
   patronus: { type: String },
   actor: { type: String },
-  alive: { type: Boolean, default: false },
+  alive: Boolean,
   image: { type: String },
-  wizard: { type: Boolean, default: false },
+  wizard: Boolean,
 }, { timestamps: true });
 
 export default mongoose.model("Student", studentSchema);

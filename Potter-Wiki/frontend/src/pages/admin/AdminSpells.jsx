@@ -1,4 +1,4 @@
-// frontend/src/pages/admin/AdminSpells.jsx
+// frontend/src/pages/admin/AdminSpells.jsx 
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
@@ -9,10 +9,9 @@ const AdminSpells = () => {
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [newSpells, setNewSpells] = useState({
-    name: "",
-    description: "",
-  });
+  const [newSpells, setNewSpells] = useState({ name: "", description: "" });
+  const [editingId, setEditingId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const fetchSpells = async () => {
@@ -42,6 +41,13 @@ const AdminSpells = () => {
     );
   }, [searchTerm, spells]);
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const handleChange = (e) => {
     setNewSpells({ ...newSpells, [e.target.name]: e.target.value });
   };
@@ -55,30 +61,63 @@ const AdminSpells = () => {
       const updated = [...spells, res.data];
       setSpells(updated);
       setFiltered(updated);
-      setNewSpells({ name: "", description: ""});
+      setNewSpells({ name: "", description: "" });
+      setSuccessMessage("Spell added successfully!");
     } catch (err) {
-      console.error("Error adding spells:", err);
+      console.error("Error adding spell:", err);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`http://localhost:3000/api/spells/${editingId}`, newSpells, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const updated = spells.map((spell) =>
+        spell._id === editingId ? { ...spell, ...newSpells } : spell
+      );
+      setSpells(updated);
+      setFiltered(updated);
+      setEditingId(null);
+      setNewSpells({ name: "", description: "" });
+      setSuccessMessage("Spell updated successfully!");
+    } catch (err) {
+      console.error("Error updating spell:", err);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/spells/${id}`, {
+      await axios.delete(`http://localhost:3000/api/spells/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      const updated = spells.filter((char) => char._id !== id);
+      const updated = spells.filter((spell) => spell._id !== id);
       setSpells(updated);
       setFiltered(updated);
+      setSuccessMessage("Spell deleted successfully!");
     } catch (err) {
-      console.error("Error deleting spells:", err);
+      console.error("Error deleting spell:", err);
     }
   };
 
   return (
     <section className="bg-[#251c5a] p-4 rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold mb-4">Add New Spells</h3>
-      <form onSubmit={handleAdd} className="grid grid-cols-2 gap-4 mb-6">
-        {["name","description"].map((field) => (
+      <h3 className="text-xl font-semibold mb-4">
+        {editingId ? "Edit Spell" : "Add New Spell"}
+      </h3>
+
+      {successMessage && (
+        <div className="mb-4 bg-green-600 text-white px-4 py-2 rounded text-center shadow-md">
+          {successMessage}
+        </div>
+      )}
+
+      <form
+        onSubmit={editingId ? handleUpdate : handleAdd}
+        className="grid grid-cols-2 gap-4 mb-6"
+      >
+        {["name", "description"].map((field) => (
           <input
             key={field}
             type="text"
@@ -89,9 +128,32 @@ const AdminSpells = () => {
             className="p-2 rounded bg-[#2d246e] text-white"
           />
         ))}
-        <button type="submit" className="col-span-2 bg-green-500 hover:bg-green-600 text-white py-2 rounded">
-          Add Spells
-        </button>
+
+        <div className="col-span-2 flex gap-3">
+          <button
+            type="submit"
+            className={`${
+              editingId
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-green-500 hover:bg-green-600"
+            } text-white py-2 px-4 rounded`}
+          >
+            {editingId ? "Update Spell" : "Add Spell"}
+          </button>
+
+          {editingId && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null);
+                setNewSpells({ name: "", description: "" });
+              }}
+              className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
       <div className="flex justify-between items-center mb-4">
@@ -112,22 +174,41 @@ const AdminSpells = () => {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-[#2d246e] z-10">
               <tr>
-                {["name","description"].map((header) => (
+                {["name", "description", "actions"].map((header) => (
                   <th key={header} className="p-3 border-b border-gray-600">
-                    {header}
+                    {header.charAt(0).toUpperCase() + header.slice(1)}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length > 0 ? (
-                filtered.map((char) => (
-                  <tr key={char._id} className="border-b border-gray-700 hover:bg-[#332b73] transition">
-                    <td className="p-3">{char.name}</td>
-                    <td className="p-3">{char.description}</td>
+                filtered.map((spell) => (
+                  <tr
+                    key={spell._id}
+                    className="border-b border-gray-700 hover:bg-[#332b73] transition cursor-pointer"
+                    onClick={() => {
+                      setEditingId(spell._id);
+                      setNewSpells({ name: spell.name, description: spell.description });
+                    }}
+                  >
+                 
+                    <td className="p-3">
+                      {spell.name?.trim()
+                        ? spell.name.trim().charAt(0).toUpperCase() + spell.name.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                    <td className="p-3">
+                      {spell.description?.trim()
+                        ? spell.description.trim().charAt(0).toUpperCase() + spell.description.trim().slice(1)
+                        : "No data found"}
+                    </td>
                     <td className="p-3">
                       <button
-                        onClick={() => handleDelete(char._id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(spell._id);
+                        }}
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
                       >
                         Delete
@@ -137,7 +218,7 @@ const AdminSpells = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="p-4 text-center text-gray-400">
+                  <td colSpan="3" className="p-4 text-center text-gray-400">
                     No Spells found.
                   </td>
                 </tr>

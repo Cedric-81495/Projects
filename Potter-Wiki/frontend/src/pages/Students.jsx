@@ -54,21 +54,18 @@ const Students = () => {
   }, [searchTerm, filteredStudents.length]);
 
   return (
-    <PageWrapper loading={loading}>
+ <PageWrapper loading={loading}>
       <div className="p-2">
         {/* Search Bar */}
         <SearchBar
           label="Search"
-          placeholder="Type a student name..."
+          placeholder="Type a character name..."
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
 
-        {/* Error Message */}
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-
         {/* Results */}
-        {filteredStudents.length === 0 ? (
+        {!loading && filteredStudents.length === 0 && searchTerm.trim() !== "" ? (
           <div className="pt-6">
             <p className="text-center text-gray-500 text-sm sm:text-base">
               No results found for{" "}

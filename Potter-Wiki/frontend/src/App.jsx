@@ -18,20 +18,15 @@ import SpellsDetail from "./pages/SpellsDetail";
 import StaffDetail from "./pages/StaffDetail";
 import StudentsDetail from "./pages/StudentsDetail";
 import BackToTopButton from "./pages/BackToTopButton";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
   const Layout = () => {
     const location = useLocation();
 
-    // Hide Header on specific pages
-    const hideHeader =
-      location.pathname === "/" ||
-      location.pathname.startsWith("/characters/") ||
-      location.pathname.startsWith("/spells/") ||
-      location.pathname.startsWith("/students/") ||
-      location.pathname.startsWith("/staff/") ||
-      location.pathname.startsWith("/dashboard") ||
-      ["/login", "/register", "/profile", "/dashboard"].includes(location.pathname);
+   // ✅ Show header ONLY on /characters, /spells, /students, /staff (+ subpaths)
+    const showHeader = /^\/(characters|spells|students|staff)\/?$/i.test(location.pathname);
+    const hideHeader = !showHeader;
 
     // Hide Footer on login/register/home
     const hideFooter = ["/login", "/register", "/"].includes(location.pathname);
@@ -57,6 +52,11 @@ const App = () => {
 
           {/* Auth routes */}
           <Route path="/login" element={<Login />} />
+
+          {/* Catch invalid subroutes like /login/asd or /register/asd */}
+          <Route path="/login/*" element={<NotFound message="Page not found" backPath="/login" />} />
+          <Route path="/register/*" element={<NotFound message="Page not found" backPath="/register" />} />
+        
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
 
@@ -64,12 +64,7 @@ const App = () => {
           <Route path="/dashboard/*" element={<AdminDashboard />} />
 
           {/* 404 Fallback */}
-          <Route
-            path="*"
-            element={
-              <p className="text-center mt-20 text-red-500">404: Page not found</p>
-            }
-          />
+         <Route path="*" element={<NotFound />} />
         </Routes>
 
         {!hideFooter && <Footer />}

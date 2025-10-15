@@ -29,7 +29,13 @@ const App = () => {
     const hideHeader = !showHeader;
 
     // Hide Footer on login/register/home
-    const hideFooter = ["/login", "/register", "/"].includes(location.pathname);
+    const hideFooter = [
+      "/dashboard",
+      "/dashboard/characters",
+      "/dashboard/spells",
+       "/dashboard/students",
+       "/dashboard/staff"
+      ].includes(location.pathname);
 
     return (
       <>

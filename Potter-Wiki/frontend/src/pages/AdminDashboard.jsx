@@ -292,10 +292,6 @@ const AdminDashboard = () => {
         <Route path="spells" element={<AdminSpells />} />
         <Route path="students" element={<AdminStudents />} />
         <Route path="staff" element={<AdminStaffs />} />
-        <Route
-          path=""
-          element={<p className="text-white text-center mt-4">Select a dashboard section</p>}
-        />
       </Routes>
     </div>
   );

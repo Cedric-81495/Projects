@@ -150,7 +150,7 @@ const AdminCharacters = () => {
   };
 
   return (
-    <section className="bg-[#251c5a] p-4 rounded-lg shadow-md">
+    <section className="bg-[#251c5a] p-4 rounded-lg shadow-md min-h-screen">
       <h3 className="text-xl font-semibold mb-4">
         {editingId ? "Edit Character" : "Add New Character"}
       </h3>

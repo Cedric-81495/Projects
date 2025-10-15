@@ -19,7 +19,7 @@ const BackToTopButton = () => {
     visible && (
       <button
         onClick={scrollToTop}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 flex items-center gap-2 px-4 py-3 sm:px-5 sm:py-4 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300 z-50"
+        className="fixed bottom-4 right-2 sm:bottom-6 sm:right-6 flex items-center gap-2 px-4 py-3 sm:px-5 sm:py-4 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-300 z-50"
         aria-label="Back to top"
       >
         <span className="text-sm sm:text-base font-medium">Top</span>

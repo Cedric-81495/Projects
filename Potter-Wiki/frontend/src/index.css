@@ -8,6 +8,29 @@ body {
   font-family: 'Merriweather', serif;
 }
 
+@keyframes fadeSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+.animate-fade-slide {
+  animation: fadeSlide 2s ease-in-out forwards;
+}
+
 @layer utilities {
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;

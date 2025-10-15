@@ -154,7 +154,7 @@ const AdminStaffs = () => {
   const displayBoolean = (value) => (value === true ? "Yes" : "No");
 
   return (
-    <section className="bg-[#251c5a] p-4 rounded-lg shadow-md">
+    <section className="bg-[#251c5a] p-4 rounded-lg shadow-md min-h-screen">
       <h3 className="text-xl font-semibold mb-4">
         {editingId ? "Edit Staff" : "Add New Staff"}
       </h3>

@@ -9,6 +9,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const menuRef = useRef(null);
   const [loggingOut, setLoggingOut] = useState(false);
+  
 
   const handleLogout = () => {
   setLoggingOut(true);
@@ -19,9 +20,9 @@ const Navbar = () => {
       setMenuOpen(false);
       toast.dismiss();
       toast.success("You've been logged out");
-      navigate("/");
+      navigate("/login");
       setLoggingOut(false);
-    }, 2000); // 2-second delay
+    }, 1000); // 2-second delay
   };
 
   // ✅ Close dropdown when clicking outside
@@ -39,12 +40,14 @@ const Navbar = () => {
     };
   }, [menuOpen]);
 
- {loggingOut && (
-  <div className="fixed top-0 left-0 w-full bg-yellow-500 text-black text-center py-2 z-[9999]">
-      Logging out...
-    </div>
-  )}
+ 
   return (
+    <>
+    {loggingOut && (
+    <div className="fixed top-20 left-1/2 transform -translate-x-1/2 w-[200px] bg-yellow-500 text-black text-center py-2 text-sm sm:text-base z-[9999] shadow-md rounded">
+       Logging out...
+    </div>
+    )}
     <header className="fixed top-0 left-0 w-full z-50 bg-navbar text-white shadow-md">
       <nav className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
@@ -119,7 +122,7 @@ const Navbar = () => {
               </div>
             ) : (
 
-            // ✅ Same row for login + register on mobile
+            // ✅ Same row for `login` + register on mobile
             <div className="flex flex-col space-y-2">
               <Link to="/login" className="text-gray-300 hover:text-white">
                 Login
@@ -132,6 +135,7 @@ const Navbar = () => {
         </div>
       )}
     </header>
+    </>
   );
 };
 

@@ -199,7 +199,7 @@ export {
   createSuperAdmin,
   getSuperAdmins,
   createAdminBySuperUser,
-  getAllAdminsBySuperUser,
+  getAllAdminsBySuperUser, 
   updateAdminBySuperUser,
   deleteAdminBySuperUser,
   updateAdminRole,

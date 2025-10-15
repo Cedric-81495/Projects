@@ -48,7 +48,7 @@ const AdminDashboard = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admins/super-admins/admins`, editForm, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/super-admins/admins`, editForm, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = [...admins, res.data];

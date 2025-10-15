@@ -8,9 +8,5 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
-  server: {
-    port: 5173,
-  },
-
   base: '/', // Ensure correct asset linking
-})
+});

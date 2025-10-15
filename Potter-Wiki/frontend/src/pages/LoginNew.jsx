@@ -3,6 +3,8 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 
 const Login = () => {
@@ -14,13 +16,13 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+ 
 
-  // Determine where to go back (from previous page or fallback)
-  const from = location.state?.from || "/"; // default to home page
+
+  const from = location.state?.from || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
       return;
@@ -31,47 +33,55 @@ const Login = () => {
         email,
         password,
       });
-
-      // Successful login
       login(res.data);
       setSuccessMessage("Login successful!");
       setErrorMessage("");
 
       const role = res.data?.role;
-      // Redirect based on role
-      if (role === "superUser" || role === "adminUser") {
-        navigate("/dashboard");
-      } else {
-        navigate("/profile");
-      }
+      navigate(role === "superUser" || role === "adminUser" ? "/dashboard" : "/profile");
     } catch (err) {
       console.error("Login failed:", err);
       setSuccessMessage("");
-
-      if (err.response?.status === 401) {
-        setErrorMessage("Incorrect password.");
-      } else if (err.response?.status === 404) {
-        setErrorMessage("Account not found. Please check your email.");
-      } else if (err.response?.status === 400) {
-        setErrorMessage("Invalid credentials. Please try again.");
-      } else {
-        setErrorMessage("Something went wrong. Please try again later.");
-      }
+      if (err.response?.status === 401) setErrorMessage("Incorrect password.");
+      else if (err.response?.status === 404) setErrorMessage("Account not found.");
+      else setErrorMessage("Something went wrong. Please try again later.");
     }
   };
 
-  // Handle back navigation (go to previous page or fallback)
-  const handleGoBack = () => {
-    if (location.key !== "default") {
-      navigate(-1); // Go back if user came from another page
-    } else {
-      navigate(from); // Fallback (e.g., home)
+  // ✅ Google OAuth success handler
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const decoded = jwtDecode(credentialResponse.credential);
+      const { email, given_name, family_name, picture } = decoded;
+
+      // You can send the Google user data to your backend for verification or registration
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google-login`, {
+        email,
+        firstname: given_name,
+        lastname: family_name,
+        picture,
+      });
+
+      login(res.data);
+      navigate("/profile");
+    } catch (err) {
+      console.error("Google login failed:", err);
+      setErrorMessage("Google login failed. Please try again.");
     }
+  };
+
+  // ✅ Google OAuth error handler
+  const handleGoogleError = () => {
+    setErrorMessage("Google sign-in was cancelled or failed. Please try again.");
+  };
+
+  const handleGoBack = () => {
+    if (location.key !== "default") navigate(-1);
+    else navigate(from);
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 bg-amber-50 relative">
-      {/* 🔙 Back Button */}
       <button
         onClick={handleGoBack}
         className="absolute top-6 left-6 text-amber-900 font-medium hover:underline"
@@ -87,7 +97,6 @@ const Login = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
           <input
             type="email"
             value={email}
@@ -98,13 +107,10 @@ const Login = () => {
             }}
             placeholder="Email"
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-amber-50 text-amber-900 ${
-              errorMessage
-                ? "border-red-500 focus:ring-red-400"
-                : "border-amber-600 focus:ring-amber-500"
+              errorMessage ? "border-red-500 focus:ring-red-400" : "border-amber-600 focus:ring-amber-500"
             }`}
           />
 
-          {/* Password */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -116,30 +122,21 @@ const Login = () => {
               }}
               placeholder="Password"
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-amber-50 text-amber-900 ${
-                errorMessage
-                  ? "border-red-500 focus:ring-red-400"
-                  : "border-amber-600 focus:ring-amber-500"
+                errorMessage ? "border-red-500 focus:ring-red-400" : "border-amber-600 focus:ring-amber-500"
               }`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
               className="absolute right-3 top-2.5 text-amber-700 hover:text-amber-900"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
 
-          {/* Messages */}
-          {errorMessage && (
-            <p className="text-red-600 text-sm font-medium">{errorMessage}</p>
-          )}
-          {successMessage && (
-            <p className="text-green-600 text-sm font-medium">{successMessage}</p>
-          )}
+          {errorMessage && <p className="text-red-600 text-sm font-medium">{errorMessage}</p>}
+          {successMessage && <p className="text-green-600 text-sm font-medium">{successMessage}</p>}
 
-          {/* Submit */}
           <button
             type="submit"
             className="w-full bg-amber-700 text-white py-2 rounded-lg hover:bg-amber-800 transition font-semibold"
@@ -147,6 +144,18 @@ const Login = () => {
             Login
           </button>
         </form>
+
+        {/* 🟡 Divider */}
+        <div className="flex items-center justify-center my-4">
+          <span className="h-px w-1/3 bg-amber-700"></span>
+          <p className="mx-2 text-sm text-amber-800">or</p>
+          <span className="h-px w-1/3 bg-amber-700"></span>
+        </div>
+
+        {/* 🔹 Google Login Button */}
+        <div className="flex justify-center">
+          <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+        </div>
       </div>
     </div>
   );

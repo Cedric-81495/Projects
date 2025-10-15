@@ -12,7 +12,7 @@ const Spells = () => {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const resultsRef = useRef(null); 
-
+  
   useEffect(() => {
     const fetchSpells = async () => {
       try {
@@ -41,14 +41,13 @@ useEffect(() => {
     }
   }, [searchTerm,  filteredSpells.length]);
 
-
   return (
     <PageWrapper loading={loading}>
       <div className="p-2">
         {/* Search Bar */}
         <SearchBar
           label="Search"
-          placeholder="Type a character name..."
+          placeholder="Type a spell name..."
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
@@ -64,7 +63,7 @@ useEffect(() => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {filteredSpells.map((char) => (
-              <Link key={char._id} to={`/characters/${char._id}`}>
+              <Link key={char._id} to={`/spells/${char._id}`}>
                 <Card title={char.name}/>
               </Link>
             ))}

@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import PageWrapper from "../components/PageWrapper";
+import NotFound from "./NotFound";    
 
 
 const StudentsDetail = () => {
@@ -10,6 +11,7 @@ const StudentsDetail = () => {
   const [student, setStudent] = useState(null);
   const [allStudents, setAllStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,9 +22,10 @@ const StudentsDetail = () => {
         ]);
         setStudent(studentRes.data);
         setAllStudents(Array.isArray(allRes.data?.students) ? allRes.data.students : []);
+        setError(false);
       } catch (err) {
         console.error("Failed to fetch student or list:", err);
-        
+        setError(true); // ✅ handle API failure
       } finally {
         setLoading(false);
       }
@@ -36,18 +39,20 @@ const StudentsDetail = () => {
   const prevStudent = currentIndex > 0 ? allStudents[currentIndex - 1]._id : null;
   const nextStudent = currentIndex < allStudents.length - 1 ? allStudents[currentIndex + 1]._id : null;
 
-  if (loading || !student) {
+ if (loading) {
+      return <PageWrapper loading={true} />;
+    }
+
+    if (error || !student) {
+      return (
+        <PageWrapper loading={false}>
+          <NotFound message="Student not found" backPath="/student" />
+        </PageWrapper>
+      );
+    }
     return (
-      <PageWrapper loading={true}>
-        <div></div>
-      </PageWrapper>
-    );
-  }
-  console.log("DOB:", student.dateOfBirth);
-  console.log("Student object:", student);
-  return (
     <PageWrapper loading={false}>
-      <div className="flex flex-col items-center mt-10">
+        <div className="flex flex-col items-center mt-10">
         <div className="bg-gray-50 border mt-10 w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-4xl px-4 py-6">
           <div className="flex flex-col md:flex-row gap-8 items-start">
             {/* Left: Image */}
@@ -75,7 +80,7 @@ const StudentsDetail = () => {
               <p className="text-gray-700"><strong>House:</strong> {student.house}</p>
               <p className="text-gray-700 mb-2"><strong>Wizard:</strong> {student.wizard ? "Yes" : "No"}</p>
               <p className="text-gray-700"><strong>Species:</strong> {student.species}</p>
-             <p className="text-gray-700 mb-2">Date of Birth: {student.dateOfBirth}</p>
+              <p className="text-gray-700 mb-2">Date of Birth: {student.dateOfBirth}</p>
         
               
             </div>
@@ -109,7 +114,7 @@ const StudentsDetail = () => {
             </button>
           )}
         </div>
-      </div>
+        </div>
     </PageWrapper>
   );
 };

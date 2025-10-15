@@ -3,15 +3,16 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import PageWrapper from "../components/PageWrapper";
+import NotFound from "./NotFound";
 
 const SpellsDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-
   const [spell, setSpell] = useState(null);
   const [spells, setSpells] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchSpells = async () => {
@@ -24,8 +25,10 @@ const SpellsDetail = () => {
         const found = res.data.find((spell) => spell._id === id);
         setSpell(found);
         window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 scroll to top on load
+        setError(false);
       } catch (err) {
-        console.error("Failed to fetch spells:", err);
+        console.error("Failed to fetch student or list:", err);
+        setError(true); // ✅ handle API failure
       } finally {
         setLoading(false);
       }
@@ -37,11 +40,20 @@ const SpellsDetail = () => {
   const prevSpell = currentIndex > 0 ? spells[currentIndex - 1] : null;
   const nextSpell = currentIndex < spells.length - 1 ? spells[currentIndex + 1] : null;
 
+    if (loading) {
+      return <PageWrapper loading={true} />;
+    }
+
+    if (error || !spell) {
+      return (
+        <PageWrapper loading={false}>
+          <NotFound message="Spell not found" />
+        </PageWrapper>
+      );
+    }
   return (
-    <PageWrapper loading={loading}>
+    <PageWrapper loading={false}>
       <div className="flex flex-col items-center px-4 py-10 sm:py-16">
-        {spell ? (
-          <>
             {/* Spell detail card */}
             <div className="bg-white/80 backdrop-blur-sm border border-gray-300 p-6 sm:p-8 rounded-lg shadow-md max-w-2xl w-full flex flex-col gap-6 items-start">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-amber-900 break-words">
@@ -82,12 +94,6 @@ const SpellsDetail = () => {
               Next →
             </button>
           </div>
-          </>
-        ) : (
-          <p className="text-center text-gray-600 pt-24 text-base sm:text-lg">
-            Spell not found
-          </p>
-        )}
       </div>
     </PageWrapper>
   );

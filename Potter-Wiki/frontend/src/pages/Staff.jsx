@@ -6,12 +6,14 @@ import PageWrapper from "../components/PageWrapper";
 import SearchBar from "./SearchBar";
 import { Link } from "react-router-dom";
 
+
 const Staff = () => {
   const [staff, setStaff] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const resultsRef = useState(null);
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchStaff = async () => {
@@ -29,9 +31,10 @@ const Staff = () => {
           : [];
 
         setStaff(data);
+        setError(false);
       } catch (err) {
-        console.error("Fetch error:", err);
-        // setError("Failed to load staff.");
+        console.error("Failed to fetch student or list:", err);
+        setError(true); 
       } finally {
         setLoading(false);
       }
@@ -53,8 +56,20 @@ const Staff = () => {
     }
   }, [searchTerm,  filteredStaff.length]);
 
+    if (loading) {
+      return <PageWrapper loading={true} />;
+    }
+
+    if (error || !staff) {
+      return (
+        <PageWrapper loading={false}>
+          <NotFound message="Student not found" />
+        </PageWrapper>
+      );
+    }
+
   return (
-     <PageWrapper loading={loading}>
+     <PageWrapper loading={false}>
       <div className="p-2">
         {/* Search Bar */}
         <SearchBar

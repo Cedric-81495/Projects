@@ -3,12 +3,14 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import PageWrapper from "../components/PageWrapper";
+import NotFound from "./NotFound";
+
 
 const CharacterDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-
+  const [error, setError] = useState(false);
   const [character, setCharacter] = useState(null);
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,9 +26,10 @@ const CharacterDetail = () => {
 
         const found = res.data.find((char) => char._id === id);
         setCharacter(found);
-        console.log("API Response:", res.data);
+        setError(false);
       } catch (err) {
-        console.error("Failed to fetch characters:", err);
+        console.error("Failed to fetch student or list:", err);
+        setError(true); // ✅ handle API failure
       } finally {
         setLoading(false);
       }
@@ -39,13 +42,23 @@ const CharacterDetail = () => {
   const currentIndex = characters.findIndex((c) => c._id === id);
   const prevCharacter = currentIndex > 0 ? characters[currentIndex - 1] : null;
   const nextCharacter =
-    currentIndex < characters.length - 1 ? characters[currentIndex + 1] : null;
+  currentIndex < characters.length - 1 ? characters[currentIndex + 1] : null;
+
+    if (loading) {
+      return <PageWrapper loading={true} />;
+    }
+
+    if (error || !character) {
+      return (
+        <PageWrapper loading={false}>
+          <NotFound message="Character not found" backPath="/characters" />
+        </PageWrapper>
+      );
+    }
 
 return (
-  <PageWrapper loading={loading}>
-<div className="bg-gray-50 min-h-screen flex flex-col items-center px-4">
-  {character ? (
-    <>
+  <PageWrapper loading={false}>
+    <div className="bg-gray-50 min-h-screen flex flex-col items-center px-4"> 
       {/* Character detail card */}
      <div className="bg-white border mt-[90px] border-gray-300 p-6 rounded-lg shadow-md w-full max-w-3xl flex flex-col md:flex-row gap-8">
         
@@ -116,10 +129,6 @@ return (
           </button>
         )}
       </div>
-    </>
-  ) : (
-    <p className="text-center text-gray-600">Character not found</p>
-  )}
 </div>
   </PageWrapper>
   );

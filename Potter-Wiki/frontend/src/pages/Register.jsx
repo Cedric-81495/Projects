@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
@@ -9,6 +10,8 @@ const Register = () => {
   const [middlename, setMiddlename] = useState("");
   const [lastname, setLastname] = useState("");
   const { login } = useContext(AuthContext); // Optional: auto-login after register
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,8 +29,24 @@ const Register = () => {
     }
   };
 
+    // Handle back navigation (go to previous page or fallback)
+  const handleGoBack = () => {
+    if (location.key !== "default") {
+      navigate(-1); // Go back if user came from another page
+    } else {
+      navigate("/register"); // Fallback (e.g., home)
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
+      {/* 🔙 Back Button */}
+      <button
+        onClick={handleGoBack}
+        className="absolute top-6 left-6 text-amber-900 font-medium hover:underline"
+      >
+        ← Back
+      </button>
       <div className="relative w-full max-w-md p-8 rounded-2xl shadow-2xl bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 border-4 border-amber-700">
         <div className="absolute top-0 left-0 h-full w-3 bg-amber-700 rounded-l-2xl shadow-inner" />
 

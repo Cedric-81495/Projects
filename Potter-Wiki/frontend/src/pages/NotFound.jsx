@@ -1,19 +1,22 @@
 // frontend/src/pages/NotFound.jsx
 import { Link } from "react-router-dom";
 
-const NotFound = () => {
+const NotFound = ({ message = "Page not found", backPath = "/" }) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#1a1244] text-white text-center">
-      <h1 className="text-6xl font-bold text-red-500 mb-4">404</h1>
-      <h2 className="text-2xl font-semibold mb-2">Page Not Found</h2>
-      <p className="text-gray-400 mb-6">
-        Oops! The page you’re looking for doesn’t exist.
+    <div className="flex flex-col justify-center items-center min-h-screen bg-white text-center px-4">
+      <h1 className="text-6xl sm:text-7xl font-bold text-red-600">404</h1>
+      <h2 className="text-2xl sm:text-3xl font-semibold mt-4 text-gray-900">
+        {message}
+      </h2>
+      <p className="mt-2 text-gray-600">
+        Oops! The page you’re looking for doesn’t exist or may have been moved.
       </p>
+
       <Link
-        to="/"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
+        to={backPath}
+        className="mt-6 bg-black text-white px-5 py-2 rounded-md hover:bg-gray-800 transition"
       >
-        Go Home
+        Go Back
       </Link>
     </div>
   );

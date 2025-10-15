@@ -3,12 +3,13 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import PageWrapper from "../components/PageWrapper";
+import NotFound from "./NotFound";
 
 const StaffDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-
+  const [error, setError] = useState(false);
   const [staff, setStaff] = useState(null);
   const [staffList, setStaffList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,8 +24,10 @@ const StaffDetail = () => {
 
         const found = res.data.find((s) => s._id === id);
         setStaff(found || null);
+        setError(false);
       } catch (err) {
-        console.error("Failed to fetch staff list:", err);
+        console.error("Failed to fetch student or list:", err);
+        setError(true); // ✅ handle API failure
       } finally {
         setLoading(false);
       }
@@ -36,10 +39,20 @@ const StaffDetail = () => {
   const prevStaff = currentIndex > 0 ? staffList[currentIndex - 1] : null;
   const nextStaff = currentIndex < staffList.length - 1 ? staffList[currentIndex + 1] : null;
 
-  return (
-    <PageWrapper loading={loading}>
-      {staff ? (
-        <>
+    if (loading) {
+      return <PageWrapper loading={true} />;
+    }
+
+    if (error || !staff) {
+      return (
+        <PageWrapper loading={false}>
+          <NotFound message="Staff not found" backPath="/staff" />
+        </PageWrapper>
+      );
+    }
+    return (
+    <PageWrapper loading={false}>
+
           <div className="flex justify-center w-full mt-10">
             <div className="mt-10 w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl px-4 py-6">
               <div className="bg-white border border-gray-300 p-6 rounded-lg shadow-md w-full flex flex-col md:flex-row gap-8 items-center md:items-start">
@@ -121,10 +134,6 @@ const StaffDetail = () => {
               Next →
             </button>
           </div>
-        </>
-      ) : (
-        <p className="text-center text-gray-600 pt-24">Staff member not found</p>
-      )}
     </PageWrapper>
   );
 };

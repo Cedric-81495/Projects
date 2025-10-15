@@ -41,8 +41,6 @@ app.use(cors({
 //app.options("/*", cors());
 app.options(/.*/, cors());
 
-
-
 // ✅ Parse incoming JSON
 app.use(express.json());
 
@@ -50,7 +48,6 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("✅ Potter Wiki Backend is running...");
 });
-
 
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
@@ -60,8 +57,6 @@ app.use("/api/staff", staffRoutes);
 app.use("/api/public", publicRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/admin", adminRoutes);
-
-
 
 // ✅ Start server
 const PORT = process.env.PORT || 3000;

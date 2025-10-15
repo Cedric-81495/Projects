@@ -162,7 +162,7 @@ const updateAdminRole = asyncHandler(async (req, res) => {
 
 // ✅ Update any admin/superUser details
 const updateAdminDetails = asyncHandler(async (req, res) => {
-  const { firstname, lastname, email, role } = req.body;
+  const { firstname, lastname, email, role, username } = req.body;
   const user = await User.findById(req.params.id);
 
   if (!user) throw new Error("User not found");
@@ -171,6 +171,7 @@ const updateAdminDetails = asyncHandler(async (req, res) => {
   user.lastname = lastname || user.lastname;
   user.email = email || user.email;
   user.role = role || user.role;
+  user.username = username || user.username;
 
   await user.save();
   res.status(200).json({ message: "Admin updated", user });

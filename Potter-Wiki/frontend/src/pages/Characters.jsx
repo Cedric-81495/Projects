@@ -61,7 +61,7 @@ const Characters = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 hover:shadow-xl transition-shadow duration-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {filteredCharacters.map((char) => (
               <Link key={char._id} to={`/characters/${char._id}`}>
                 <Card title={char.name} description={char.description} />

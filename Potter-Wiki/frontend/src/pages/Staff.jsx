@@ -31,6 +31,7 @@ const Staff = () => {
         setStaff(data);
       } catch (err) {
         console.error("Fetch error:", err);
+        // setError("Failed to load staff.");
       } finally {
         setLoading(false);
       }
@@ -53,7 +54,7 @@ const Staff = () => {
   }, [searchTerm,  filteredStaff.length]);
 
   return (
-      <PageWrapper loading={loading}>
+     <PageWrapper loading={loading}>
       <div className="p-2">
         {/* Search Bar */}
         <SearchBar
@@ -72,7 +73,7 @@ const Staff = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {filteredStaff.map((member) => (
               <Link to={`/staff/${member._id}`} key={member._id}>
                 <Card

@@ -8,7 +8,8 @@ import AdminStudents from "./admin/AdminStudents";
 import AdminStaffs from "./admin/AdminStaffs";
 
 const AdminDashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
+  const [logoutMessage, setLogoutMessage] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -47,7 +48,7 @@ const AdminDashboard = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/super-admins/admins`, editForm, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admins/super-admins/admins`, editForm, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = [...admins, res.data];
@@ -62,10 +63,26 @@ const AdminDashboard = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:3000/api/admin/super-admins/${editingId}`, editForm, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const updated = admins.map((admin) =>
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/admin/super-admins/${editingId}`,
+        editForm,
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+
+      // ✅ If the logged-in superUser updates their own role
+      if (editingId === user._id && editForm.role !== user.role) {
+        setLogoutMessage("You have been logged out. Please login again.");
+
+        // Wait 2.5 seconds, then log out and redirect
+        setTimeout(() => {
+          logout();
+          navigate("/login");
+        }, 2500);
+        return; // stop further updates
+      }
+
+      // ✅ Otherwise just update local state
+      const updated = res.map((admin) =>
         admin._id === editingId ? { ...admin, ...editForm } : admin
       );
       setAdmins(updated);
@@ -78,13 +95,14 @@ const AdminDashboard = () => {
     }
   };
 
+
   const handleDelete = async (id) => {
     if (user.role !== "superUser" || id === user._id) return;
     const confirmDelete = window.confirm("Are you sure you want to delete this admin?");
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/api/admin/super-admins/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/super-admins/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const updated = admins.filter((admin) => admin._id !== id);
@@ -98,6 +116,8 @@ const AdminDashboard = () => {
       console.error("Error deleting admin:", err);
     }
   };
+
+  
 
   const sortedAdmins = admins.sort((a, b) =>
     a.role === "superUser" ? -1 : b.role === "superUser" ? 1 : 0
@@ -114,6 +134,14 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+      {logoutMessage && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-red-600 text-white px-6 py-3 rounded shadow-lg text-center animate-pulse">
+            {logoutMessage}
+          </div>
+        </div>
+      )}
+
 
       <section className="border-b border-gray-600 pb-4 mb-6">
         <h2 className="text-2xl font-bold mb-2">

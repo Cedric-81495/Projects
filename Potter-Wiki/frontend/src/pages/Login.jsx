@@ -2,8 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import bgImage from "../assets/voyeglq-bg.jpg"; // ✅ Same background as Register
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,8 +14,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine where to go back (from previous page or fallback)
-  const from = location.state?.from || "/"; // default to home page
+  const from = location.state?.from || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,13 +30,11 @@ const Login = () => {
         password,
       });
 
-      // Successful login
       login(res.data);
       setSuccessMessage("Login successful!");
       setErrorMessage("");
 
       const role = res.data?.role;
-      // Redirect based on role
       if (role === "superUser" || role === "adminUser") {
         navigate("/dashboard");
       } else {
@@ -47,7 +43,6 @@ const Login = () => {
     } catch (err) {
       console.error("Login failed:", err);
       setSuccessMessage("");
-
       if (err.response?.status === 401) {
         setErrorMessage("Incorrect password.");
       } else if (err.response?.status === 404) {
@@ -60,34 +55,37 @@ const Login = () => {
     }
   };
 
-  // Handle back navigation (go to previous page or fallback)
   const handleGoBack = () => {
     if (location.key !== "default") {
-      navigate(-1); // Go back if user came from another page
+      navigate(-1);
     } else {
-      navigate(from); // Fallback (e.g., home)
+      navigate(from);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 bg-amber-50 relative">
+    <div
+      className="relative flex items-center justify-center min-h-screen px-4 sm:px-6 md:px-8 py-12 sm:py-20 bg-cover bg-center"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
+      {/* 🧥 Overlay */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0" />
+
       {/* 🔙 Back Button */}
       <button
         onClick={handleGoBack}
-        className="absolute top-6 left-6 text-amber-900 font-medium hover:underline"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 text-amber-100 text-sm sm:text-base font-medium hover:underline z-10"
       >
         ← Back
       </button>
 
-      <div className="relative w-full max-w-md p-6 sm:p-8 rounded-2xl shadow-2xl bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 border-4 border-amber-700">
-        <div className="absolute top-0 left-0 h-full w-2 sm:w-3 bg-amber-700 rounded-l-2xl shadow-inner" />
-
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-amber-900 font-serif">
+      {/* 🧾 Form Container */}
+      <div className="relative z-10 w-full max-w-md sm:max-w-lg md:max-w-xl p-6 sm:p-8 rounded-2xl shadow-2xl bg-[#2e1e4d] border-4 border-amber-700">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-amber-200 font-serif">
           Login
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="email"
             value={email}
@@ -97,14 +95,9 @@ const Login = () => {
               setSuccessMessage("");
             }}
             placeholder="Email"
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-amber-50 text-amber-900 ${
-              errorMessage
-                ? "border-red-500 focus:ring-red-400"
-                : "border-amber-600 focus:ring-amber-500"
-            }`}
+            className="w-full px-4 py-2 border border-amber-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-[#3a2b5a] text-white placeholder:text-amber-100 text-sm sm:text-base"
           />
 
-          {/* Password */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -115,34 +108,28 @@ const Login = () => {
                 setSuccessMessage("");
               }}
               placeholder="Password"
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-amber-50 text-amber-900 ${
-                errorMessage
-                  ? "border-red-500 focus:ring-red-400"
-                  : "border-amber-600 focus:ring-amber-500"
-              }`}
+              className="w-full px-4 py-2 border border-amber-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-[#3a2b5a] text-white placeholder:text-amber-100 text-sm sm:text-base"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute right-3 top-2.5 text-amber-700 hover:text-amber-900"
+              className="absolute right-3 top-2.5 text-amber-300 hover:text-amber-100"
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {showPassword ? "🙈" : "👁️"}
             </button>
           </div>
 
-          {/* Messages */}
           {errorMessage && (
-            <p className="text-red-600 text-sm font-medium">{errorMessage}</p>
+            <p className="text-red-400 text-sm font-medium text-center">{errorMessage}</p>
           )}
           {successMessage && (
-            <p className="text-green-600 text-sm font-medium">{successMessage}</p>
+            <p className="text-green-400 text-sm font-medium text-center">{successMessage}</p>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-amber-700 text-white py-2 rounded-lg hover:bg-amber-800 transition font-semibold"
+            className="w-full bg-[#5163BC] text-white py-2 rounded-lg hover:bg-amber-800 transition font-semibold text-sm sm:text-base"
           >
             Login
           </button>

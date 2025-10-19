@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
+import bgImage from "../assets/aesthetic-bg.jpg";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -9,7 +10,7 @@ const Register = () => {
   const [firstname, setFirstname] = useState("");
   const [middlename, setMiddlename] = useState("");
   const [lastname, setLastname] = useState("");
-  const { login } = useContext(AuthContext); // Optional: auto-login after register
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,41 +18,45 @@ const Register = () => {
     e.preventDefault();
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
-        firstname, 
-        middlename, 
+        firstname,
+        middlename,
         lastname,
         email,
         password,
       });
-      login(res.data); // Optional: log in immediately
+      login(res.data);
     } catch (err) {
       console.error("Registration failed:", err);
     }
   };
 
-    // Handle back navigation (go to previous page or fallback)
   const handleGoBack = () => {
     if (location.key !== "default") {
-      navigate(-1); // Go back if user came from another page
+      navigate(-1);
     } else {
-      navigate("/register"); // Fallback (e.g., home)
+      navigate("/register");
     }
   };
 
   return (
-  <div className="flex items-center justify-center min-h-screen px-4 sm:px-6 md:px-8 py-12 sm:py-20">
+    <div
+      className="relative flex items-center justify-center min-h-screen px-4 sm:px-6 md:px-8 py-12 sm:py-20 bg-cover bg-center"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
+      {/* 🧥 Overlay */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0" />
+
       {/* 🔙 Back Button */}
       <button
         onClick={handleGoBack}
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 text-amber-900 text-sm sm:text-base font-medium hover:underline"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 text-amber-100 text-sm sm:text-base font-medium hover:underline z-10"
       >
         ← Back
       </button>
 
-      <div className="relative w-full max-w-md sm:max-w-lg md:max-w-xl p-6 sm:p-8 rounded-2xl shadow-2xl bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-200 border-4 border-amber-700">
-        <div className="absolute top-0 left-0 h-full w-2 sm:w-3 bg-amber-700 rounded-l-2xl shadow-inner" />
-
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-amber-900 font-serif">
+      {/* 🧾 Form Container */}
+      <div className="relative z-10 w-full max-w-md sm:max-w-lg md:max-w-xl p-6 sm:p-8 rounded-2xl shadow-2xl bg-[#2e1e4d] border-4 border-amber-700">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-amber-200 font-serif">
           Register
         </h2>
 
@@ -69,13 +74,13 @@ const Register = () => {
               value={value}
               onChange={(e) => setter(e.target.value)}
               placeholder={placeholder}
-              className="w-full px-4 py-2 border border-amber-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-amber-50 text-amber-900 text-sm sm:text-base"
+              className="w-full px-4 py-2 border border-amber-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-[#3a2b5a] text-white placeholder:text-amber-100 text-sm sm:text-base"
             />
           ))}
 
           <button
             type="submit"
-            className="w-full bg-amber-700 text-white py-2 rounded-lg hover:bg-amber-800 transition font-semibold text-sm sm:text-base"
+            className="w-full bg-[#5163BC] text-white py-2 rounded-lg hover:bg-amber-800 transition font-semibold text-sm sm:text-base"
           >
             Register
           </button>

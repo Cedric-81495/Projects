@@ -9,11 +9,10 @@ const Navbar = () => {
   const navigate = useNavigate();
   const menuRef = useRef(null);
   const [loggingOut, setLoggingOut] = useState(false);
-  
 
   const handleLogout = () => {
-  setLoggingOut(true);
-  toast.loading("Logging out...");
+    setLoggingOut(true);
+    toast.loading("Logging out...");
 
     setTimeout(() => {
       logout();
@@ -22,10 +21,9 @@ const Navbar = () => {
       toast.success("You've been logged out");
       navigate("/login");
       setLoggingOut(false);
-    }, 1000); // 2-second delay
+    }, 1000);
   };
 
-  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -40,101 +38,94 @@ const Navbar = () => {
     };
   }, [menuOpen]);
 
- 
   return (
     <>
-    {loggingOut && (
-    <div className="fixed top-20 left-1/2 transform -translate-x-1/2 w-[200px] bg-yellow-500 text-black text-center py-2 text-sm sm:text-base z-[9999] shadow-md rounded">
-       Logging out...
-    </div>
-    )}
-    <header className="fixed top-0 left-0 w-full z-50 bg-navbar text-white shadow-md">
-      <nav className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="text-xl font-bold text-white hover:text-white transition-colors duration-200"
-        >
-          Potter Wiki
-        </Link>
-
-        {/* Desktop Links */}
-        <div className="hidden md:flex space-x-4 items-center">
-          <Link to="/characters" className="text-gray-300 hover:text-white">Characters</Link>
-          <Link to="/spells" className="text-gray-300 hover:text-white">Spells</Link>
-          <Link to="/students" className="text-gray-300 hover:text-white">Students</Link>
-          <Link to="/staff" className="text-gray-300 hover:text-white">Staff</Link>
-         {(user?.role === "adminUser" || user?.role === "superUser") && (
-            <Link to="/dashboard" className="text-gray-300 hover:text-white">Dashboard</Link>
-          )}
-
-          {user ? (
-            <>
-              <Link to="/profile" className="text-gray-300 hover:text-white">Profile</Link>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            // ✅ Put Login + Register in same row
-            <div className="flex space-x-3">
-              <Link to="/login" className="text-gray-300 hover:text-white">Login</Link>
-              <Link to="/register" className="text-gray-300 hover:text-white">Register</Link>
-            </div>
-          )}
+      {loggingOut && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 w-[200px] bg-yellow-500 text-black text-center py-2 text-sm sm:text-base z-[9999] shadow-md rounded">
+          Logging out...
         </div>
+      )}
 
-        {/* Mobile Toggle Button */}
-        <button
-          className="md:hidden text-white"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          ☰
-        </button>
-      </nav>
+      <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-[#0B0B0B] via-[#111111] to-[#1a1a1a] text-white shadow-md font-serif">
+        <nav className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="text-2xl font-extrabold text-amber-200 hover:text-amber-300 transition-colors duration-200"
+          >
+            Potter Wiki
+          </Link>
 
-      {/* Mobile Dropdown */}
-      {menuOpen && (
-        <div ref={menuRef} className="md:hidden bg-navbar px-4 py-3 space-y-2">
-          <Link to="/characters" className="block text-gray-300 hover:text-white">Characters</Link>
-          <Link to="/spells" className="block text-gray-300 hover:text-white">Spells</Link>
-          <Link to="/students" className="block text-gray-300 hover:text-white">Students</Link>
-          <Link to="/staff" className="block text-gray-300 hover:text-white">Staff</Link>
-          {(user?.role === "adminUser" || user?.role === "superUser") && (
-            <Link to="/dashboard" className="text-gray-300 hover:text-white">Dashboard</Link>
-          )}
-           {(user?.role === "adminUser" || user?.role === "superUser") && (
-            <Link to="/dashboard" className="block text-gray-300 hover:text-white">Profile</Link>
-          )}
+          {/* Desktop Links */}
+          <div className="hidden md:flex space-x-4 items-center">
+            <Link to="/characters" className="text-amber-100 hover:text-amber-300 transition">Characters</Link>
+            <Link to="/spells" className="text-amber-100 hover:text-amber-300 transition">Spells</Link>
+            <Link to="/students" className="text-amber-100 hover:text-amber-300 transition">Students</Link>
+            <Link to="/staff" className="text-amber-100 hover:text-amber-300 transition">Staff</Link>
+            {(user?.role === "adminUser" || user?.role === "superUser") && (
+              <Link to="/dashboard" className="text-amber-100 hover:text-amber-300 transition">Dashboard</Link>
+            )}
 
-          {user ? (
+            {user ? (
+              <>
+                <Link to="/profile" className="text-amber-100 hover:text-amber-300 transition">Profile</Link>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-white font-serif"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <div className="flex space-x-3">
+                <Link to="/login" className="text-amber-100 hover:text-amber-300 transition">Login</Link>
+                <Link to="/register" className="text-amber-100 hover:text-amber-300 transition">Register</Link>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Toggle Button */}
+          <button
+            className="md:hidden text-white text-xl"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            ☰
+          </button>
+        </nav>
+
+        {/* Mobile Dropdown */}
+        {menuOpen && (
+          <div ref={menuRef} className="md:hidden bg-[#0B0B0B] px-4 py-3 space-y-2 font-serif">
+            <Link to="/characters" className="block text-amber-100 hover:text-amber-300 transition">Characters</Link>
+            <Link to="/spells" className="block text-amber-100 hover:text-amber-300 transition">Spells</Link>
+            <Link to="/students" className="block text-amber-100 hover:text-amber-300 transition">Students</Link>
+            <Link to="/staff" className="block text-amber-100 hover:text-amber-300 transition">Staff</Link>
+            {(user?.role === "adminUser" || user?.role === "superUser") && (
+              <Link to="/dashboard" className="block text-amber-100 hover:text-amber-300 transition">Dashboard</Link>
+            )}
+            {user && (
+              <Link to="/profile" className="block text-amber-100 hover:text-amber-300 transition">Profile</Link>
+            )}
+
+            {user ? (
               <div className="flex items-center justify-start space-x-3">
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+                  className="bg-red-500 px-3 py-1 rounded hover:bg-red-600 text-white font-serif"
                 >
-                  Logout  
-                </button> 
-                  <p>{user.username} 's Profile</p>      
+                  Logout
+                </button>
+                <p className="text-amber-100">{user.username}'s Profile</p>
               </div>
             ) : (
-
-            // ✅ Same row for `login` + register on mobile
-            <div className="flex flex-col space-y-2">
-              <Link to="/login" className="text-gray-300 hover:text-white">
-                Login
-              </Link>
-              <Link to="/register" className="text-gray-300 hover:text-white">
-                Register
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
-    </header>
+              <div className="flex flex-col space-y-2">
+                <Link to="/login" className="text-amber-100 hover:text-amber-300 transition">Login</Link>
+                <Link to="/register" className="text-amber-100 hover:text-amber-300 transition">Register</Link>
+              </div>
+            )}
+          </div>
+        )}
+      </header>
     </>
   );
 };

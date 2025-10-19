@@ -19,29 +19,42 @@ import StaffDetail from "./pages/StaffDetail";
 import StudentsDetail from "./pages/StudentsDetail";
 import BackToTopButton from "./pages/BackToTopButton";
 import NotFound from "./pages/NotFound";
-
 const App = () => {
   const Layout = () => {
     const location = useLocation();
 
-   // ✅ Show header ONLY on /characters, /spells, /students, /staff (+ subpaths)
+    // ✅ Route metadata map
+    const routeMeta = {
+      "/": { showFooter: true },
+      "/characters": { showFooter: true },
+      "/characters/:id": { showFooter: true },
+      "/spells": { showFooter: true },
+      "/spells/:id": { showFooter: true },
+      "/students": { showFooter: true },
+      "/students/:id": { showFooter: true },
+      "/staff": { showFooter: true },
+      "/staff/:id": { showFooter: true },
+      "/profile": { showFooter: true },
+      "/login": { showFooter: false },
+      "/login/*": { showFooter: false },
+      "/register": { showFooter: false },
+      "/register/*": { showFooter: false },
+      "/dashboard": { showFooter: false },
+      "/dashboard/*": { showFooter: false },
+    };
+
+    // ✅ Match route prefix dynamically
+    const hideFooter = Object.entries(routeMeta).some(([path, meta]) =>
+      location.pathname.startsWith(path.replace("/*", "")) && meta.showFooter === false
+    );
+
     const showHeader = /^\/(characters|spells|students|staff)\/?$/i.test(location.pathname);
     const hideHeader = !showHeader;
 
-    // Hide Footer on login/register/home
-    const hideFooter = [
-      "/dashboard",
-      "/dashboard/characters",
-      "/dashboard/spells",
-       "/dashboard/students",
-       "/dashboard/staff"
-      ].includes(location.pathname);
-
     return (
-      <>
+      <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#0B0B0B] via-[#111111] to-[#1a1a1a] text-white font-sans">
         <BackToTopButton />
         <Navbar />
-
         {!hideHeader && <Header />}
 
         <Routes>
@@ -58,23 +71,20 @@ const App = () => {
 
           {/* Auth routes */}
           <Route path="/login" element={<Login />} />
-
-          {/* Catch invalid subroutes like /login/asd or /register/asd */}
           <Route path="/login/*" element={<NotFound message="Page not found" backPath="/login" />} />
-          <Route path="/register/*" element={<NotFound message="Page not found" backPath="/register" />} />
-        
           <Route path="/register" element={<Register />} />
+          <Route path="/register/*" element={<NotFound message="Page not found" backPath="/register" />} />
           <Route path="/profile" element={<Profile />} />
 
           {/* Admin dashboard routes */}
           <Route path="/dashboard/*" element={<AdminDashboard />} />
 
           {/* 404 Fallback */}
-         <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
         {!hideFooter && <Footer />}
-      </>
+      </div>
     );
   };
 

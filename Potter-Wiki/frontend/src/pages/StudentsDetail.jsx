@@ -1,122 +1,154 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 import PageWrapper from "../components/PageWrapper";
-import NotFound from "./NotFound";    
+import NotFound from "./NotFound";
 
-
-const StudentsDetail = () => {
+const StudentDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [student, setStudent] = useState(null);
-  const [allStudents, setAllStudents] = useState([]);
+  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStudents = async () => {
       try {
-        const [studentRes, allRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL}/api/students/${id}`),
-          axios.get(`${import.meta.env.VITE_API_URL}/api/students`)
-        ]);
-        setStudent(studentRes.data);
-        setAllStudents(Array.isArray(allRes.data?.students) ? allRes.data.students : []);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/students`, {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
+
+        const data = Array.isArray(res.data?.students)
+          ? res.data.students
+          : Array.isArray(res.data)
+          ? res.data
+          : [];
+
+        setStudents(data);
+        const found = data.find((s) => s._id === id);
+        setStudent(found || null);
         setError(false);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (err) {
-        console.error("Failed to fetch student or list:", err);
-        setError(true); // ✅ handle API failure
+        console.error("Failed to fetch student:", err);
+        setError(true);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
-  }, [id]);
 
-  const currentIndex = Array.isArray(allStudents)
-  ? allStudents.findIndex((s) => s._id === id)
-  : -1;
-  const prevStudent = currentIndex > 0 ? allStudents[currentIndex - 1]._id : null;
-  const nextStudent = currentIndex < allStudents.length - 1 ? allStudents[currentIndex + 1]._id : null;
+    fetchStudents();
+  }, [id, user]);
 
- if (loading) {
-      return <PageWrapper loading={true} />;
-    }
+  const currentIndex = students.findIndex((s) => s._id === id);
+  const prevStudent = currentIndex > 0 ? students[currentIndex - 1] : null;
+  const nextStudent =
+    currentIndex < students.length - 1 ? students[currentIndex + 1] : null;
 
-    if (error || !student) {
-      return (
-        <PageWrapper loading={false}>
-          <NotFound message="Student not found" backPath="/student" />
-        </PageWrapper>
-      );
-    }
+  if (loading) return <PageWrapper loading={true} />;
+  if (error || !student)
     return (
-    <PageWrapper loading={false}>
-        <div className="flex flex-col items-center mt-10">
-        <div className="bg-gray-50 border mt-10 w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-4xl px-4 py-6">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
-            {/* Left: Image */}
-            <div className="flex justify-center md:justify-start md:w-1/3">
-              {student.image ? (
-                <img
-                  src={student.image}
-                  alt={student.name}
-                  className="w-64 h-64 object-cover rounded-lg border border-gray-400"
-                />
-              ) : (
-                <div className="w-64 h-64 flex items-center justify-center rounded-lg border border-gray-400 bg-gray-100 text-gray-500">
-                  No Available Image
-                </div>
-              )}
-            </div>
+      <PageWrapper>
+        <NotFound message="Student not found" backPath="/students" />
+      </PageWrapper>
+    );
 
-            {/* Right: Details */}
-            <div className="flex-1">
-              <h2 className="text-3xl font-bold text-amber-900 mb-4">{student.name}</h2>
-              <p className="text-gray-700 mb-2"><strong>House:</strong> {student.house}</p>
-              <p className="text-gray-700 mb-2"><strong>Year:</strong> {student.year}</p>
-              <p className="text-gray-700"><strong>Blood Status:</strong> {student.ancestry}</p>
-              <p className="text-gray-700"><strong>Gender:</strong> {student.gender}</p>
-              <p className="text-gray-700"><strong>House:</strong> {student.house}</p>
-              <p className="text-gray-700 mb-2"><strong>Wizard:</strong> {student.wizard ? "Yes" : "No"}</p>
-              <p className="text-gray-700"><strong>Species:</strong> {student.species}</p>
-              <p className="text-gray-700 mb-2">Date of Birth: {student.dateOfBirth}</p>
-        
-              
+  return (
+    <PageWrapper>
+      <div className="min-h-screen design-div flex flex-col items-center justify-center px-4 py-12 sm:py-20">
+        {/* 🧑‍🎓 Student Card */}
+        <div className="bg-[#6b4ea0] text-white shadow-2xl rounded-2xl border border-amber-700 p-8 sm:p-10 w-full max-w-5xl flex flex-col md:flex-row gap-10">
+          {/* 🪄 Student Image */}
+          {student.image ? (
+            <img
+              src={student.image}
+              alt={student.name}
+              className="w-64 h-80 object-cover rounded-xl border-4 border-amber-700 shadow-lg mx-auto md:mx-0"
+            />
+          ) : (
+            <div className="w-64 h-80 flex items-center justify-center rounded-xl border-4 border-amber-700 bg-[#3a2b5a] text-gray-300 shadow-lg mx-auto md:mx-0">
+              No Image Available
+            </div>
+          )}
+
+          {/* 🪄 Student Info */}
+          <div className="flex-1 flex flex-col items-start justify-center">
+            <h2 className="text-4xl sm:text-5xl font-extrabold text-amber-200 font-serif mb-6 text-center md:text-left">
+              {student.name}
+            </h2>
+
+            <div className="space-y-2 text-base sm:text-lg font-medium leading-relaxed">
+              <p>
+                <span className="text-amber-300 font-semibold">House:</span>{" "}
+                {student.house || "N/A"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Gender:</span>{" "}
+                {student.gender || "N/A"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Date of Birth:</span>{" "}
+                {student.dateOfBirth || "Unknown"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Wizard:</span>{" "}
+                {student.wizard ? "Yes" : "No"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Ancestry:</span>{" "}
+                {student.ancestry || "Unknown"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Patronus:</span>{" "}
+                {student.patronus || "Unknown"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Alive:</span>{" "}
+                {student.alive ? "Yes" : "No"}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-center items-center gap-4 mt-[48px]">
+        {/* 🪄 Navigation Buttons */}
+        <div className="flex justify-center items-center gap-4 mt-10 flex-wrap">
           <button
-            onClick={() => navigate("/spells")}
-            className="px-4 py-2 text-sm sm:text-base bg-gray-800 text-white rounded hover:bg-gray-700"
+            onClick={() => navigate("/students")}
+            className="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow"
           >
             ← Back
           </button>
 
-          {prevStudent && (
-            <button
-              onClick={() => navigate(`/students/${prevStudent}`)}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
-            >
-              ← Prev
-            </button>
-          )}
+          <button
+            onClick={() => prevStudent && navigate(`/students/${prevStudent._id}`)}
+            disabled={!prevStudent}
+            className={`px-5 py-2 rounded-lg shadow ${
+              prevStudent
+                ? "bg-blue-600 hover:bg-blue-500 text-white"
+                : "bg-gray-400 text-gray-700 cursor-not-allowed"
+            }`}
+          >
+            ← Prev
+          </button>
 
-          {nextStudent && (
-            <button
-              onClick={() => navigate(`/students/${nextStudent}`)}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
-            >
-              Next →
-            </button>
-          )}
+          <button
+            onClick={() => nextStudent && navigate(`/students/${nextStudent._id}`)}
+            disabled={!nextStudent}
+            className={`px-5 py-2 rounded-lg shadow ${
+              nextStudent
+                ? "bg-blue-600 hover:bg-blue-500 text-white"
+                : "bg-gray-400 text-gray-700 cursor-not-allowed"
+            }`}
+          >
+            Next →
+          </button>
         </div>
-        </div>
+      </div>
     </PageWrapper>
   );
 };
 
-export default StudentsDetail;
+export default StudentDetail;

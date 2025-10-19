@@ -9,6 +9,7 @@ import SearchBar from "./SearchBar"; // Adjust path if needed
 const Characters = () => {
   const [characters, setCharacters] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [visibleCount, setVisibleCount] = useState(24); // Show 6x4 initially
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 
@@ -34,15 +35,18 @@ const Characters = () => {
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // Scroll to top when no results found
   useEffect(() => {
     if (filteredCharacters.length === 0 && searchTerm.trim() !== "") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [searchTerm, filteredCharacters.length]);
 
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 36);
+  };
+
   return (
-  <PageWrapper loading={loading}>
+    <PageWrapper loading={loading}>
       <div className="p-2">
         {/* Search Bar */}
         <SearchBar
@@ -61,13 +65,27 @@ const Characters = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            {filteredCharacters.map((char) => (
-              <Link key={char._id} to={`/characters/${char._id}`}>
-                <Card title={char.name} description={char.description} />
-              </Link>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+              {filteredCharacters.slice(0, visibleCount).map((char) => (
+                <Link key={char._id} to={`/characters/${char._id}`}>
+                  <Card title={char.name} description={char.description} />
+                </Link>
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {visibleCount < filteredCharacters.length && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
+                >
+                  Load More
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </PageWrapper>

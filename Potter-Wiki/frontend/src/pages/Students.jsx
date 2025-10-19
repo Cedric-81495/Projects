@@ -4,11 +4,12 @@ import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
 import { Link } from "react-router-dom";
-import SearchBar from "./SearchBar"; // Adjusted path if needed
+import SearchBar from "./SearchBar";
 
 const Students = () => {
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [visibleCount, setVisibleCount] = useState(24); 
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 
@@ -19,8 +20,6 @@ const Students = () => {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
 
-        console.log("API response:", res.data);
-
         const data = Array.isArray(res.data?.students)
           ? res.data.students
           : Array.isArray(res.data)
@@ -29,8 +28,7 @@ const Students = () => {
 
         setStudents(data);
       } catch (err) {
-        console.error("Fetch error:", err);
-        console.log("Failed to load students.");
+        console.error("Failed to load students:", err);
       } finally {
         setLoading(false);
       }
@@ -45,43 +43,60 @@ const Students = () => {
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // 👇 Scroll to top of page when search yields no results
   useEffect(() => {
     if (filteredStudents.length === 0) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [searchTerm, filteredStudents.length]);
 
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 36);
+  };
+
   return (
- <PageWrapper loading={loading}>
-      <div className="p-2">
-        {/* Search Bar */}
+    <PageWrapper loading={loading}>
+      <div className="p-2 design-div min-h-screen">
+        {/* 🔍 Search Bar */}
         <SearchBar
           label="Search"
-          placeholder="Type a character name..."
+          placeholder="Type a student name..."
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
 
-        {/* Results */}
+        {/* 🧭 Results */}
         {!loading && filteredStudents.length === 0 && searchTerm.trim() !== "" ? (
           <div className="pt-6">
-            <p className="text-center text-gray-500 text-sm sm:text-base">
+            <p className="text-center text-gray-400 text-sm sm:text-base">
               No results found for{" "}
-              <span className="font-semibold">"{searchTerm}"</span>.
+              <span className="font-semibold text-amber-400">"{searchTerm}"</span>.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            {filteredStudents.map((student) => (
-              <Link to={`/students/${student._id}`} key={student._id}>
-                <Card
-                  title={student.name}
-                  description={`House: ${student.house || "Unknown"}`}
-                />
-              </Link>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              {filteredStudents.slice(0, visibleCount).map((student) => (
+                <Link to={`/students/${student._id}`} key={student._id}>
+                  <Card
+                    title={student.name}
+                    description={`House: ${student.house || "Unknown"}`}
+                  />
+                </Link>
+              ))}
+            </div>
+
+            {/* 🪄 Load More Button */}
+            {visibleCount < filteredStudents.length && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
+                >
+                  Load More
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </PageWrapper>

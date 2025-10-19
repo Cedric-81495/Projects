@@ -1,4 +1,4 @@
-// frontend/src/components/SearchBar.jsx
+// fronmtend/src/pages/SearchBar.jsx
 import { useEffect, useState } from "react";
 
 const SearchBar = ({
@@ -14,25 +14,23 @@ const SearchBar = ({
       setScrolled(window.scrollY > 100);
     };
 
-    // ✅ Run once on mount so it doesn’t bounce back
-    handleScroll();
-
+    handleScroll(); // ✅ Run once on mount
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <div
-      className={`flex items-center gap-4 transition-all duration-300 ${
+      className={`flex items-center gap-4 w-[320px] transition-all duration-300 ${
         scrolled
-          ? "sticky top-16 z-20 bg-white p-4 rounded-md w-[310px] shadow"
-          : "relative mb-4"
+          ? "sticky top-16 z-20 bg-[#6b4ea0]  w-[310px] p-4 rounded-xl shadow-lg border border-amber-700"
+          : "relative mb-6 bg-[#6b4ea0] p-4 w-[310px] rounded-xl shadow-lg border border-amber-700"
       }`}
     >
       {label && (
         <h2
-          className={`font-bold whitespace-nowrap transition-all duration-300 ${
-            scrolled ? "text-xl" : "text-2xl"
+          className={`font-serif font-bold whitespace-nowrap transition-all duration-300 ${
+            scrolled ? "text-xl text-amber-200" : "text-2xl text-amber-200"
           }`}
         >
           {label}:
@@ -43,9 +41,7 @@ const SearchBar = ({
         placeholder={placeholder}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className={`border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-gray-700 transition-all duration-300 ${
-          scrolled ? "w-[192px] p-2" : "w-[192px] p-2"
-        }`}
+        className="w-[192px] p-2 rounded-xl  shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder:text-amber-100 text-white border border-amber-700 bg-[#6b4ea0]"
       />
     </div>
   );

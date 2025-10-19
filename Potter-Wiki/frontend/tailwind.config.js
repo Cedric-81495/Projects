@@ -13,6 +13,16 @@ export default {
       },
       colors: {
         navbar: '#171718',
+        wizard: {
+        bg: '#1C1B29',
+        card: '#2A273F',
+        accent: '#7F5AF0',
+        gold: '#FFD700',
+        error: '#FF4C4C',
+        success: '#32CD32',
+        textSecondary: '#C0C0C0',
+        },
+
       },
     },
   },

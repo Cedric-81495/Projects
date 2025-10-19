@@ -5,7 +5,6 @@ import { AuthContext } from "../context/AuthContext";
 import PageWrapper from "../components/PageWrapper";
 import NotFound from "./NotFound";
 
-
 const CharacterDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -14,7 +13,6 @@ const CharacterDetail = () => {
   const [character, setCharacter] = useState(null);
   const [characters, setCharacters] = useState([]);
   const [loading, setLoading] = useState(true);
-  
 
   useEffect(() => {
     const fetchCharacters = async () => {
@@ -27,9 +25,10 @@ const CharacterDetail = () => {
         const found = res.data.find((char) => char._id === id);
         setCharacter(found);
         setError(false);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (err) {
-        console.error("Failed to fetch student or list:", err);
-        setError(true); // ✅ handle API failure
+        console.error("Failed to fetch character:", err);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -37,100 +36,131 @@ const CharacterDetail = () => {
     fetchCharacters();
   }, [id, user]);
 
-
-  // Find index of current character for prev/next navigation
   const currentIndex = characters.findIndex((c) => c._id === id);
   const prevCharacter = currentIndex > 0 ? characters[currentIndex - 1] : null;
   const nextCharacter =
-  currentIndex < characters.length - 1 ? characters[currentIndex + 1] : null;
+    currentIndex < characters.length - 1 ? characters[currentIndex + 1] : null;
 
-    if (loading) {
-      return <PageWrapper loading={true} />;
-    }
+  if (loading) return <PageWrapper loading={true} />;
+  if (error || !character)
+    return (
+      <PageWrapper>
+        <NotFound message="Character not found" backPath="/characters" />
+      </PageWrapper>
+    );
 
-    if (error || !character) {
-      return (
-        <PageWrapper loading={false}>
-          <NotFound message="Character not found" backPath="/characters" />
-        </PageWrapper>
-      );
-    }
+  return (
+    <PageWrapper>
+      <div className="min-h-screen design-div flex flex-col items-center justify-center px-4 py-12 sm:py-20">
+        {/* Character Card */}
+        <div className="bg-[#6b4ea0] text-white shadow-2xl rounded-2xl border border-amber-700 p-8 sm:p-10 w-full max-w-5xl flex flex-col md:flex-row gap-10">
+          {/* Character Image */}
+          {character.image ? (
+            <img
+              src={character.image}
+              alt={character.name}
+              className="w-64 h-80 object-cover rounded-xl border-4 border-amber-700 shadow-lg mx-auto md:mx-0"
+            />
+          ) : (
+            <div className="w-64 h-80 flex items-center justify-center rounded-xl border-4 border-amber-700 bg-[#3a2b5a] text-gray-300 shadow-lg mx-auto md:mx-0">
+              No Image Available
+            </div>
+          )}
 
-return (
-  <PageWrapper loading={false}>
-    <div className="bg-gray-50 min-h-screen flex flex-col items-center px-4"> 
-      {/* Character detail card */}
-     <div className="bg-white border mt-[90px] border-gray-300 p-6 rounded-lg shadow-md w-full max-w-3xl flex flex-col md:flex-row gap-8">
-        
-        {/* Image */}
-        {character.image ? (
-          <img
-            src={character.image}
-            alt={character.name}
-            className="w-64 h-80 object-cover rounded-lg border border-gray-400 mx-auto md:mx-0"
-          />
-        ) : (
-          <div className="w-64 h-64 flex items-center justify-center rounded-lg border border-gray-400 bg-gray-100 text-gray-500 mx-auto md:mx-0">
-            No Available Image
-          </div>
-        )}
-
-        {/* Right side (name + details) */}
-       
-          <div className="flex-1 flex flex-col items-start text-left px-2 sm:px-6">
-            
-            {/* Name */}
-            <h2 className="text-3xl sm:text-4xl font-bold text-amber-900 mb-6">
+          {/* Character Info */}
+          <div className="flex-1 flex flex-col items-start justify-center">
+            <h2 className="text-4xl sm:text-5xl font-extrabold text-amber-200 font-serif mb-6 text-center md:text-left">
               {character.name}
             </h2>
-            
-            {/* Details */}
-            <div className="space-y-2 text-gray-700 text-base w-full">
-              <p><strong>Species:</strong> {character.species}</p>
-              <p><strong>Gender:</strong> {character.gender}</p>
-              <p><strong>House:</strong> {character.house || "N/A"}</p>
-              <p><strong>Date of Birth:</strong> {character.dateOfBirth || "N/A"}</p>
-              <p><strong>Wizard:</strong> {character.wizard ? "Yes" : "No"}</p>
-              <p><strong>Ancestry:</strong> {character.ancestry}</p>
-              <p><strong>Eye Colour:</strong> {character.eyeColour}</p>
-              <p><strong>Hair Colour:</strong> {character.hairColour}</p>
-              <p><strong>Hogwarts Student:</strong> {character.hogwartsStudent ? "Yes" : "No"}</p>
-              <p><strong>Hogwarts Staff:</strong> {character.hogwartsStaff ? "Yes" : "No"}</p>
-              <p><strong>Actor:</strong> {character.actor}</p>
-              <p><strong>Alive:</strong> {character.alive ? "Yes" : "No"}</p>
+
+            <div className="space-y-2 text-base sm:text-lg font-medium leading-relaxed">
+              <p>
+                <span className="text-amber-300 font-semibold">Species:</span>{" "}
+                {character.species || "N/A"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Gender:</span>{" "}
+                {character.gender || "N/A"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">House:</span>{" "}
+                {character.house || "N/A"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Date of Birth:</span>{" "}
+                {character.dateOfBirth || "N/A"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Wizard:</span>{" "}
+                {character.wizard ? "Yes" : "No"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Ancestry:</span>{" "}
+                {character.ancestry || "Unknown"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Eye Colour:</span>{" "}
+                {character.eyeColour || "Unknown"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Hair Colour:</span>{" "}
+                {character.hairColour || "Unknown"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Hogwarts Student:</span>{" "}
+                {character.hogwartsStudent ? "Yes" : "No"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Hogwarts Staff:</span>{" "}
+                {character.hogwartsStaff ? "Yes" : "No"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Actor:</span>{" "}
+                {character.actor || "Unknown"}
+              </p>
+              <p>
+                <span className="text-amber-300 font-semibold">Alive:</span>{" "}
+                {character.alive ? "Yes" : "No"}
+              </p>
             </div>
           </div>
         </div>
-      
-      {/* Navigation buttons */}
-      <div className="flex justify-center items-center gap-4 mt-8 flex-wrap">
-        <button
-          onClick={() => navigate("/characters")}
-          className="px-5 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
-        >
-          ← Back
-        </button>
 
-        {prevCharacter && (
+        {/* Navigation Buttons */}
+        <div className="flex justify-center items-center gap-4 mt-10 flex-wrap">
           <button
-            onClick={() => navigate(`/characters/${prevCharacter._id}`)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+            onClick={() => navigate("/characters")}
+            className="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow"
+          >
+            ← Back
+          </button>
+
+          <button
+            onClick={() => prevCharacter && navigate(`/characters/${prevCharacter._id}`)}
+            disabled={!prevCharacter}
+            className={`px-5 py-2 rounded-lg shadow ${
+              prevCharacter
+                ? "bg-blue-600 hover:bg-blue-500 text-white"
+                : "bg-gray-400 text-gray-700 cursor-not-allowed"
+            }`}
           >
             ← Prev
           </button>
-        )}
 
-        {nextCharacter && (
           <button
-            onClick={() => navigate(`/characters/${nextCharacter._id}`)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+            onClick={() => nextCharacter && navigate(`/characters/${nextCharacter._id}`)}
+            disabled={!nextCharacter}
+            className={`px-5 py-2 rounded-lg shadow ${
+              nextCharacter
+                ? "bg-blue-600 hover:bg-blue-500 text-white"
+                : "bg-gray-400 text-gray-700 cursor-not-allowed"
+            }`}
           >
             Next →
           </button>
-        )}
+        </div>
       </div>
-</div>
-  </PageWrapper>
+    </PageWrapper>
   );
 };
 

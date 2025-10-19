@@ -1,4 +1,4 @@
-// frontend/pages/Profile.jsx
+// frontend/src/pages/Profile.jsx
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import PageWrapper from "../components/PageWrapper";
@@ -28,7 +28,9 @@ const Profile = () => {
     return (
       <PageWrapper>
         <div className="flex items-center justify-center min-h-screen">
-          <p className="text-gray-600 text-lg">You must be logged in to view this page.</p>
+          <p className="text-amber-200 text-lg font-serif">
+            You must be logged in to view this page.
+          </p>
         </div>
       </PageWrapper>
     );
@@ -39,9 +41,11 @@ const Profile = () => {
       <div className="pt-24 px-4">
         <div className="max-w-3xl mx-auto space-y-8">
           {/* Profile Info */}
-          <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Welcome, {user.firstname} {user.lastname}</h2>
-            <div className="space-y-2 text-gray-700 text-sm">
+          <div className="bg-[#6b4ea0] text-white shadow-lg rounded-xl p-6 border border-amber-700">
+            <h2 className="text-2xl sm:text-3xl font-bold font-serif text-amber-200 mb-4 text-center">
+              Welcome, {user.firstname} {user.lastname}
+            </h2>
+            <div className="space-y-2 text-sm sm:text-base text-amber-100">
               <p><strong>Email:</strong> {user.email}</p>
               <p><strong>Role:</strong> {user.role}</p>
               <p><strong>Joined:</strong> {new Date(user.createdAt).toLocaleDateString()}</p>
@@ -50,23 +54,27 @@ const Profile = () => {
 
           {/* Update Password */}
           {(user.role === "publicUser" || user.role === "adminUser" || user.role === "superUser") && (
-            <div className="bg-white shadow-md rounded-lg p-6 border border-gray-300">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-4">Update Password</h3>
+            <div className="bg-[#6b4ea0] text-white shadow-lg rounded-xl p-6 border border-amber-700">
+              <h3 className="text-xl sm:text-2xl font-semibold font-serif text-amber-200 mb-4 text-center">
+                Update Password
+              </h3>
               <div className="space-y-4">
                 <input
                   type="password"
                   placeholder="New Password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-2 border rounded focus:outline-none focus:ring"
+                  className="w-full px-4 py-2 rounded-lg border border-amber-600 bg-[#3a2b5a] text-white placeholder:text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
                 <button
                   onClick={handlePasswordUpdate}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500"
+                  className="w-full px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg transition"
                 >
                   Update Password
                 </button>
-                {status && <p className="text-sm text-gray-600">{status}</p>}
+                {status && (
+                  <p className="text-sm text-amber-100 text-center">{status}</p>
+                )}
               </div>
             </div>
           )}

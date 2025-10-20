@@ -5,9 +5,18 @@
 @tailwind utilities;
 
 body {
+  margin: 0;
+  padding: 0;
   font-family: 'Merriweather', serif;
 
   color: #ffffff; /* makes text readable */
+}
+
+input:-webkit-autofill {
+  background-color: #3a2b5a !important;
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 @keyframes fadeSlide {

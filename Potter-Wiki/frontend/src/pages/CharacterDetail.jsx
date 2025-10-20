@@ -51,7 +51,7 @@ const CharacterDetail = () => {
 
   return (
     <PageWrapper>
-      <div className="min-h-screen design-div flex flex-col items-center justify-center px-4 py-12 sm:py-20">
+      <div className="flex flex-col flex-grow design-div items-center justify-center px-4 py-12 sm:py-20">
         {/* Character Card */}
         <div className="bg-[#6b4ea0] text-white shadow-2xl rounded-2xl border border-amber-700 p-8 sm:p-10 w-full max-w-5xl flex flex-col md:flex-row gap-10">
           {/* Character Image */}

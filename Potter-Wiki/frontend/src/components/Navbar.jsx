@@ -20,6 +20,7 @@ const Navbar = () => {
   const [loggingOut, setLoggingOut] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [showMobileDropdown, setShowMobileDropdown] = useState(false);
 
   const handleLogout = () => {
     setLoggingOut(true);
@@ -37,7 +38,7 @@ const Navbar = () => {
   // Hide/show navbar on scroll
   useEffect(() => {
     const controlNavbar = () => {
-      if (window.scrollY > lastScrollY && window.scrollY > 100) {
+      if (window.scrollY > lastScrollY && window.scrollY > 50) {
         setIsVisible(false);
       } else {
         setIsVisible(true);
@@ -147,12 +148,12 @@ const Navbar = () => {
           <Link to="/quizzes" className="hover:text-amber-300 transition">Quizzes & Puzzles</Link>
           <Link to="/jk-rowling" className="hover:text-amber-300 transition">J.K. Rowling Archive</Link>
           <div className="relative group">
-            <button className="hover:text-amber-300 transition">Discover ▾</button>
-            <div className="absolute left-0 mt-2 w-48 bg-[#0b0b0b] border border-gray-700 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
-              <Link to="/books" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300 transition">Books</Link>
-              <Link to="/films" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300 transition">Films</Link>
-              <Link to="/portkey games" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300 transition">Portkey Games </Link>
-              <Link to="/experience" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300 transition">Experience</Link>
+            <button className="hover:text-amber-300 transition">Magical Data ▾</button>
+            <div className="absolute top-full left-0 w-48 bg-[#0b0b0b] border border-gray-700 rounded shadow-lg invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 z-50">
+              <Link to="/characters" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Characters</Link>
+              <Link to="/spells" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Spells</Link>
+              <Link to="/students" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Students</Link>
+              <Link to="/staff" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Staff</Link>
             </div>
           </div>
           <Link to="/hogwarts-sorting" className="hover:text-amber-300 transition">Hogwarts Sorting</Link>
@@ -175,16 +176,33 @@ const Navbar = () => {
         {/* Mobile Dropdown */}
         {menuOpen && (
           <div
-              ref={menuRef}
-              className="md:hidden bg-[#0E0E38] border-t border-gray-700 py-4 transition-all duration-300"
-            >
-              <div className="flex flex-col items-center space-y-3 text-sm font-semibold uppercase tracking-wide">
+            ref={menuRef}
+            className="md:hidden bg-[#020325 py-4 transition-all duration-300 max-h-[calc(100vh-80px)] overflow-y-auto"
+          >
+            <div className="flex flex-col items-center space-y-3 text-sm font-semibold uppercase tracking-wide">
+                  
                 <Link to="/news" onClick={() => setMenuOpen(false)}>News & Features</Link>
                 <Link to="/quizzes" onClick={() => setMenuOpen(false)}>Quizzes & Puzzles</Link>
                 <Link to="/discover" onClick={() => setMenuOpen(false)}>Discover</Link>
                 <Link to="/hogwarts-sorting" onClick={() => setMenuOpen(false)}>Hogwarts Sorting</Link>
                 <Link to="/portrait-maker" onClick={() => setMenuOpen(false)}>Portrait Maker</Link>
                 <Link to="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
+                <Link>
+                  <button
+                    onClick={() => setShowMobileDropdown(!showMobileDropdown)}
+                    className="w-full text-left hover:text-amber-300"
+                  >
+                    Magical Data ▾
+                  </button></Link>
+                  {showMobileDropdown && (
+                   <div className="mt-2 mx-auto w-48 bg-[#020325] shadow-lg justify-center">
+                      <Link to="/characters" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Characters</Link>
+                      <Link to="/spells" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Spells</Link>
+                      <Link to="/students" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Students</Link>
+                      <Link to="/staff" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Staff</Link>
+                    </div>
+                  )}
+                
 
                 <div className="border-t border-gray-600 w-3/4 my-2"></div>
 

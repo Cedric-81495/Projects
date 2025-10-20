@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar";
 //import AdminRoute from "./components/AdminRoute";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-// import Characters from "./pages/Characters";
+import Characters from "./pages/Characters";
 // import Spells from "./pages/Spells";
 // import Students from "./pages/Students";
 // import Staff from "./pages/Staff";
@@ -30,7 +30,9 @@ function App() {
 
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* <Route path="/characters" element={<Characters />} />
+           <Route path="/characters" element={<Characters />} />
+          {/*
+          <Navbar />
           <Route path="/characters/:id" element={<CharacterDetail />} />
           <Route path="/spells" element={<Spells />} />
           <Route path="/spells/:id" element={<SpellsDetail />} />

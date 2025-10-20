@@ -1,15 +1,17 @@
+// frontend/src/pages/Characters.jsx
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
-import SearchBar from "./SearchBar"; // Adjust path if needed
+import SearchBar from "./SearchBar";
+import voyeglq from "../assets/voyeglq.jpg";
 
 const Characters = () => {
   const [characters, setCharacters] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [visibleCount, setVisibleCount] = useState(24); // Show 6x4 initially
+  const [visibleCount, setVisibleCount] = useState(24);
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 
@@ -47,47 +49,49 @@ const Characters = () => {
 
   return (
     <PageWrapper loading={loading}>
-      <div className="p-2">
-        {/* Search Bar */}
-        <SearchBar
-          label="Search"
-          placeholder="Type a character name..."
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
+      <section
+              className="min-h-screen flex flex-col items-center justify-center px-6 py-20 text-center bg-cover bg-center relative"
+              style={{ backgroundImage: `url(${voyeglq})` }} 
+            >
+          {/* Search Bar */}
+          <SearchBar
+            label="Search"
+            placeholder="Type a character name..."
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
 
-        {/* Results */}
-        {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (
-          <div className="mt-4">
-            <p className="text-center text-gray-500 text-sm sm:text-base">
-              No results found for{" "}
-              <span className="font-semibold">"{searchTerm}"</span>.
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-              {filteredCharacters.slice(0, visibleCount).map((char) => (
-                <Link key={char._id} to={`/characters/${char._id}`}>
-                  <Card title={char.name} description={char.description} />
-                </Link>
-              ))}
+          {/* Results */}
+          {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (
+            <div className="mt-6">
+              <p className="text-center text-gray-500 text-sm sm:text-base">
+                No results found for <span className="font-semibold">"{searchTerm}"</span>.
+              </p>
             </div>
-
-            {/* Load More Button */}
-            {visibleCount < filteredCharacters.length && (
-              <div className="flex justify-center mt-8">
-                <button
-                  onClick={handleLoadMore}
-                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
-                >
-                  Load More
-                </button>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-6 w-full">
+                {filteredCharacters.slice(0, visibleCount).map((char) => (
+                  <Link key={char._id} to={`/characters/${char._id}`}>
+                    <Card title={char.name} description={char.description} />
+                  </Link>
+                ))}
               </div>
-            )}
-          </>
-        )}
-      </div>
+
+              {visibleCount < filteredCharacters.length && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={handleLoadMore}
+                    className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+       
+      </section>
     </PageWrapper>
   );
 };

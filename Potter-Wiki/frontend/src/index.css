@@ -12,6 +12,8 @@ body {
   color: #ffffff; /* makes text readable */
 }
 
+
+
 input:-webkit-autofill {
   background-color: #3a2b5a !important;
   color: white !important;

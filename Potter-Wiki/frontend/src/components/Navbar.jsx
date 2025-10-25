@@ -37,12 +37,7 @@ const Navbar = () => {
       setLoggingOut(false);
     }, 1000);
   };
-  
-  const handleNavLinkClick = (path) => {
-  navigate(path);
-  setMenuOpen(false);
-  setShowMobileDropdown(false);
-  };
+
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -97,14 +92,23 @@ const Navbar = () => {
               />
               <span className="absolute right-3 top-1.5 text-gray-400">🔍</span>
             </div>
-            {user ? (
+           {user ? (
+              <div className="flex items-center gap-2">
+              <Link
+                to="/dashboard"
+                className="bg-[#5163BC] px-3 py-1.5 rounded text-sm text-white hover:bg-[#3f4fa0] transition"
+              >
+                Dashboard
+              </Link>
               <button
                 onClick={handleLogout}
-                className="bg-red-600 px-3 py-1.5 rounded text-sm hover:bg-red-700 transition"
+                className="bg-red-600 px-3 py-1.5 rounded text-sm text-white hover:bg-red-700 transition"
               >
                 Logout
               </button>
+            </div>
             ) : (
+
               <>
                 <Link
                   to="/login"
@@ -118,6 +122,7 @@ const Navbar = () => {
                 >
                   Sign Up
                 </Link>
+                
               </>
             )}
           </div>
@@ -165,6 +170,7 @@ const Navbar = () => {
                   Features
                 </Link>
               </div>
+              
             )}
           </div>
 
@@ -213,6 +219,7 @@ const Navbar = () => {
               </div>
             )}
           </div>
+          
         </nav>
 
         {/* Mobile Dropdown */}

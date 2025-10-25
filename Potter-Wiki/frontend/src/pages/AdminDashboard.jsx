@@ -126,7 +126,7 @@ const AdminDashboard = () => {
   const isDashboardRoot = location.pathname === "/dashboard";
 
   return (
-    <div className="pt-20 p-6 bg-[#1a1244] text-white min-h-screen relative">
+    <div className="pt-[160px] pb-[24px] bg-[#1a1244] text-white min-h-screen relative">
       {successMessage && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
           <div className="bg-green-600 text-white px-6 py-3 rounded shadow-lg text-center">

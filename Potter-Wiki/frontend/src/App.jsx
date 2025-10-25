@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { useEffect, useState } from "react";
 import { AuthProvider } from "./context/AuthProvider";
 import Navbar from "./components/Navbar";
-// import Header from "./components/Header";
 // import AdminRoute from "./components/AdminRoute";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -12,9 +11,9 @@ import Spells from "./pages/Spells";
 import Students from "./pages/Students";
 import Staff from "./pages/Staff";
 import Login from "./pages/Login";
-// import Register from "./pages/Register";
-// import Profile from "./pages/Profile";
-// import AdminDashboard from "./pages/AdminDashboard";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
+import AdminDashboard from "./pages/AdminDashboard";
 import CharacterDetail from "./pages/CharacterDetail";
 import SpellsDetail from "./pages/SpellsDetail";
 import StaffDetail from "./pages/StaffDetail";
@@ -29,6 +28,13 @@ const location = useLocation();
   // Define valid route patterns
   const validPatterns = [
     /^\/login$/, // Home
+    /^\/profile$/, // Home
+    /^\/dashboard$/, // Admin Dashboard
+    /^\/dashboard\/characters$/, // Admin Dashboard Characters
+    /^\/dashboard\/spells$/, // Admin Dashboard Spells
+    /^\/dashboard\/students$/, // Admin Dashboard Students
+    /^\/dashboard\/staff$/, // Admin Dashboard Staff
+    /^\/register$/, // Register
     /^\/$/, // Home
     /^\/characters$/, /^\/characters\/[a-f\d]{24}$/,
     /^\/spells$/, /^\/spells\/[a-f\d]{24}$/,
@@ -40,8 +46,7 @@ const location = useLocation();
 
 // Check if current path matches any valid pattern
 const isValidPath = validPatterns.some((pattern) => pattern.test(location.pathname));
-const hideLayout = location.pathname === "/login";
-
+const hideLayout = location.pathname === "/login" || location.pathname === "/register";
 
 if (!isValidPath) {
     return (
@@ -62,28 +67,24 @@ if (!isValidPath) {
       <BackToTopButton />
       
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/characters" element={<Characters />} />
-        <Route path="/characters/:id" element={<CharacterDetail />} />
-        <Route path="/spells" element={<Spells />} />
-        <Route path="/spells/:id" element={<SpellsDetail />} />
-        <Route path="/staff" element={<Staff />} />
-        <Route path="/staff/:id" element={<StaffDetail />} />
-        <Route path="/students" element={<Students />} />
-        <Route path="/students/:id" element={<StudentsDetail />} />
-        <Route path="/login" element={<Login />} />
-        {/* 
-        <Navbar />
-        <Route path="/characters/:id" element={<CharacterDetail />} />
-        <Route path="/spells/:id" element={<SpellsDetail />} />
-        <Route path="/students" element={<Students />} />
+           {/* Public routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/characters" element={<Characters />} />
+          <Route path="/characters/:id" element={<CharacterDetail />} />
+          <Route path="/spells" element={<Spells />} />
+          <Route path="/spells/:id" element={<SpellsDetail />} />
+          <Route path="/students" element={<Students />} />
+          <Route path="/students/:id" element={<StudentsDetail />} />
+          <Route path="/staff" element={<Staff />} />
+          <Route path="/staff/:id" element={<StaffDetail />} />
 
-        <Route path="/staff" element={<Staff />} />
-        <Route path="/staff/:id" element={<StaffDetail />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard/*" element={<AdminDashboard />} /> 
-        */}
+          {/* Auth routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
+
+          {/* Admin dashboard routes */}
+          <Route path="/dashboard/*" element={<AdminDashboard />} />
 
         {/* ⚠️ NotFound route */}
           <Route path="*" element={<NotFound message="Invalid route format" />} />

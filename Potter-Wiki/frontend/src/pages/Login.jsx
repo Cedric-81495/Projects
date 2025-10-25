@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import bgImage from "../assets/voyeglq-bg.jpg"; // ✅ Same background as Register
+import aestheticbg from "../assets/aesthetic-bg.jpg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -65,27 +65,20 @@ const Login = () => {
 
   return (
     <div
-      className="relative flex items-center justify-center min-h-screen px-4 sm:px-6 md:px-8 py-12 sm:py-20 bg-cover bg-center"
-      style={{ backgroundImage: `url(${bgImage})` }}
+      className="relative min-h-screen flex items-center justify-center px-4 py-20 bg-cover bg-center"
+      style={{ backgroundImage: `url(${aestheticbg})` }}
     >
-      {/* 🧥 Overlay */}
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0" />
 
-      {/* 🔙 Back Button */}
-      <button
-        onClick={handleGoBack}
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 text-amber-100 text-sm sm:text-base font-medium hover:underline z-10"
-      >
-        ← Back
-      </button>
 
-      {/* 🧾 Form Container */}
-      <div className="relative z-10 w-full max-w-md sm:max-w-lg md:max-w-xl p-6 sm:p-8 rounded-2xl shadow-2xl bg-[#2e1e4d] border-4 border-amber-700">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-amber-200 font-serif">
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-xl bg-[#1b1b2f] border border-[#cfae6d] text-[#f5e6c8] shadow-lg hover:shadow-xl transition duration-300 rounded-2xl p-6 sm:p-10">
+        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center mb-8">
           Login
         </h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <input
             type="email"
             value={email}
@@ -95,7 +88,7 @@ const Login = () => {
               setSuccessMessage("");
             }}
             placeholder="Email"
-            className="w-full px-4 py-2 border border-amber-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-[#3a2b5a] text-white placeholder:text-amber-100 text-sm sm:text-base"
+            className="w-full px-4 py-2 border border-[#cfae6d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#cfae6d] bg-[#2c2c44] text-white placeholder:text-[#f5e6c8] text-sm sm:text-base"
           />
 
           <div className="relative">
@@ -108,13 +101,13 @@ const Login = () => {
                 setSuccessMessage("");
               }}
               placeholder="Password"
-              className="w-full px-4 py-2 border border-amber-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-[#3a2b5a] text-white placeholder:text-amber-100 text-sm sm:text-base"
+              className="w-full px-4 py-2 border border-[#cfae6d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#cfae6d] bg-[#2c2c44] text-white placeholder:text-[#f5e6c8] text-sm sm:text-base"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute right-3 top-2.5 text-amber-300 hover:text-amber-100"
+              className="absolute right-3 top-2.5 text-[#cfae6d] hover:text-[#e0c98c]"
             >
               {showPassword ? "🙈" : "👁️"}
             </button>
@@ -129,12 +122,21 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-[#5163BC] text-white py-2 rounded-lg hover:bg-amber-800 transition font-semibold text-sm sm:text-base"
+            className="w-full bg-[#5163BC] hover:bg-[#3f4fa0] text-white py-2 rounded-lg transition font-semibold text-sm sm:text-base"
           >
             Login
           </button>
+       
         </form>
+           {/* Back Button */}
+           <button
+            onClick={handleGoBack}
+            className="w-full bg-[#5c5e68] mt-[10px] hover:bg-[#3f4fa0] text-white py-2 rounded-lg transition font-semibold text-sm sm:text-base"
+          >
+            Back
+          </button>
       </div>
+    
     </div>
   );
 };

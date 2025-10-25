@@ -18,9 +18,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const menuRef = useRef(null);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [showMobileDropdown, setShowMobileDropdown] = useState(false);
+  const [showNewsDropdown, setShowNewsDropdown] = useState(false);
+  const [showMagicalDropdown, setShowMagicalDropdown] = useState(false);
+  const [showMobileNewsDropdown, setShowMobileNewsDropdown] = useState(false);
+  const [showMobileMagicalDropdown, setShowMobileMagicalDropdown] = useState(false);
+
+
 
   const handleLogout = () => {
     setLoggingOut(true);
@@ -34,20 +37,12 @@ const Navbar = () => {
       setLoggingOut(false);
     }, 1000);
   };
-
-  // Hide/show navbar on scroll
-  useEffect(() => {
-    const controlNavbar = () => {
-      if (window.scrollY > lastScrollY && window.scrollY > 50) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      setLastScrollY(window.scrollY);
-    };
-    window.addEventListener("scroll", controlNavbar);
-    return () => window.removeEventListener("scroll", controlNavbar);
-  }, [lastScrollY]);
+  
+  const handleNavLinkClick = (path) => {
+  navigate(path);
+  setMenuOpen(false);
+  setShowMobileDropdown(false);
+  };
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -68,11 +63,8 @@ const Navbar = () => {
         </div>
       )}
 
-      <header
-        className={`fixed top-0 left-0 w-full z-50 text-white font-serif transition-transform duration-300 ${
-          isVisible ? "translate-y-0" : "-translate-y-full"
-        } bg-[#020325]`}
-      >
+   <header className="fixed top-0 left-0 w-full z-50 text-white bg-[#020325] font-serif transition-transform duration-300 translate-y-0">
+
         {/* Top Row */}
         <div className="w-full flex justify-between items-center px-6 py-4 max-w-7xl mx-auto relative">
           {/* Social Icons */}
@@ -144,32 +136,82 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex justify-center items-center gap-6 py-3 text-sm font-semibold uppercase tracking-wide bg-[#020325]">
-          <Link to="/news" className="hover:text-amber-300 transition">News & Features</Link>
-          <Link to="/quizzes" className="hover:text-amber-300 transition">Quizzes & Puzzles</Link>
-          <Link to="/jk-rowling" className="hover:text-amber-300 transition">J.K. Rowling Archive</Link>
-          <div className="relative group">
-            <button className="hover:text-amber-300 transition">Magical Data ▾</button>
-            <div className="absolute top-full left-0 w-48 bg-[#0b0b0b] border border-gray-700 rounded shadow-lg invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 z-50">
-              <Link to="/characters" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Characters</Link>
-              <Link to="/spells" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Spells</Link>
-              <Link to="/students" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Students</Link>
-              <Link to="/staff" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Staff</Link>
-            </div>
-          </div>
-          <Link to="/hogwarts-sorting" className="hover:text-amber-300 transition">Hogwarts Sorting</Link>
-          <Link to="/portrait-maker" className="hover:text-amber-300 transition">Portrait Maker</Link>
-          <Link to="/patronus" className="hover:text-amber-300 transition">Patronus Experience</Link>
-          <Link to="/fact-files" className="hover:text-amber-300 transition">Fact Files</Link>
-          <Link to="/shop" className="hover:text-amber-300 transition">Shop</Link>
+           {/* News and Features (click-to-toggle) */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowNewsDropdown((prev) => !prev);
+                setShowMagicalDropdown(false);
+              }}
+                className="text-white hover:text-amber-300 transition flex items-center gap-1"
+            >
+              News & Features ▾
+            </button>
 
-          <div className="relative group">
-            <button className="hover:text-amber-300 transition">Magical Data ▾</button>
-            <div className="absolute left-0 mt-2 w-48 bg-[#0b0b0b] border border-gray-700 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
-              <Link to="/characters" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300 transition">Characters</Link>
-              <Link to="/spells" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300 transition">Spells</Link>
-              <Link to="/students" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300 transition">Students</Link>
-              <Link to="/staff" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300 transition">Staff</Link>
-            </div>
+            {showNewsDropdown && (
+              <div className="absolute top-full left-0 w-48 bg-[#0b0b0b] border border-gray-700 rounded shadow-lg transition-all duration-300 z-50">
+                <Link
+                  to="/news"
+                  onClick={() => setShowNewsDropdown(false)}
+                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
+                >
+                  News
+                </Link>
+                <Link
+                  to="/features"
+                  onClick={() => setShowNewsDropdown(false)}
+                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
+                >
+                  Features
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Magical Data */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowMagicalDropdown((prev) => !prev);
+                setShowNewsDropdown(false);
+              }}
+              className="text-white hover:text-amber-300 transition flex items-center gap-1"
+            >
+              Magical Data ▾
+            </button>
+
+            {showMagicalDropdown && (
+              <div className="absolute top-full left-0 w-48 bg-[#0b0b0b] border border-gray-700 rounded shadow-lg transition-all duration-300 z-50">
+                <Link
+                  to="/characters"
+                  onClick={() => setShowMagicalDropdown(false)}
+                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
+                >
+                  Characters
+                </Link>
+                <Link
+                  to="/spells"
+                  onClick={() => setShowMagicalDropdown(false)}
+                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
+                >
+                  Spells
+                </Link>
+                <Link
+                  to="/students"
+                  onClick={() => setShowMagicalDropdown(false)}
+                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
+                >
+                  Students
+                </Link>
+                <Link
+                  to="/staff"
+                  onClick={() => setShowMagicalDropdown(false)}
+                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
+                >
+                  Staff
+                </Link>
+              </div>
+            )}
           </div>
         </nav>
 
@@ -177,63 +219,90 @@ const Navbar = () => {
         {menuOpen && (
           <div
             ref={menuRef}
-            className="md:hidden bg-[#020325 py-4 transition-all duration-300 max-h-[calc(100vh-80px)] overflow-y-auto"
+            className="md:hidden bg-[#020325] py-4 transition-all duration-300 max-h-[calc(100vh-80px)] overflow-y-auto"
           >
             <div className="flex flex-col items-center space-y-3 text-sm font-semibold uppercase tracking-wide">
-                  
-                <Link to="/news" onClick={() => setMenuOpen(false)}>News & Features</Link>
-                <Link to="/quizzes" onClick={() => setMenuOpen(false)}>Quizzes & Puzzles</Link>
-                <Link to="/discover" onClick={() => setMenuOpen(false)}>Discover</Link>
-                <Link to="/hogwarts-sorting" onClick={() => setMenuOpen(false)}>Hogwarts Sorting</Link>
-                <Link to="/portrait-maker" onClick={() => setMenuOpen(false)}>Portrait Maker</Link>
-                <Link to="/shop" onClick={() => setMenuOpen(false)}>Shop</Link>
-                <Link>
-                  <button
-                    onClick={() => setShowMobileDropdown(!showMobileDropdown)}
-                    className="w-full text-left hover:text-amber-300"
-                  >
-                    Magical Data ▾
-                  </button></Link>
-                  {showMobileDropdown && (
-                   <div className="mt-2 mx-auto w-48 bg-[#020325] shadow-lg justify-center">
-                      <Link to="/characters" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Characters</Link>
-                      <Link to="/spells" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Spells</Link>
-                      <Link to="/students" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Students</Link>
-                      <Link to="/staff" className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">Staff</Link>
-                    </div>
-                  )}
-                
 
-                <div className="border-t border-gray-600 w-3/4 my-2"></div>
+              {/* News & Features (Accordion) */}
+              <button
+                onClick={() => {
+                  setShowMobileNewsDropdown((prev) => !prev);
+                  setShowMobileMagicalDropdown(false);
+                }}
+                className="w-full text-center hover:text-amber-300"
+              >
+                News & Features ▾
+              </button>
+              {showMobileNewsDropdown && (
+                <div className="mt-2 mx-auto w-48 bg-[#020325] shadow-lg justify-center">
+                  <Link to="/news" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                    News
+                  </Link>
+                  <Link to="/features" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                    Features
+                  </Link>
+                </div>
+              )}
 
-                {user ? (
-                  <button
-                    onClick={handleLogout}
-                    className="bg-red-600 px-3 py-1.5 rounded text-sm hover:bg-red-700 transition"
+              {/* Magical Data (Accordion) */}
+              <button
+                onClick={() => {
+                  setShowMobileMagicalDropdown((prev) => !prev);
+                  setShowMobileNewsDropdown(false);
+                }}
+                className="w-full text-center hover:text-amber-300"
+              >
+                Magical Data ▾
+              </button>
+              {showMobileMagicalDropdown && (
+                <div className="mt-2 mx-auto w-48 bg-[#020325] shadow-lg justify-center">
+                  <Link to="/characters" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                    Characters
+                  </Link>
+                  <Link to="/spells" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                    Spells
+                  </Link>
+                  <Link to="/students" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                    Students
+                  </Link>
+                  <Link to="/staff" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                    Staff
+                  </Link>
+                </div>
+              )}
+
+              {/* Divider */}
+              <div className="border-t border-gray-600 w-3/4 my-2"></div>
+
+              {/* Auth Buttons */}
+              {user ? (
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 px-3 py-1.5 rounded text-sm hover:bg-red-700 transition"
+                >
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="border border-white px-3 py-1.5 rounded text-sm hover:bg-white hover:text-black transition"
                   >
-                    Logout
-                  </button>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      onClick={() => setMenuOpen(false)}
-                      className="border border-white px-3 py-1.5 rounded text-sm hover:bg-white hover:text-black transition"
-                    >
-                      Log In
-                    </Link>
-                    <Link
-                      to="/register"
-                      onClick={() => setMenuOpen(false)}
-                       className="inline-block bg-amber-500 text-black px-6 py-3 rounded-lg shadow hover:bg-amber-600 transition font-semibold"
-                    >
-                      Sign Up
-                    </Link>
-                  </>
-                )}
-              </div>
+                    Log In
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="inline-block bg-amber-500 text-black px-6 py-3 rounded-lg shadow hover:bg-amber-600 transition font-semibold"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
-          )}
+          </div> 
+        )}      
       </header>
     </>
   );

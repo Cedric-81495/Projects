@@ -10,7 +10,7 @@ import NotFound from "./NotFound";
 const Staff = () => {
   const [staff, setStaff] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [visibleCount, setVisibleCount] = useState(24); 
+  const [visibleCount, setVisibleCount] = useState(24);
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -71,28 +71,29 @@ const Staff = () => {
 
   return (
     <PageWrapper loading={false}>
-      <div className="p-2">
-        {/* Search Bar */}
-        <SearchBar
-          label="Search"
-          placeholder="Type a staff name..."
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-
-        {/* Results */}
-        {!loading && filteredStaff.length === 0 && searchTerm.trim() !== "" ? (
-          <div className="mt-4">
-            <p className="text-center text-gray-500 text-sm sm:text-base">
-              No results found for{" "}
-              <span className="font-semibold">"{searchTerm}"</span>.
-            </p>
+      <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
+        {/* 🔍 Search Bar */}
+        <div className="w-full flex justify-center mb-10">
+          <div className="w-full max-w-3xl">
+            <SearchBar
+              label="Search"
+              placeholder="Type a staff name..."
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
           </div>
+        </div>
+
+        {/* 🧑‍🏫 Staff Results */}
+        {!loading && filteredStaff.length === 0 && searchTerm.trim() !== "" ? (
+          <p className="text-gray-400 mt-8 text-center">
+            No results found for <span className="font-semibold">"{searchTerm}"</span>.
+          </p>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
               {filteredStaff.slice(0, visibleCount).map((member) => (
-                <Link to={`/staff/${member._id}`} key={member._id}>
+                <Link key={member._id} to={`/staff/${member._id}`}>
                   <Card
                     title={member.name}
                     description={`House: ${member.house || "Unknown"}`}
@@ -103,7 +104,7 @@ const Staff = () => {
 
             {/* Load More Button */}
             {visibleCount < filteredStaff.length && (
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-10">
                 <button
                   onClick={handleLoadMore}
                   className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
@@ -114,7 +115,7 @@ const Staff = () => {
             )}
           </>
         )}
-      </div>
+      </section>
     </PageWrapper>
   );
 };

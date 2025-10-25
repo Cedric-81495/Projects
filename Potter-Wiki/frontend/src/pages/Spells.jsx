@@ -1,6 +1,6 @@
 // src/pages/Spells.jsx
 import { Link } from "react-router-dom";
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
@@ -10,10 +10,9 @@ import SearchBar from "./SearchBar";
 const Spells = () => {
   const [spells, setSpells] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [visibleCount, setVisibleCount] = useState(24); // ✅ Show 36 items initially (6x4)
+  const [visibleCount, setVisibleCount] = useState(24);
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-  const resultsRef = useRef(null);
 
   // ✅ Fetch spells
   useEffect(() => {
@@ -53,35 +52,38 @@ const Spells = () => {
 
   return (
     <PageWrapper loading={loading}>
-      <div className="p-2">
-        {/* 🔍 Search Bar */}
-        <SearchBar
-          label="Search"
-          placeholder="Type a spell name..."
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-
-        {/* 🔽 Results */}
-        {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
-          <div ref={resultsRef} className="mt-4">
-            <p className="text-center text-gray-500 text-sm sm:text-base">
-              No results found for{" "}
-              <span className="font-semibold">"{searchTerm}"</span>.
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* 🧩 Spell Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 design-div">
+         {/* Charater Section */}
+      <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
+            {/* 🔍 Search Bar pinned under navbar */}
+            <div className="w-full flex justify-center mb-10">
+              <div className="w-full max-w-3xl">
+                <SearchBar
+                  label="Search"
+                  placeholder="Type a spell name..."
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                />
+              </div>
+            </div>
+            {/* 🧙 Results */}
+            {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
+              <div className="mt-8">
+                <p className="text-center text-gray-500 text-sm sm:text-base">
+                  No results found for <span className="font-semibold">"{searchTerm}"</span>.
+                </p>
+              </div>
+            ) : (
+               <>
+            {/* 🧙 Spell Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
               {filteredSpells.slice(0, visibleCount).map((spell) => (
                 <Link key={spell._id} to={`/spells/${spell._id}`}>
-                  <Card title={spell.name} description={spell.effect} />
+                  <Card title={spell.name} />
                 </Link>
               ))}
             </div>
 
-            {/* 🧭 Load More Button */}
+            {/* 🧭 Load More */}
             {visibleCount < filteredSpells.length && (
               <div className="flex justify-center mt-8">
                 <button
@@ -94,7 +96,7 @@ const Spells = () => {
             )}
           </>
         )}
-      </div>
+      </section>
     </PageWrapper>
   );
 };

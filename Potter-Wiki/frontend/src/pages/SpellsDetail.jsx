@@ -1,4 +1,3 @@
-// src/pages/SpellsDetail.jsx
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
@@ -45,79 +44,66 @@ const SpellsDetail = () => {
   if (error || !spell)
     return (
       <PageWrapper>
-        <NotFound message="Spell not found" />
+        <NotFound message="Spell not found" backPath="/spells" />
       </PageWrapper>
     );
 
   return (
     <PageWrapper>
-      <div className="min-h-screen design-div flex flex-col items-center justify-center px-4 py-12 sm:py-20">
-        {/* Card */}
-        <div className="bg-[#6b4ea0] text-white shadow-2xl rounded-2xl border border-amber-700 p-8 sm:p-10 w-full max-w-3xl">
-          <h2 className="text-4xl sm:text-5xl font-extrabold mb-6 text-amber-200 font-serif text-center">
+      <section className="min-h-screen pt-[160px] flex flex-col items-center justify-start px-4">
+        <div className="w-full max-w-6xl mx-auto">
+          {/* 🪄 Spell Name */}
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#f5e6c8] mb-10 text-center">
             {spell.name}
           </h2>
 
-          <div className="space-y-3 text-base sm:text-lg leading-relaxed font-medium">
-            <p>
-              <span className="font-bold text-amber-300">Type:</span>{" "}
-              {spell.type || "—"}
-            </p>
-            <p>
-              <span className="font-bold text-amber-300">Effect:</span>{" "}
-              {spell.effect || "—"}
-            </p>
-            <p>
-              <span className="font-bold text-amber-300">Incantation:</span>{" "}
-              <em>{spell.incantation || "—"}</em>
-            </p>
-            <p>
-              <span className="font-bold text-amber-300">Light:</span>{" "}
-              {spell.light || "Unknown"}
-            </p>
-            <p>
-              <span className="font-bold text-amber-300">Creator:</span>{" "}
-              {spell.creator || "Unknown"}
-            </p>
-            <p>
-              <span className="font-bold text-amber-300">Description:</span>{" "}
-              {spell.description || "No description available."}
-            </p>
+          {/* 📜 Spell Card */}
+          <div className="bg-[#1b1b2f] border border-[#cfae6d] text-[#f5e6c8] shadow-md hover:shadow-xl transition duration-300 rounded-2xl p-6 sm:p-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-base sm:text-lg font-medium leading-relaxed">
+              <p><span className="text-[#cfae6d] font-semibold">Type:</span> {spell.type || "—"}</p>
+              <p><span className="text-[#cfae6d] font-semibold">Effect:</span> {spell.effect || "—"}</p>
+              <p><span className="text-[#cfae6d] font-semibold">Incantation:</span> <em>{spell.incantation || "—"}</em></p>
+              <p><span className="text-[#cfae6d] font-semibold">Light:</span> {spell.light || "Unknown"}</p>
+              <p><span className="text-[#cfae6d] font-semibold">Creator:</span> {spell.creator || "Unknown"}</p>
+              <p className="sm:col-span-2"><span className="text-[#cfae6d] font-semibold">Description:</span> {spell.description || "No description available."}</p>
+            </div>
+          </div>
+
+          {/* 🧭 Navigation Buttons */}
+          <div className="flex justify-center items-center gap-4 mt-10 flex-wrap">
+            <button
+              onClick={() => navigate("/spells")}
+              className="px-6 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
+            >
+              ← Back
+            </button>
+
+            <button
+              onClick={() => prevSpell && navigate(`/spells/${prevSpell._id}`)}
+              disabled={!prevSpell}
+              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition ${
+                prevSpell
+                  ? "bg-blue-600 hover:bg-blue-500 text-white"
+                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
+              }`}
+            >
+              ← Prev
+            </button>
+
+            <button
+              onClick={() => nextSpell && navigate(`/spells/${nextSpell._id}`)}
+              disabled={!nextSpell}
+              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition ${
+                nextSpell
+                  ? "bg-blue-600 hover:bg-blue-500 text-white"
+                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
+              }`}
+            >
+              Next →
+            </button>
           </div>
         </div>
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-center items-center gap-4 mt-10 flex-wrap">
-          <button
-            onClick={() => navigate("/spells")}
-            className="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg shadow"
-          >
-            ← Back
-          </button>
-          <button
-            onClick={() => prevSpell && navigate(`/spells/${prevSpell._id}`)}
-            disabled={!prevSpell}
-            className={`px-5 py-2 rounded-lg shadow ${
-              prevSpell
-                ? "bg-blue-600 hover:bg-blue-500 text-white"
-                : "bg-gray-400 text-gray-700 cursor-not-allowed"
-            }`}
-          >
-            ← Prev
-          </button>
-          <button
-            onClick={() => nextSpell && navigate(`/spells/${nextSpell._id}`)}
-            disabled={!nextSpell}
-            className={`px-5 py-2 rounded-lg shadow ${
-              nextSpell
-                ? "bg-blue-600 hover:bg-blue-500 text-white"
-                : "bg-gray-400 text-gray-700 cursor-not-allowed"
-            }`}
-          >
-            Next →
-          </button>
-        </div>
-      </div>
+      </section>
     </PageWrapper>
   );
 };

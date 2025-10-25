@@ -1,16 +1,17 @@
 import { Link } from "react-router-dom";
-import voyeglq from "../assets/voyeglq.jpg";
+//import voyeglq from "../assets/voyeglq.jpg";
+import harrypotterbg from "../assets/harry-potter-bg.jpg";
 
 const Home = () => {
   return (
     <div className="text-gray-800 font-serif">
       {/* Hero Section */}
      <section
-        className="min-h-screen flex flex-col items-center justify-center px-6 py-20 text-center bg-cover bg-center relative"
-        style={{ backgroundImage: `url(${voyeglq})` }} 
+        className="min-h-screen flex flex-col items-center justify-center text-center bg-cover bg-center relative pt-24 sm:pt-28"
+        style={{ backgroundImage: `url(${harrypotterbg})` }}
       >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/50 z-0"></div>
+      <div className="relative inset-0 bg-black/50 z-0"></div>
         {/* Content */}
         <div className="relative z-10 max-w-3xl text-white">
           <h1 className="text-5xl font-extrabold mb-4 drop-shadow-lg">Welcome to Potter Wiki</h1>

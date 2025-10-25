@@ -1,4 +1,3 @@
-// frontend/src/pages/Characters.jsx
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
@@ -6,7 +5,6 @@ import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
 import SearchBar from "./SearchBar";
-import voyeglq from "../assets/voyeglq.jpg";
 
 const Characters = () => {
   const [characters, setCharacters] = useState([]);
@@ -32,9 +30,7 @@ const Characters = () => {
   }, [user]);
 
   const filteredCharacters = characters
-    .filter((char) =>
-      char.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter((char) => char.name.toLowerCase().includes(searchTerm.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   useEffect(() => {
@@ -43,54 +39,52 @@ const Characters = () => {
     }
   }, [searchTerm, filteredCharacters.length]);
 
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + 36);
-  };
+  const handleLoadMore = () => setVisibleCount((prev) => prev + 36);
 
   return (
     <PageWrapper loading={loading}>
-      <section
-              className="min-h-screen flex flex-col items-center justify-center px-6 py-20 text-center bg-cover bg-center relative"
-              style={{ backgroundImage: `url(${voyeglq})` }} 
-            >
-          {/* Search Bar */}
-          <SearchBar
-            label="Search"
-            placeholder="Type a character name..."
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-          />
+      {/* 🧱 Main Layout */}
+      <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
+            {/* 🔍 Search Bar pinned under navbar */}
+        <div className="w-full flex justify-center mb-10">
+          <div className="w-full max-w-3xl">
+            <SearchBar
+              label="Search"
+              placeholder="Type a character name..."
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
+          </div>
+        </div>
 
-          {/* Results */}
-          {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (
-            <div className="mt-6">
-              <p className="text-center text-gray-500 text-sm sm:text-base">
-                No results found for <span className="font-semibold">"{searchTerm}"</span>.
-              </p>
+
+        {/* 🧙 Character Results */}
+        {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (
+          <p className="text-gray-400 mt-8 text-center">
+            No results found for <span className="font-semibold">"{searchTerm}"</span>.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+              {filteredCharacters.slice(0, visibleCount).map((char) => (
+                <Link key={char._id} to={`/characters/${char._id}`}>
+                  <Card title={char.name} />
+                </Link>
+              ))}
             </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-6 w-full">
-                {filteredCharacters.slice(0, visibleCount).map((char) => (
-                  <Link key={char._id} to={`/characters/${char._id}`}>
-                    <Card title={char.name} description={char.description} />
-                  </Link>
-                ))}
-              </div>
 
-              {visibleCount < filteredCharacters.length && (
-                <div className="flex justify-center mt-8">
-                  <button
-                    onClick={handleLoadMore}
-                    className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
-                  >
-                    Load More
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-       
+            {visibleCount < filteredCharacters.length && (
+              <div className="flex justify-center mt-10">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
+                >
+                  Load More
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </section>
     </PageWrapper>
   );

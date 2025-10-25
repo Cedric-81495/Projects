@@ -96,14 +96,14 @@ const StudentDetail = () => {
           {/* 🧭 Navigation Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4">
             <button
-              onClick={() => navigate("/student")}
+              onClick={() => navigate("/students")}
               className="w-full px-4 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
             >
               ← Back
             </button>
 
             <button
-              onClick={() => prevStudent && navigate(`/characters/${prevStudent._id}`)}
+              onClick={() => prevStudent && navigate(`/students/${prevStudent._id}`)}
               disabled={!prevStudent}
               className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
                 prevStudent
@@ -115,7 +115,7 @@ const StudentDetail = () => {
             </button>
 
             <button
-              onClick={() => nextStudent && navigate(`/characters/${nextStudent._id}`)}
+              onClick={() => nextStudent && navigate(`/students/${nextStudent._id}`)}
               disabled={!nextStudent}
               className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
                 nextStudent

@@ -79,7 +79,7 @@ const SpellsDetail = () => {
             </button>
 
             <button
-              onClick={() => prevSpell && navigate(`/characters/${prevSpell._id}`)}
+              onClick={() => prevSpell && navigate(`/spells/${prevSpell._id}`)}
               disabled={!prevSpell}
               className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
                 prevSpell
@@ -91,7 +91,7 @@ const SpellsDetail = () => {
             </button>
 
             <button
-              onClick={() => nextSpell && navigate(`/characters/${nextSpell._id}`)}
+              onClick={() => nextSpell && navigate(`/spells/${nextSpell._id}`)}
               disabled={!nextSpell}
               className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
                 nextSpell

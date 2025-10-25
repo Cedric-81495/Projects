@@ -46,7 +46,7 @@ const Characters = () => {
       {/* 🧱 Main Layout */}
       <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
             {/* 🔍 Search Bar pinned under navbar */}
-        <div className="w-full flex justify-center mb-10">
+       <div className="w-full flex justify-center mt-10 px-4">
           <div className="w-full max-w-3xl">
             <SearchBar
               label="Search"
@@ -56,7 +56,6 @@ const Characters = () => {
             />
           </div>
         </div>
-
 
         {/* 🧙 Character Results */}
         {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (

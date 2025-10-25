@@ -55,17 +55,17 @@ const Spells = () => {
          {/* Charater Section */}
       <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
             {/* 🔍 Search Bar pinned under navbar */}
-            <div className="w-full flex justify-center mb-10">
-              <div className="w-full max-w-3xl">
-                <SearchBar
-                  label="Search"
-                  placeholder="Type a spell name..."
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                />
-              </div>
-            </div>
-            {/* 🧙 Results */}
+      <div className="w-full flex justify-center mt-10 px-4">
+          <div className="w-full max-w-3xl">
+            <SearchBar
+              label="Search"
+              placeholder="Type a character name..."
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
+          </div>
+        </div>
+                      {/* 🧙 Results */}
             {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
               <div className="mt-8">
                 <p className="text-center text-gray-500 text-sm sm:text-base">

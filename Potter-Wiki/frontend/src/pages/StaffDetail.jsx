@@ -91,18 +91,18 @@ const StaffDetail = () => {
           </div>
 
           {/* 🧭 Navigation Buttons */}
-          <div className="flex justify-center items-center gap-4 mt-10 flex-wrap">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4">
             <button
-              onClick={() => navigate("/staff")}
-              className="px-6 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
+              onClick={() => navigate("/student")}
+              className="w-full px-4 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
             >
               ← Back
             </button>
 
             <button
-              onClick={() => prevStaff && navigate(`/staff/${prevStaff._id}`)}
+              onClick={() => prevStaff && navigate(`/characters/${prevStaff._id}`)}
               disabled={!prevStaff}
-              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition ${
+              className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
                 prevStaff
                   ? "bg-blue-600 hover:bg-blue-500 text-white"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"
@@ -112,9 +112,9 @@ const StaffDetail = () => {
             </button>
 
             <button
-              onClick={() => nextStaff && navigate(`/staff/${nextStaff._id}`)}
+              onClick={() => nextStaff && navigate(`/characters/${nextStaff._id}`)}
               disabled={!nextStaff}
-              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition ${
+              className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
                 nextStaff
                   ? "bg-blue-600 hover:bg-blue-500 text-white"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"

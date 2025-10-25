@@ -70,18 +70,18 @@ const SpellsDetail = () => {
           </div>
 
           {/* 🧭 Navigation Buttons */}
-          <div className="flex justify-center items-center gap-4 mt-10 flex-wrap">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4">
             <button
-              onClick={() => navigate("/spells")}
-              className="px-6 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
+              onClick={() => navigate("/student")}
+              className="w-full px-4 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
             >
               ← Back
             </button>
 
             <button
-              onClick={() => prevSpell && navigate(`/spells/${prevSpell._id}`)}
+              onClick={() => prevSpell && navigate(`/characters/${prevSpell._id}`)}
               disabled={!prevSpell}
-              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition ${
+              className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
                 prevSpell
                   ? "bg-blue-600 hover:bg-blue-500 text-white"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"
@@ -91,9 +91,9 @@ const SpellsDetail = () => {
             </button>
 
             <button
-              onClick={() => nextSpell && navigate(`/spells/${nextSpell._id}`)}
+              onClick={() => nextSpell && navigate(`/characters/${nextSpell._id}`)}
               disabled={!nextSpell}
-              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition ${
+              className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
                 nextSpell
                   ? "bg-blue-600 hover:bg-blue-500 text-white"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"

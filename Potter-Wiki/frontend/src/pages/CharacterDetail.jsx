@@ -93,38 +93,38 @@ const CharacterDetail = () => {
           </div>
 
           {/* 🧭 Navigation Buttons */}
-          <div className="flex justify-center items-center gap-4 mt-10 flex-wrap">
-            <button
-              onClick={() => navigate("/characters")}
-              className="px-6 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
-            >
-              ← Back
-            </button>
+         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4">
+          <button
+            onClick={() => navigate("/characters")}
+            className="w-full px-4 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
+          >
+            ← Back
+          </button>
 
-            <button
-              onClick={() => prevCharacter && navigate(`/characters/${prevCharacter._id}`)}
-              disabled={!prevCharacter}
-              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition ${
-                prevCharacter
-                  ? "bg-blue-600 hover:bg-blue-500 text-white"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
-              }`}
-            >
-              ← Prev
-            </button>
+          <button
+            onClick={() => prevCharacter && navigate(`/characters/${prevCharacter._id}`)}
+            disabled={!prevCharacter}
+            className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
+              prevCharacter
+                ? "bg-blue-600 hover:bg-blue-500 text-white"
+                : "bg-gray-400 text-gray-700 cursor-not-allowed"
+            }`}
+          >
+            ← Prev
+          </button>
 
-            <button
-              onClick={() => nextCharacter && navigate(`/characters/${nextCharacter._id}`)}
-              disabled={!nextCharacter}
-              className={`px-6 py-2 font-semibold rounded-lg shadow-md transition ${
-                nextCharacter
-                  ? "bg-blue-600 hover:bg-blue-500 text-white"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
-              }`}
-            >
-              Next →
-            </button>
-          </div>
+          <button
+            onClick={() => nextCharacter && navigate(`/characters/${nextCharacter._id}`)}
+            disabled={!nextCharacter}
+            className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
+              nextCharacter
+                ? "bg-blue-600 hover:bg-blue-500 text-white"
+                : "bg-gray-400 text-gray-700 cursor-not-allowed"
+            }`}
+          >
+            Next →
+          </button>
+        </div>
         </div>
       </section>
     </PageWrapper>

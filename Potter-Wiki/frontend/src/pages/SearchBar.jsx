@@ -2,9 +2,9 @@ const SearchBar = ({ label = "Search", placeholder = "Search...", searchTerm, se
   return (
     <div className="w-full flex flex-col sm:flex-row items-center justify-center gap-3 px-4 py-3 mb-6 
                     shadow-md rounded-xl transition-all duration-300">
-      <label className="font-serif text-[#f5e6c8] text-sm sm:text-base font-medium whitespace-nowrap">
+      <h2><label className="font-serif text-[#f5e6c8] text-sm sm:text-base font-medium whitespace-nowrap">
         {label}:
-      </label>
+      </label></h2>
       <form className="w-full max-w-md">
         <input
           type="text"

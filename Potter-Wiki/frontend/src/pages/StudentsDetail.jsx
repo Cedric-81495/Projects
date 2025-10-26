@@ -62,17 +62,18 @@ const StudentDetail = () => {
             {/* 🪄 Student Card */}
             <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 border-2xl p-6 sm:p-10 flex flex-col md:flex-row gap-10">
               {/* Image */}
-              <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center border-xl border border-black shadow-sm mx-auto md:mx-0 overflow-hidden bg-gray-100">
-                {student.image ? (
-                  <img
-                    src={student.image}
-                    alt={student.name}
-                    className="max-w-full max-h-full object-cover object-center"
-                  />
-                ) : (
-                  <span className="text-gray-500 text-sm text-center px-2">No Image Available</span>
-                )}
-              </div>
+                  {student.image ? (
+                    <img
+                      src={student.image}
+                      alt={student.name}
+                      className="w-full max-w-[180px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
+                    />
+                  ) : (
+                    <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
+                      No Image Available
+                    </div>
+                  )}
+            
                
               {/* Info Grid */}
               <div className="flex-1 flex flex-col justify-center">

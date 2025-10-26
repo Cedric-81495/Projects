@@ -60,12 +60,12 @@ return (
             <img
               src={character.image}
               alt={character.name}
-              className="w-full max-w-[180px] aspect-[3/4] object-cover border-xl border-2 border-black shadow-md mx-auto md:mx-0"
-            />
-          ) : (
-            <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center border-xl border-[1px] border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
-              No Image Available
-            </div>
+              className="w-full max-w-[180px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
+              />
+            ) : (
+              <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
+                No Image Available
+              </div>
           )}
 
           {/* Info Grid */}

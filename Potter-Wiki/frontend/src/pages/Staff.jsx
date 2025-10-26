@@ -1,11 +1,11 @@
+// src/pages/Staff.jsx
+import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
 import SearchBar from "./SearchBar";
-import { Link } from "react-router-dom";
-import NotFound from "./NotFound";
 
 const Staff = () => {
   const [staff, setStaff] = useState([]);
@@ -70,7 +70,7 @@ const Staff = () => {
   }
 
   return (
-    <PageWrapper loading={false}>
+    <PageWrapper loading={loading}>
       <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
         {/* 🔍 Search Bar */}
         <div className="w-full flex justify-center">

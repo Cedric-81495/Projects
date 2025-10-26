@@ -65,7 +65,7 @@ const Spells = () => {
             />
           </div>
         </div>
-                      {/* 🧙 Results */}
+         {/* 🧙 Results */}
             {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
               <div className="mt-8">
                 <p className="text-center text-gray-500 text-sm sm:text-base">

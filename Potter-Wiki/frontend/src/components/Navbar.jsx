@@ -172,7 +172,7 @@ const Navbar = () => {
           {/* Home */}
           <div className="relative">
             <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
-              <Link  to="/">Home</Link>
+              <Link  to="/">HOME</Link>
             </button>
           </div>
 
@@ -182,7 +182,7 @@ const Navbar = () => {
               onClick={() => handleDropdownToggle("magical")}
               className="text-white hover:text-amber-300 transition flex items-center gap-1"
             >
-              Magical Data ▾
+              MAGICAL DATA ▾
             </button>
 
             {showMagicalDropdown && (
@@ -229,7 +229,7 @@ const Navbar = () => {
               onClick={() => handleDropdownToggle("books")}
               className="text-white hover:text-amber-300 transition flex items-center gap-1"
             >
-              Books ▾
+              BOOKS ▾
             </button>
 
             {showBooksDropdown && (
@@ -277,14 +277,18 @@ const Navbar = () => {
             ref={menuRef}
             className="md:hidden bg-[#020325] py-4 transition-all duration-300 max-h-[calc(100vh-80px)] overflow-y-auto"
           >
+             {/* Home */}
+            
             <div className="flex flex-col items-center space-y-3 text-sm font-semibold uppercase tracking-wide">
-
+              <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
+                  <Link  to="/">HOME</Link>
+              </button>
               {/* Magical Data (Accordion) */}
               <button
                 onClick={() => handleDropdownToggle("magical", true)}
                 className="text-white hover:text-amber-300 transition flex items-center gap-1"
               >
-                Magical Data ▾
+                MAGICAL DATA ▾
               </button>
 
               {showMobileMagicalDropdown && (
@@ -308,7 +312,7 @@ const Navbar = () => {
                 onClick={() => handleDropdownToggle("books", true)}
                 className="text-white hover:text-amber-300 transition flex items-center gap-1"
               >
-                Books ▾
+                BOOKS ▾
               </button>
 
               {showMobileBooksDropdown && (

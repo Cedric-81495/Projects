@@ -11,6 +11,12 @@ const NotFound = ({ message = "Page not found" }) => {
     if (path.startsWith("/staff")) return "/staff";
     if (path.startsWith("/profile")) return "/profile";
     if (path.startsWith("/dashboard")) return "/dashboard";
+    if (path.startsWith("/fiction")) return "/";
+    if (path.startsWith("/fantasy")) return "/";
+    if (path.startsWith("/magical")) return "/";
+    if (path.startsWith("/adventure")) return "/";
+    if (path.startsWith("/profile")) return "/profile";
+    if (path.startsWith("/dashboard")) return "/dashboard";
     if (path.startsWith("/login") || path.startsWith("/register")) return "/";
     return "/";
   };

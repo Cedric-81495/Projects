@@ -6,6 +6,7 @@ const Home = () => {
   return (
     <div className="text-[#f5e6c8] font-serif bg-[#0b0b0b]">
       {/* 🧙 Hero Section */}
+      {/* 📊 Magical Data */}
       <section
         className="min-h-screen flex items-center justify-center text-center bg-cover bg-center relative"
         style={{ backgroundImage: `url(${harrypotterbg})` }}
@@ -16,25 +17,10 @@ const Home = () => {
           <p className="text-base sm:text-lg mb-6">
             Your gateway to the magical universe — explore characters, spells, lore, and rare tales.
           </p>
-        <div className="text-center mt-8">
-       <Link
-          to="/discover"
-          className="inline-block px-6 py-3 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-[#5c3b00] via-[#8b5e00] to-[#5c3b00] hover:from-[#7a4a00] hover:to-[#a86f00] shadow-md hover:shadow-lg transition-all duration-300 font-serif tracking-wide"
-        >
-        Discover the Magic
-        </Link>
-      </div>
-        </div>
-      </section>
-
-        {/* 📊 Magical Data */}
-      <section className="py-[80px] px-4 bg-gradient-to-b text-center from-[#1a1a1a] via-[#0B0B0B] to-[#000000] text-amber-100 shadow-inner font-serif">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl text-white font-bold mb-4">Magical Data</h2>
-          <p className="mb-6 text-white">
-            Access structured data on characters, spells, students, and staff.
+          <p className="text-base sm:text-lg mb-6">
+            Access structured Magical Data data on characters, spells, students, and staff.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+      <div className="flex flex-wrap gap-4 justify-center">
             <Link
               to="/characters"
               className="px-6 py-2 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-indigo-900 via-indigo-700 to-indigo-900 hover:from-indigo-700 hover:to-indigo-800 shadow-md hover:shadow-lg transition-all duration-300 font-serif tracking-wide"
@@ -65,7 +51,7 @@ const Home = () => {
 
       {/* 📚 Books */}
       <section
-        className="pt-[80px] px-4 text-center bg-cover bg-center text-white"
+        className="pt-[80px] pb-[80px] px-4 text-center bg-cover bg-center text-white"
         style={{ backgroundImage: `url(${booksbg})` }}
       >
         <div className="bg-black/50 p-6 rounded-lg inline-block max-w-3xl mx-auto">

@@ -3,6 +3,8 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
 import PotterWikiHeader from "../assets/PotterWikiHeader.png";
+import Header from "./Header";
+
 import {
   FaYoutube,
   FaTiktok,
@@ -18,12 +20,26 @@ const Navbar = () => {
   const navigate = useNavigate();
   const menuRef = useRef(null);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [showNewsDropdown, setShowNewsDropdown] = useState(false);
+  // Desktop dropdowns
+  const [showBooksDropdown, setShowBooksDropdown] = useState(false);
+  //const [showNewsDropdown, setShowNewsDropdown] = useState(false);
   const [showMagicalDropdown, setShowMagicalDropdown] = useState(false);
-  const [showMobileNewsDropdown, setShowMobileNewsDropdown] = useState(false);
+  // Mobile dropdowns
+  const [showMobileBooksDropdown, setShowMobileBooksDropdown] = useState(false);
+  //const [showMobileNewsDropdown, setShowMobileNewsDropdown] = useState(false);
   const [showMobileMagicalDropdown, setShowMobileMagicalDropdown] = useState(false);
 
 
+  // Function that ensures only one dropdown is open at a time.
+  const handleDropdownToggle = (dropdown, isMobile = false) => {
+    if (isMobile) {
+      setShowMobileMagicalDropdown(dropdown === "magical" ? !showMobileMagicalDropdown : false);
+      setShowMobileBooksDropdown(dropdown === "books" ? !showMobileBooksDropdown : false);
+    } else {
+      setShowMagicalDropdown(dropdown === "magical" ? !showMagicalDropdown : false);
+      setShowBooksDropdown(dropdown === "books" ? !showBooksDropdown : false);
+    }
+  };
 
   const handleLogout = () => {
     setLoggingOut(true);
@@ -61,7 +77,7 @@ const Navbar = () => {
    <header className="fixed top-0 left-0 w-full z-50 text-white bg-[#020325] font-serif transition-transform duration-300 translate-y-0">
 
         {/* Top Row */}
-        <div className="w-full flex justify-between items-center px-6 py-4 max-w-7xl mx-auto relative">
+        <div className="w-full flex justify-between items-center px-6 py-3 max-w-7xl mx-auto relative">
           {/* Social Icons */}
           <div className="hidden md:flex space-x-4">
             <a href="#" className="hover:text-amber-300 text-xl"><FaYoutube /></a>
@@ -71,16 +87,7 @@ const Navbar = () => {
           </div>
 
           {/* Logo */}
-          <div className="flex justify-center">
-            <Link to="/">
-             <img
-                src={PotterWikiHeader}
-                alt="Potter Wiki Logo"
-                className="object-contain mx-auto w-[230px] h-[50px] sm:w-[180px] sm:h-[60px] xs:w-[150px] xs:h-[50px]"
-                style={{ filter: "brightness(1.1) contrast(1.3)" }}
-              />
-            </Link>
-          </div>
+          <Header />
 
           {/* Search & Auth */}
           <div className="hidden md:flex items-center space-x-3">
@@ -141,85 +148,106 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex justify-center items-center gap-6 py-3 text-sm font-semibold uppercase tracking-wide bg-[#020325]">
-           {/* News and Features (click-to-toggle) */}
+          {/* Home */}
           <div className="relative">
-            <button
-              onClick={() => {
-                setShowNewsDropdown((prev) => !prev);
-                setShowMagicalDropdown(false);
-              }}
-                className="text-white hover:text-amber-300 transition flex items-center gap-1"
-            >
-              News & Features ▾
+            <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
+              <Link  to="/">Home</Link>
             </button>
-
-            {showNewsDropdown && (
-              <div className="absolute top-full left-0 w-48 bg-[#0b0b0b] border border-gray-700 rounded shadow-lg transition-all duration-300 z-50">
-                <Link
-                  to="/news"
-                  onClick={() => setShowNewsDropdown(false)}
-                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
-                >
-                  News
-                </Link>
-                <Link
-                  to="/features"
-                  onClick={() => setShowNewsDropdown(false)}
-                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
-                >
-                  Features
-                </Link>
-              </div>
-              
-            )}
           </div>
 
           {/* Magical Data */}
           <div className="relative">
             <button
-              onClick={() => {
-                setShowMagicalDropdown((prev) => !prev);
-                setShowNewsDropdown(false);
-              }}
+              onClick={() => handleDropdownToggle("magical")}
               className="text-white hover:text-amber-300 transition flex items-center gap-1"
             >
               Magical Data ▾
             </button>
 
             {showMagicalDropdown && (
-              <div className="absolute top-full left-0 w-48 bg-[#0b0b0b] border border-gray-700 rounded shadow-lg transition-all duration-300 z-50">
-                <Link
-                  to="/characters"
-                  onClick={() => setShowMagicalDropdown(false)}
-                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
+                <div
+                  className={`absolute top-full left-0 w-48 bg-[#020325] border border-gray-700 rounded shadow-lg transition-all duration-300 ease-in-out z-50 ${
+                    showMagicalDropdown ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+                  }`}
                 >
-                  Characters
-                </Link>
-                <Link
-                  to="/spells"
-                  onClick={() => setShowMagicalDropdown(false)}
-                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
-                >
-                  Spells
-                </Link>
-                <Link
-                  to="/students"
-                  onClick={() => setShowMagicalDropdown(false)}
-                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
-                >
-                  Students
-                </Link>
-                <Link
-                  to="/staff"
-                  onClick={() => setShowMagicalDropdown(false)}
-                  className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300"
-                >
-                  Staff
-                </Link>
-              </div>
+              <Link
+                to="/characters"
+                onClick={() => setShowMagicalDropdown(false)}
+                className="block px-4 py-2 hover:text-amber-300"
+              >
+                Characters
+              </Link>
+              <Link
+                to="/spells"
+                onClick={() => setShowMagicalDropdown(false)}
+                className="block px-4 py-2 hover:text-amber-300"
+              >
+                Spells
+              </Link>
+              <Link
+                to="/students"
+                onClick={() => setShowMagicalDropdown(false)}
+                className="block px-4 py-2 hover:text-amber-300"
+              >
+                Students
+              </Link>
+              <Link
+                to="/staff"
+                onClick={() => setShowMagicalDropdown(false)}
+                className="block px-4 py-2 hover:text-amber-300"
+              >
+                Staff
+              </Link>
+            </div>
             )}
           </div>
-          
+
+          {/* Books  */}
+                    <div className="relative">
+            <button
+              onClick={() => handleDropdownToggle("books")}
+              className="text-white hover:text-amber-300 transition flex items-center gap-1"
+            >
+              Books ▾
+            </button>
+
+            {showBooksDropdown && (
+                <div
+                  className={`absolute top-full left-0 w-48 bg-[#020325] border border-gray-700 rounded shadow-lg transition-all duration-300 ease-in-out z-50 ${
+                    showBooksDropdown ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+                  }`}
+                >
+              <Link
+                to="/fiction"
+                onClick={() => setShowBooksDropdown(false)}
+                className="block px-4 py-2 hover:text-amber-300"
+              >
+                fiction
+              </Link>
+              <Link
+                to="/fantasy"
+                onClick={() => setShowBooksDropdown(false)}
+                className="block px-4 py-2 hover:text-amber-300"
+              >
+                fantasy
+              </Link>
+              <Link
+                to="/magical"
+                onClick={() => setShowBooksDropdown(false)}
+                className="block px-4 py-2 hover:text-amber-300"
+              >
+                magical
+              </Link>
+              <Link
+                to="/adventure"
+                onClick={() => setShowBooksDropdown(false)}
+                className="block px-4 py-2 hover:text-amber-300"
+              >
+                adventure
+              </Link>
+            </div>
+            )}
+          </div>
         </nav>
 
         {/* Mobile Dropdown */}
@@ -230,53 +258,55 @@ const Navbar = () => {
           >
             <div className="flex flex-col items-center space-y-3 text-sm font-semibold uppercase tracking-wide">
 
-              {/* News & Features (Accordion) */}
-              <button
-                onClick={() => {
-                  setShowMobileNewsDropdown((prev) => !prev);
-                  setShowMobileMagicalDropdown(false);
-                }}
-                className="w-full text-center hover:text-amber-300"
-              >
-                News & Features ▾
-              </button>
-              {showMobileNewsDropdown && (
-                <div className="mt-2 mx-auto w-48 bg-[#020325] shadow-lg justify-center">
-                  <Link to="/news" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
-                    News
-                  </Link>
-                  <Link to="/features" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
-                    Features
-                  </Link>
-                </div>
-              )}
-
               {/* Magical Data (Accordion) */}
               <button
-                onClick={() => {
-                  setShowMobileMagicalDropdown((prev) => !prev);
-                  setShowMobileNewsDropdown(false);
-                }}
-                className="w-full text-center hover:text-amber-300"
+                onClick={() => handleDropdownToggle("magical", true)}
+                className="text-white hover:text-amber-300 transition flex items-center gap-1"
               >
                 Magical Data ▾
               </button>
+
               {showMobileMagicalDropdown && (
                 <div className="mt-2 mx-auto w-48 bg-[#020325] shadow-lg justify-center">
-                  <Link to="/characters" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                  <Link to="/characters" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
                     Characters
                   </Link>
-                  <Link to="/spells" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                  <Link to="/spells" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
                     Spells
                   </Link>
-                  <Link to="/students" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                  <Link to="/students" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
                     Students
                   </Link>
-                  <Link to="/staff" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:bg-[#141414] hover:text-amber-300">
+                  <Link to="/staff" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
                     Staff
                   </Link>
                 </div>
               )}
+
+              <button
+                onClick={() => handleDropdownToggle("books", true)}
+                className="text-white hover:text-amber-300 transition flex items-center gap-1"
+              >
+                Books ▾
+              </button>
+
+              {showMobileBooksDropdown && (
+                <div className="mt-2 mx-auto w-48 bg-[#020325] shadow-lg justify-center">
+                  <Link to="/fiction" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
+                    fiction
+                  </Link>
+                  <Link to="/fantasy" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
+                    fantasy
+                  </Link>
+                  <Link to="/magic" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
+                    magic
+                  </Link>
+                  <Link to="/adventure" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
+                    adventure
+                  </Link>
+                </div>
+              )}
+
 
               {/* Divider */}
               <div className="border-t border-gray-600 w-3/4 my-2"></div>

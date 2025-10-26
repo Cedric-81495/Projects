@@ -1,18 +1,23 @@
 // src/components/Header.jsx
+import { Link } from "react-router-dom";
 import PotterWikiHeader from "../assets/PotterWikiHeader.png";
-import divCover from "../assets/divCover.png";
 
 export default function Header() {
   return (
-   <div
-    className="pb-10 pt-20 w-full relative flex items-center justify-center py-4 px-4 bg-cover bg-center"
-    style={{ backgroundImage: `url(${divCover})` }}
-    >
-      <img
-        src={PotterWikiHeader}
-        alt="Potter Wiki Header"
-        className="max-w-full h-auto md:max-w-xl lg:max-w-2xl"
-      />
+    <div className="flex justify-center">
+      <Link to="/">
+        <img
+          src={PotterWikiHeader}
+          alt="Potter Wiki Logo"
+          className="object-contain mx-auto w-[430px] h-[50px] sm:w-[180px] sm:h-[60px] xs:w-[150px] xs:h-[50px]"
+          style={{
+          width: "clamp(150px, 30vw, 300px)",
+          height: "clamp(80px, 10vw, 60px)",
+          filter: "brightness(1.1) contrast(1.3)",
+        }}
+
+        />
+      </Link>
     </div>
   );
 }

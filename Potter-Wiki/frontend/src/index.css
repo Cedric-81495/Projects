@@ -11,6 +11,16 @@ body {
   color: #ffffff; /* makes text readable */
 }
 
+h2 {
+  font-size: clamp(1.25rem, 2vw, 2rem); /* Responsive scaling */
+  font-weight: 600;
+}
+
+p {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+}
+
+
 
 
 input:-webkit-autofill {

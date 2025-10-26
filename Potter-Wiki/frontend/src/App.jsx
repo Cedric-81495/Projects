@@ -21,6 +21,7 @@ import StudentsDetail from "./pages/StudentsDetail";
 import BackToTopButton from "./pages/BackToTopButton";
 import NotFound from "./pages/NotFound";
 
+
 function AppContent() {
 
 const location = useLocation();

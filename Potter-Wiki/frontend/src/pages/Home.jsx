@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import harrypotterbg from "../assets/harry-potter-bg.jpg";
+import booksbg from "../assets/books-bg.jpeg";
 
 const Home = () => {
   return (
@@ -15,110 +16,69 @@ const Home = () => {
           <p className="text-base sm:text-lg mb-6">
             Your gateway to the magical universe — explore characters, spells, lore, and rare tales.
           </p>
-          <Link
-            to="/discover"
-            className="inline-block bg-[#cfae6d] text-black px-6 py-3 rounded-lg shadow hover:bg-[#e0c98c] transition font-semibold"
-          >
-            Discover the Magic
-          </Link>
+        <div className="text-center mt-8">
+       <Link
+          to="/discover"
+          className="inline-block px-6 py-3 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-[#5c3b00] via-[#8b5e00] to-[#5c3b00] hover:from-[#7a4a00] hover:to-[#a86f00] shadow-md hover:shadow-lg transition-all duration-300 font-serif tracking-wide"
+        >
+        Discover the Magic
+        </Link>
+      </div>
         </div>
       </section>
 
-      {/* 📰 News & Features */}
-      <section className="py-20 px-4 text-center bg-gradient-to-r from-[#fef9c3] to-[#fde68a] text-gray-900">
+        {/* 📊 Magical Data */}
+      <section className="bg-gradient-to-b text-center from-[#1a1a1a] via-[#0B0B0B] to-[#000000] text-amber-100 py-8 shadow-inner font-serif">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">📰 News & Features</h2>
-          <p className="mb-6">Stay updated with magical headlines, fan theories, and behind-the-scenes insights.</p>
-          <Link to="/news" className="bg-yellow-600 text-white px-5 py-2 rounded hover:bg-yellow-700 transition">Read News</Link>
-        </div>
-      </section>
-
-      {/* 🧩 Quizzes & Puzzles */}
-      <section
-        className="py-20 px-4 text-center bg-cover bg-center text-white"
-        style={{ backgroundImage: "url('/images/quizzes-bg.jpg')" }}
-      >
-        <div className="bg-black/50 p-6 rounded-lg inline-block max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">🧩 Quizzes & Puzzles</h2>
-          <p className="mb-6">Test your magical knowledge with trivia, logic puzzles, and house challenges.</p>
-          <Link to="/quizzes" className="bg-yellow-500 text-black px-5 py-2 rounded hover:bg-yellow-600 transition">Take a Quiz</Link>
-        </div>
-      </section>
-
-      {/* 📚 J.K. Rowling Archive */}
-      <section className="py-20 px-4 text-center bg-gradient-to-r from-[#e2e8f0] to-[#cbd5e1] text-gray-800">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">📚 J.K. Rowling Archive</h2>
-          <p className="mb-6">Explore original writings, lore, and unpublished notes from the creator herself.</p>
-          <Link to="/jk-rowling" className="bg-gray-700 text-white px-5 py-2 rounded hover:bg-gray-800 transition">View Archive</Link>
-        </div>
-      </section>
-
-      {/* 🔍 Discover */}
-      <section
-        className="py-20 px-4 text-center bg-cover bg-center text-white"
-        style={{ backgroundImage: "url('/images/discover-bg.jpg')" }}
-      >
-        <div className="bg-black/50 p-6 rounded-lg inline-block max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">🔍 Discover</h2>
-          <p className="mb-6">Uncover hidden facts, magical locations, and character connections.</p>
-          <Link to="/discover" className="bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600 transition">Start Discovering</Link>
-        </div>
-      </section>
-
-      {/* 🏰 Hogwarts Sorting */}
-      <section className="py-20 px-4 text-center bg-gradient-to-r from-[#c7d2fe] to-[#a5b4fc] text-gray-800">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">🏰 Hogwarts Sorting</h2>
-          <p className="mb-6">Take the Sorting Hat quiz and find your true Hogwarts house.</p>
-          <Link to="/hogwarts-sorting" className="bg-indigo-600 text-white px-5 py-2 rounded hover:bg-indigo-700 transition">Get Sorted</Link>
-        </div>
-      </section>
-
-      {/* 🦌 Patronus Discovery */}
-      <section
-        className="py-20 px-4 text-center bg-cover bg-center text-white"
-        style={{ backgroundImage: "url('/images/patronus-bg.jpg')" }}
-      >
-        <div className="bg-black/50 p-6 rounded-lg inline-block max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">🦌 Patronus Discovery</h2>
-          <p className="mb-6">Discover your Patronus — the magical guardian that reflects your inner spirit.</p>
-          <Link to="/patronus" className="bg-teal-500 text-white px-5 py-2 rounded hover:bg-teal-600 transition">Find Your Patronus</Link>
-        </div>
-      </section>
-
-      {/* 📖 Rare Tales */}
-      <section className="py-20 px-4 text-center bg-gradient-to-r from-[#fbcfe8] to-[#f9a8d4] text-gray-800">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">📖 Rare Tales</h2>
-          <p className="mb-6">Read lesser-known stories, magical myths, and enchanted folklore.</p>
-          <Link to="/rare-tales" className="bg-pink-500 text-white px-5 py-2 rounded hover:bg-pink-600 transition">Read Tales</Link>
-        </div>
-      </section>
-
-      {/* 🛍️ Shop */}
-      <section
-        className="py-20 px-4 text-center bg-cover bg-center text-white"
-        style={{ backgroundImage: "url('/images/shop-bg.jpg')" }}
-      >
-        <div className="bg-black/50 p-6 rounded-lg inline-block max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">🛍️ Shop</h2>
-          <p className="mb-6">Browse magical merchandise, wands, robes, and collectibles.</p>
-          <Link to="/shop" className="bg-orange-500 text-white px-5 py-2 rounded hover:bg-orange-600 transition">Visit Shop</Link>
-        </div>
-      </section>
-
-      {/* 📊 Magical Data */}
-      <section className="py-20 px-4 text-center bg-gradient-to-r from-[#ede9fe] to-[#ddd6fe] text-gray-800">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">📊 Magical Data</h2>
-          <p className="mb-6">Access structured data on characters, spells, students, and staff.</p>
+          <h2 className="text-3xl text-white font-bold mb-4">Magical Data</h2>
+          <p className="mb-6 text-white">
+            Access structured data on characters, spells, students, and staff.
+          </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link to="/characters" className="bg-indigo-600 text-white px-5 py-2 rounded hover:bg-indigo-700 transition">Characters</Link>
-            <Link to="/spells" className="bg-purple-600 text-white px-5 py-2 rounded hover:bg-purple-700 transition">Spells</Link>
-            <Link to="/students" className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition">Students</Link>
-            <Link to="/staff" className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700 transition">Staff</Link>
+            <Link
+              to="/characters"
+              className="px-6 py-2 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-indigo-900 via-indigo-700 to-indigo-900 hover:from-indigo-700 hover:to-indigo-800 shadow-md hover:shadow-lg transition-all duration-300 font-serif tracking-wide"
+            >
+              Characters
+            </Link>
+            <Link
+              to="/spells"
+              className="px-6 py-2 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-purple-900 via-purple-700 to-purple-900 hover:from-purple-700 hover:to-purple-800 shadow-md hover:shadow-lg transition-all duration-300 font-serif tracking-wide"
+            >
+              Spells
+            </Link>
+            <Link
+              to="/students"
+              className="px-6 py-2 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-green-900 via-green-700 to-green-900 hover:from-green-700 hover:to-green-800 shadow-md hover:shadow-lg transition-all duration-300 font-serif tracking-wide"
+            >
+              Students
+            </Link>
+            <Link
+              to="/staff"
+              className="px-6 py-2 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-red-900 via-red-700 to-red-900 hover:from-red-700 hover:to-red-800 shadow-md hover:shadow-lg transition-all duration-300 font-serif tracking-wide"
+            >
+              Staff
+            </Link>
           </div>
+        </div>
+      </section>
+
+      {/* 📚 Books */}
+      <section
+        className="pt-[80px] px-4 text-center bg-cover bg-center text-white"
+        style={{ backgroundImage: `url(${booksbg})` }}
+      >
+        <div className="bg-black/50 p-6 rounded-lg inline-block max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold mb-4">Books</h2>
+          <p className="mb-6">
+            Dive into magical literature — explore spellbooks, rare tomes, and wizarding lore.
+          </p>
+       <Link
+          to="/books"
+          className="px-6 py-2 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-[#5c3b00] via-[#8b5e00] to-[#5c3b00] hover:from-[#7a4a00] hover:to-[#a86f00] shadow-md hover:shadow-lg transition-all duration-300 font-serif tracking-wide"
+        >
+         Browse Books
+        </Link>
         </div>
       </section>
     </div>

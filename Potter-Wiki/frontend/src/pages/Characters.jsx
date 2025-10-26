@@ -45,8 +45,8 @@ const Characters = () => {
     <PageWrapper loading={loading}>
       {/* 🧱 Main Layout */}
       <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
-            {/* 🔍 Search Bar pinned under navbar */}
-       <div className="w-full flex justify-center mt-10 px-4">
+            {/* 🔍 Search Bar */}
+       <div className="w-full flex justify-center">
           <div className="w-full max-w-3xl">
             <SearchBar
               label="Search"

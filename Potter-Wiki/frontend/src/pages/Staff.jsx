@@ -73,11 +73,11 @@ const Staff = () => {
     <PageWrapper loading={false}>
       <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
         {/* 🔍 Search Bar */}
-      <div className="w-full flex justify-center mt-10 px-4">
+        <div className="w-full flex justify-center">
           <div className="w-full max-w-3xl">
             <SearchBar
               label="Search"
-              placeholder="Type a character name..."
+              placeholder="Type a staff name..."
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
             />

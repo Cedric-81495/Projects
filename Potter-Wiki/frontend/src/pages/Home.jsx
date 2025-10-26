@@ -28,7 +28,7 @@ const Home = () => {
       </section>
 
         {/* 📊 Magical Data */}
-      <section className="bg-gradient-to-b text-center from-[#1a1a1a] via-[#0B0B0B] to-[#000000] text-amber-100 py-8 shadow-inner font-serif">
+      <section className="py-[80px] px-4 bg-gradient-to-b text-center from-[#1a1a1a] via-[#0B0B0B] to-[#000000] text-amber-100 shadow-inner font-serif">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl text-white font-bold mb-4">Magical Data</h2>
           <p className="mb-6 text-white">

@@ -94,7 +94,7 @@ return (
         </div>
 
         {/* 🧭 Navigation Buttons */}
-        <div className="grid grid-cols-2 mb-5 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-sans">
+        <div className="grid grid-cols-2  mb-6 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-sans">
           {/* ← Prev */}
           <button
             onClick={() => prevCharacter && navigate(`/characters/${prevCharacter._id}`)}

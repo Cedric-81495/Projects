@@ -71,7 +71,7 @@ return (
       </div>
 
         {/* 🧭 Navigation Buttons */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif mb-6">
           {/* ← Prev */}
           <button
             onClick={() => prevSpell && navigate(`/spells/${prevSpell._id}`)}

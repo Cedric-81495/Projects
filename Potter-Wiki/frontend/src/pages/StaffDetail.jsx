@@ -89,7 +89,7 @@ const StaffDetail = () => {
           </div>
 
           {/* 🧭 Navigation Buttons */}
-          <div className="grid grid-cols-2 mb-5 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif">
+          <div className="grid grid-cols-2 mb-6 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif">
             {/* ← Prev */}
             <button
               onClick={() => prevStaff && navigate(`/staff/${prevStaff._id}`)}

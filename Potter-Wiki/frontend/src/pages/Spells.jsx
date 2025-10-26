@@ -75,7 +75,7 @@ const Spells = () => {
             ) : (
                <>
             {/* 🧙 Spell Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+            <div className="grid grid-cols-1  border-lg sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
               {filteredSpells.slice(0, visibleCount).map((spell) => (
                 <Link key={spell._id} to={`/spells/${spell._id}`}>
                   <Card title={spell.name} />
@@ -88,7 +88,7 @@ const Spells = () => {
               <div className="flex justify-center mt-8">
                 <button
                   onClick={handleLoadMore}
-                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
+                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold mb-5 border-lg shadow-md transition"
                 >
                   Load More
                 </button>

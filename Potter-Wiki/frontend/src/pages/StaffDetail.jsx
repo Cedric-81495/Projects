@@ -57,49 +57,47 @@ const StaffDetail = () => {
 
   return (
     <PageWrapper>
-      <section className="min-h-screen pt-[180px] flex flex-col items-center justify-start px-4">
+     <section className="min-h-screen pt-[130px] md:pt-[280px] flex flex-col items-center justify-start px-4 bg-white text-black">
         <div className="w-full max-w-6xl mx-auto">
-          {/* 🧑‍🏫 Staff Name */}
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#f5e6c8] mb-10 text-center">
-            {staff.name}
-          </h2>
-
           {/* 🪄 Staff Card */}
-          <div className="bg-[#1b1b2f] border border-[#cfae6d] text-[#f5e6c8] shadow-md hover:shadow-xl transition duration-300 rounded-2xl p-6 sm:p-10 flex flex-col md:flex-row gap-10">
+          <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 p-6 sm:p-10 flex flex-col md:flex-row gap-10">
             {/* Image */}
-            <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center rounded-xl border-4 border-[#cfae6d] shadow-lg mx-auto md:mx-0 overflow-hidden bg-[#2c2c44]">
-              {staff.image ? (
-                <img
-                  src={staff.image}
-                  alt={staff.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-gray-300 text-sm text-center px-2">No Image Available</span>
-              )}
-            </div>
+            {staff.image ? (
+              <img
+                src={staff.image}
+                alt={staff.name}
+                className="w-full max-w-[180px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
+              />
+            ) : (
+              <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
+                No Image Available
+              </div>
+            )}
 
-            {/* Info Grid */}
+            {/* Text Content */}
             <div className="flex-1 flex flex-col justify-center">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-base sm:text-lg font-medium leading-relaxed">
-                <p><span className="text-[#cfae6d] font-semibold">House:</span> {staff.house || "Unknown"}</p>
-                <p><span className="text-[#cfae6d] font-semibold">Specialty:</span> {staff.specialty || "Unknown"}</p>
-                <p><span className="text-[#cfae6d] font-semibold">Actor:</span> {staff.actor || "Unknown"}</p>
-                <p><span className="text-[#cfae6d] font-semibold">Alive:</span> {staff.alive ? "Yes" : "No"}</p>
+             <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center md:text-left mb-6">
+                {staff.name}
+              </h2>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed leading-[5px] md:leading-relaxed">
+                <p><span className="font-semibold">House:</span> {staff.house || "Unknown"}</p>
+                <p><span className="font-semibold">Specialty:</span> {staff.specialty || "Unknown"}</p>
+                <p><span className="font-semibold">Actor:</span> {staff.actor || "Unknown"}</p>
+                <p><span className="font-semibold">Alive:</span> {staff.alive ? "Yes" : "No"}</p>
               </div>
             </div>
           </div>
 
-    {/* 🧭 Navigation Buttons */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif">
+          {/* 🧭 Navigation Buttons */}
+          <div className="grid grid-cols-2 mb-5 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif">
             {/* ← Prev */}
             <button
               onClick={() => prevStaff && navigate(`/staff/${prevStaff._id}`)}
               disabled={!prevStaff}
-              className={`w-full px-6 py-3 rounded-md border border-amber-400 shadow-md transition-all duration-300 tracking-wide ${
+              className={`w-full px-6 py-3 border-md border border-black shadow-sm transition-all duration-300 tracking-wide ${
                 prevStaff
-                  ? "bg-gradient-to-r from-indigo-900 via-indigo-700 to-indigo-900 text-amber-200 hover:from-indigo-700 hover:to-indigo-800"
-                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                  ? "bg-white text-black hover:bg-gray-100"
+                  : "bg-white text-gray-400 border-gray-300 cursor-not-allowed"
               }`}
             >
               ← Prev
@@ -109,10 +107,10 @@ const StaffDetail = () => {
             <button
               onClick={() => nextStaff && navigate(`/staff/${nextStaff._id}`)}
               disabled={!nextStaff}
-              className={`w-full px-6 py-3 rounded-md border border-amber-400 shadow-md transition-all duration-300 tracking-wide ${
+              className={`w-full px-6 py-3 border-md border border-black shadow-sm transition-all duration-300 tracking-wide ${
                 nextStaff
-                  ? "bg-gradient-to-r from-indigo-900 via-indigo-700 to-indigo-900 text-amber-200 hover:from-indigo-700 hover:to-indigo-800"
-                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                  ? "bg-white text-black hover:bg-gray-100"
+                  : "bg-white text-gray-400 border-gray-300 cursor-not-allowed"
               }`}
             >
               Next →
@@ -121,7 +119,7 @@ const StaffDetail = () => {
             {/* ← Back */}
             <button
               onClick={() => navigate("/staff")}
-              className="w-full px-6 py-3 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-[#5c3b00] via-[#8b5e00] to-[#5c3b00] hover:from-[#7a4a00] hover:to-[#a86f00] shadow-md hover:shadow-lg transition-all duration-300 tracking-wide col-span-2 md:col-span-1"
+              className="w-full px-6 py-3 border border-black text-white bg-black hover:bg-white hover:text-black shadow-md hover:shadow-lg transition-all duration-300 tracking-wide col-span-2 md:col-span-1"
             >
               ← Back
             </button>

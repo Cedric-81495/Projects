@@ -91,7 +91,7 @@ const Staff = () => {
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+            <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
               {filteredStaff.slice(0, visibleCount).map((member) => (
                 <Link key={member._id} to={`/staff/${member._id}`}>
                   <Card
@@ -107,7 +107,7 @@ const Staff = () => {
               <div className="flex justify-center mt-10">
                 <button
                   onClick={handleLoadMore}
-                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
+                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold mb-5 border-lg shadow-md transition"
                 >
                   Load More
                 </button>

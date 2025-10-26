@@ -91,7 +91,7 @@ const Students = () => {
               <div className="flex justify-center mt-10">
                 <button
                   onClick={handleLoadMore}
-                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg shadow-md transition"
+                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white mb-5 font-semibold border-lg shadow-md transition"
                 >
                   Load More
                 </button>

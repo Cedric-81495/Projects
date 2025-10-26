@@ -82,8 +82,8 @@ const AdminDashboard = () => {
       }
 
       // ✅ Otherwise just update local state
-       const updated = admins.map((admin) =>
-        admin._id === editingId ? res.data : admin
+      const updated = res.map((admin) =>
+        admin._id === editingId ? { ...admin, ...editForm } : admin
       );
       setAdmins(updated);
       setEditingId(null);

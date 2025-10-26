@@ -3,6 +3,7 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import aestheticbg from "../assets/aesthetic-bg.jpg";
+import { toast } from "react-hot-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,47 +14,62 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [loggin, setLoggin] = useState(false);
 
   const from = location.state?.from || "/";
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!email || !password) {
-      setErrorMessage("Please enter both email and password.");
-      return;
-    }
+  if (!email || !password) {
+    setErrorMessage("Please enter both email and password.");
+    return;
+  }
 
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-        email,
-        password,
-      });
+  setLoggin(true);
+  toast.loading("Logging in...");
 
-      login(res.data);
-      setSuccessMessage("Login successful!");
-      setErrorMessage("");
+  try {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      email,
+      password,
+    });
 
+    login(res.data); // ✅ correct usage
+    setSuccessMessage("Login successful!");
+    setErrorMessage("");
+    toast.dismiss();
+    toast.success("You're now logged in");
+
+      setTimeout(() => {
       const role = res.data?.role;
       if (role === "superUser" || role === "adminUser") {
         navigate("/dashboard");
+        // This will log user data object
+        //console.log("Login response:", res.data);
       } else {
         navigate("/profile");
       }
-    } catch (err) {
-      console.error("Login failed:", err);
-      setSuccessMessage("");
-      if (err.response?.status === 401) {
-        setErrorMessage("Incorrect password.");
-      } else if (err.response?.status === 404) {
-        setErrorMessage("Account not found. Please check your email.");
-      } else if (err.response?.status === 400) {
-        setErrorMessage("Invalid credentials. Please try again.");
-      } else {
-        setErrorMessage("Something went wrong. Please try again later.");
-      }
+      setLoggin(false); // ✅ move inside the timeout
+    }, 1000);
+  } catch (err) {
+    toast.dismiss();
+    setSuccessMessage("");
+    console.error("Login failed:", err);
+    if (err.response?.status === 401) {
+      setErrorMessage("Incorrect password.");
+    } else if (err.response?.status === 404) {
+      setErrorMessage("Account not found. Please check your email.");
+    } else if (err.response?.status === 400) {
+      setErrorMessage("Invalid credentials. Please try again.");
+    } else {
+      setErrorMessage("Something went wrong. Please try again later.");
     }
-  };
+    toast.error("Login failed.");
+  } finally {
+    setLoggin(false); // ✅ just reset the loading state
+  }
+};
 
   const handleGoBack = () => {
     if (location.key !== "default") {
@@ -63,11 +79,19 @@ const Login = () => {
     }
   };
 
+
+
   return (
     <div
       className="relative min-h-screen flex items-center justify-center px-4 py-20 bg-cover bg-center"
       style={{ backgroundImage: `url(${aestheticbg})` }}
     >
+      {loggin && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 w-[200px] bg-green-500 text-white text-center py-2 text-sm sm:text-base z-[9999] shadow-md rounded">
+          Logging in...
+        </div>
+      )}
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0" />
 
@@ -120,12 +144,15 @@ const Login = () => {
             <p className="text-green-400 text-sm font-medium text-center">{successMessage}</p>
           )}
 
-          <button
-            type="submit"
-            className="w-full bg-[#5163BC] hover:bg-[#3f4fa0] text-white py-2 rounded-lg transition font-semibold text-sm sm:text-base"
-          >
-            Login
-          </button>
+            <button
+              type="submit"
+              disabled={loggin}
+              className={`w-full py-2 rounded-lg transition font-semibold text-sm sm:text-base ${
+                loggin ? "bg-gray-500 cursor-not-allowed" : "bg-[#5163BC] hover:bg-[#3f4fa0] text-white"
+              }`}
+            >
+              {loggin ? "Please wait..." : "Login"}
+            </button>
           {/* Back Button */}
           <button
             type="button"

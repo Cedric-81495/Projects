@@ -90,7 +90,7 @@ const Navbar = () => {
   return (
     <>
       {loggingOut && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 w-[200px] bg-yellow-500 text-black text-center py-2 text-sm sm:text-base z-[9999] shadow-md rounded">
+        <div className="fixed top-10 left-1/2 transform -translate-x-1/2 w-[200px] bg-yellow-500 text-black text-center py-2 text-sm sm:text-base z-[9999] shadow-md rounded">
           Logging out...
         </div>
       )}

@@ -3,13 +3,24 @@ import { useState } from "react";
 import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")) || null);
+    const [user, setUser] = useState(() => {
+      try {
+        return JSON.parse(localStorage.getItem("user")) || null;
+      } catch (err) {
+        console.error("Failed to parse user from localStorage:", err);
+        localStorage.removeItem("user");
+        return null;
+      }
+    });
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-    console.log("User from localStorage:", localStorage.getItem("user"));
-  };
+    const login = (userData) => {
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      // This will log user data object
+      //console.log("User from localStorage:", localStorage.getItem("user"));
+      //console.log("Login response:", userData);
+      console.log("AuthProvider mounted");
+    };
 
   const logout = () => {
     setUser(null);

@@ -93,37 +93,40 @@ const StudentDetail = () => {
             </div>
           </div>
 
-          {/* 🧭 Navigation Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4">
-            <button
-              onClick={() => navigate("/students")}
-              className="w-full px-4 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
-            >
-              ← Back
-            </button>
-
+ {/* 🧭 Navigation Buttons */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif">
+            {/* ← Prev */}
             <button
               onClick={() => prevStudent && navigate(`/students/${prevStudent._id}`)}
               disabled={!prevStudent}
-              className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
+              className={`w-full px-6 py-3 rounded-md border border-amber-400 shadow-md transition-all duration-300 tracking-wide ${
                 prevStudent
-                  ? "bg-blue-600 hover:bg-blue-500 text-white"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  ? "bg-gradient-to-r from-indigo-900 via-indigo-700 to-indigo-900 text-amber-200 hover:from-indigo-700 hover:to-indigo-800"
+                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
               }`}
             >
               ← Prev
             </button>
 
+            {/* Next → */}
             <button
               onClick={() => nextStudent && navigate(`/students/${nextStudent._id}`)}
               disabled={!nextStudent}
-              className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
+              className={`w-full px-6 py-3 rounded-md border border-amber-400 shadow-md transition-all duration-300 tracking-wide ${
                 nextStudent
-                  ? "bg-blue-600 hover:bg-blue-500 text-white"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  ? "bg-gradient-to-r from-indigo-900 via-indigo-700 to-indigo-900 text-amber-200 hover:from-indigo-700 hover:to-indigo-800"
+                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
               }`}
             >
               Next →
+            </button>
+
+            {/* ← Back */}
+            <button
+              onClick={() => navigate("/students")}
+              className="w-full px-6 py-3 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-[#5c3b00] via-[#8b5e00] to-[#5c3b00] hover:from-[#7a4a00] hover:to-[#a86f00] shadow-md hover:shadow-lg transition-all duration-300 tracking-wide col-span-2 md:col-span-1"
+            >
+              ← Back
             </button>
           </div>
         </div>

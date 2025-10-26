@@ -51,7 +51,7 @@ const CharacterDetail = () => {
 
   return (
     <PageWrapper>
-      <section className="min-h-screen pt-[160px] flex flex-col items-center justify-start">
+      <section className="min-h-screen pt-[180px] flex flex-col items-center justify-start">
         <div className="w-full max-w-6xl mx-auto">
           {/* 🧙 Character Name */}
           <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#f5e6c8] mb-10 text-center">
@@ -93,38 +93,41 @@ const CharacterDetail = () => {
           </div>
 
           {/* 🧭 Navigation Buttons */}
-         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4">
-          <button
-            onClick={() => navigate("/characters")}
-            className="w-full px-4 py-2 bg-[#cfae6d] hover:bg-[#e0c98c] text-black font-semibold rounded-lg shadow-md transition"
-          >
-            ← Back
-          </button>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif">
+            {/* ← Prev */}
+            <button
+              onClick={() => prevCharacter && navigate(`/characters/${prevCharacter._id}`)}
+              disabled={!prevCharacter}
+              className={`w-full px-6 py-3 rounded-md border border-amber-400 shadow-md transition-all duration-300 tracking-wide ${
+                prevCharacter
+                  ? "bg-gradient-to-r from-indigo-900 via-indigo-700 to-indigo-900 text-amber-200 hover:from-indigo-700 hover:to-indigo-800"
+                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              ← Prev
+            </button>
 
-          <button
-            onClick={() => prevCharacter && navigate(`/characters/${prevCharacter._id}`)}
-            disabled={!prevCharacter}
-            className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
-              prevCharacter
-                ? "bg-blue-600 hover:bg-blue-500 text-white"
-                : "bg-gray-400 text-gray-700 cursor-not-allowed"
-            }`}
-          >
-            ← Prev
-          </button>
+            {/* Next → */}
+            <button
+              onClick={() => nextCharacter && navigate(`/characters/${nextCharacter._id}`)}
+              disabled={!nextCharacter}
+              className={`w-full px-6 py-3 rounded-md border border-amber-400 shadow-md transition-all duration-300 tracking-wide ${
+                nextCharacter
+                  ? "bg-gradient-to-r from-indigo-900 via-indigo-700 to-indigo-900 text-amber-200 hover:from-indigo-700 hover:to-indigo-800"
+                  : "bg-gray-700 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              Next →
+            </button>
 
-          <button
-            onClick={() => nextCharacter && navigate(`/characters/${nextCharacter._id}`)}
-            disabled={!nextCharacter}
-            className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition ${
-              nextCharacter
-                ? "bg-blue-600 hover:bg-blue-500 text-white"
-                : "bg-gray-400 text-gray-700 cursor-not-allowed"
-            }`}
-          >
-            Next →
-          </button>
-        </div>
+            {/* ← Back */}
+            <button
+              onClick={() => navigate("/characters")}
+              className="w-full px-6 py-3 rounded-md border border-amber-400 text-amber-200 bg-gradient-to-r from-[#5c3b00] via-[#8b5e00] to-[#5c3b00] hover:from-[#7a4a00] hover:to-[#a86f00] shadow-md hover:shadow-lg transition-all duration-300 tracking-wide col-span-2 md:col-span-1"
+            >
+              ← Back
+            </button>
+          </div>
         </div>
       </section>
     </PageWrapper>

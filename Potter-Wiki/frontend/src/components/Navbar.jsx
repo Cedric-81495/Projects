@@ -22,12 +22,33 @@ const Navbar = () => {
   const [loggingOut, setLoggingOut] = useState(false);
   // Desktop dropdowns
   const [showBooksDropdown, setShowBooksDropdown] = useState(false);
-  //const [showNewsDropdown, setShowNewsDropdown] = useState(false);
   const [showMagicalDropdown, setShowMagicalDropdown] = useState(false);
   // Mobile dropdowns
   const [showMobileBooksDropdown, setShowMobileBooksDropdown] = useState(false);
-  //const [showMobileNewsDropdown, setShowMobileNewsDropdown] = useState(false);
   const [showMobileMagicalDropdown, setShowMobileMagicalDropdown] = useState(false);
+  // Close desktoip dropdowns when clicking outside
+  const magicalDropdownRef = useRef(null);
+  const booksDropdownRef = useRef(null);
+
+  useEffect(() => {
+  const handleOutsideClick = (e) => {
+    if (
+      magicalDropdownRef.current &&
+      !magicalDropdownRef.current.contains(e.target)
+    ) {
+      setShowMagicalDropdown(false);
+    }
+    if (
+      booksDropdownRef.current &&
+      !booksDropdownRef.current.contains(e.target)
+    ) {
+      setShowBooksDropdown(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleOutsideClick);
+  return () => document.removeEventListener("mousedown", handleOutsideClick);
+}, []);
 
 
   // Function that ensures only one dropdown is open at a time.
@@ -156,7 +177,7 @@ const Navbar = () => {
           </div>
 
           {/* Magical Data */}
-          <div className="relative">
+          <div className="relative" ref={magicalDropdownRef}>
             <button
               onClick={() => handleDropdownToggle("magical")}
               className="text-white hover:text-amber-300 transition flex items-center gap-1"
@@ -203,7 +224,7 @@ const Navbar = () => {
           </div>
 
           {/* Books  */}
-                    <div className="relative">
+          <div className="relative" ref={booksDropdownRef}>
             <button
               onClick={() => handleDropdownToggle("books")}
               className="text-white hover:text-amber-300 transition flex items-center gap-1"

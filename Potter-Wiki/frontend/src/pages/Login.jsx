@@ -126,15 +126,17 @@ const Login = () => {
           >
             Login
           </button>
-       
-        </form>
-           {/* Back Button */}
-           <button
+          {/* Back Button */}
+          <button
+            type="button"
             onClick={handleGoBack}
             className="w-full bg-[#5c5e68] mt-[10px] hover:bg-[#3f4fa0] text-white py-2 rounded-lg transition font-semibold text-sm sm:text-base"
           >
             Back
           </button>
+       
+        </form>
+           
       </div>
     
     </div>

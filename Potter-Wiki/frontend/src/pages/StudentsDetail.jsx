@@ -57,7 +57,7 @@ const StudentDetail = () => {
 
   return (
     <PageWrapper>
-      <section className="min-h-screen pt-[160px] flex flex-col items-center justify-start px-4">
+      <section className="min-h-screen pt-[180px] flex flex-col items-center justify-start px-4">
         <div className="w-full max-w-6xl mx-auto">
           {/* 🧑‍🎓 Student Name */}
           <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#f5e6c8] mb-10 text-center">

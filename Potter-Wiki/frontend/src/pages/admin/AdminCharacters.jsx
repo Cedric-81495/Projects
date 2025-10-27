@@ -2,6 +2,7 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthProvider";
+import { formatDate } from "../../utils/dateUtils";
 
 const AdminCharacters = () => {
   const { user } = useContext(AuthContext);
@@ -62,22 +63,6 @@ const AdminCharacters = () => {
 
   const handleChange = (e) => {
     setNewCharacter({ ...newCharacter, [e.target.name]: e.target.value });
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr || !dateStr.includes("-")) return dateStr;
-
-    const [day, month, year] = dateStr.split("-");
-    const isoDate = `${year}-${month}-${day}`; // YYYY-MM-DD
-    const date = new Date(isoDate);
-
-    if (isNaN(date)) return dateStr; // fallback if invalid
-
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
   };
 
   const handleAdd = async (e) => {

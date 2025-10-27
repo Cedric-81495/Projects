@@ -13,7 +13,7 @@ import Staff from "./pages/Staff";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import CharacterDetail from "./pages/CharacterDetail";
 import SpellsDetail from "./pages/SpellsDetail";
 import StaffDetail from "./pages/StaffDetail";
@@ -46,8 +46,14 @@ const location = useLocation();
 
 
 // Check if current path matches any valid pattern
+
+console.log("🔍 Current pathname:", location.pathname);
+
 const isValidPath = validPatterns.some((pattern) => pattern.test(location.pathname));
+console.log("✅ Is valid route:", isValidPath);
+
 const hideLayout = location.pathname === "/login" || location.pathname === "/register";
+console.log("🧭 Should hide layout:", hideLayout);
 
 if (!isValidPath) {
     return (
@@ -101,20 +107,29 @@ if (!isValidPath) {
 function App() {
   const [serverUp, setServerUp] = useState(true);
   const [checking, setChecking] = useState(true);
+  
+    useEffect(() => {
+    console.log("🚀 App mounted. Checking server...");
+    checkServer();
+  }, []);
+
 
   const checkServer = async () => {
     setChecking(true);
     try {
       const response = await fetch(import.meta.env.VITE_API_URL);
+      console.log("🌐 Server response status:", response.status);
       if (!response.ok) throw new Error("Server error");
       setServerUp(true);
     } catch (error) {
       setServerUp(false);
-      console.error("Failed to fetch characters:", error);
+      console.error("❌ Failed to fetch server:", error);
     } finally {
       setChecking(false);
+      console.log("✅ Server check complete.");
     }
   };
+
 
   useEffect(() => {
     // Run check once on mount

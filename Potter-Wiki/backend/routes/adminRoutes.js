@@ -67,4 +67,12 @@ router.get("/all", protect, admin, async (req, res) => {
   }
 });
 
+router.get("/super-admins/:id", protect, isSuperAdmin, async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password");
+  if (!user || !["adminUser", "superUser"].includes(user.role)) {
+    return res.status(404).json({ message: "Admin not found" });
+  }
+  res.status(200).json(user);
+});
+
 export default router;

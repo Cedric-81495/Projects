@@ -1,7 +1,7 @@
 // frontend/src/pages/admin/AdminSpells.jsx 
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../../context/AuthProvider";
 
 const AdminSpells = () => {
   const { user } = useContext(AuthContext);

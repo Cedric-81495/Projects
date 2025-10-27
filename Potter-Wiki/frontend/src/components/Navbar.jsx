@@ -1,8 +1,9 @@
+// frontend/src/components
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState, useEffect, useRef } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthProvider";
 import { toast } from "react-hot-toast";
-import PotterWikiHeader from "../assets/PotterWikiHeader.png";
+//import PotterWikiHeader from "../assets/PotterWikiHeader.png";
 import Header from "./Header";
 
 import {

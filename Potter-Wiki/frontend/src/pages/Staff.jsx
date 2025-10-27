@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext} from "../context/AuthProvider";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
 import SearchBar from "./SearchBar";

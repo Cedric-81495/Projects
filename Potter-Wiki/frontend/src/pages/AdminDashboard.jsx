@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthProvider";
 import AdminCharacters from "./admin/AdminCharacters";
 import AdminSpells from "./admin/AdminSpells";
 import AdminStudents from "./admin/AdminStudents";

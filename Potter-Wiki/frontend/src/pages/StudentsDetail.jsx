@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import NotFound from "./NotFound";
 
@@ -81,7 +81,7 @@ const StudentDetail = () => {
                 <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center md:text-left mb-6">
                 {student.name}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed leading-[5px] md:leading-relaxed">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed md:leading-relaxed">
                   <p><span className="font-semibold text-black">House:</span> {student.house || "N/A"}</p>
                   <p><span className="font-semibold text-black">Gender:</span> {student.gender || "N/A"}</p>
                   <p><span className="font-semibold text-black">Date of Birth:</span> {student.dateOfBirth || "Unknown"}</p>

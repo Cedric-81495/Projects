@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import NotFound from "./NotFound";
 
@@ -60,7 +60,7 @@ return (
           <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center md:text-left mb-6">
             {spell.name}
           </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 mb-6 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed leading-[5px] md:leading-relaxed">
+        <div className="grid grid-cols-1 md:grid-cols-2 mb-6 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed md:leading-relaxed">
           <p><span className="font-semibold">Type:</span> {spell.type || "—"}</p>
           <p><span className="font-semibold">Effect:</span> {spell.effect || "—"}</p>
           <p><span className="font-semibold">Incantation:</span> <em>{spell.incantation || "—"}</em></p>

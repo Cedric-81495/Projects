@@ -2,9 +2,8 @@ import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthProvider";
-import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
-import SearchBar from "./SearchBar";
+import SearchBar from "../components/SearchBar";
 import noimg from "../assets/no-image.jpg";
 
 const Characters = () => {
@@ -17,9 +16,7 @@ const Characters = () => {
   useEffect(() => {
     const fetchCharacters = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/characters`, {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
+        const res = await axios.get(`/api/characters`);
         setCharacters(res.data);
       } catch (err) {
         console.error("Failed to fetch characters:", err);
@@ -68,6 +65,7 @@ const Characters = () => {
            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-6xl">
               {filteredCharacters.slice(0, visibleCount).map((char) => (
                 <Link key={char._id} to={`/characters/${char._id}`}>
+                  
                   <div className="flex flex-col items-center bg-white p-4 hover:shadow-lg transition-shadow duration-300">
                     <div className="w-80 h-80 mb-4 border-2 border-black overflow-hidden">
                       <img

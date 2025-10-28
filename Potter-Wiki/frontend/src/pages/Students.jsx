@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthProvider";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
 import { Link } from "react-router-dom";
-import SearchBar from "./SearchBar";
+import SearchBar from "../components/SearchBar";
 
 const Students = () => {
   const [students, setStudents] = useState([]);
@@ -16,10 +16,7 @@ const Students = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/students`, {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
-
+        const res = await axios.get("/api/students");
         const data = Array.isArray(res.data?.students)
           ? res.data.students
           : Array.isArray(res.data)
@@ -68,14 +65,18 @@ const Students = () => {
              </div>
            </div>
 
-        {/* 🧑‍🎓 Student Results */}
+        {/*  Student Results */}
         {!loading && filteredStudents.length === 0 && searchTerm.trim() !== "" ? (
           <p className="text-gray-400 mt-8 text-center">
             No results found for <span className="font-semibold">"{searchTerm}"</span>.
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+            {/*  Student Cards */}
+            <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl ${
+                 visibleCount >= filteredStudents.length ? "mb-6" : ""
+                }`}
+              >
               {filteredStudents.slice(0, visibleCount).map((student) => (
                 <Link key={student._id} to={`/students/${student._id}`}>
                   <Card

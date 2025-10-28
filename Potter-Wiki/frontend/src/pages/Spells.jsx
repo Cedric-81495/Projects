@@ -5,7 +5,7 @@ import axios from "axios";
 import { AuthContext} from "../context/AuthProvider";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
-import SearchBar from "./SearchBar";
+import SearchBar from "../components/SearchBar";
 
 const Spells = () => {
   const [spells, setSpells] = useState([]);
@@ -18,10 +18,9 @@ const Spells = () => {
   useEffect(() => {
     const fetchSpells = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/spells`, {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
+        const res = await axios.get(`/api/spells`);
         setSpells(res.data);
+        //console.log("API Response:", res.data);
       } catch (err) {
         console.error("Failed to fetch spells:", err);
       } finally {
@@ -53,19 +52,19 @@ const Spells = () => {
   return (
     <PageWrapper loading={loading}>
          {/* Charater Section */}
-      <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
+         <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
             {/* 🔍 Search Bar */}
-       <div className="w-full flex justify-center">
-          <div className="w-full max-w-3xl">
-            <SearchBar
-              label="Search"
-              placeholder="Type a spell name..."
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-            />
-          </div>
-        </div>
-         {/* 🧙 Results */}
+            <div className="w-full flex justify-center">
+              <div className="w-full max-w-3xl">
+                <SearchBar
+                  label="Search"
+                  placeholder="Type a spell name..."
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                />
+              </div>
+            </div>
+            {/* 🧙 Results */}
             {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
               <div className="mt-8">
                 <p className="text-center text-gray-500 text-sm sm:text-base">
@@ -74,28 +73,33 @@ const Spells = () => {
               </div>
             ) : (
                <>
-            {/* 🧙 Spell Cards */}
-            <div className="grid grid-cols-1  border-lg sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
-              {filteredSpells.slice(0, visibleCount).map((spell) => (
-                <Link key={spell._id} to={`/spells/${spell._id}`}>
-                  <Card title={spell.name} />
-                </Link>
-              ))}
-            </div>
-
-            {/* 🧭 Load More */}
-            {visibleCount < filteredSpells.length && (
-              <div className="flex justify-center mt-8">
-                <button
-                  onClick={handleLoadMore}
-                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold mb-5 border-lg shadow-md transition"
-                >
-                  Load More
-                </button>
+             {/* 🧙 Spell Cards */}
+              <div
+                className={`grid grid-cols-1 border-lg sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl ${
+                  visibleCount >= filteredSpells.length ? "mb-6" : ""
+                }`}
+              >
+                {filteredSpells.slice(0, visibleCount).map((spell) => (
+                  <Link key={spell._id} to={`/spells/${spell._id}`}>
+                    <Card title={spell.name} />
+                  </Link>
+                ))}
               </div>
-            )}
-          </>
-        )}
+
+              {/* 🧭 Load More */}
+              {visibleCount < filteredSpells.length && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={handleLoadMore}
+                    className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold mb-5 border-lg shadow-md transition"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
+
+             </>
+           )}
       </section>
     </PageWrapper>
   );

@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
-import NotFound from "./NotFound";
+import NotFound from "../components/NotFound";
 
 const StaffDetail = () => {
   const { id } = useParams();
@@ -17,10 +17,7 @@ const StaffDetail = () => {
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff`, {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
-
+        const res = await axios.get("/api/staff");
         const data = Array.isArray(res.data?.staff)
           ? res.data.staff
           : Array.isArray(res.data)
@@ -57,29 +54,30 @@ const StaffDetail = () => {
 
   return (
     <PageWrapper>
-     <section className="min-h-screen pt-[130px] md:pt-[280px] flex flex-col items-center justify-start px-4 bg-white text-black">
+     <section className="min-h-screen pt-[130px] md:pt-[200px] flex flex-col items-center justify-start px-4 bg-white text-black">
         <div className="w-full max-w-6xl mx-auto">
           {/* 🪄 Staff Card */}
-          <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 p-6 sm:p-10 flex flex-col md:flex-row gap-10">
+          <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 
+            p-6 sm:p-10 sm:gap-1 flex flex-col md:flex-row gap-10">
             {/* Image */}
             {staff.image ? (
               <img
-                src={staff.image}
-                alt={staff.name}
-                className="w-full max-w-[180px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
-              />
-            ) : (
-              <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
-                No Image Available
-              </div>
-            )}
+               src={staff.image}
+               alt={staff.name}
+               className="w-full max-w-[180px] md:max-w-[200px] lg:max-w-[300px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
+               />
+               ) : (
+                <div className="w-full max-w-[180px] md:max-w-[200px] lg:max-w-[300px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
+                      No Image Available
+                </div>
+              )}
 
             {/* Text Content */}
-            <div className="flex-1 flex flex-col justify-center">
+            <div className="flex-1 flex flex-col px-6 justify-center">
              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center md:text-left mb-6">
                 {staff.name}
               </h2>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center md:leading-relaxed">
+               <div className="grid grid-cols-1  md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center md:leading-relaxed">
                 <p><span className="font-semibold">House:</span> {staff.house || "Unknown"}</p>
                 <p><span className="font-semibold">Specialty:</span> {staff.specialty || "Unknown"}</p>
                 <p><span className="font-semibold">Actor:</span> {staff.actor || "Unknown"}</p>

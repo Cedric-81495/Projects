@@ -121,23 +121,31 @@ const Navbar = () => {
               />
               <span className="absolute right-3 top-1.5 text-gray-400">🔍</span>
             </div>
-           {user ? (
+            {user ? (
               <div className="flex items-center gap-2">
-              <Link
-                to="/dashboard"
-                className="bg-[#5163BC] px-3 py-1.5 rounded text-sm text-white hover:bg-[#3f4fa0] transition"
-              >
-                Dashboard
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 px-3 py-1.5 rounded text-sm text-white hover:bg-red-700 transition"
-              >
-                Logout
-              </button>
-            </div>
+                {(user.role === "superUser" || user.role === "adminUser") ? (
+                  <Link
+                    to="/dashboard"
+                    className="bg-[#5163BC] px-3 py-1.5 rounded text-sm text-white hover:bg-[#3f4fa0] transition"
+                  >
+                    Dashboard
+                  </Link>
+                ) : (
+                  <Link
+                    to="/profile"
+                    className="bg-[#5163BC] px-3 py-1.5 rounded text-sm text-white hover:bg-[#3f4fa0] transition"
+                  >
+                    Profile
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 px-3 py-1.5 rounded text-sm text-white hover:bg-red-700 transition"
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
-
               <>
                 <Link
                   to="/login"
@@ -151,7 +159,6 @@ const Navbar = () => {
                 >
                   Sign Up
                 </Link>
-                
               </>
             )}
           </div>

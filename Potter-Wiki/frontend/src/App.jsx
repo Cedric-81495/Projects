@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import { useEffect, useState } from "react";
 import { AuthProvider } from "./context/AuthProvider";
 import Navbar from "./components/Navbar";
-// import AdminRoute from "./components/AdminRoute";
+import AdminRoute from "./routes/AdminRoute";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Characters from "./pages/Characters";
@@ -18,8 +18,10 @@ import CharacterDetail from "./pages/CharacterDetail";
 import SpellsDetail from "./pages/SpellsDetail";
 import StaffDetail from "./pages/StaffDetail";
 import StudentsDetail from "./pages/StudentsDetail";
-import BackToTopButton from "./pages/BackToTopButton";
-import NotFound from "./pages/NotFound";
+import BackToTopButton from "./components/BackToTopButton";
+import NotFound from "./components/NotFound";
+import Unauthorized from "./pages/Unauthorized"; 
+
 
 
 function AppContent() {
@@ -31,6 +33,7 @@ const location = useLocation();
     /^\/login$/, // Home
     /^\/profile$/, // Home
     /^\/dashboard$/, // Admin Dashboard
+    /^\/unauthorized$/,
     /^\/dashboard\/characters$/, // Admin Dashboard Characters
     /^\/dashboard\/spells$/, // Admin Dashboard Spells
     /^\/dashboard\/students$/, // Admin Dashboard Students
@@ -52,7 +55,14 @@ console.log("🔍 Current pathname:", location.pathname);
 const isValidPath = validPatterns.some((pattern) => pattern.test(location.pathname));
 console.log("✅ Is valid route:", isValidPath);
 
-const hideLayout = location.pathname === "/login" || location.pathname === "/register";
+const hideLayout =
+location.pathname === "/dashboard" || 
+location.pathname === "/dashboard/spells" || 
+location.pathname === "/dashboard/students" || 
+location.pathname === "/dashboard/staff" ||
+location.pathname === "/dashboard/spells" || 
+location.pathname === "/login" || 
+location.pathname === "/register";
 console.log("🧭 Should hide layout:", hideLayout);
 
 if (!isValidPath) {
@@ -90,10 +100,20 @@ if (!isValidPath) {
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
 
-          {/* Admin dashboard routes */}
-          <Route path="/dashboard/*" element={<AdminDashboard />} />
+          {/* Admin dashboard routes */}        
+          <Route
+            path="/dashboard/*"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+          
+            {/* Unauthorized fallback */}
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* ⚠️ NotFound route */}
+           {/* ⚠️ NotFound route */}
           <Route path="*" element={<NotFound message="Invalid route format" />} />
 
       </Routes>

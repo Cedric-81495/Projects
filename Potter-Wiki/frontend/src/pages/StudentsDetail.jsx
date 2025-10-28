@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
-import NotFound from "./NotFound";
+import NotFound from "../components/NotFound";
 
 const StudentDetail = () => {
   const { id } = useParams();
@@ -17,10 +17,7 @@ const StudentDetail = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/students`, {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
-
+        const res = await axios.get("/api/students");
         const data = Array.isArray(res.data?.students)
           ? res.data.students
           : Array.isArray(res.data)
@@ -57,7 +54,7 @@ const StudentDetail = () => {
 
     return (
       <PageWrapper>
-        <section className="min-h-screen pt-[130px] md:pt-[290px] flex flex-col items-center justify-start px-4 bg-white text-black">
+        <section className="min-h-screen pt-[130px] md:pt-[200px] flex flex-col items-center justify-start px-4 bg-white text-black">
           <div className="w-full max-w-6xl mx-auto">
             {/* 🪄 Student Card */}
             <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 border-2xl p-6 sm:p-10 flex flex-col md:flex-row gap-10">
@@ -66,14 +63,14 @@ const StudentDetail = () => {
                     <img
                       src={student.image}
                       alt={student.name}
-                      className="w-full max-w-[180px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
+                      className="w-full max-w-[180px] md:max-w-[200px] lg:max-w-[300px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
                     />
                   ) : (
-                    <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
+                    <div className="w-full max-w-[180px] md:max-w-[200px] lg:max-w-[300px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
                       No Image Available
                     </div>
                   )}
-            
+                    
                
               {/* Info Grid */}
               <div className="flex-1 flex flex-col justify-center">

@@ -26,7 +26,7 @@ const Profile = () => {
   if (!user) {
     return (
       <PageWrapper>
-        <div className="flex items-center justify-center min-h-screen bg-[#0b0b0b]">
+        <div className="flex items-center pt-10 justify-center min-h-screen bg-[#0b0b0b]">
           <p className="text-amber-200 text-lg font-serif">
             You must be logged in to view this page.
           </p>
@@ -37,7 +37,7 @@ const Profile = () => {
 
   return (
     <PageWrapper>
-      <section className="min-h-screen pt-[160px] px-4 flex flex-col items-center justify-start bg-[#0b0b0b] text-[#f5e6c8] font-serif">
+      <section className="min-h-screen pt-[200px] px-4 flex flex-col items-center justify-start bg-[#0b0b0b] text-[#f5e6c8] font-serif">
         <div className="w-full max-w-2xl space-y-10">
           {/* 🧙 Profile Info */}
           <div className="bg-[#1b1b2f] border border-[#cfae6d] shadow-lg hover:shadow-xl transition rounded-2xl p-6 sm:p-8">

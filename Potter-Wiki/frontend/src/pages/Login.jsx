@@ -30,11 +30,7 @@ const Login = () => {
   toast.loading("Logging in...");
 
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-      email,
-      password,
-    });
-
+    const res = await axios.post("/api/auth/login", { email, password });
     login(res.data); // ✅ correct usage
     setSuccessMessage("Login successful!");
     setErrorMessage("");
@@ -42,7 +38,7 @@ const Login = () => {
     toast.success("You're now logged in");
 
       setTimeout(() => {
-      const role = res.data?.role;
+      const role = res.data?.user?.role;
       if (role === "superUser" || role === "adminUser") {
         navigate("/dashboard");
         // This will log user data object

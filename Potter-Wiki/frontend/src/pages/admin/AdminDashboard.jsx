@@ -27,9 +27,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/admin/all`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      })
+      .get("/api/admin/all")
       .then((res) => setAdmins(res.data))
       .catch((err) => console.error("Error fetching admins:", err));
   }, [user]);
@@ -45,12 +43,10 @@ const AdminDashboard = () => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/super-admins/admins`, editForm, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+    const handleCreate = async (e) => {
+      e.preventDefault();
+      try {
+      const res = await axios.post("/api/admin/super-admins/admins", editForm);
       const updated = [...admins, res.data];
       setAdmins(updated);
       setEditForm({ firstname: "", lastname: "", email: "", role: "", username: "" });
@@ -63,12 +59,8 @@ const AdminDashboard = () => {
     const handleUpdate = async (e) => {
       e.preventDefault();
       try {
-        const res = await axios.put(
-          `${import.meta.env.VITE_API_URL}/api/admin/super-admins/${editingId}`,
-          editForm,
-          { headers: { Authorization: `Bearer ${user.token}` } }
-        );
-
+  
+        const res = await axios.post("/api/admin/super-admins/${editingId}", editForm);
         console.log("🛠️ Update response:", res.data);
         console.log("🧾 Editing ID:", editingId);
         console.log("🧑‍💻 Current user ID:", user._id);
@@ -105,9 +97,7 @@ const AdminDashboard = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/super-admins/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.delete(`/api/admin/super-admins/${id}`);
       const updated = admins.filter((admin) => admin._id !== id);
       setAdmins(updated);
       if (selectedAdmin?._id === id) {
@@ -156,9 +146,9 @@ const AdminDashboard = () => {
           <span
             className={`px-2 py-1 rounded text-sm ${
               user.role === "superUser"
-                ? "bg-blue-600"
+                ?  "bg-red-500"
                 : user.role === "adminUser"
-                ? "bg-red-500"
+                ? "bg-green-600"
                 : "bg-gray-500"
             }`}
           >
@@ -178,7 +168,8 @@ const AdminDashboard = () => {
       {isDashboardRoot && (
         <section className="mb-10">
           <h3 className="text-xl font-semibold mb-3 border-b border-gray-600 pb-2">Admin Accounts</h3>
-
+          
+          {user.role === "superUser" && (
           <form
             onSubmit={editingId ? handleUpdate : handleCreate}
             className="grid grid-cols-2 gap-4 mb-6 bg-[#251c5a] p-4 rounded-lg"
@@ -229,8 +220,9 @@ const AdminDashboard = () => {
               )}
             </div>
           </form>
+          )}
 
-          <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 border border-gray-700 rounded-lg scrollbar-thin scrollbar-thumb-[#4338ca] scrollbar-track-[#1a1244] scrollbar-thumb-rounded scrollbar-track-rounded">
+          <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 border border-gray-700 rounded-lg scrollbar-thin scrollbar-thumb-[#4338ca] scrollbar-track-[#1a1244] scrollbar-thumb-rounded scrollbar-track-rounded">
             {sortedAdmins.map((admin) => (
               <div
                 key={admin._id}

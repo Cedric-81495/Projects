@@ -16,9 +16,7 @@ const AdminSpells = () => {
   useEffect(() => {
     const fetchSpells = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/spells`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const res = await axios.get(`/api/spells`);
         setSpells(res.data);
         setFiltered(res.data);
       } catch (err) {
@@ -55,9 +53,7 @@ const AdminSpells = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/spells`, newSpells, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const res = await axios.get(`/api/spells`, newSpells);
       const updated = [...spells, res.data];
       setSpells(updated);
       setFiltered(updated);

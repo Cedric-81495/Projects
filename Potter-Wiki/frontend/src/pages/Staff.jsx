@@ -5,7 +5,7 @@ import axios from "axios";
 import { AuthContext} from "../context/AuthProvider";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
-import SearchBar from "./SearchBar";
+import SearchBar from "../components/SearchBar";
 
 const Staff = () => {
   const [staff, setStaff] = useState([]);
@@ -18,10 +18,7 @@ const Staff = () => {
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff`, {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
-
+        const res = await axios.get("/api/staff");
         const data = Array.isArray(res.data?.staff)
           ? res.data.staff
           : Array.isArray(res.data)
@@ -91,7 +88,10 @@ const Staff = () => {
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+            <div className={`grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl ${
+                  visibleCount >= filteredStaff.length ? "mb-6" : ""
+                }`}
+              >
               {filteredStaff.slice(0, visibleCount).map((member) => (
                 <Link key={member._id} to={`/staff/${member._id}`}>
                   <Card

@@ -3,7 +3,8 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
-import NotFound from "./NotFound";
+import NotFound from "../components/NotFound";
+import { formatDate } from "../utils/dateUtils";
 
 const CharacterDetail = () => {
   const { id } = useParams();
@@ -17,9 +18,7 @@ const CharacterDetail = () => {
   useEffect(() => {
     const fetchCharacters = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/characters`, {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
+        const res = await axios.get(`/api/characters`);
         setCharacters(res.data);
 
         const found = res.data.find((char) => char._id === id);
@@ -52,20 +51,20 @@ const CharacterDetail = () => {
 return (
   <PageWrapper>
      <section className="min-h-screen pt-[130px] md:pt-[200px] flex flex-col items-center justify-start px-4 bg-white text-black">
-      <div className="w-full max-w-6xl mx-auto">
+      <div className="w-full max-w-5xl mx-auto">
         {/* 🪄 Character Card */}
-       <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 border-2xl p-6 sm:p-10 flex flex-col md:flex-row gap-10">
+           <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 border-2xl p-6 sm:p-10 flex flex-col md:flex-row gap-10">
           {/* Image */}
           {character.image ? (
             <img
               src={character.image}
               alt={character.name}
-              className="w-full max-w-[180px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
-              />
-            ) : (
-              <div className="w-full max-w-[180px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
-                No Image Available
-              </div>
+              className="w-full max-w-[180px] md:max-w-[200px] lg:max-w-[300px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
+            />
+          ) : (
+            <div className="w-full max-w-[180px] md:max-w-[200px] lg:max-w-[300px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
+              No Image Available
+            </div>
           )}
 
           {/* Info Grid */}
@@ -75,10 +74,10 @@ return (
            {character.name}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed md:leading-relaxed">
-            <p><span className="font-semibold">Species:</span> {character.species || "N/A"}</p>
-            <p><span className="font-semibold">Gender:</span> {character.gender || "N/A"}</p>
-            <p><span className="font-semibold">House:</span> {character.house || "N/A"}</p>
-            <p><span className="font-semibold">Date of Birth:</span> {character.dateOfBirth || "N/A"}</p>
+            <p><span className="font-semibold">Species:</span> {character.species || "Unknown"}</p>
+            <p><span className="font-semibold">Gender:</span> {character.gender || "Unknown"}</p>
+            <p><span className="font-semibold">House:</span> {character.house || "Unknown"}</p>
+            <p><span className="font-semibold">Date of Birth:</span> {character.dateOfBirth ? formatDate(character.dateOfBirth) : "Unknown"}</p>
             <p><span className="font-semibold">Wizard:</span> {character.wizard ? "Yes" : "No"}</p>
             <p><span className="font-semibold">Ancestry:</span> {character.ancestry || "Unknown"}</p>
             <p><span className="font-semibold">Eye Colour:</span> {character.eyeColour || "Unknown"}</p>

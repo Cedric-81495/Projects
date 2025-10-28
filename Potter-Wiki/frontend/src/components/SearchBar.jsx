@@ -1,16 +1,24 @@
-// src/components/SearchBar.jsx
-
-const SearchBar = ({ label, placeholder, searchTerm, setSearchTerm }) => {
+const SearchBar = ({ placeholder = "Search...", searchTerm, setSearchTerm }) => {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center mb-4">
-      <label className="font-bold text-lg mr-2 text-white">{label}:</label>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder={placeholder}
-        className="w-full sm:w-64 px-4 py-2 border border-amber-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-amber-50 text-amber-900"
-      />
+    <div className="border-xl transition-all duration-300 gap-3 mb-6 px-0 pt-[10px] sm:px-4 sm:pt-[50px]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 w-full">
+        <form className="sm:max-w-md flex flex-col gap-2">
+          <label className="text-black text-base sm:text-lg font-medium whitespace-nowrap">
+        
+          </label>
+          <input
+            id="search-input"
+            type="text"
+            placeholder={placeholder}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-4 py-2 border-md border border-black
+                      focus:outline-none focus:ring-2 focus:ring-black
+                      bg-white text-black placeholder:text-gray-500
+                      text-base sm:text-lg transition"
+          />
+        </form>
+      </div>
     </div>
   );
 };

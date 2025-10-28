@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("authToken", userData.token);
     //console.log("User from localStorage:", localStorage.getItem("user"));
   };
 

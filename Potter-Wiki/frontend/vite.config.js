@@ -8,5 +8,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
-  base: '/', // Ensure correct asset linking
+  base: '/',
+
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+  },
 });

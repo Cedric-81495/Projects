@@ -67,9 +67,7 @@ const AdminSpells = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:3000/api/spells/${editingId}`, newSpells, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.get(`/api/spells/${editingId}`, newSpells);
       const updated = spells.map((spell) =>
         spell._id === editingId ? { ...spell, ...newSpells } : spell
       );
@@ -85,9 +83,7 @@ const AdminSpells = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/spells/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.delete(`/api/spells/${id}`);
       const updated = spells.filter((spell) => spell._id !== id);
       setSpells(updated);
       setFiltered(updated);

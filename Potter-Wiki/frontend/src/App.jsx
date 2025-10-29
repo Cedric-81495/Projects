@@ -22,9 +22,14 @@ import BackToTopButton from "./components/BackToTopButton";
 import NotFound from "./components/NotFound";
 import Unauthorized from "./pages/Unauthorized"; 
 
-
-
 function AppContent() {
+
+useEffect(() => {
+  fetch("http://localhost:3000/")
+    .then(res => res.json())
+    .then(data => console.log("Backend Health:", data))
+    .catch(err => console.error("Error:", err));
+}, []);
 
 const location = useLocation();
 
@@ -56,11 +61,6 @@ const isValidPath = validPatterns.some((pattern) => pattern.test(location.pathna
 console.log("✅ Is valid route:", isValidPath);
 
 const hideLayout =
-location.pathname === "/dashboard" || 
-location.pathname === "/dashboard/spells" || 
-location.pathname === "/dashboard/students" || 
-location.pathname === "/dashboard/staff" ||
-location.pathname === "/dashboard/spells" || 
 location.pathname === "/login" || 
 location.pathname === "/register";
 console.log("🧭 Should hide layout:", hideLayout);

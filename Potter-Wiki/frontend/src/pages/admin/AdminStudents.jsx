@@ -35,9 +35,7 @@ const AdminStudents = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/students`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const res = await axios.get(`/api/students`);
         setStudents(res.data.students);
         setFiltered(res.data.students);
       } catch (err) {
@@ -74,9 +72,8 @@ const AdminStudents = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/students`, newStudent, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+
+      const res = await axios.post(`api/students`, newStudent);
       const updated = [...students, res.data];
       setStudents(updated);
       setFiltered(updated);
@@ -90,9 +87,7 @@ const AdminStudents = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/students/${editingId}`, newStudent, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.put(`/api/students/${editingId}`, newStudent);
       const updated = students.map((s) =>
         s._id === editingId ? { ...s, ...newStudent } : s
       );
@@ -107,9 +102,7 @@ const AdminStudents = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/students/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.delete(`/api/students/${id}`);
       const updated = students.filter((s) => s._id !== id);
       setStudents(updated);
       setFiltered(updated);

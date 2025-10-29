@@ -31,9 +31,7 @@ const AdminStaffs = () => {
   useEffect(() => {
     const fetchStaffs = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/staff`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const res = await axios.get('api/staff');
         setStaffs(res.data);
         setFiltered(res.data);
       } catch (err) {
@@ -70,9 +68,7 @@ const AdminStaffs = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/staff`, newStaff, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const res = await axios.post(`/api/staff`, newStaff);
       const updated = [...staffs, res.data];
       setStaffs(updated);
       setFiltered(updated);
@@ -101,9 +97,7 @@ const AdminStaffs = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/staff/${editingId}`, newStaff, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.put(`/api/staff/${editingId}`, newStaff);
       const updated = staffs.map((s) =>
         s._id === editingId ? { ...s, ...newStaff } : s
       );
@@ -134,9 +128,7 @@ const AdminStaffs = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/staff/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.delete(`/api/staff/${id}`);
       const updated = staffs.filter((s) => s._id !== id);
       setStaffs(updated);
       setFiltered(updated);

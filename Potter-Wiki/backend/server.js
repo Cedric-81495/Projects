@@ -1,4 +1,5 @@
 // backend/server.js
+import mongoose from "mongoose";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -37,8 +38,6 @@ app.use(cors({
 }));
 
 // ✅ Handle preflight requests globally
-//app.options("*", cors());
-//app.options("/*", cors());
 app.options(/.*/, cors());
 
 // ✅ Parse incoming JSON
@@ -46,8 +45,13 @@ app.use(express.json());
 
 // ✅ Health check route
 app.get("/", (req, res) => {
-  res.send("✅ Potter Wiki Backend is running...");
+  res.status(200).json({
+    status: "ok",
+    message: "✅ Backend connected successfully",
+    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+  });
 });
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);

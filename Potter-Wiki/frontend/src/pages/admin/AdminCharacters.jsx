@@ -22,6 +22,7 @@ const AdminCharacters = () => {
     eyeColour: "",
     hairColour: "",
     patronus: "",
+    image: "",
   });
 
   useEffect(() => {
@@ -66,9 +67,7 @@ const AdminCharacters = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3000/api/characters", newCharacter, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const res = await axios.post(`/api/characters`, newCharacter);
       const updated = [...characters, res.data];
       setCharacters(updated);
       setFiltered(updated);
@@ -82,6 +81,7 @@ const AdminCharacters = () => {
         eyeColour: "",
         hairColour: "",
         patronus: "",
+        image: "",
       });
       setSuccessMessage("Character added successfully!");
     } catch (err) {
@@ -89,40 +89,49 @@ const AdminCharacters = () => {
     }
   };
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/characters/${editingId}`, newCharacter, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const updated = characters.map((char) =>
-        char._id === editingId ? { ...char, ...newCharacter } : char
-      );
-      setCharacters(updated);
-      setFiltered(updated);
-      setEditingId(null);
-      setNewCharacter({
-        name: "",
-        species: "",
-        gender: "",
-        house: "",
-        dateOfBirth: "",
-        ancestry: "",
-        eyeColour: "",
-        hairColour: "",
-        patronus: "",
-      });
-      setSuccessMessage("Character updated successfully!");
-    } catch (err) {
-      console.error("Error updating character:", err);
-    }
-  };
+
+const handleUpdate = async (e) => {
+  e.preventDefault();
+  try {
+    const { data: updatedCharacter } = await axios.put(
+      `/api/characters/${editingId}`,
+      newCharacter
+    );
+
+    // ✅ Update local state immediately so UI refreshes
+    setCharacters((prev) =>
+      prev.map((char) => (char._id === editingId ? updatedCharacter : char))
+    );
+    setFiltered((prev) =>
+      prev.map((char) => (char._id === editingId ? updatedCharacter : char))
+    );
+
+    setEditingId(null);
+    setNewCharacter({
+      name: "",
+      species: "",
+      gender: "",
+      house: "",
+      dateOfBirth: "",
+      ancestry: "",
+      eyeColour: "",
+      hairColour: "",
+      patronus: "",
+      image: "",
+    });
+
+    setSuccessMessage("✅ Character updated successfully!");
+  } catch (err) {
+    console.error("Error updating character:", err);
+  }
+};
+
+
+
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/characters/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.delete(`/api/characters/${id}`);
       const updated = characters.filter((char) => char._id !== id);
       setCharacters(updated);
       setFiltered(updated);
@@ -158,6 +167,7 @@ const AdminCharacters = () => {
           "eyeColour",
           "hairColour",
           "patronus",
+          "image", 
         ].map((field) => (
           <input
             key={field}
@@ -197,6 +207,7 @@ const AdminCharacters = () => {
                   eyeColour: "",
                   hairColour: "",
                   patronus: "",
+                  image: "",
                 });
               }}
               className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
@@ -235,6 +246,7 @@ const AdminCharacters = () => {
                   "eyeColour",
                   "hairColour",
                   "patronus",
+                  "image",
                   "actions",
                 ].map((header) => (
                   <th key={header} className="p-3 border-b border-gray-600">
@@ -261,6 +273,7 @@ const AdminCharacters = () => {
                         eyeColour: char.eyeColour,
                         hairColour: char.hairColour,
                         patronus: char.patronus,
+                        image: char.image,
                       });
                     }}
                   >
@@ -305,6 +318,11 @@ const AdminCharacters = () => {
                     <td className="p-3">
                       {char.patronus?.trim()
                         ? char.patronus.trim().charAt(0).toUpperCase() + char.patronus.trim().slice(1)
+                        : "No data found"}
+                    </td>
+                        <td className="p-3">
+                      {char.image?.trim()
+                        ? char.image.trim().charAt(0).toUpperCase() + char.image.trim().slice(1)
                         : "No data found"}
                     </td>
                      <td className="p-3">

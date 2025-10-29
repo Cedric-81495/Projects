@@ -25,20 +25,22 @@ const AdminCharacters = () => {
     image: "",
   });
 
+  const fetchCharacters = async () => {
+    try {
+      const res = await axios.get(`/api/characters`);
+      setCharacters(res.data);
+      setFiltered(res.data);
+    } catch (err) {
+      console.error("Error fetching characters:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCharacters = async () => {
-      try {
-        const res = await axios.get(`/api/characters`);
-        setCharacters(res.data);
-        setFiltered(res.data);
-      } catch (err) {
-        console.error("Error fetching characters:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCharacters();
-  }, [user]);
+  fetchCharacters();
+}, [user]);
+
 
   useEffect(() => {
     const lower = searchTerm.toLowerCase();
@@ -64,13 +66,19 @@ const AdminCharacters = () => {
     setNewCharacter({ ...newCharacter, [e.target.name]: e.target.value });
   };
 
-  const handleAdd = async (e) => {
+  // Add 'POST' a Character
+    const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`/api/characters`, newCharacter);
-      const updated = [...characters, res.data];
+      // POST request to create a new character
+      const { data: createCharacter } = await axios.post("/api/characters", newCharacter);
+      await fetchCharacters();
+      // Update state immediately to reflect new data in UI
+      const updated = [...characters, createCharacter];
       setCharacters(updated);
       setFiltered(updated);
+
+      // Reset form fields
       setNewCharacter({
         name: "",
         species: "",
@@ -83,13 +91,14 @@ const AdminCharacters = () => {
         patronus: "",
         image: "",
       });
+
       setSuccessMessage("Character added successfully!");
     } catch (err) {
       console.error("Error adding character:", err);
     }
   };
 
-
+// Update 'PUT' a Character
 const handleUpdate = async (e) => {
   e.preventDefault();
   try {
@@ -127,14 +136,15 @@ const handleUpdate = async (e) => {
 };
 
 
-
-
   const handleDelete = async (id) => {
     try {
       await axios.delete(`/api/characters/${id}`);
-      const updated = characters.filter((char) => char._id !== id);
-      setCharacters(updated);
-      setFiltered(updated);
+
+      // Update local state manually
+      const updatedList = characters.filter((char) => char._id !== id);
+      setCharacters(updatedList);
+      setFiltered(updatedList);
+
       setSuccessMessage("Character deleted successfully!");
     } catch (err) {
       console.error("Error deleting character:", err);

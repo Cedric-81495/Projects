@@ -4,6 +4,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import NotFound from "../components/NotFound";
+import { formatDate } from "../utils/dateUtils";
 
 const StaffDetail = () => {
   const { id } = useParams();
@@ -55,7 +56,7 @@ const StaffDetail = () => {
   return (
     <PageWrapper>
      <section className="min-h-screen pt-[130px] md:pt-[200px] flex flex-col items-center justify-start px-4 bg-white text-black">
-        <div className="w-full max-w-6xl mx-auto">
+        <div className="w-full max-w-5xl mx-auto">
           {/* 🪄 Staff Card */}
           <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 
             p-6 sm:p-10 sm:gap-1 flex flex-col md:flex-row gap-10">
@@ -73,15 +74,23 @@ const StaffDetail = () => {
               )}
 
             {/* Text Content */}
-            <div className="flex-1 flex flex-col px-6 justify-center">
+            <div className="flex-1 flex flex-col px-5 justify-center gap-1 md:gap-10">
              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center md:text-left mb-6">
                 {staff.name}
               </h2>
-               <div className="grid grid-cols-1  md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center md:leading-relaxed">
-                <p><span className="font-semibold">House:</span> {staff.house || "Unknown"}</p>
-                <p><span className="font-semibold">Specialty:</span> {staff.specialty || "Unknown"}</p>
-                <p><span className="font-semibold">Actor:</span> {staff.actor || "Unknown"}</p>
-                <p><span className="font-semibold">Alive:</span> {staff.alive ? "Yes" : "No"}</p>
+               <div className="grid grid-cols-1 sm:gap-y-1 md:grid-cols-2  gap-y-4 text-base md:text-lg font-normal justify-item-center md:leading-relaxed">
+                  <p><span className="font-semibold">Species:</span> {staff.species || "Unknown"}</p>
+                  <p><span className="font-semibold">Gender:</span> {staff.gender || "Unknown"}</p>
+                  <p><span className="font-semibold">House:</span> {staff.house || "Unknown"}</p>
+                  <p><span className="font-semibold">Date of Birth:</span> {staff.dateOfBirth ? formatDate(staff.dateOfBirth) : "Unknown"}</p>
+                  <p><span className="font-semibold">Wizard:</span> {staff.wizard ? "Yes" : "No"}</p>
+                  <p><span className="font-semibold">Ancestry:</span> {staff.ancestry || "Unknown"}</p>
+                  <p><span className="font-semibold">Eye Colour:</span> {staff.eyeColour || "Unknown"}</p>
+                  <p><span className="font-semibold">Hair Colour:</span> {staff.hairColour || "Unknown"}</p>
+                  <p><span className="font-semibold">Hogwarts Student:</span> {staff.hogwartsStudent ? "Yes" : "No"}</p>
+                  <p><span className="font-semibold">Hogwarts Staff:</span> {staff.hogwartsStaff ? "Yes" : "No"}</p>
+                  <p><span className="font-semibold">Actor:</span> {staff.actor || "Unknown"}</p>
+                  <p><span className="font-semibold">Alive:</span> {staff.alive ? "Yes" : "No"}</p>
               </div>
             </div>
           </div>

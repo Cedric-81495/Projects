@@ -48,12 +48,12 @@ const SpellsDetail = () => {
 
 return (
   <PageWrapper>
-    <section className="min-h-screen pt-[190px] md:pt-[300px]  flex flex-col items-center justify-start px-4 bg-white text-black">
+    <section className="min-h-screen pt-[150px] md:pt-[200px]  flex flex-col items-center justify-start px-4 bg-white text-black">
       <div className="w-full max-w-6xl mx-auto">
 
        
       {/* 📜 Spell Card */}
-       <div className="w-full max-w-sm md:max-w-3xl mx-auto px-4 py-3 border border-black shadow-sm bg-white text-black">
+       <div className="w-full md:max-w-3xl mx-auto px-4 py-3 max-w-7xl border border-black shadow-sm bg-white text-black">
 
           {/* 🪄 Spell Name */}
           <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center md:text-left sm:py-8 sm:px-8m b-2">
@@ -61,7 +61,7 @@ return (
           </h2>
 
         {/* 🧾 Spell Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 mb-6 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed md:leading-relaxed">
+        <div className="grid grid-cols-1 md:grid-cols-2 mb-6 gap-x-8 gap-y-2 text-base md:text-lg font-normal justify-item-center leading-relaxed md:leading-relaxed">
           <p><span className="font-semibold">Type:</span> {spell.type || "—"}</p>
           <p><span className="font-semibold">Effect:</span> {spell.effect || "—"}</p>
           <p><span className="font-semibold">Incantation:</span> <em>{spell.incantation || "—"}</em></p>

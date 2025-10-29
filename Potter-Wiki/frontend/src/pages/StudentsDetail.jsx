@@ -4,6 +4,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import NotFound from "../components/NotFound";
+import { formatDate } from "../utils/dateUtils";
 
 const StudentDetail = () => {
   const { id } = useParams();
@@ -54,38 +55,84 @@ const StudentDetail = () => {
 
     return (
       <PageWrapper>
-        <section className="min-h-screen pt-[130px] md:pt-[200px] flex flex-col items-center justify-start px-4 bg-white text-black">
-          <div className="w-full max-w-6xl mx-auto">
+        <section
+          className="
+            min-h-screen 
+            flex flex-col items-center justify-start 
+            px-4 
+            bg-white text-black 
+            pt-[130px]                 /* 🟢 Base (mobile): top padding */
+            md:pt-[200px]              /* 🟡 Medium screens ≥768px: increase top padding */
+          "
+        >
+          <div className="w-full max-w-5xl mx-auto">
             {/* 🪄 Student Card */}
-            <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 border-2xl p-6 sm:p-10 flex flex-col md:flex-row gap-10">
-              {/* Image */}
-                  {student.image ? (
-                    <img
-                      src={student.image}
-                      alt={student.name}
-                      className="w-full max-w-[180px] md:max-w-[200px] lg:max-w-[300px] aspect-[3/4] object-cover border border-black shadow-md mx-auto md:mx-0"
-                    />
-                  ) : (
-                    <div className="w-full max-w-[180px] md:max-w-[200px] lg:max-w-[300px] aspect-[3/4] flex items-center justify-center border border-black bg-gray-100 text-gray-500 shadow-md mx-auto md:mx-0">
-                      No Image Available
-                    </div>
-                  )}
-                    
-               
-              {/* Info Grid */}
-              <div className="flex-1 flex flex-col justify-center">
-                {/* 🧑‍🎓 Student Name */}
-                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center md:text-left mb-6">
+            <div
+              className="
+                bg-white border border-black text-black 
+                shadow-md hover:shadow-xl transition duration-300 border-2xl 
+                flex flex-col gap-10                      /* 🟢 Base (mobile): vertical layout */
+                md:flex-row                              /* 🟡 Medium ≥768px: side-by-side layout */
+                p-6                                      /* 🟢 Base: default padding */
+                sm:p-10                                  /* 🔵 Small ≥640px: increase padding */
+              "
+            >
+              {/* 🖼️ Student Image */}
+              {student.image ? (
+                <img
+                  src={student.image}
+                  alt={student.name}
+                  className="
+                    w-full 
+                    aspect-[3/4] object-cover border border-black shadow-md 
+                    mx-auto                                 /* 🟢 Base: center image */
+                    md:mx-0                                 /* 🟡 Medium ≥768px: align left */
+                    max-w-[180px]                           /* 🟢 Base: small image width */
+                    md:max-w-[200px]                        /* 🟡 Medium ≥768px: slightly larger */
+                    lg:max-w-[300px]                        /* 🔴 Large ≥1024px: largest image size */
+                  "
+                />
+              ) : (
+                <div
+                  className="
+                    w-full 
+                    aspect-[3/4] flex items-center justify-center 
+                    border border-black bg-gray-100 text-gray-500 shadow-md 
+                    mx-auto md:mx-0
+                    max-w-[180px] md:max-w-[200px] lg:max-w-[300px]
+                  "
+                >
+                  No Image Available
+                </div>
+              )}
+
+              {/* 🧩 Info Section */}
+                 <div className="flex-1 flex flex-col px-5 justify-center gap-1 md:gap-10">
+                        {/* 🧑‍🎓 Student Name */}
+                        <h2
+                          className="
+                            font-serif font-bold mb-6 
+                            text-center                        /* 🟢 Base: center text */
+                            md:text-left                       /* 🟡 Medium ≥768px: align left */
+                            text-3xl                           /* 🟢 Base font size */
+                            sm:text-4xl                        /* 🔵 Small ≥640px: increase font size */
+                          "
+                        >
                 {student.name}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed md:leading-relaxed">
-                  <p><span className="font-semibold text-black">House:</span> {student.house || "N/A"}</p>
-                  <p><span className="font-semibold text-black">Gender:</span> {student.gender || "N/A"}</p>
-                  <p><span className="font-semibold text-black">Date of Birth:</span> {student.dateOfBirth || "Unknown"}</p>
-                  <p><span className="font-semibold text-black">Wizard:</span> {student.wizard ? "Yes" : "No"}</p>
-                  <p><span className="font-semibold text-black">Ancestry:</span> {student.ancestry || "Unknown"}</p>
-                  <p><span className="font-semibold text-black">Patronus:</span> {student.patronus || "Unknown"}</p>
-                  <p><span className="font-semibold text-black">Alive:</span> {student.alive ? "Yes" : "No"}</p>
+                 <div className="grid grid-cols-1  md:grid-cols-2 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center md:leading-relaxed">
+                 <p><span className="font-semibold">Species:</span> {student.species || "Unknown"}</p>
+                             <p><span className="font-semibold">Gender:</span> {student.gender || "Unknown"}</p>
+                             <p><span className="font-semibold">House:</span> {student.house || "Unknown"}</p>
+                             <p><span className="font-semibold">Date of Birth:</span> {student.dateOfBirth ? formatDate(student.dateOfBirth) : "Unknown"}</p>
+                             <p><span className="font-semibold">Wizard:</span> {student.wizard ? "Yes" : "No"}</p>
+                             <p><span className="font-semibold">Ancestry:</span> {student.ancestry || "Unknown"}</p>
+                             <p><span className="font-semibold">Eye Colour:</span> {student.eyeColour || "Unknown"}</p>
+                             <p><span className="font-semibold">Hair Colour:</span> {student.hairColour || "Unknown"}</p>
+                             <p><span className="font-semibold">Hogwarts Student:</span> {student.hogwartsStudent ? "Yes" : "No"}</p>
+                             <p><span className="font-semibold">Hogwarts Staff:</span> {student.hogwartsStaff ? "Yes" : "No"}</p>
+                             <p><span className="font-semibold">Actor:</span> {student.actor || "Unknown"}</p>
+                             <p><span className="font-semibold">Alive:</span> {student.alive ? "Yes" : "No"}</p>
                 </div>
               </div>
             </div>

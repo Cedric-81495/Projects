@@ -53,15 +53,15 @@ return (
 
        
       {/* 📜 Spell Card */}
-<div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 p-3 sm:p-5 font-serif flex flex-col gap-8">
+       <div className="w-full max-w-sm md:max-w-3xl mx-auto px-4 py-3 border border-black shadow-sm bg-white text-black">
 
           {/* 🪄 Spell Name */}
-          <h2 className="text-4xl sm:text-5xl font-bold text-center sm:text-left text-black border-b border-gray-300 pb-4">
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center md:text-left sm:py-8 sm:px-8m b-2">
             {spell.name}
           </h2>
 
         {/* 🧾 Spell Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-base md:text-lg leading-relaxed">
+        <div className="grid grid-cols-1 md:grid-cols-2 mb-6 gap-x-8 gap-y-4 text-base md:text-lg font-normal justify-item-center leading-relaxed md:leading-relaxed">
           <p><span className="font-semibold">Type:</span> {spell.type || "—"}</p>
           <p><span className="font-semibold">Effect:</span> {spell.effect || "—"}</p>
           <p><span className="font-semibold">Incantation:</span> <em>{spell.incantation || "—"}</em></p>

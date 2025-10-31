@@ -13,20 +13,21 @@ const AdminSpells = () => {
   const [editingId, setEditingId] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
 
+   const fetchSpells = async () => {
+    try {
+      const res = await axios.get(`/api/spells`);
+      setSpells(res.data);
+      setFiltered(res.data);
+    } catch (err) {
+      console.error("Error fetching spells:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchSpells = async () => {
-      try {
-        const res = await axios.get(`/api/spells`);
-        setSpells(res.data);
-        setFiltered(res.data);
-      } catch (err) {
-        console.error("Error fetching spells:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSpells();
-  }, [user]);
+  fetchSpells();
+}, [user]);
 
   useEffect(() => {
     const lower = searchTerm.toLowerCase();
@@ -46,14 +47,16 @@ const AdminSpells = () => {
     }
   }, [successMessage]);
 
+
   const handleChange = (e) => {
     setNewSpells({ ...newSpells, [e.target.name]: e.target.value });
   };
 
+
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.get(`/api/spells`, newSpells);
+      const res = await axios.post(`/api/spells`, newSpells);
       const updated = [...spells, res.data];
       setSpells(updated);
       setFiltered(updated);
@@ -67,7 +70,7 @@ const AdminSpells = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.get(`/api/spells/${editingId}`, newSpells);
+      await axios.put(`/api/spells/${editingId}`, newSpells);
       const updated = spells.map((spell) =>
         spell._id === editingId ? { ...spell, ...newSpells } : spell
       );
@@ -82,16 +85,16 @@ const AdminSpells = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`/api/spells/${id}`);
-      const updated = spells.filter((spell) => spell._id !== id);
-      setSpells(updated);
-      setFiltered(updated);
-      setSuccessMessage("Spell deleted successfully!");
-    } catch (err) {
-      console.error("Error deleting spell:", err);
-    }
-  };
+      try {
+        await axios.delete(`/api/spells/${id}`);
+        const updatedList = spells.filter((spell) => spell._id !== id);
+        setSpells(updatedList);
+        setFiltered(updatedList);
+        setSuccessMessage("Spell deleted successfully!");
+      } catch (err) {
+        console.error("Error Spell character:", err);
+      }
+    };
 
   return (
     <section className="bg-[#251c5a] p-4 rounded-lg shadow-md min-h-screen">

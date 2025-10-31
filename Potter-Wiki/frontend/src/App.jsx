@@ -21,6 +21,8 @@ import StudentsDetail from "./pages/StudentsDetail";
 import BackToTopButton from "./components/BackToTopButton";
 import NotFound from "./components/NotFound";
 import Unauthorized from "./pages/Unauthorized"; 
+import Books from "./pages/Books"; 
+import BookCardPage from "./pages/BookCardPage"; 
 
 function AppContent() {
 
@@ -45,6 +47,7 @@ const location = useLocation();
     /^\/dashboard\/staff$/, // Admin Dashboard Staff
     /^\/register$/, // Register
     /^\/$/, // Home
+    /^\/books$/, /^\/books\/[a-f\d]{24}$/,
     /^\/characters$/, /^\/characters\/[a-f\d]{24}$/,
     /^\/spells$/, /^\/spells\/[a-f\d]{24}$/,
     /^\/staff$/, /^\/staff\/[a-f\d]{24}$/,
@@ -86,6 +89,8 @@ if (!isValidPath) {
       <Routes>
            {/* Public routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/books" element={<Books />} />
+          <Route path="/books/:id" element={<BookCardPage />} />
           <Route path="/characters" element={<Characters />} />
           <Route path="/characters/:id" element={<CharacterDetail />} />
           <Route path="/spells" element={<Spells />} />
@@ -161,7 +166,7 @@ function App() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0B0B] text-white font-serif">
         <div className="animate-spin h-10 w-10 border-4 border-yellow-400 border-t-transparent rounded-full mb-4"></div>
-        <p>Checking server status...</p>
+        
       </div>
     );
   }

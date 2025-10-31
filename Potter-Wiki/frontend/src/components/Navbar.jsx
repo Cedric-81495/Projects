@@ -184,6 +184,13 @@ const Navbar = () => {
             </button>
           </div>
 
+          {/* Books  */}
+          <div className="relative">
+            <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
+              <Link  to="/books">BOOKS</Link>
+            </button>
+          </div>
+
           {/* Magical Data */}
           <div className="relative" ref={magicalDropdownRef}>
             <button
@@ -229,54 +236,7 @@ const Navbar = () => {
               </Link>
             </div>
             )}
-          </div>
-
-          {/* Books  */}
-          <div className="relative" ref={booksDropdownRef}>
-            <button
-              onClick={() => handleDropdownToggle("books")}
-              className="text-white hover:text-amber-300 transition flex items-center gap-1"
-            >
-              BOOKS ▾
-            </button>
-
-            {showBooksDropdown && (
-                <div
-                  className={`absolute top-full left-0 w-48 bg-[#020325] border border-gray-700 rounded shadow-lg transition-all duration-300 ease-in-out z-50 ${
-                    showBooksDropdown ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-                  }`}
-                >
-              <Link
-                to="/fiction"
-                onClick={() => setShowBooksDropdown(false)}
-                className="block px-4 py-2 hover:text-amber-300"
-              >
-                fiction
-              </Link>
-              <Link
-                to="/fantasy"
-                onClick={() => setShowBooksDropdown(false)}
-                className="block px-4 py-2 hover:text-amber-300"
-              >
-                fantasy
-              </Link>
-              <Link
-                to="/magical"
-                onClick={() => setShowBooksDropdown(false)}
-                className="block px-4 py-2 hover:text-amber-300"
-              >
-                magical
-              </Link>
-              <Link
-                to="/adventure"
-                onClick={() => setShowBooksDropdown(false)}
-                className="block px-4 py-2 hover:text-amber-300"
-              >
-                adventure
-              </Link>
-            </div>
-            )}
-          </div>
+          </div> 
         </nav>
 
         {/* Mobile Dropdown */}
@@ -285,11 +245,16 @@ const Navbar = () => {
             ref={menuRef}
             className="md:hidden bg-[#020325] py-4 transition-all duration-300 max-h-[calc(100vh-80px)] overflow-y-auto"
           >
-             {/* Home */}
+             
             
             <div className="flex flex-col items-center space-y-3 text-sm font-semibold uppercase tracking-wide">
+              {/* Home */}
               <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
                   <Link  to="/">HOME</Link>
+              </button>
+              {/* Books */}
+               <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
+                  <Link  to="/books">BOOKS</Link>
               </button>
               {/* Magical Data (Accordion) */}
               <button
@@ -315,31 +280,6 @@ const Navbar = () => {
                   </Link>
                 </div>
               )}
-
-              <button
-                onClick={() => handleDropdownToggle("books", true)}
-                className="text-white hover:text-amber-300 transition flex items-center gap-1"
-              >
-                BOOKS ▾
-              </button>
-
-              {showMobileBooksDropdown && (
-                <div className="mt-2 mx-auto w-48 bg-[#020325] shadow-lg justify-center">
-                  <Link to="/fiction" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
-                    fiction
-                  </Link>
-                  <Link to="/fantasy" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
-                    fantasy
-                  </Link>
-                  <Link to="/magic" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
-                    magic
-                  </Link>
-                  <Link to="/adventure" onClick={() => setMenuOpen(false)} className="block px-4 py-2 hover:text-amber-300">
-                    adventure
-                  </Link>
-                </div>
-              )}
-
 
               {/* Divider */}
               <div className="border-t border-gray-600 w-3/4 my-2"></div>

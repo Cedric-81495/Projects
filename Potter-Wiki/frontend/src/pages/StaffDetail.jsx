@@ -87,6 +87,7 @@ const StaffDetail = () => {
                   <p><span className="font-semibold">Ancestry:</span> {staff.ancestry || "Unknown"}</p>
                   <p><span className="font-semibold">Eye Colour:</span> {staff.eyeColour || "Unknown"}</p>
                   <p><span className="font-semibold">Hair Colour:</span> {staff.hairColour || "Unknown"}</p>
+                  <p><span className="font-semibold">Patronous::</span> {staff.patronus || "Unknown"}</p>
                   <p><span className="font-semibold">Hogwarts Student:</span> {staff.hogwartsStudent ? "Yes" : "No"}</p>
                   <p><span className="font-semibold">Hogwarts Staff:</span> {staff.hogwartsStaff ? "Yes" : "No"}</p>
                   <p><span className="font-semibold">Actor:</span> {staff.actor || "Unknown"}</p>

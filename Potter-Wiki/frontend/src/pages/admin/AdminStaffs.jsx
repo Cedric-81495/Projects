@@ -264,7 +264,11 @@ const AdminStaffs = () => {
                     <td className="p-3">{displayBoolean(char.hogwartsStaff)}</td>
                     <td className="p-3">{displayValue(char.actor)}</td>
                     <td className="p-3">{displayBoolean(char.alive)}</td>
-                    <td className="p-3">{char.image?.trim() || "No data found"}</td>
+                    <td className="p-3 max-w-[200px] break-words whitespace-normal">
+                      {char.image?.trim()
+                        ? char.image.trim().charAt(0).toUpperCase() + char.image.trim().slice(1)
+                        : "No data found"}
+                    </td>
                     <td className="p-3">
                       <button
                         onClick={(e) => {

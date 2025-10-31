@@ -114,7 +114,7 @@ const handleUpdate = async (e) => {
     setFiltered((prev) =>
       prev.map((char) => (char._id === editingId ? updatedCharacter : char))
     );
-
+  ;
     setEditingId(null);
     setNewCharacter({
       name: "",
@@ -330,7 +330,7 @@ const handleUpdate = async (e) => {
                         ? char.patronus.trim().charAt(0).toUpperCase() + char.patronus.trim().slice(1)
                         : "No data found"}
                     </td>
-                        <td className="p-3">
+                    <td className="p-3 max-w-[200px] break-words whitespace-normal">
                       {char.image?.trim()
                         ? char.image.trim().charAt(0).toUpperCase() + char.image.trim().slice(1)
                         : "No data found"}

@@ -1,4 +1,4 @@
-// backend\seder.js
+// backend/seeder.js
 import dotenv from "dotenv";
 import axios from "axios";
 import connectDB from "./config/db.js";
@@ -15,83 +15,83 @@ const importData = async () => {
     await connectDB();
 
     // --- Books ---
-    const books = await axios.get("https://api.potterdb.com/v1/books");
-    const char = books.data.data;  
+    const bookRes = await axios.get("https://api.potterdb.com/v1/books");
+    const books = bookRes.data.data;
     let bookUpdated = 0, bookNew = 0;
 
-    for (const book of char) {
-      const existingBook = await Book.findOneAndUpdate(
+    for (const book of books) {
+      const result = await Book.findOneAndUpdate(
         { "attributes.slug": book.attributes.slug },
-        char,
+        book,
         { upsert: true, new: true, setDefaultsOnInsert: true }
       );
-
-      if (existingBook.wasNew) bookNew++;
+      if (result.wasNew) bookNew++;
       else bookUpdated++;
     }
 
     // --- Characters ---
-    const characters = await axios.get("https://hp-api.onrender.com/api/characters");
-    const char = characters.data.data; 
-    let updatedCount = 0, newCount = 0;
+    const charRes = await axios.get("https://hp-api.onrender.com/api/characters");
+    const characters = charRes.data;
+    let charUpdated = 0, charNew = 0;
 
-    for (const data of char) {
+    for (const data of characters) {
       const result = await Character.findOneAndUpdate(
-        { name: data.name }, 
-        data,
-        { upsert: true, new: true }
-      );
-      if (result.isNew) newCount++;
-      else updatedCount++;
-    }
-
-    // --- Spells ---
-    const spells = await axios.get("https://hp-api.onrender.com/api/spells");
-    const char = spells.data.data; 
-    let updatedCount = 0, newCount = 0;
-
-    for (const data of char) {
-      const result = await Spells.findOneAndUpdate(
         { name: data.name },
         data,
         { upsert: true, new: true }
       );
-      if (result.isNew) newCount++;
-      else updatedCount++;
+      if (result.isNew) charNew++;
+      else charUpdated++;
+    }
+
+    // --- Spells ---
+    const spellRes = await axios.get("https://hp-api.onrender.com/api/spells");
+    const spells = spellRes.data;
+    let spellUpdated = 0, spellNew = 0;
+
+    for (const data of spells) {
+      const result = await Spell.findOneAndUpdate(
+        { name: data.name },
+        data,
+        { upsert: true, new: true }
+      );
+      if (result.isNew) spellNew++;
+      else spellUpdated++;
     }
 
     // --- Students ---
-    const students = await axios.get("https://hp-api.onrender.com/api/students");
-    const char = students.data.data;   
-    let updatedCount = 0, newCount = 0;
+    const studentRes = await axios.get("https://hp-api.onrender.com/api/students");
+    const students = studentRes.data;
+    let studentUpdated = 0, studentNew = 0;
 
-    for (const data of char) {
-      const result = await Students.findOneAndUpdate(
-        { name: data.name }, 
+    for (const data of students) {
+      const result = await Student.findOneAndUpdate(
+        { name: data.name },
         data,
         { upsert: true, new: true }
       );
-      if (result.isNew) newCount++;
-      else updatedCount++;
+      if (result.isNew) studentNew++;
+      else studentUpdated++;
     }
 
     // --- Staff ---
-    const staffs = await axios.get("https://hp-api.onrender.com/api/staff");
-    const char = staffs.data.data;   
-    let updatedCount = 0, newCount = 0;
+    const staffRes = await axios.get("https://hp-api.onrender.com/api/staff");
+    const staffList = staffRes.data;
+    let staffUpdated = 0, staffNew = 0;
 
-    for (const data of char) {
-      const result = await Staffs.findOneAndUpdate(
-        { name: data.name }, 
+    for (const data of staffList) {
+      const result = await Staff.findOneAndUpdate(
+        { name: data.name },
         data,
         { upsert: true, new: true }
       );
-      if (result.isNew) newCount++;
-      else updatedCount++;
+      if (result.isNew) staffNew++;
+      else staffUpdated++;
     }
 
     console.log("✅ Data Import Complete (Safe Mode)");
-    console.log(`📚 Characters → Updated: ${updatedCount}, New: ${newCount}`);
+    console.log(`📚 Books → Updated: ${bookUpdated}, New: ${bookNew}`);
+    console.log(`🧙 Characters → Updated: ${charUpdated}, New: ${charNew}`);
     console.log(`✨ Spells → Updated: ${spellUpdated}, New: ${spellNew}`);
     console.log(`🎓 Students → Updated: ${studentUpdated}, New: ${studentNew}`);
     console.log(`🏫 Staff → Updated: ${staffUpdated}, New: ${staffNew}`);

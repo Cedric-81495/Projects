@@ -1,6 +1,6 @@
 const SearchBar = ({ placeholder = "Search...", searchTerm, setSearchTerm }) => {
   return (
-    <div className="border-xl transition-all duration-300 gap-3 mb-6 px-0 pt-[10px] sm:px-4 sm:pt-[50px]">
+    <div className="border-xl transition-all duration-300 gap-3 mb-6 px-0 sm:px-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 w-full">
         <form className="sm:max-w-md flex flex-col gap-2">
           <label className="text-black text-base sm:text-lg font-medium whitespace-nowrap">

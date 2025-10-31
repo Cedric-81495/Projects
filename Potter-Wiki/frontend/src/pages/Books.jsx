@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
+import SearchBar from "../components/SearchBar";
 
 export default function Books() {
   const { user } = useContext(AuthContext);
@@ -13,6 +14,8 @@ export default function Books() {
   const [error, setError] = useState(null);
   const [visibleBooks, setVisibleBooks] = useState(6);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  
 
   const categories = [
     { id: 'all', name: 'All Books' },
@@ -42,25 +45,30 @@ export default function Books() {
         if (slug.includes("half-blood") || slug.includes("deathly")) return "fantasy";
         return "fiction"; // default fallback
       };
-
+      const inferTitle = (title = "") => {
+        if (title);
+        return title;
+      };
       const formattedBooks = rawBooks.map((book, index) => {
         const attributes = book.raw?.attributes || {};
         const slug = attributes.slug || "";
+        const title = attributes.title || "";
 
         return {
           id: book.id || `book-${index}`,
-          title: attributes.title || "Unknown Title",
+          title: inferTitle(title) || "Unknown Title",
           author: attributes.author || "Unknown Author",
           cover: attributes.cover || "",
           summary: attributes.summary || "No description available.",
           release_date: attributes.release_date || "Unknown",
           pages: attributes.pages || 0,
           slug,
-          category: inferCategory(slug) // ✅ inferred category
+          category: inferCategory(slug)
         };
       });
 
         setBooks(formattedBooks);
+        console.log("Formatted Books:", formattedBooks.map(a => a.title));
         console.log("Formatted Books:", formattedBooks.map(b => b.category));
         setError(null);
       } catch (err) {
@@ -87,11 +95,21 @@ export default function Books() {
   };
 
   // Get filtered books based on active category
-  const filteredBooks = activeCategory === 'all' 
-    ? books 
-    : books.filter(book => book.category === activeCategory);
-    console.log("Active Category:",activeCategory );
-    
+  const filteredBooks = books.filter(book => {
+    const matchesCategory = activeCategory === 'all' || book.category === activeCategory;
+    const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase());
+
+    console.log("Checking Book:", book.title, "| Category:", book.category);
+
+    return matchesCategory && matchesSearch;
+  });
+
+   useEffect(() => {
+    if (filteredBooks.length === 0 && searchTerm.trim() !== "") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [searchTerm, filteredBooks.length]);
+
   if (error) {
     return (
       <div className="flex min-h-screen">
@@ -131,11 +149,11 @@ export default function Books() {
 
   return (
   <PageWrapper loading={loading}>
-    <section className="flex min-h-screen pt-[100px] md:pt-[160px]  px-4">
-      {/* Left Sidebar */}
-      <div className="w-64 bg-white shadow-md p-4 hidden md:block">
+    <section className="flex pt-[50px] md:pt-[150px] px-4">
+      {/* Category sidebar */}
+      <div className="w-64 border shadow-md p-4 hidden md:block self-start">
         <h2 className="font-bold text-lg mb-4 text-gray-800">Categories</h2>
-        <div className="space-y-1 mb-6">
+        <div className="space-y-1 mb-4">
           {categories.map(category => (
             <button
               key={category.id}
@@ -143,7 +161,7 @@ export default function Books() {
               className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
                 activeCategory === category.id 
                   ? 'bg-blue-100 text-blue-700 font-medium' 
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-gray-700 hover:bg-gray-200'
               }`}
             >
               {category.name}
@@ -158,7 +176,7 @@ export default function Books() {
             <Link
               key={link.id}
               to={link.path}
-              className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+              className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-200 transition-colors"
             >
               {link.name}
             </Link>
@@ -168,38 +186,54 @@ export default function Books() {
       
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-6">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-          <h1 className="text-2xl md:text-3xl text-black font-bold mb-4 md:mb-0">
-            {activeCategory === 'all' ? 'All Books' : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Books`}
-          </h1>
-          
-          {/* Mobile category selector */}
-          <div className="md:hidden w-full mb-4">
-            <select 
-              value={activeCategory}
-              onChange={(e) => filterBooksByCategory(e.target.value)}
-              className="w-full p-2 border text-black rounded-md bg-white"
-            >
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          
+             {/* SearchBar at the top */}
+           <div className="w-full flex justify-between items-center flex-wrap gap-4 mb-[10px] md:mb-[10px]">
+              {/* Heading */}
+              <h1 className="text-2xl md:text-3xl text-black font-bold text-center md:text-left">
+                {activeCategory === 'all'
+                  ? 'All Books'
+                  : `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Books`}
+              </h1>
 
-        </div>
+              {/* SearchBar */}
+              <div className="w-full md:w-auto max-w-md">
+                <SearchBar
+                  label="Search"
+                  placeholder="Type a book title..."
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                />
+              </div>
+            </div>
+
+            {/* Heading + Category Selector */}
+    
+              {/* Mobile category selector */}
+              <div className="md:hidden w-full">
+                <select
+                  value={activeCategory}
+                  onChange={(e) => filterBooksByCategory(e.target.value)}
+                  className="w-full p-2 border text-black rounded-md bg-white"
+                >
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
         
-        {/* Book Grid - smaller cards with more columns */}
-        <div className="px-2 sm:px-0">
-          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 max-w-full">
 
-            {filteredBooks.slice(0, visibleBooks).map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
+        
+         {/* Book Grid */}
+          <div className="px-2 sm:px-0 mt-[10px]">
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 max-w-full">
+              {filteredBooks.slice(0, visibleBooks).map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </div>
           </div>
-        </div>
+
         
         {/* Empty state */}
         {filteredBooks.length === 0 && (

@@ -42,7 +42,7 @@ const Characters = () => {
   return (
     <PageWrapper loading={loading}>
       {/* 🧱 Main Layout */}
-      <section className="min-h-screen flex flex-col items-center justify-start pt-28 px-4">
+      <section className="min-h-screen flex flex-col items-center justify-start pt-[120px] md:pt-[160px] px-4">
             {/* 🔍 Search Bar */}
        <div className="w-full flex justify-center">
           <div className="w-full max-w-3xl">

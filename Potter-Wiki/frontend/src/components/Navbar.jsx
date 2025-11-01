@@ -96,7 +96,7 @@ const Navbar = () => {
         </div>
       )}
 
-   <header className="fixed top-0 left-0 w-full z-50 text-white bg-[#020325] font-serif transition-transform duration-300 translate-y-0">
+   <header className="top-0 left-0 relative w-full z-50 text-white bg-[#020325] font-serif transition-transform duration-300 translate-y-0">
 
         {/* Top Row */}
         <div className="w-full flex justify-between items-center px-6 py-3 max-w-7xl mx-auto relative">

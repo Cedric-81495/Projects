@@ -4,11 +4,10 @@ import booksbg from "../assets/books-bg.jpeg";
 
 const Home = () => {
   return (
-    <div className="text-[#f5e6c8] font-serif bg-[#0b0b0b]">
+    <div className="text-[#f5e6c8] font-serif">
       {/* 🧙 Hero Section */}
-      {/* 📊 Magical Data */}
       <section
-        className="min-h-screen flex items-center justify-center text-center bg-cover bg-center relative"
+        className="pt-[200px] pb-[200px]  flex items-center justify-center text-center bg-cover bg-center relative"
         style={{ backgroundImage: `url(${harrypotterbg})` }}
       >
         <div className="absolute inset-0 bg-black/60 z-0" />
@@ -51,7 +50,7 @@ const Home = () => {
 
       {/* 📚 Books */}
       <section
-        className="pt-[80px] pb-[80px] px-4 text-center bg-cover bg-center text-white"
+        className="pt-[100px] pb-[100px] relative px-4 text-center bg-cover bg-center text-white"
         style={{ backgroundImage: `url(${booksbg})` }}
       >
         <div className="bg-black/50 p-6 rounded-lg inline-block max-w-3xl mx-auto">

@@ -1,12 +1,12 @@
 // backend/models/Book.js
 import mongoose from "mongoose";
-
 const { Schema } = mongoose;
 
 const chapterSchema = new Schema({
   type: { type: String, default: "chapter" },
 });
 
+// Book schema
 const bookSchema = new Schema(
   {
     type: { type: String, default: "book" },
@@ -27,10 +27,24 @@ const bookSchema = new Schema(
       },
     },
     links: {
-      self: { type: String },
+      self: {
+        type: String,
+        default: function () {
+          return `/v1/books/${this._id}`;
+        },
+      },
     },
   },
   { timestamps: true }
 );
+
+// Virtual field to expose `id` instead of `_id`
+bookSchema.virtual("id").get(function () {
+  return this._id.toHexString();
+});
+
+bookSchema.set("toJSON", {
+  virtuals: true,
+});
 
 export default mongoose.model("Book", bookSchema);

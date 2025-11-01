@@ -4,11 +4,11 @@ const PageWrapper = ({ children, loading = false }) => {
     <div className="flex flex-col flex-grow w-full min-h-screen text-white font-serif relative">
       {/* 🌀 Loader Overlay */}
       {loading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-50">
-          <span className="text-xl font-semibold italic tracking-wide text-amber-200 mb-4">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-10">
+         <span className="text-xl font-semibold mt-[-2000px] md:mt-[-200px] italic tracking-wide text-amber-200 mb-4">
             Loading...
           </span>
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-amber-500"></div>
+         <div className="animate-spin rounded-full md:mt-[-10px] h-12 w-12 border-t-4 border-b-4 border-amber-500"></div>
         </div>
       )}
 

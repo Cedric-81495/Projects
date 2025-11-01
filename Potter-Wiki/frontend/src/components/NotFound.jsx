@@ -4,21 +4,29 @@ const NotFound = ({ message = "Page not found" }) => {
   const location = useLocation();
 
   const getBackPath = () => {
-    const path = location.pathname;
-    if (path.startsWith("/characters")) return "/characters";
-    if (path.startsWith("/spells")) return "/spells";
-    if (path.startsWith("/students")) return "/students";
-    if (path.startsWith("/staff")) return "/staff";
-    if (path.startsWith("/profile")) return "/profile";
-    if (path.startsWith("/dashboard")) return "/dashboard";
-    if (path.startsWith("/fiction")) return "/";
-    if (path.startsWith("/fantasy")) return "/";
-    if (path.startsWith("/magical")) return "/";
-    if (path.startsWith("/adventure")) return "/";
-    if (path.startsWith("/profile")) return "/profile";
-    if (path.startsWith("/dashboard")) return "/dashboard";
-    if (path.startsWith("/books")) return "/books";
-    if (path.startsWith("/books") || path.startsWith("/books/")) return "/books";
+  const path = location.pathname;
+
+    const validSections = [
+      "/characters",
+      "/spells",
+      "/students",
+      "/staff",
+      "/profile",
+      "/dashboard",
+      "/books",
+      "/fiction",
+      "/fantasy",
+      "/magical",
+      "/adventure",
+    ];
+
+    for (const section of validSections) {
+      if (path.startsWith(section)) {
+        // always return the base section (e.g. /books/anything → /books)
+        return section;
+      }
+    }
+
     if (path.startsWith("/login") || path.startsWith("/register")) return "/";
     return "/";
   };

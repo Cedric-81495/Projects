@@ -42,7 +42,7 @@ const Characters = () => {
   return (
     <PageWrapper loading={loading}>
       {/* 🧱 Main Layout */}
-      <section className="min-h-screen flex flex-col items-center justify-start pt-[120px] md:pt-[160px] px-4">
+      <section className="min-h-screen flex flex-col items-center justify-start pt-[5px]  md:pt-[5px] relative px-4">
             {/* 🔍 Search Bar */}
        <div className="w-full flex justify-center">
           <div className="w-full max-w-3xl">
@@ -54,18 +54,17 @@ const Characters = () => {
             />
           </div>
         </div>
-
-        {/* Character Results */}
         {!loading && filteredCharacters.length === 0 && searchTerm.trim() !== "" ? (
-          <p className="text-gray-400 mt-8 text-center">
+        <div className="mt-8">
+          <p className="text-center text-gray-500 text-sm sm:text-base">
             No results found for <span className="font-semibold">"{searchTerm}"</span>.
           </p>
+        </div>
         ) : (
           <>
            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-6xl">
               {filteredCharacters.slice(0, visibleCount).map((char) => (
                 <Link key={char._id} to={`/characters/${char._id}`}>
-                  
                   <div className="flex flex-col items-center bg-white p-4 hover:shadow-lg transition-shadow duration-300">
                     <div className="w-80 h-80 mb-4 border-2 border-black overflow-hidden">
                       <img
@@ -81,13 +80,13 @@ const Characters = () => {
             </div>
 
             {visibleCount < filteredCharacters.length && (
-              <div className="flex justify-center mt-5 mb-5">
+             <div className="flex justify-center mt-8">
                 <button
                   onClick={handleLoadMore}
                   className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold border-lg shadow-md transition"
                 >
                   Load More
-                </button>
+                </button> 
               </div>
             )}
           </>

@@ -11,7 +11,7 @@ const Students = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleCount, setVisibleCount] = useState(24);
   const { user } = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -52,55 +52,63 @@ const Students = () => {
 
   return (
     <PageWrapper loading={loading}>
-      <section className="min-h-screen flex flex-col items-center justify-start pt-[120px] md:pt-[160px] px-4">
-        {/* 🔍 Search Bar */}
-       <div className="w-full flex justify-center">
-          <div className="w-full max-w-3xl">
-               <SearchBar
-                 label="Search"
-                 placeholder="Type a student name..."
-                 searchTerm={searchTerm}
-                 setSearchTerm={setSearchTerm}
-               />
-             </div>
-           </div>
-
-        {/*  Student Results */}
-        {!loading && filteredStudents.length === 0 && searchTerm.trim() !== "" ? (
-          <p className="text-gray-400 mt-8 text-center">
-            No results found for <span className="font-semibold">"{searchTerm}"</span>.
-          </p>
-        ) : (
-          <>
-            {/*  Student Cards */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl ${
-                 visibleCount >= filteredStudents.length ? "mb-6" : ""
-                }`}
-              >
-              {filteredStudents.slice(0, visibleCount).map((student) => (
-                <Link key={student._id} to={`/students/${student._id}`}>
-                  <Card
-                    title={student.name}
-                    description={`House: ${student.house || "Unknown"}`}
+        <section className="min-h-screen flex flex-col items-center justify-start pt-[5px] md:pt-[5px] relative px-4">
+          
+          {students.length > 0 ? (
+            <>
+              <div className="w-full flex justify-center">
+                <div className="w-full max-w-3xl">
+                  <SearchBar
+                    label="Search"
+                    placeholder="Type a student name..."
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
                   />
-                </Link>
-              ))}
-            </div>
-
-            {/* 🪄 Load More Button */}
-            {visibleCount < filteredStudents.length && (
-              <div className="flex justify-center mt-10">
-                <button
-                  onClick={handleLoadMore}
-                  className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white mb-5 font-semibold border-lg shadow-md transition"
-                >
-                  Load More
-                </button>
+                </div>
               </div>
-            )}
-          </>
-        )}
-      </section>
+
+              {!loading && filteredStudents.length === 0 && searchTerm.trim() !== "" ? (
+                <p className="text-gray-400 mt-8 text-center">
+                  No results found for <span className="font-semibold">"{searchTerm}"</span>.
+                </p>
+              ) : (
+                <>
+                 
+                  <div
+                    className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl ${
+                      visibleCount >= filteredStudents.length ? "mb-6" : ""
+                    }`}
+                  >
+                    {filteredStudents.slice(0, visibleCount).map((student) => (
+                      <Link key={student._id} to={`/students/${student._id}`}>
+                        <Card
+                          title={student.name}
+                          description={`House: ${student.house || "Unknown"}`}
+                        />
+                      </Link>
+                    ))}
+                  </div>
+
+                  {visibleCount < filteredStudents.length && (
+                    <div className="flex justify-center mt-10">
+                      <button
+                        onClick={handleLoadMore}
+                        className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white mb-5 font-semibold border-lg shadow-md transition"
+                      >
+                        Load More
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          ) : (
+
+            <div className="w-full flex justify-center">
+              <p>No student data found.</p>
+            </div>
+          )}
+        </section>
     </PageWrapper>
   );
 };

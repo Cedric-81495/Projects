@@ -52,7 +52,7 @@ const Spells = () => {
   return (
     <PageWrapper loading={loading}>
          {/* Charater Section */}
-         <section className="min-h-screen flex flex-col items-center justify-start pt-[120px] md:pt-[160px] px-4">
+         <section className="min-h-screen flex flex-col items-center justify-start pt-[5px]  md:pt-[5px] relative px-4">
             {/* 🔍 Search Bar */}
             <div className="w-full flex justify-center">
               <div className="w-full max-w-3xl">
@@ -64,16 +64,14 @@ const Spells = () => {
                 />
               </div>
             </div>
-            {/* 🧙 Results */}
             {!loading && filteredSpells.length === 0 && searchTerm.trim() !== "" ? (
               <div className="mt-8">
                 <p className="text-center text-gray-500 text-sm sm:text-base">
                   No results found for <span className="font-semibold">"{searchTerm}"</span>.
                 </p>
-              </div>
+              </div> 
             ) : (
                <>
-             {/* 🧙 Spell Cards */}
               <div
                 className={`grid grid-cols-1 border-lg sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl ${
                   visibleCount >= filteredSpells.length ? "mb-6" : ""
@@ -86,7 +84,6 @@ const Spells = () => {
                 ))}
               </div>
 
-              {/* 🧭 Load More */}
               {visibleCount < filteredSpells.length && (
                 <div className="flex justify-center mt-8">
                   <button
@@ -97,7 +94,6 @@ const Spells = () => {
                   </button>
                 </div>
               )}
-
              </>
            )}
       </section>

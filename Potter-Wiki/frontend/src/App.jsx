@@ -23,6 +23,7 @@ import NotFound from "./components/NotFound";
 import Unauthorized from "./pages/Unauthorized"; 
 import Books from "./pages/Books"; 
 import BookCardPage from "./pages/BookCardPage"; 
+import BookContents from "./pages/BookContents"; 
 
 function AppContent() {
 
@@ -47,7 +48,7 @@ const location = useLocation();
     /^\/dashboard\/staff$/, // Admin Dashboard Staff
     /^\/register$/, // Register
     /^\/$/, // Home
-    /^\/books$/, /^\/books\/[a-f\d]{24}$/,
+    /^\/books$/, /^\/books\/[\w-]+$/,
     /^\/characters$/, /^\/characters\/[a-f\d]{24}$/,
     /^\/spells$/, /^\/spells\/[a-f\d]{24}$/,
     /^\/staff$/, /^\/staff\/[a-f\d]{24}$/,
@@ -57,16 +58,12 @@ const location = useLocation();
 
 
 // Check if current path matches any valid pattern
-
-console.log("🔍 Current pathname:", location.pathname);
-
 const isValidPath = validPatterns.some((pattern) => pattern.test(location.pathname));
 console.log("✅ Is valid route:", isValidPath);
 
 const hideLayout =
 location.pathname === "/login" || 
 location.pathname === "/register";
-console.log("🧭 Should hide layout:", hideLayout);
 
 if (!isValidPath) {
     return (
@@ -78,19 +75,16 @@ if (!isValidPath) {
     );
   }
 
-
-
   return (
     <>
       {!hideLayout && <Navbar />}
-
       <BackToTopButton />
-      
       <Routes>
            {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/books" element={<Books />} />
           <Route path="/books/:id" element={<BookCardPage />} />
+          <Route path="/books/:id/contents" element={<BookContents />} />
           <Route path="/characters" element={<Characters />} />
           <Route path="/characters/:id" element={<CharacterDetail />} />
           <Route path="/spells" element={<Spells />} />
@@ -134,7 +128,7 @@ function App() {
   const [checking, setChecking] = useState(true);
   
     useEffect(() => {
-    console.log("🚀 App mounted. Checking server...");
+    console.log("App mounted. Checking server...");
     checkServer();
   }, []);
 
@@ -161,11 +155,11 @@ function App() {
     checkServer();
   }, []);
 
-  // ⏳ Loading state while checking server
+  // Loading state while checking server
   if (checking) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0B0B] text-white font-serif">
-        <div className="animate-spin h-10 w-10 border-4 border-yellow-400 border-t-transparent rounded-full mb-4"></div>
+           <div className="animate-spin h-10 w-10 border-4 border-yellow-400 border-t-transparent rounded-full mb-4"></div>
         
       </div>
     );

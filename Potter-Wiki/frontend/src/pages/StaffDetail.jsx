@@ -55,7 +55,7 @@ const StaffDetail = () => {
 
   return (
     <PageWrapper>
-     <section className="min-h-screen pt-[130px] md:pt-[200px] flex flex-col items-center justify-start px-4 bg-white text-black">
+     <section className="min-h-screen flex flex-col items-center justify-start px-4 bg-white text-black pt-[20px]  md:pt-[20px] relative">
         <div className="w-full max-w-5xl mx-auto">
           {/* 🪄 Staff Card */}
           <div className="bg-white border border-black text-black shadow-md hover:shadow-xl transition duration-300 
@@ -97,7 +97,7 @@ const StaffDetail = () => {
           </div>
 
           {/* 🧭 Navigation Buttons */}
-          <div className="grid grid-cols-2 mb-6 md:grid-cols-3 gap-4 mt-10 w-full max-w-xl mx-auto px-4 font-serif">
+          <div className="grid grid-cols-2 mb-6 md:grid-cols-3 gap-4 mt-[20px]  w-full max-w-xl mx-auto px-4 font-serif">
             {/* ← Prev */}
             <button
               onClick={() => prevStaff && navigate(`/staff/${prevStaff._id}`)}

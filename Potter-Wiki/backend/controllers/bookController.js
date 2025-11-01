@@ -2,52 +2,92 @@
 import asyncHandler from "express-async-handler";
 import Book from "../models/Book.js";
 
-// @desc Get all book members
-// @route GET /api/book
-// @access Public
-const getBook = asyncHandler(async (req, res) => {
-  const bookCollections = await Book.find({});
-  res.status(200).json(bookCollections);
+// @desc    Get all books
+// @route   GET /api/books
+// @access  Public
+export const getBooks = asyncHandler(async (req, res) => {
+  const books = await Book.find();
+
+  res.status(200).json(
+    books.map((book) => ({
+      id: book.id,
+      type: book.type,
+      attributes: book.attributes,
+      relationships: book.relationships,
+      links: book.links,
+    }))
+  );
 });
 
-// @desc Create a new book member
-// @route POST /api/book
-// @access Private/Admin
-const createBook = asyncHandler(async (req, res) => {
-  const book = await Book.create(req.body);
-  res.status(201).json(book);
+// @desc    Get single book by ID
+// @route   GET /api/books/:id
+// @access  Public
+export const getBookById = asyncHandler(async (req, res) => {
+  const book = await Book.findById(req.params.id);
+
+  if (!book) {
+    res.status(404);
+    throw new Error("Book not found");
+  }
+
+  res.status(200).json({
+    id: book.id,
+    type: book.type,
+    attributes: book.attributes,
+    relationships: book.relationships,
+    links: book.links,
+  });
 });
 
-// @desc Update a book member
-// @route PUT /api/book/:id
-// @access Private/Admin
-const updateBook = asyncHandler(async (req, res) => {
-  const book = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
+// @desc    Create new book
+// @route   POST /api/books
+// @access  Private/Admin
+export const createBook = asyncHandler(async (req, res) => {
+  const { attributes, relationships } = req.body;
+
+  const book = new Book({
+    type: "book",
+    attributes,
+    relationships,
+  });
+
+  const createdBook = await book.save();
+  createdBook.links = { self: `/v1/books/${createdBook._id}` };
+  await createdBook.save();
+
+  res.status(201).json(createdBook);
+});
+
+// @desc    Update existing book
+// @route   PUT /api/books/:id
+// @access  Private/Admin
+export const updateBook = asyncHandler(async (req, res) => {
+  const { attributes, relationships } = req.body;
+  const book = await Book.findById(req.params.id);
+
+  if (!book) {
+    res.status(404);
+    throw new Error("Book not found");
+  }
+
+  book.attributes = attributes || book.attributes;
+  book.relationships = relationships || book.relationships;
+  await book.save();
+
   res.status(200).json(book);
 });
 
-// @desc Delete a book member
-// @route DELETE /api/book/:id
-// @access Private/Admin
-const deleteBook = asyncHandler(async (req, res) => {
-  await Book.findByIdAndDelete(req.params.id);
-  res.status(200).json({ message: "Book deleted" });
-});
+// @desc    Delete a book
+// @route   DELETE /api/books/:id
+// @access  Private/Admin
+export const deleteBook = asyncHandler(async (req, res) => {
+  const book = await Book.findById(req.params.id);
 
-
-export const getBookById = async (req, res) => {
-  try {
-    const book = await Book.findById(req.params.id);
-    if (!book) {
-      return res.status(404).json({ message: "Book not found" });
-    }
-    res.json(book);
-  } catch (error) {
-    console.error("Error fetching book:", error);
-    res.status(500).json({ message: "Server error" });
+  if (!book) {
+    res.status(404);
+    throw new Error("Book not found");
   }
-};
 
-
-
-export { getBook, createBook, updateBook, deleteBook };
+  await book.deleteOne();
+  res.status(200).json({ message: "Book deleted successfully" });
+});

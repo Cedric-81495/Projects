@@ -263,6 +263,10 @@ const Navbar = () => {
                <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
                   <Link  to="/books">BOOKS</Link>
               </button>
+               {/* Books */}
+               <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
+                  <Link  to="/movies">MOVIES</Link>
+              </button>
               {/* Magical Data (Accordion) */}
               <button
                 onClick={() => handleDropdownToggle("magical", true)}

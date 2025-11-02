@@ -191,6 +191,13 @@ const Navbar = () => {
             </button>
           </div>
 
+          {/* Movies  */}
+          <div className="relative">
+            <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
+              <Link  to="/movies">MOVIES</Link>
+            </button>
+          </div>
+
           {/* Magical Data */}
           <div className="relative" ref={magicalDropdownRef}>
             <button

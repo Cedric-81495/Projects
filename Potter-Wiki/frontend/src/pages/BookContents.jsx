@@ -8,7 +8,7 @@ export default function BookContents() {
   const { id, chapterId } = useParams();
   const [chapter, setChapter] = useState(null);
   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
   async function fetchChapter() {

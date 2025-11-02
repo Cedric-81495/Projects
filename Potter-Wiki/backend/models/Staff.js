@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const staffSchema = new mongoose.Schema({
+  externalId: { type: String, unique: true, index: true },
   name: { type: String, required: true },
   alternate_names: [String],
   species: { type: String },

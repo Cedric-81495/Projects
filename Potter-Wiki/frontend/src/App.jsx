@@ -22,6 +22,7 @@ import BackToTopButton from "./components/BackToTopButton";
 import NotFound from "./components/NotFound";
 import Unauthorized from "./pages/Unauthorized"; 
 import Books from "./pages/Books"; 
+import Movies from "./pages/Movies"; 
 import BookCardPage from "./pages/BookCardPage"; 
 import BookContents from "./pages/BookContents"; 
 
@@ -48,6 +49,7 @@ const location = useLocation();
     /^\/dashboard\/staff$/, // Admin Dashboard Staff
     /^\/register$/, // Register
     /^\/$/, // Home
+    /^\/movies$/,
     /^\/books$/, /^\/books\/[\w-]+$/,
     /^\/characters$/, /^\/characters\/[a-f\d]{24}$/,
     /^\/spells$/, /^\/spells\/[a-f\d]{24}$/,
@@ -82,6 +84,7 @@ if (!isValidPath) {
       <Routes>
            {/* Public routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/movies" element={<Movies />} />
           <Route path="/books" element={<Books />} />
           <Route path="/books/:id" element={<BookCardPage />} />
           <Route path="/books/:id/contents" element={<BookContents />} />

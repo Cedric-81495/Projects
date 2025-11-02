@@ -2,6 +2,7 @@
 import mongoose from "mongoose";
 
 const studentSchema = new mongoose.Schema({
+  externalId: { type: String, unique: true, index: true },
   name: { type: String },
   alternate_names: [String],
   species: { type: String },

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const characterSchema = new mongoose.Schema({
+  externalId: { type: String, unique: true, index: true },
   name: { type: String },
   species: { type: String },
   gender: { type: String },

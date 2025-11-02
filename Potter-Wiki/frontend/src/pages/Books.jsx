@@ -25,9 +25,6 @@ export default function Books() {
 
   const links = [
     { id: "authors", name: "Authors", path: "/authors" },
-    { id: "movies", name: "Movies", path: "/movies" },
-    { id: "about", name: "About", path: "/about" },
-    { id: "contact", name: "Contact", path: "/contact" },
   ];
 
   // ✅ Fetch PotterDB Books
@@ -189,47 +186,82 @@ export default function Books() {
 
           {/* --- Book Grid --- */}
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-full">
-            {filteredBooks.slice(0, visibleBooks).map((book) => (
-              <div
-                key={book.id}
-                className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col w-full"
-              >
-                <Link
-                  to={`/books/${book.id}`}
-                  className="block relative w-full aspect-[2/3]"
+            {filteredBooks && filteredBooks.length > 0 ? (
+              filteredBooks.slice(0, visibleBooks).map((book) => (
+                <div
+                  key={book.id}
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col w-full"
                 >
-                  {book.cover ? (
-                    <img
-                      src={book.cover}
-                      alt={book.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400 text-xs">
-                      No Cover Available
+                  <Link
+                    to={`/books/${book.id}`}
+                    className="block relative w-full aspect-[2/3]"
+                  >
+                    {book.cover ? (
+                      <img
+                        src={book.cover}
+                        alt={book.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400 text-xs">
+                        No Cover Available
+                      </div>
+                    )}
+                  </Link>
+
+                  <div className="p-3 flex flex-col flex-grow">
+                    <h3 className="text-sm font-semibold text-gray-800 truncate">
+                      {book.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 mb-2 truncate">
+                      {book.author}
+                    </p>
+
+                    <div className="mt-auto">
+                      <Link
+                        to={`/books/${book.id}`}
+                        className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-1.5 rounded-md text-center transition-colors"
+                      >
+                        Read Book Free
+                      </Link>
                     </div>
-                  )}
-                </Link>
-
-                <div className="p-3 flex flex-col flex-grow">
-                  <h3 className="text-sm font-semibold text-gray-800 truncate">
-                    {book.title}
-                  </h3>
-                  <p className="text-xs text-gray-500 mb-2 truncate">
-                    {book.author}
-                  </p>
-
-                  <div className="mt-auto">
-                    <Link
-                      to={`/books/${book.id}`}
-                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-1.5 rounded-md text-center transition-colors"
-                    >
-                      Read Book Free
-                    </Link>
                   </div>
+                  {/* --- Load More --- */}
+                  {visibleBooks < filteredBooks.length && (
+                        <div className="text-center mt-8">
+                          <button
+                            onClick={loadMoreBooks}
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-6 rounded transition-colors"
+                          >
+                            Load More
+                          </button>
+                        </div>
+                      )}
                 </div>
-              </div>
-            ))}
+              ))
+             ) : (
+                !loading && (
+                    <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-12 h-12 mb-4 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <p className="text-center text-sm">
+                        No books found.
+                      </p>
+                    </div>
+                  )
+              )}
           </div>
 
           {/* --- Load More --- */}

@@ -13,6 +13,7 @@ import bookRoutes from "./routes/bookRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
+import movieRoutes from "./routes/movieRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -63,6 +64,7 @@ app.use("/api/public", publicRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/movies", movieRoutes);
 
 // ✅ Start server
 const PORT = process.env.PORT || 3000;

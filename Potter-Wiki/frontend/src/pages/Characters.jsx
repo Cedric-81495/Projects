@@ -80,7 +80,7 @@ const Characters = () => {
             </div>
 
             {visibleCount < filteredCharacters.length && (
-             <div className="flex justify-center mt-8">
+             <div className="flex justify-center mb-6 mt-8">
                 <button
                   onClick={handleLoadMore}
                   className="px-6 py-2 bg-amber-700 hover:bg-amber-800 text-white font-semibold border-lg shadow-md transition"

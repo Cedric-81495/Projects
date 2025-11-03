@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 
-const NotFound = ({ message = "Page not found" }) => {
+const NotFound = () => {
   const location = useLocation();
 
   const getBackPath = () => {

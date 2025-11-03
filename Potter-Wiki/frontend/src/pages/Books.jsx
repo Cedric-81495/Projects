@@ -115,7 +115,8 @@ export default function Books() {
 
   return (
     <PageWrapper loading={loading}>
-      <section className="flex pt-[5px] relative px-4">
+      <section className="flex pt-[5px]  relative px-4">
+        
         {/* --- Sidebar --- */}
         <div className="w-64 border shadow-md p-4 hidden md:block self-start">
           <h2 className="font-bold text-lg mb-4 text-gray-800">Categories</h2>

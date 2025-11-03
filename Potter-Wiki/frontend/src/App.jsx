@@ -23,8 +23,8 @@ import NotFound from "./components/NotFound";
 import Unauthorized from "./pages/Unauthorized"; 
 import Books from "./pages/Books"; 
 import Movies from "./pages/Movies"; 
+import MovieDetails from "./pages/MovieDetails"; 
 import BookCardPage from "./pages/BookCardPage"; 
-import BookContents from "./pages/BookContents"; 
 
 function AppContent() {
 
@@ -49,7 +49,7 @@ const location = useLocation();
     /^\/dashboard\/staff$/, // Admin Dashboard Staff
     /^\/register$/, // Register
     /^\/$/, // Home
-    /^\/movies$/,
+    /^\/movies$/, /^\/movies\/[\w-]+$/,
     /^\/books$/, /^\/books\/[\w-]+$/,
     /^\/characters$/, /^\/characters\/[a-f\d]{24}$/,
     /^\/spells$/, /^\/spells\/[a-f\d]{24}$/,
@@ -85,9 +85,9 @@ if (!isValidPath) {
            {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/movies" element={<Movies />} />
+          <Route path="/movies/:id" element={<MovieDetails />} />
           <Route path="/books" element={<Books />} />
           <Route path="/books/:id" element={<BookCardPage />} />
-          <Route path="/books/:id/contents" element={<BookContents />} />
           <Route path="/characters" element={<Characters />} />
           <Route path="/characters/:id" element={<CharacterDetail />} />
           <Route path="/spells" element={<Spells />} />

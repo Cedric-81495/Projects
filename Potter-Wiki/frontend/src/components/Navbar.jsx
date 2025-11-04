@@ -252,8 +252,6 @@ const Navbar = () => {
             ref={menuRef}
             className="md:hidden bg-[#020325] py-4 transition-all duration-300 max-h-[calc(100vh-80px)] overflow-y-auto"
           >
-             
-            
             <div className="flex flex-col items-center space-y-3 text-sm font-semibold uppercase tracking-wide">
               {/* Home */}
               <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
@@ -297,7 +295,7 @@ const Navbar = () => {
 
               {/* Auth Buttons */}
               {user ? (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col items-center gap-2">
                 {(user.role === "superUser" || user.role === "adminUser") ? (
                   <Link
                     to="/dashboard"

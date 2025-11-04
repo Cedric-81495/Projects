@@ -16,6 +16,7 @@ import registerRoutes from "./routes/registerRoutes.js";
 import movieRoutes from "./routes/movieRoutes.js";
 
 dotenv.config();
+connectDB();
 
 const app = express();
 
@@ -65,10 +66,6 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
 
-connectDB().then(() => {
-   
+// ✅ Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-});
-

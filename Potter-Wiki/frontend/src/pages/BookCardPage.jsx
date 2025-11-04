@@ -84,7 +84,7 @@ export default function BookCardPage() {
 
   return (
     <PageWrapper>
-      <section className="max-w-4xl mx-auto p-6">
+      <section className="min-h-screen max-w-4xl mx-auto p-6">
         <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md">
           {/* Cover */}
           <div className="flex flex-col items-center">

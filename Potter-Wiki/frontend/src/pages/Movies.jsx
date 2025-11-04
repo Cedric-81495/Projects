@@ -33,7 +33,7 @@ useEffect(() => {
 useEffect(() => {
   if (carouselMovies.length === 0) return;
   const interval = setInterval(() => {
-    setCarouselIndex((prev) => (prev + 1) % carouselMovies.length);
+    setCarouselIndex((prev) => (prev - 1) % carouselMovies.length);
   }, 5000);
   return () => clearInterval(interval);
 }, [carouselMovies]);
@@ -77,7 +77,7 @@ useEffect(() => {
        
         {/* --- Carousel --- */}
         {carouselMovies.length > 0 && (
-          <div className="relative w-full max-w-5xl mx-auto mb-8 overflow-hidden rounded-xl shadow-lg">
+          <div className="relative w-full max-w-4xl mx-auto mb-8 overflow-hidden rounded-xl shadow-lg">
             <div
               className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
@@ -86,26 +86,31 @@ useEffect(() => {
                 <Link
                   key={b.id}
                   to={`/movies/${b.id}`}
-                  className="min-w-full h-[400px] bg-gray-200 flex items-center justify-center relative"
+                  className="relative min-w-full h-[400px] flex items-center justify-center bg-gradient-to-b from-gray-300 via-gray-400 to-gray-600"
                 >
                   {b.poster ? (
                     <img
                       src={b.poster}
                       alt={b.title}
-                      className="w-full h-full object-cover"
+                      className="
+                        absolute inset-0 w-full h-full object-cover
+                        object-center md:object-left opacity-80
+                      "
                     />
                   ) : (
-                    <div className="text-gray-500 text-lg font-semibold">
+                    <div className="text-gray-100 text-lg font-semibold z-10">
                       {b.title}
                     </div>
                   )}
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-center py-3">
+                  <div className="absolute md:pb-[25px] bottom-0 left-0 right-0 bg-black/50 text-white text-center py-3">
                     <h3 className="text-lg font-bold">{b.title}</h3>
                     <p className="text-sm">{b.author}</p>
                   </div>
                 </Link>
               ))}
             </div>
+
+
 
             {/* Dots Navigation */}
             <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-2">
@@ -142,18 +147,18 @@ useEffect(() => {
           </div>
         )}
         {/* Header + Search Bar */}
-        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4">
             <h1 className="text-2xl md:text-3xl font-bold text-wihte md:pl-[20px]">
               Movies
             </h1>
-            <div className="w-full md:w-auto md:ml-auto">
+            <div className="w-full md:w-auto md:ml-auto ">
               <div className="max-w-3xl w-full md:w-[400px]">
                 <SearchBar
                   label="Search"
                   placeholder="Search movies..."
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
-                  className="w-full p-2 border rounded-md bg-gray text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                 
                 />
               </div>
             </div>
@@ -180,18 +185,18 @@ useEffect(() => {
                     <img
                       src={movie.poster || "/placeholder.jpg"}
                       alt={movie.title}
-                      className="w-full h-64 object-cover"
+                      className="w-full h-90 object-cover"
                     />
                     <div className="p-4 text-white">
                       <h3 className="text-lg font-bold truncate">
                         {movie.title || "Untitled"}
                       </h3>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-gray-400">
                         {movie.release_date
                           ? new Date(movie.release_date).getFullYear()
                           : "Unknown Year"}
                       </p>
-                      <p className="text-xs text-gray-500 mt-2 truncate">
+                      <p className="text-xs text-gray-500 truncate">
                         {movie.rating || "Unrated"}
                       </p>
                     </div>

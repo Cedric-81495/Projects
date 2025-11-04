@@ -3,6 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
+import { formatDate } from "../utils/dateUtils";
 
 export default function BookCardPage() {
   const { id } = useParams();
@@ -11,13 +12,13 @@ export default function BookCardPage() {
   const [chapters, setChapters] = useState([]);
   const [nextBookId, setNextBookId] = useState(null);
   const [prevBookId, setPrevBookId] = useState(null);
-  const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchBookDetails() {
       try {
-        setLoading(true);
+      
         const res = await axios.get(`/api/books/${id}`);
         const data = res.data;
 
@@ -39,24 +40,12 @@ export default function BookCardPage() {
       } catch (err) {
         console.error("Error fetching book:", err);
         setError("Failed to load book details.");
-      } finally {
-        setLoading(false);
-      }
+      } 
     }
 
     if (id) fetchBookDetails();
   }, [id, user]);
 
-  if (loading) {
-    return (
-      <PageWrapper loading={true}>
-        <section className="min-h-screen flex items-center justify-center px-4">
-          <div className="max-w-3xl w-full">
-          </div>
-        </section>
-      </PageWrapper>
-    );
-  }
 
   if (error) {
     return (
@@ -104,7 +93,7 @@ export default function BookCardPage() {
           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
             <div>
               <span className="font-semibold">Release Date:</span>{" "}
-              {book.release_date?.slice(0, 10)}
+                {book.release_date ? formatDate(book.release_date) : "No data found"}
             </div>
             <div>
               <span className="font-semibold">Pages:</span> {book.pages}
@@ -112,7 +101,7 @@ export default function BookCardPage() {
           </div>
 
           {book.dedication && (
-            <p className="italic text-gray-600 mt-4">“{book.dedication}”</p>
+            <p className="italic text-gray-600 mt-4">Dedication: “{book.dedication}”</p>
           )}
 
           {/* Chapters */}
@@ -152,11 +141,14 @@ export default function BookCardPage() {
             </Link>
             {nextBookId && (
               <Link
-                to={`/books/${nextBookId}`}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded-md"
-              >
-                Next Book →
-              </Link>
+                  to={`/books/${nextBookId}`}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1.5 rounded-md"
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  Next Book →
+                </Link>
             )}
           </div>
         </div>

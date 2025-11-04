@@ -7,7 +7,7 @@ const Home = () => {
     <div className="text-[#f5e6c8] font-serif">
       {/* 🧙 Hero Section */}
       <section
-        className="min-h-screen pt-[150px] pb-[150px] md:pt-[210px] md:pb-[200px]  flex items-center justify-center text-center bg-cover bg-center relative"
+        className="min-h-screen pt-[100px] pb-[100px] md:pt-[100px] md:pb-[190px]  flex items-center justify-center text-center bg-cover bg-center relative"
         style={{ backgroundImage: `url(${harrypotterbg})` }}
       >
         <div className="absolute inset-0 bg-black/60 z-0" />

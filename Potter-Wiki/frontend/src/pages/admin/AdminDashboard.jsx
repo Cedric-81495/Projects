@@ -6,6 +6,8 @@ import AdminCharacters from "./AdminCharacters";
 import AdminSpells from "./AdminSpells";
 import AdminStudents from "./AdminStudents";
 import AdminStaffs from "./AdminStaffs";
+import AdminMovies from "./AdminMovies";
+import AdminBooks from "./AdminBooks";
 
 const AdminDashboard = () => {
   const { user, logout } = useContext(AuthContext);
@@ -163,6 +165,8 @@ const AdminDashboard = () => {
         <button onClick={() => navigate("/dashboard/spells")} className="btn-green">Spells</button>
         <button onClick={() => navigate("/dashboard/students")} className="btn-yellow">Students</button>
         <button onClick={() => navigate("/dashboard/staff")} className="btn-red">Staff</button>
+        <button onClick={() => navigate("/dashboard/movies")} className="btn-red">Movies</button>
+        <button onClick={() => navigate("/dashboard/books")} className="btn-red">Books</button>
       </nav>
 
       {isDashboardRoot && (
@@ -287,6 +291,8 @@ const AdminDashboard = () => {
         <Route path="spells" element={<AdminSpells />} />
         <Route path="students" element={<AdminStudents />} />
         <Route path="staff" element={<AdminStaffs />} />
+        <Route path="movies" element={<AdminMovies />} />
+        <Route path="books" element={<AdminBooks />} />
       </Routes>
     </div>
   );

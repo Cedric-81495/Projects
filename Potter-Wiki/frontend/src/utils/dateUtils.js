@@ -1,11 +1,27 @@
 // frontend/src/utils/dateUtils.js
 
 export const formatDate = (dateStr) => {
-  if (!dateStr || !dateStr.includes("-")) return dateStr;
+  if (!dateStr) return "No date";
 
-  const [day, month, year] = dateStr.split("-");
-  const isoDate = `${year}-${month}-${day}`; // YYYY-MM-DD
-  const date = new Date(isoDate);
+  let date;
+
+  // 🧩 Check if it's already a valid ISO or timestamp
+  if (!isNaN(Date.parse(dateStr))) {
+    date = new Date(dateStr);
+  } else if (dateStr.includes("-")) {
+    const parts = dateStr.split("-");
+    // Detect if first part looks like a year
+    if (parts[0].length === 4) {
+      // YYYY-MM-DD
+      date = new Date(dateStr);
+    } else {
+      // DD-MM-YYYY → convert to ISO
+      const [day, month, year] = parts;
+      date = new Date(`${year}-${month}-${day}`);
+    }
+  } else {
+    return dateStr; // fallback if format unknown
+  }
 
   if (isNaN(date)) return dateStr;
 

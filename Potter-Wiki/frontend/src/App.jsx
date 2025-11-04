@@ -47,6 +47,8 @@ const location = useLocation();
     /^\/dashboard\/spells$/, // Admin Dashboard Spells
     /^\/dashboard\/students$/, // Admin Dashboard Students
     /^\/dashboard\/staff$/, // Admin Dashboard Staff
+     /^\/dashboard\/movies$/, // Admin Dashboard Staff
+      /^\/dashboard\/books$/, // Admin Dashboard Staff
     /^\/register$/, // Register
     /^\/$/, // Home
     /^\/movies$/, /^\/movies\/[\w-]+$/,

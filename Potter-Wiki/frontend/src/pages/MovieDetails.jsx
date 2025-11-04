@@ -70,9 +70,9 @@ const MovieDetails = () => {
                   </h2>
                  <div className="grid grid-cols-1  md:grid-cols-1 gap-x-5 gap-y-4 text-base md:text-lg 
                  font-normal justify-item-center md:leading-relaxed">
-                 <p><span className="font-semibold">Title:</span> {movie.title || "Unknown"}</p>
-                <p><span className="font-semibold">Summary:</span> {movie.summary || "Unknown"}</p>
-                <p><span className="font-semibold">Trailer:</span>   
+                 <p><span className="font-semibold">Title: </span> {movie.title || "Unknown"}</p>
+                <p><span className="font-semibold">Summary: </span> {movie.summary || "Unknown"}</p>
+                <p><span className="font-semibold">Trailer: </span>   
                 <a
                     href={movie.trailer}
                     target="_blank"
@@ -81,7 +81,7 @@ const MovieDetails = () => {
                 >
                     {movie.trailer}
                 </a> </p>
-                <p><span className="font-semibold">Wiki:</span> 
+                <p><span className="font-semibold">Wiki: </span> 
                 <a
                     href={movie.wiki}
                     target="_blank"
@@ -90,10 +90,11 @@ const MovieDetails = () => {
                 >
                     {movie.wiki}
                 </a> </p>
-                <p><span className="font-semibold">Box Office:</span> {movie.box_office || "Unknown"}</p>
-                <p><span className="font-semibold">Budget:</span> {movie.budget || "Unknown"}</p>
-                <p><span className="font-semibold">Rating:</span> {movie.rating || "Unknown"}</p>
-                <p><span className="font-semibold">Release data:</span> {movie.release_date ? formatDate(movie.release_date) : "Unknown"}</p>
+                <p><span className="font-semibold">Box Office: </span> {movie.box_office || "Unknown"}</p>
+                <p><span className="font-semibold">Budget: </span> {movie.budget || "Unknown"}</p>
+                <p><span className="font-semibold">Rating: </span> {movie.rating || "Unknown"}</p>
+                <p><span className="font-semibold">Release date: </span> {movie.release_date ? formatDate(movie.release_date) : "Unknown"}</p>
+                <p><span className="font-semibold">Running time: </span> {movie.running_time || "Unknown"}</p>
                 </div>
               </div>
             </div>

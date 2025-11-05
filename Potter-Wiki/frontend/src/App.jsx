@@ -25,15 +25,9 @@ import Books from "./pages/Books";
 import Movies from "./pages/Movies"; 
 import MovieDetails from "./pages/MovieDetails"; 
 import BookCardPage from "./pages/BookCardPage"; 
+import ScrollToTop from "./utils/ScrollToTop";
 
 function AppContent() {
-
-useEffect(() => {
-  fetch("http://localhost:3000/")
-    .then(res => res.json())
-    .then(data => console.log("Backend Health:", data))
-    .catch(err => console.error("Error:", err));
-}, []);
 
 const location = useLocation();
 
@@ -47,8 +41,8 @@ const location = useLocation();
     /^\/dashboard\/spells$/, // Admin Dashboard Spells
     /^\/dashboard\/students$/, // Admin Dashboard Students
     /^\/dashboard\/staff$/, // Admin Dashboard Staff
-     /^\/dashboard\/movies$/, // Admin Dashboard Staff
-      /^\/dashboard\/books$/, // Admin Dashboard Staff
+    /^\/dashboard\/movies$/, // Admin Dashboard Staff
+    /^\/dashboard\/books$/, // Admin Dashboard Staff
     /^\/register$/, // Register
     /^\/$/, // Home
     /^\/movies$/, /^\/movies\/[\w-]+$/,
@@ -63,7 +57,7 @@ const location = useLocation();
 
 // Check if current path matches any valid pattern
 const isValidPath = validPatterns.some((pattern) => pattern.test(location.pathname));
-console.log("✅ Is valid route:", isValidPath);
+//console.log("✅ Is valid route:", isValidPath);
 
 const hideLayout =
 location.pathname === "/login" || 
@@ -83,6 +77,7 @@ if (!isValidPath) {
     <>
       {!hideLayout && <Navbar />}
       <BackToTopButton />
+      <ScrollToTop />
       <Routes>
            {/* Public routes */}
           <Route path="/" element={<Home />} />
@@ -117,7 +112,7 @@ if (!isValidPath) {
             {/* Unauthorized fallback */}
           <Route path="/unauthorized" element={<Unauthorized />} />
 
-           {/* ⚠️ NotFound route */}
+           {/* NotFound route */}
           <Route path="*" element={<NotFound message="Invalid route format" />} />
 
       </Routes>
@@ -133,7 +128,7 @@ function App() {
   const [checking, setChecking] = useState(true);
   
     useEffect(() => {
-    console.log("App mounted. Checking server...");
+    //console.log("App mounted. Checking server...");
     checkServer();
   }, []);
 

@@ -33,7 +33,7 @@ useEffect(() => {
 useEffect(() => {
   if (carouselMovies.length === 0) return;
   const interval = setInterval(() => {
-    setCarouselIndex((prev) => (prev - 1) % carouselMovies.length);
+    setCarouselIndex((prev) => (prev + 1) % carouselMovies.length);
   }, 5000);
   return () => clearInterval(interval);
 }, [carouselMovies]);
@@ -50,7 +50,7 @@ useEffect(() => {
           ? res.data.data
           : [];
         setMovies(rawMovies);
-        console.log("Fetched Movies:", rawMovies);
+        //console.log("Fetched Movies:", rawMovies);
         setError(false);
       } catch (err) {
         console.error("Failed to fetch movie list:", err);

@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 
 // 🔐 Token generator
 const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "10m" });
 };
 
 // ✅ Create super admin

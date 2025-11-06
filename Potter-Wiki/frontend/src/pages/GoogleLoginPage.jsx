@@ -56,7 +56,7 @@ const GoogleLoginPage = () => {
         </p>
         <p className="mt-6 text-xs text-gray-400">
           <Link 
-                to="/login" 
+                to="/" 
                 className="text-[#cfae6d] hover:underline">
             Back to home
           </Link>

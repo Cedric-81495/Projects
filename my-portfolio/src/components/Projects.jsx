@@ -4,33 +4,35 @@ export default function Projects() {
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-10">Projects</h2>
         
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {/* Project Card 1 */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300">
-            <h3 className="text-xl font-semibold mb-2">Spotify Portfolio</h3>
-            <p className="text-sm mb-4">
-              A personal portfolio powered by Spotify’s API to display playlists, profile info, and top tracks.
-            </p>
-            <a href="https://spotify-projects-frontend.vercel.app" className="text-blue-500 dark:text-blue-400 font-medium hover:underline">View Project</a>
-          </div>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {/* Project Card 3 */}
+            <div
+                className="relative bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+                style={{
+                  backgroundImage: "url('/src/assets/harry-potter-bg.png')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                {/* Overlay for readability */}
+                <div className="absolute inset-0 bg-black bg-opacity-40 rounded-2xl"></div>
 
-          {/* Project Card 2 */}
-          <div className="bg-white  dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300">
-            <h3 className="text-xl font-semibold mb-2">Harry Potter DB</h3>
-            <p className="text-sm mb-4">
-              A full-stack app using a public Harry Potter API + MariaDB + React to showcase spellbook features.
-            </p>
-            <a href="https://hpotter-books-4pummym3a-cedrics-projects-188a68e7.vercel.app/" className="text-blue-500 dark:text-blue-400 font-medium hover:underline">View Project</a>
-          </div>
-
-          {/* Project Card 3 */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300">
-            <h3 className="text-xl font-semibold mb-2">Books Collection</h3>
-            <p className="text-sm mb-4">
-              A web app to manage and showcase a digital library of books using React + Express + MongoDB.
-            </p>
-            <a href="https://books-collection-eiqzurk30-cedrics-projects-188a68e7.vercel.app/" className="text-blue-500 dark:text-blue-400 font-medium hover:underline">View Project</a>
-          </div>
+                {/* Content */}
+                <div className="relative z-10">
+                  <h3 className="text-2xl font-bold text-white mb-2">Potter Wiki</h3>
+                  <p className="text-sm text-gray-100 mb-4">
+                    A full-stack MERN web app for exploring and managing magical data from the Harry Potter universe. Features include public browsing, admin-only CRUD, JWT-based role auth, and Tailwind-styled cards for Characters, Spells, Students, and Staff.
+                  </p>
+                  <a
+                    href="https://potter-wiki-pedia.vercel.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition"
+                  >
+                    View Project
+                  </a>
+                </div>
+            </div>
         </div>
       </div>
     </section>

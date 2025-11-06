@@ -16,8 +16,8 @@ export default function Experience() {
               <em>May 2022 – Present</em>
             </p>
             <p className="mt-2 text-gray-800 dark:text-gray-200">
-              Maintained and developed publishing platforms with XML workflows and React/Perl tools.
-              Automated data processes and enhanced frontend features for internal tools.
+              Maintained and developed publishing platforms with XML workflows and Perl tools.
+              Automated data processes and enhanced data features for internal tools.
             </p>
           </div>
 

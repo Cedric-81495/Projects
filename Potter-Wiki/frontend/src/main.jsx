@@ -1,13 +1,14 @@
-// frontend/src/main.jsx
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './index.css';
-import App from './App.jsx';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
 import axios from "axios";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
-
+// ✅ Configure Axios base URL
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
+// ✅ Attach Authorization header if token exists
 axios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authToken");
@@ -22,8 +23,12 @@ axios.interceptors.request.use(
   }
 );
 
-createRoot(document.getElementById('root')).render(
+
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    {/* 👇 Wrap App with GoogleOAuthProvider */}
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <App />
+    </GoogleOAuthProvider>
+  </StrictMode>
+);

@@ -7,5 +7,7 @@ Spotify-project/
 # Ignore all .env files
 **/*.env
 
+.env
+
 # Ignore all .txt files
 **/*.txt

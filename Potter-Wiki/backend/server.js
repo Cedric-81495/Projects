@@ -54,7 +54,7 @@ app.get("/", (req, res) => {
   });
 });
 
-
+// ✅ API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
 app.use("/api/spells", spellRoutes);

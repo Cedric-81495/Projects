@@ -26,6 +26,8 @@ import Movies from "./pages/Movies";
 import MovieDetails from "./pages/MovieDetails"; 
 import BookCardPage from "./pages/BookCardPage"; 
 import ScrollToTop from "./utils/ScrollToTop";
+import GoogleLoginPage from "./pages/GoogleLoginPage.jsx";
+import GoogleRegisterPage from "./pages/GoogleRegisterPage.jsx";
 
 function AppContent() {
 
@@ -34,6 +36,7 @@ const location = useLocation();
   // Define valid route patterns
   const validPatterns = [
     /^\/login$/, // Home
+    /^\/login-admin$/, // Home
     /^\/profile$/, // Home
     /^\/dashboard$/, // Admin Dashboard
     /^\/unauthorized$/,
@@ -44,6 +47,7 @@ const location = useLocation();
     /^\/dashboard\/movies$/, // Admin Dashboard Staff
     /^\/dashboard\/books$/, // Admin Dashboard Staff
     /^\/register$/, // Register
+    /^\/register-admin$/, // Register
     /^\/$/, // Home
     /^\/movies$/, /^\/movies\/[\w-]+$/,
     /^\/books$/, /^\/books\/[\w-]+$/,
@@ -94,10 +98,16 @@ if (!isValidPath) {
           <Route path="/staff" element={<Staff />} />
           <Route path="/staff/:id" element={<StaffDetail />} />
 
-          {/* Auth routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* Google Auth Routes  <Route path="/profile" element={<GoogleProfile />} />*/}
+          <Route path="/login" element={<GoogleLoginPage />} />
+          <Route path="/register" element={<GoogleRegisterPage />} />
+          
+
+          {/* Admin Auth Routes */}
+          <Route path="/login-admin" element={<Login />} />
+          <Route path="/register-admin" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          
 
           {/* Admin dashboard routes */}        
           <Route

@@ -1,7 +1,6 @@
-// frontend/src/context/AuthProvider.jsx
+// ✅ frontend/src/context/AuthProvider.jsx
 import { createContext, useState, useEffect } from "react";
 
-// ✅ Create and export the context
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -12,24 +11,25 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500);
+    const timer = setTimeout(() => setLoading(false), 300);
     return () => clearTimeout(timer);
   }, []);
 
-  const login = (userData) => {
+  // ✅ Unified login for both Google and local
+  const login = (data) => {
+    const userData = data.user || data; // support backend returning { user, token } or plain user
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("authToken", userData.token);
-    //console.log("User from localStorage:", localStorage.getItem("user"));
+    if (data.token) localStorage.setItem("authToken", data.token);
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
   };
 
   return (

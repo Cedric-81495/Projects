@@ -151,13 +151,13 @@ const Navbar = () => {
                   to="/login"
                   className="border border-white px-3 py-1.5 rounded text-sm hover:bg-white hover:text-black transition"
                 >
-                  Log In
+                  Log in with Google
                 </Link>
                 <Link
                   to="/register"
                   className="bg-amber-500 px-3 py-1.5 rounded text-sm text-black shadow hover:bg-amber-600 transition"
                 >
-                  Sign Up
+                  Sign up with Google
                 </Link>
               </>
             )}
@@ -325,14 +325,14 @@ const Navbar = () => {
                     onClick={() => setMenuOpen(false)}
                     className="border border-white px-3 py-1.5 rounded text-sm hover:bg-white hover:text-black transition"
                   >
-                    Log In
+                    Log in with Google
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setMenuOpen(false)}
                     className="inline-block bg-amber-500 text-black px-6 py-3 rounded-lg shadow hover:bg-amber-600 transition font-semibold"
                   >
-                    Sign Up
+                    Sign up with Google
                   </Link>
                 </>
               )}

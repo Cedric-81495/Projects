@@ -1,20 +1,22 @@
 // backend/routes/authRoutes.js
 import express from "express";
-import { registerUser, loginUser } from "../controllers/authController.js";
+import {
+  registerUser,
+  loginUser,
+  googleLogin,
+  googleRegister,
+} from "../controllers/authController.js";
 import { loginLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
-// @route   POST /api/auth/register
-// @desc    Register a new user
-// @access  Public
+// Local auth
 router.post("/register", registerUser);
-
-// @route   POST /api/auth/login
-// @desc    Authenticate user and return token
-// @access  Public
 router.post("/login", loginLimiter, loginUser);
 
-
+// Google auth
+router.post("/google-login", googleLogin);
+console.log("googleLogin is:", typeof googleLogin);
+router.post("/google-register", googleRegister);
 
 export default router;

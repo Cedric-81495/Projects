@@ -4,14 +4,13 @@ import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import bgImage from "../assets/aesthetic-bg.jpg";
 
 const GoogleRegisterPage = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-
   const handleGoogleRegister = async (credentialResponse) => {
     try {
       toast.loading("Registering with Google...");
@@ -20,15 +19,13 @@ const GoogleRegisterPage = () => {
         token: credentialResponse.credential,
       });
 
-    
-
       login(res.data);
       toast.dismiss();
-      toast.success(`Welcome, ${name}!`);
+      toast.success(`Welcome, ${res.data.user.firstname}!`);
       navigate("/profile");
     } catch (err) {
+      console.error("Google registration error:", err.response?.data || err.message || err);
       toast.dismiss();
-      console.error("Google registration failed:", err);
       toast.error("Registration failed. Try again.");
     }
   };
@@ -55,6 +52,13 @@ const GoogleRegisterPage = () => {
           <a href="/login" className="text-[#cfae6d] hover:underline">
             Log in
           </a>
+        </p>
+            <p className="mt-6 text-xs text-gray-400">
+          <Link 
+                to="/" 
+                className="text-[#cfae6d] hover:underline">
+            Back to home
+          </Link>
         </p>
       </div>
     </div>

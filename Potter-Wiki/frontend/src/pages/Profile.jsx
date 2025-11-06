@@ -28,8 +28,8 @@ const Profile = () => {
             </h2>
             <div className="space-y-2 text-sm sm:text-base text-[#f5e6c8]">
               <p><span className="text-[#cfae6d] font-semibold">Email:</span> {user.email}</p>
-              <p><span className="text-[#cfae6d] font-semibold">Role:</span> {user.role}</p>
-              <p><span className="text-[#cfae6d] font-semibold">Auth Method:</span> Google</p>
+              {/*<p><span className="text-[#cfae6d] font-semibold">Role:</span> {user.role}</p>
+              <p><span className="text-[#cfae6d] font-semibold">Auth Method:</span> Google</p> */}
               <p><span className="text-[#cfae6d] font-semibold">Joined:</span> {new Date(user.createdAt).toLocaleDateString()}</p>
             </div>
           </div>

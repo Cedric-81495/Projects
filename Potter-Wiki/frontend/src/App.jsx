@@ -102,7 +102,6 @@ if (!isValidPath) {
           <Route path="/login" element={<GoogleLoginPage />} />
           <Route path="/register" element={<GoogleRegisterPage />} />
           
-
           {/* Admin Auth Routes */}
           <Route path="/login-admin" element={<Login />} />
           <Route path="/register-admin" element={<Register />} />

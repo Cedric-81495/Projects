@@ -3,14 +3,13 @@ import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import bgImage from "../assets/aesthetic-bg.jpg";
 
 const GoogleLoginPage = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-
     const handleGoogleSuccess = async (credentialResponse) => {                                                                         
       try {
         toast.loading("Signing in with Google...");
@@ -24,6 +23,8 @@ const GoogleLoginPage = () => {
         toast.success(`Welcome back, ${res.data.user.firstname}!`);
         navigate("/profile");
       } catch (err) {
+        console.error("Google login error:", err.response?.data || err.message || err);
+
         toast.dismiss();
         console.error("Google login failed:", err);
         toast.error("Google login failed. Please try again.");
@@ -52,6 +53,13 @@ const GoogleLoginPage = () => {
           <a href="/register" className="text-[#cfae6d] hover:underline">
             Register
           </a>
+        </p>
+        <p className="mt-6 text-xs text-gray-400">
+          <Link 
+                to="/login" 
+                className="text-[#cfae6d] hover:underline">
+            Back to home
+          </Link>
         </p>
       </div>
     </div>

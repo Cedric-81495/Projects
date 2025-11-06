@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
 
-const client = new OAuth2Client(process.env.VITE_GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Generate JWT
 const generateToken = (id, role) => {
@@ -49,7 +49,7 @@ export const registerUser = async (req, res) => {
       token: generateToken(user._id, user.role),
     });
   } catch (err) {
-    console.error("Register error:", err);
+    console.error("Register error:", err.message || err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -82,7 +82,7 @@ export const loginUser = async (req, res) => {
       token: generateToken(user._id, user.role),
     });
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("Login error:", err.message || err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -98,7 +98,7 @@ export const googleRegister = async (req, res) => {
 
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: process.env.VITE_GOOGLE_CLIENT_ID,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -107,12 +107,15 @@ export const googleRegister = async (req, res) => {
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: "Account already exists" });
 
-    const [firstname, lastname] = name.split(" ");
+    const [firstname, lastname = ""] = name?.split(" ") || [];
+    const username = email.split("@")[0]; // fallback to avoid duplicate null
+
     const newUser = await User.create({
       firstname,
       lastname,
       email,
       googleId,
+      username,
       password: null,
       role: "publicUser",
     });
@@ -120,7 +123,7 @@ export const googleRegister = async (req, res) => {
     const jwtToken = generateToken(newUser._id, newUser.role);
     res.status(201).json({ user: newUser, token: jwtToken });
   } catch (err) {
-    console.error("Google register error:", err);
+    console.error("Google register error:", err.message || err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -132,7 +135,7 @@ export const googleLogin = async (req, res) => {
 
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: process.env.VITE_GOOGLE_CLIENT_ID,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -141,12 +144,15 @@ export const googleLogin = async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      const [firstname, lastname] = name.split(" ");
+      const [firstname, lastname = ""] = name?.split(" ") || [];
+      const username = email.split("@")[0];
+
       user = await User.create({
         firstname,
         lastname,
         email,
         googleId,
+        username,
         password: null,
         role: "publicUser",
       });
@@ -155,7 +161,7 @@ export const googleLogin = async (req, res) => {
     const jwtToken = generateToken(user._id, user.role);
     res.status(200).json({ user, token: jwtToken });
   } catch (err) {
-    console.error("Google login error:", err);
+    console.error("Google login error:", err.message || err);
     res.status(500).json({ message: "Server error" });
   }
 };

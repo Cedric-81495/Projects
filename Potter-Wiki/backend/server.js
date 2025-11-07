@@ -72,5 +72,5 @@ app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
 
 // ✅ Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || (process.env.NODE_ENV === "development" ? 3000 : undefined);
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

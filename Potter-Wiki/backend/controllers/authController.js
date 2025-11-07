@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(process.env.VITE_GOOGLE_CLIENT_ID);
 
 // Generate JWT
 const generateToken = (id, role) => {
@@ -49,7 +49,7 @@ export const registerUser = async (req, res) => {
       token: generateToken(user._id, user.role),
     });
   } catch (err) {
-    console.error("Register error:", err.message || err);
+    console.error("Register error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -82,7 +82,7 @@ export const loginUser = async (req, res) => {
       token: generateToken(user._id, user.role),
     });
   } catch (err) {
-    console.error("Login error:", err.message || err);
+    console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -91,11 +91,45 @@ export const loginUser = async (req, res) => {
 // 📌 GOOGLE AUTH (Public Users)
 // ===============================
 
-export const googleAuth = async (req, res) => {
+// @desc Register user via Google
+export const googleRegister = async (req, res) => {
   try {
     const { token } = req.body;
 
-    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId } = payload;
+
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(400).json({ message: "Account already exists" });
+
+    const [firstname, lastname] = name.split(" ");
+    const newUser = await User.create({
+      firstname,
+      lastname,
+      email,
+      googleId,
+      password: null,
+      role: "publicUser",
+    });
+
+    const jwtToken = generateToken(newUser._id, newUser.role);
+    res.status(201).json({ user: newUser, token: jwtToken });
+  } catch (err) {
+    console.error("Google register error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// @desc Login user via Google
+export const googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -106,41 +140,22 @@ export const googleAuth = async (req, res) => {
 
     let user = await User.findOne({ email });
 
-    // Handle local vs Google accounts
-    if (user && user.password && !user.googleId) {
-      return res.status(400).json({
-        message: "This email is registered with a password. Please use local login instead.",
-      });
-    }
-
-    // If new user, create
     if (!user) {
-      const [firstname, lastname = ""] = name?.split(" ") || [];
-      const username = email.split("@")[0];
+      const [firstname, lastname] = name.split(" ");
       user = await User.create({
         firstname,
         lastname,
         email,
         googleId,
-        username,
         password: null,
         role: "publicUser",
       });
-      console.log(`🆕 Registered new Google user: ${email}`);
-    } else {
-      console.log(`✅ Logged in existing Google user: ${email}`);
-      // Update missing googleId if needed
-      if (!user.googleId) {
-        user.googleId = googleId;
-        await user.save();
-      }
     }
 
-    // Issue your JWT
     const jwtToken = generateToken(user._id, user.role);
     res.status(200).json({ user, token: jwtToken });
   } catch (err) {
-    console.error("Google auth error:", err.message || err);
-    res.status(500).json({ message: "Server error during Google authentication" });
+    console.error("Google login error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };

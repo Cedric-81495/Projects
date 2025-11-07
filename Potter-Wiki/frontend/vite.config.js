@@ -10,13 +10,9 @@ export default defineConfig({
   },
   base: '/',
 
-    server: {
+  server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        secure: false,
-      },
+      '/api': 'http://localhost:3000',
     },
   },
 });

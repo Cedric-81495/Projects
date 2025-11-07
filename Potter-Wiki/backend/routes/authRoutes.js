@@ -3,7 +3,8 @@ import express from "express";
 import {
   registerUser,
   loginUser,
-  googleAuth,
+  googleLogin,
+  googleRegister,
 } from "../controllers/authController.js";
 import { loginLimiter } from "../middleware/rateLimiter.js";
 
@@ -14,6 +15,7 @@ router.post("/register", registerUser);
 router.post("/login", loginLimiter, loginUser);
 
 // Google auth
-router.post("/google-auth", googleAuth);
+router.post("/google-login", googleLogin);
+router.post("/google-register", googleRegister);
 
 export default router;

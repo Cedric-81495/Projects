@@ -8,7 +8,6 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 // ✅ Configure Axios base URL
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
-
 // ✅ Attach Authorization header if token exists
 axios.interceptors.request.use(
   (config) => {
@@ -24,7 +23,6 @@ axios.interceptors.request.use(
   }
 );
 
-console.log("Client ID:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

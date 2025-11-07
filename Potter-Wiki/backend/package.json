@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "vite --mode development",
-    "build": "vite build --mode production"
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",

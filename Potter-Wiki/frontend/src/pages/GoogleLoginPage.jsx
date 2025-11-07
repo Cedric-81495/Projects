@@ -10,28 +10,49 @@ import bgImage from "../assets/aesthetic-bg.jpg";
 const GoogleLoginPage = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-    const handleGoogleSuccess = async (credentialResponse) => {                                                                         
-      try {
-        toast.loading("Signing in with Google...");
 
-        const res = await axios.post(`/api/auth/google-login`, {
-          token: credentialResponse.credential,
-        });
+  console.log("Base URLd:", axios.defaults.baseURL);
+console.log("Vite URL:", import.meta.env.VITE_API_URL);
+console.log("VITE API CLIENT ID:",import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
-        login(res.data);
-        toast.dismiss();
-        toast.success(`Welcome back, ${res.data.user.firstname}!`);
-        navigate("/profile");
-      } catch (err) {
-        console.error("Google login error:", err.response?.data || err.message || err);
+  const handleGoogleSuccess = async (credentialResponse) => {
+    const token = credentialResponse?.credential;
+    if (!token) {
+      toast.error("Missing Google token. Please try again.");
+      return;
+    }
 
-        toast.dismiss();
-        console.error("Google login failed:", err);
-        toast.error("Google login failed. Please try again.");
-      }
-    };
+    toast.loading("Signing in with Google...");
 
+    try {
+      // ✅ Always POST — sending token in request body
+      const res = await axios.post("/api/auth/google-auth", { token });
+
+      // ✅ Save auth data in your context/localStorage
+      login(res.data);
+
+      toast.dismiss();
+      toast.success(`Welcome back, ${res.data.user.firstname || "User"}!`);
+
+      // ✅ Navigate to protected route
+      navigate("/profile");
+    } catch (err) {
+      toast.dismiss();
+
+      console.error("❌ Google login error:", err.response?.data || err.message || err);
+      const message =
+        err.response?.data?.message || "Google login failed. Please try again.";
+      toast.error(message);
+    }
+  };
+
+  
+
+  const handleGoogleError = () => {
+    toast.error("Google Sign-In failed. Please try again.");
+  };
   return (
+    
     <div
       className="relative flex items-center justify-center min-h-screen bg-cover bg-center px-4"
       style={{ backgroundImage: `url(${bgImage})` }}
@@ -45,7 +66,7 @@ const GoogleLoginPage = () => {
         <div className="flex justify-center">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
-            onError={() => toast.error("Google login failed")}
+            onError={handleGoogleError}
           />
         </div>
         <p className="mt-6 text-xs text-gray-400">

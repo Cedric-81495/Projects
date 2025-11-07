@@ -8,6 +8,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 // ✅ Configure Axios base URL
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
+
 // ✅ Attach Authorization header if token exists
 axios.interceptors.request.use(
   (config) => {

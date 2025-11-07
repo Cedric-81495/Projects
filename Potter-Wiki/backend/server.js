@@ -15,7 +15,12 @@ import publicRoutes from "./routes/publicRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
 import movieRoutes from "./routes/movieRoutes.js";
 
-dotenv.config();
+//dotenv.config();
+
+const envFile = `.env.${process.env.NODE_ENV || "development"}`;
+dotenv.config({ path: envFile });
+console.log(`🔧 Loaded environment from ${envFile}`);
+
 connectDB();
 
 const app = express();

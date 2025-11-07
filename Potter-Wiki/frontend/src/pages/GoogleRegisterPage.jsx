@@ -15,10 +15,11 @@ const GoogleRegisterPage = () => {
     try {
       toast.loading("Registering with Google...");
 
-      const res = await axios.post("/api/auth/google-register", {
+      const res = await axios.post(`/api/auth/google-auth`, {
         token: credentialResponse.credential,
+       
       });
-
+       console.log("Generated user token", credentialResponse.credential);
       login(res.data);
       toast.dismiss();
       toast.success(`Welcome, ${res.data.user.firstname}!`);
@@ -53,7 +54,7 @@ const GoogleRegisterPage = () => {
             Log in
           </a>
         </p>
-            <p className="mt-6 text-xs text-gray-400">
+        <p className="mt-6 text-xs text-gray-400">
           <Link 
                 to="/" 
                 className="text-[#cfae6d] hover:underline">

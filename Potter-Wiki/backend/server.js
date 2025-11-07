@@ -15,12 +15,7 @@ import publicRoutes from "./routes/publicRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
 import movieRoutes from "./routes/movieRoutes.js";
 
-//dotenv.config();
-
-const envFile = `.env.${process.env.NODE_ENV || "development"}`;
-dotenv.config({ path: envFile });
-console.log(`🔧 Loaded environment from ${envFile}`);
-
+dotenv.config();
 connectDB();
 
 const app = express();
@@ -72,5 +67,5 @@ app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
 
 // ✅ Start server
-const PORT = process.env.PORT || (process.env.NODE_ENV === "development" ? 3000 : undefined);
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

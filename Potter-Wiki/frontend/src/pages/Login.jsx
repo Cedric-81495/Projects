@@ -28,9 +28,9 @@ const Login = () => {
 
   setLoggin(true);
   toast.loading("Logging in...");
-
+  
   try {
-    const res = await axios.post("/api/auth/login", { email, password });
+    const res = await axios.post("/api/auth/login", { email, password }, { withCredentials: true });
     login(res.data); // ✅ correct usage
     setSuccessMessage("Login successful!");
     setErrorMessage("");

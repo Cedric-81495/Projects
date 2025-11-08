@@ -64,6 +64,8 @@ const isValidPath = validPatterns.some((pattern) => pattern.test(location.pathna
 //console.log("✅ Is valid route:", isValidPath);
 
 const hideLayout =
+location.pathname === "/login-admin" || 
+location.pathname === "/register-admin" || 
 location.pathname === "/login" || 
 location.pathname === "/register";
 
@@ -102,7 +104,6 @@ if (!isValidPath) {
           <Route path="/login" element={<GoogleLoginPage />} />
           <Route path="/register" element={<GoogleRegisterPage />} />
           
-
           {/* Admin Auth Routes */}
           <Route path="/login-admin" element={<Login />} />
           <Route path="/register-admin" element={<Register />} />

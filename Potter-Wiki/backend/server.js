@@ -1,8 +1,11 @@
 // backend/server.js
-import mongoose from "mongoose";
 import express from "express";
+import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import characterRoutes from "./routes/characterRoutes.js";
@@ -20,41 +23,39 @@ connectDB();
 
 const app = express();
 
-// ✅ Robust CORS configuration
+// ---------- CORS ----------
 const allowedOrigins = [
   process.env.FRONTEND_URL || "http://localhost:5173",
   "http://localhost:5173",
   "https://potter-wiki-pedia.vercel.app"
 ];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error("❌ Blocked by CORS:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.error("❌ Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
-// ✅ Handle preflight requests globally
-app.options(/.*/, cors());
-
-// ✅ Parse incoming JSON
+app.options("*", cors());
 app.use(express.json());
 
-// ✅ Health check route
+// ---------- API ROUTES ----------
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "ok",
     message: "✅ Backend connected successfully",
-    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
   });
 });
 
-// ✅ API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
 app.use("/api/spells", spellRoutes);
@@ -66,6 +67,19 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
 
-// ✅ Start server
+// ---------- FRONTEND DEPLOY SUPPORT ----------
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// If the frontend build exists (after "npm run build" in frontend), serve it
+const frontendPath = path.resolve(__dirname, "../frontend/dist");
+app.use(express.static(frontendPath));
+
+// Serve frontend for any non-API route
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+
+// ---------- START SERVER ----------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

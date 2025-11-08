@@ -3,8 +3,6 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -66,19 +64,6 @@ app.use("/api/register", registerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
-
-// ---------- FRONTEND DEPLOY SUPPORT ----------
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// If the frontend build exists (after "npm run build" in frontend), serve it
-const frontendPath = path.resolve(__dirname, "../frontend/dist");
-app.use(express.static(frontendPath));
-
-// Serve frontend for any non-API route
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
-});
 
 // ---------- START SERVER ----------
 const PORT = process.env.PORT || 3000;

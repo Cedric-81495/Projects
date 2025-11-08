@@ -13,6 +13,7 @@ import bookRoutes from "./routes/bookRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
+import movieRoutes from "./routes/movieRoutes.js";
 
 dotenv.config();
 connectDB();

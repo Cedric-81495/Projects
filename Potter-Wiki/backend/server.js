@@ -1,9 +1,8 @@
 // backend/server.js
-import express from "express";
 import mongoose from "mongoose";
+import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import characterRoutes from "./routes/characterRoutes.js";
@@ -14,45 +13,45 @@ import bookRoutes from "./routes/bookRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
-import movieRoutes from "./routes/movieRoutes.js";
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
-// ---------- CORS ----------
+// ✅ Robust CORS configuration
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "http://localhost:5173",
   "http://localhost:5173",
   "https://potterwikiapp.vercel.app"
 ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.error("❌ Blocked by CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error("❌ Blocked by CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 
-app.options("*", cors());
+// ✅ Handle preflight requests globally
+app.options(/.*/, cors());
+
+// ✅ Parse incoming JSON
 app.use(express.json());
 
-// ---------- API ROUTES ----------
+// ✅ Health check route
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "ok",
     message: "✅ Backend connected successfully",
-    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
   });
 });
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
@@ -65,6 +64,6 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
 
-// ---------- START SERVER ----------
+// ✅ Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

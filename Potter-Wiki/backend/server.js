@@ -25,7 +25,7 @@ const app = express();
 const allowedOrigins = [
   process.env.FRONTEND_URL || "http://localhost:5173",
   "http://localhost:5173",
-  "https://potter-wiki-pedia.vercel.app"
+  "https://potterwikiapp.vercel.app"
 ];
 
 app.use(

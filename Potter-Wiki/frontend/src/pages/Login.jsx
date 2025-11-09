@@ -31,7 +31,7 @@ const Login = () => {
   
   try {
     const res = await axios.post("/api/auth/login", { email, password }, { withCredentials: true });
-    login(res.data); // ✅ correct usage
+    login(res.data);
     setSuccessMessage("Login successful!");
     setErrorMessage("");
     toast.dismiss();
@@ -41,12 +41,10 @@ const Login = () => {
       const role = res.data?.user?.role;
       if (role === "superUser" || role === "adminUser") {
         navigate("/dashboard");
-        // This will log user data object
-        //console.log("Login response:", res.data);
       } else {
         navigate("/profile");
       }
-      setLoggin(false); // ✅ move inside the timeout
+      setLoggin(false);
     }, 1000);
   } catch (err) {
     toast.dismiss();

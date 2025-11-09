@@ -111,16 +111,8 @@ const Navbar = () => {
           {/* Logo */}
           <Header />
 
-          {/* Search & Auth */}
+          {/* Auth */}
           <div className="hidden md:flex items-center space-x-3">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search"
-                className="bg-[#0E0E38] text-white rounded-full px-4 py-1.5 text-sm outline-none w-40 md:w-48"
-              />
-              <span className="absolute right-3 top-1.5 text-gray-400">🔍</span>
-            </div>
             {user ? (
               <div className="flex items-center gap-2">
                 {(user.role === "superUser" || user.role === "adminUser") ? (

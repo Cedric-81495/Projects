@@ -1,4 +1,3 @@
-// backend/controllers/superAdminController.js
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
@@ -50,7 +49,7 @@ const getSuperAdmins = asyncHandler(async (req, res) => {
   res.status(200).json(superAdmins);
 });
 
-// ✅ Create adminUser (superUser only)
+// ✅ Create adminUser
 const createAdminBySuperUser = asyncHandler(async (req, res) => {
   const { firstname, middlename, lastname, username, email, password } = req.body;
 
@@ -84,13 +83,7 @@ const createAdminBySuperUser = asyncHandler(async (req, res) => {
   });
 });
 
-// ✅ Read all adminUsers
-const getAllAdminsBySuperUser = asyncHandler(async (req, res) => {
-  const admins = await User.find({ role: "adminUser" }).select("-password");
-  res.status(200).json(admins);
-});
-
-// ✅ Update adminUser details
+// ✅ Update adminUser
 const updateAdminBySuperUser = asyncHandler(async (req, res) => {
   const { firstname, middlename, lastname, username, email } = req.body;
   const admin = await User.findById(req.params.id);
@@ -128,7 +121,7 @@ const deleteAdminBySuperUser = asyncHandler(async (req, res) => {
   res.status(200).json({ message: `Admin ${admin.username} deleted successfully` });
 });
 
-// ✅ Update any admin/superUser role
+// ✅ Update role
 const updateAdminRole = asyncHandler(async (req, res) => {
   const { role } = req.body;
   if (!["adminUser", "superUser"].includes(role)) {
@@ -160,7 +153,7 @@ const updateAdminRole = asyncHandler(async (req, res) => {
   });
 });
 
-// ✅ Update any admin/superUser details
+// ✅ Update details
 const updateAdminDetails = asyncHandler(async (req, res) => {
   const { firstname, lastname, email, role, username } = req.body;
   const user = await User.findById(req.params.id);
@@ -177,7 +170,7 @@ const updateAdminDetails = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Admin updated", user });
 });
 
-// ✅ Delete any admin or super admin
+// ✅ Delete any admin/superUser
 const deleteAdminUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
 
@@ -195,14 +188,36 @@ const deleteAdminUser = asyncHandler(async (req, res) => {
   res.status(200).json({ message: `User ${user.username} deleted successfully` });
 });
 
+// ✅ Get all admins
+const getAllAdmins = asyncHandler(async (req, res) => {
+  const users = await User.find({
+    role: { $in: ["adminUser", "superUser"] },
+  }).select("-password");
+
+  res.status(200).json(users);
+});
+
+// ✅ Get admin by ID
+const getAdminById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password");
+
+  if (!user || !["adminUser", "superUser"].includes(user.role)) {
+    res.status(404);
+    throw new Error("Admin not found");
+  }
+
+  res.status(200).json(user);
+});
+
 export {
   createSuperAdmin,
-  getSuperAdmins,
   createAdminBySuperUser,
-  getAllAdminsBySuperUser, 
   updateAdminBySuperUser,
   deleteAdminBySuperUser,
   updateAdminRole,
   updateAdminDetails,
   deleteAdminUser,
+  getAllAdmins,
+  getAdminById,
+  getSuperAdmins,
 };

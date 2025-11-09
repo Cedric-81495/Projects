@@ -62,7 +62,7 @@ const AdminDashboard = () => {
       e.preventDefault();
       try {
   
-        const res = await axios.post("/api/admin/super-admins/${editingId}", editForm);
+        const res = await axios.put(`/api/admin/super-admins/${editingId}`, editForm);
         console.log("🛠️ Update response:", res.data);
         console.log("🧾 Editing ID:", editingId);
         console.log("🧑‍💻 Current user ID:", user._id);

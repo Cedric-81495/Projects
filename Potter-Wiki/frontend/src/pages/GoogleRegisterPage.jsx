@@ -19,7 +19,6 @@ const GoogleRegisterPage = () => {
         token: credentialResponse.credential,
        
       });
-       console.log("Generated user token", credentialResponse.credential);
       login(res.data);
       toast.dismiss();
       toast.success(`Welcome, ${res.data.user.firstname}!`);

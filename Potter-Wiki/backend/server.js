@@ -65,6 +65,7 @@ app.use("/api/register", registerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
+app.use("/api/users", adminRoutes);
 
 // ✅ Start server
 const PORT = process.env.PORT || 3000;

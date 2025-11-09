@@ -5,10 +5,10 @@ import App from "./App.jsx";
 import axios from "axios";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-// ✅ Configure Axios base URL
+// Configure Axios base URL
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
-// ✅ Attach Authorization header if token exists
+// Attach Authorization header if token exists
 axios.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authToken");

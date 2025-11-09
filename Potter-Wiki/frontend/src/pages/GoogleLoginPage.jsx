@@ -11,10 +11,6 @@ const GoogleLoginPage = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  console.log("Base URLd:", axios.defaults.baseURL);
-console.log("Vite URL:", import.meta.env.VITE_API_URL);
-console.log("VITE API CLIENT ID:",import.meta.env.VITE_GOOGLE_CLIENT_ID);
-
   const handleGoogleSuccess = async (credentialResponse) => {
     const token = credentialResponse?.credential;
     if (!token) {

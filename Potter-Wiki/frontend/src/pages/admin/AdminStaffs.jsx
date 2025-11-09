@@ -1,4 +1,3 @@
-// frontend/src/pages/admin/AdminStaffs.jsx
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthProvider";
@@ -11,37 +10,39 @@ const AdminStaffs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  const [newStaff, setNewStaff] = useState({
-    name: "",
-    species: "",
-    gender: "",
-    house: "",
-    dateOfBirth: "",
-    yearOfBirth: "",
-    ancestry: "",
-    eyeColour: "",
-    hairColour: "",
-    patronus: "",
-    hogwartsStaff: "",
-    actor: "",
-    alive: "",
-    image: "",
-  });
 
-  useEffect(() => {
-    const fetchStaffs = async () => {
-      try {
-        const res = await axios.get('api/staff');
-        setStaffs(res.data);
-        setFiltered(res.data);
-      } catch (err) {
-        console.error("Error fetching staff:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStaffs();
-  }, [user]);
+  const staffFields = [
+    "name", "species", "gender", "house", "dateOfBirth", "yearOfBirth",
+    "ancestry", "eyeColour", "hairColour", "patronus", "hogwartsStaff",
+    "actor", "alive", "image"
+  ];
+
+  const [newStaff, setNewStaff] = useState(
+    Object.fromEntries(staffFields.map((field) => [field, ""]))
+  );
+
+useEffect(() => {
+  const fetchStaffs = async () => {
+    try {
+      const res = await axios.get("/api/staff");
+
+      const cleaned = res.data.map((staff) => ({
+          _id: staff._id,
+        ...Object.fromEntries(
+          staffFields.map((field) => [field, staff[field] || ""])
+        )
+      }));
+
+      setStaffs(cleaned);
+      setFiltered(cleaned);
+    } catch (err) {
+      console.error("Error fetching staff:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchStaffs();
+}, [user]);
 
   useEffect(() => {
     const lower = searchTerm.toLowerCase();
@@ -68,26 +69,11 @@ const AdminStaffs = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`/api/staff`, newStaff);
+      const res = await axios.post("/api/staff", newStaff);
       const updated = [...staffs, res.data];
       setStaffs(updated);
       setFiltered(updated);
-      setNewStaff({
-        name: "",
-        species: "",
-        gender: "",
-        house: "",
-        dateOfBirth: "",
-        yearOfBirth: "",
-        ancestry: "",
-        eyeColour: "",
-        hairColour: "",
-        patronus: "",
-        hogwartsStaff: "",
-        actor: "",
-        alive: "",
-        image: "",
-      });
+      setNewStaff(Object.fromEntries(staffFields.map((field) => [field, ""])));
       setSuccessMessage("Staff added successfully!");
     } catch (err) {
       console.error("Error adding staff:", err);
@@ -104,22 +90,7 @@ const AdminStaffs = () => {
       setStaffs(updated);
       setFiltered(updated);
       setEditingId(null);
-      setNewStaff({
-        name: "",
-        species: "",
-        gender: "",
-        house: "",
-        dateOfBirth: "",
-        yearOfBirth: "",
-        ancestry: "",
-        eyeColour: "",
-        hairColour: "",
-        patronus: "",
-        hogwartsStaff: "",
-        actor: "",
-        alive: "",
-        image: "",
-      });
+      setNewStaff(Object.fromEntries(staffFields.map((field) => [field, ""])));
       setSuccessMessage("Staff updated successfully!");
     } catch (err) {
       console.error("Error updating staff:", err);
@@ -161,7 +132,7 @@ const AdminStaffs = () => {
         onSubmit={editingId ? handleUpdate : handleAdd}
         className="grid grid-cols-2 gap-4 mb-6"
       >
-        {Object.keys(newStaff).map((field) => (
+        {staffFields.map((field) => (
           <input
             key={field}
             type="text"
@@ -188,25 +159,13 @@ const AdminStaffs = () => {
           {editingId && (
             <button
               type="button"
-              onClick={() => {
-                setEditingId(null);
-                setNewStaff({
-                  name: "",
-                  species: "",
-                  gender: "",
-                  house: "",
-                  dateOfBirth: "",
-                  yearOfBirth: "",
-                  ancestry: "",
-                  eyeColour: "",
-                  hairColour: "",
-                  patronus: "",
-                  hogwartsStaff: "",
-                  actor: "",
-                  alive: "",
-                  image: "",
-                });
-              }}
+             onClick={() => {
+                  setEditingId(char._id);
+                  const filteredData = Object.fromEntries(
+                    staffFields.map((field) => [field, char[field] || ""])
+                  );
+                  setNewStaff(filteredData);
+                }}
               className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
             >
               Cancel
@@ -233,11 +192,12 @@ const AdminStaffs = () => {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-[#2d246e] z-10">
               <tr>
-                {[...Object.keys(newStaff), "actions"].map((header) => (
+                {staffFields.map((header) => (
                   <th key={header} className="p-3 border-b border-gray-600">
                     {displayValue(header)}
                   </th>
                 ))}
+                <th className="p-3 border-b border-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -251,24 +211,13 @@ const AdminStaffs = () => {
                       setNewStaff({ ...char });
                     }}
                   >
-                    <td className="p-3">{displayValue(char.name)}</td>
-                    <td className="p-3">{displayValue(char.species)}</td>
-                    <td className="p-3">{displayValue(char.gender)}</td>
-                    <td className="p-3">{displayValue(char.house)}</td>
-                    <td className="p-3">{char.dateOfBirth || "No data found"}</td>
-                    <td className="p-3">{char.yearOfBirth || "No data found"}</td>
-                      <td className="p-3">{displayValue(char.ancestry)}</td>
-                    <td className="p-3">{displayValue(char.eyeColour)}</td>
-                    <td className="p-3">{displayValue(char.hairColour)}</td>
-                    <td className="p-3">{displayValue(char.patronus)}</td>
-                    <td className="p-3">{displayBoolean(char.hogwartsStaff)}</td>
-                    <td className="p-3">{displayValue(char.actor)}</td>
-                    <td className="p-3">{displayBoolean(char.alive)}</td>
-                    <td className="p-3 max-w-[200px] break-words whitespace-normal">
-                      {char.image?.trim()
-                        ? char.image.trim().charAt(0).toUpperCase() + char.image.trim().slice(1)
-                        : "No data found"}
-                    </td>
+                    {staffFields.map((field) => (
+                      <td key={field} className="p-3">
+                        {field === "hogwartsStaff" || field === "alive"
+                          ? displayBoolean(char[field])
+                          : displayValue(char[field])}
+                      </td>
+                    ))}
                     <td className="p-3">
                       <button
                         onClick={(e) => {
@@ -284,7 +233,7 @@ const AdminStaffs = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={Object.keys(newStaff).length + 1} className="p-4 text-center text-gray-400">
+                  <td colSpan={staffFields.length + 1} className="p-4 text-center text-gray-400">
                     No staff found.
                   </td>
                 </tr>

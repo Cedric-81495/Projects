@@ -10,4 +10,4 @@ Spotify-project/
 .env
 
 # Ignore all .txt files
-**/*.txt
+# **/*.txt

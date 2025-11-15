@@ -4,16 +4,16 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
-import authRoutes from "./routes/authRoutes.js";
-import characterRoutes from "./routes/characterRoutes.js";
-import spellRoutes from "./routes/spellRoutes.js";
-import studentRoutes from "./routes/studentRoutes.js";
-import staffRoutes from "./routes/staffRoutes.js";
-import bookRoutes from "./routes/bookRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js";
-import publicRoutes from "./routes/publicRoutes.js";
-import registerRoutes from "./routes/registerRoutes.js";
-import movieRoutes from "./routes/movieRoutes.js";
+import authRoutes from "./src/routes/authRoutes.jss.js";
+import characterRoutes from "./src/routes/characterRoutes.jss.js";
+import spellRoutes from "./src/routes/spellRoutes.jss.js";
+import studentRoutes from "./src/routes/studentRoutes.jss.js";
+import staffRoutes from "./src/routes/staffRoutes.jss.js";
+import bookRoutes from "./src/routes/bookRoutes.jss.js";
+import adminRoutes from "./src/routes/adminRoutes.jss.js";
+import publicRoutes from "./src/routes/publicRoutes.jss.js";
+import registerRoutes from "./src/routes/registerRoutes.jss.js";
+import movieRoutes from "./src/routes/movieRoutes.jss.js";
 import path from "path";
 
 dotenv.config();
@@ -61,7 +61,7 @@ if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
     app.get("*", (req, res) =>{
-        res.sendFile(path.join(__dirnamem, "../frontend", "dist", "index.html"));
+        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
     });
 }
 

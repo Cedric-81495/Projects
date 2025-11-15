@@ -144,14 +144,14 @@ const SuggestionsPage = () => {
         )}
 
         {/* 📋 Suggestions List */}
-        <div className="w-full md:w-3/4 space-y-6 mb-5">
+        <div className="w-full md:w-3/4 space-y-6 mb-5 p-5">
           <h2 className="text-xl text-black font-bold mb-4">All Suggestions</h2>
           {suggestions.map((s) => {
             const isOwner = s.user === user?._id;
             const isEditing = editingMap[s._id];
 
             return (
-              <div key={s._id} className="border p-4 rounded shadow-sm bg-white">
+              <div key={s._id} className="border p-4 rounded shadow-sm bg-gray-200">
                 {isEditing ? (
                   <>
                   

@@ -190,6 +190,13 @@ const Navbar = () => {
             </button>
           </div>
 
+          {/* Suggestions  */}
+          <div className="relative">
+            <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
+              <Link  to="/suggestions">SUGGESTIONS</Link>
+            </button>
+          </div>
+
           {/* Magical Data */}
           <div className="relative" ref={magicalDropdownRef}>
             <button
@@ -253,9 +260,13 @@ const Navbar = () => {
                <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
                   <Link  to="/books">BOOKS</Link>
               </button>
-               {/* Books */}
+               {/* Movies */}
                <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
                   <Link  to="/movies">MOVIES</Link>
+              </button>
+                {/* Suggestions */}
+               <button className="text-white hover:text-amber-300 transition flex items-center gap-1">
+                  <Link  to="/suggestions">Suggestions</Link>
               </button>
               {/* Magical Data (Accordion) */}
               <button

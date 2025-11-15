@@ -14,6 +14,7 @@ import publicRoutes from "./routes/publicRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
 import movieRoutes from "./routes/movieRoutes.js";
 import path from "path";
+import suggestionRoutes from "./routes/suggestionRoutes.js";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 
+
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
@@ -47,6 +49,7 @@ app.use("/api/register", registerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
+app.use("/api/suggestions", suggestionRoutes);
 app.use("/api/users", adminRoutes); // Confirm if this is intended or should be a different route
 
 // Serve frontend in production

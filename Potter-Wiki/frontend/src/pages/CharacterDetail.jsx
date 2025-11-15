@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../lib/axios"; 
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import NotFound from "../components/NotFound";
@@ -18,7 +18,7 @@ const CharacterDetail = () => {
   useEffect(() => {
     const fetchCharacters = async () => {
       try {
-        const res = await axios.get(`/api/characters`);
+        const res = await api.get(`/characters`);
         setCharacters(res.data);
 
         const found = res.data.find((char) => char._id === id);

@@ -28,7 +28,7 @@ import BookCardPage from "./pages/BookCardPage";
 import ScrollToTop from "./utils/ScrollToTop";
 import GoogleLoginPage from "./pages/GoogleLoginPage.jsx";
 import GoogleRegisterPage from "./pages/GoogleRegisterPage.jsx";
-
+import SuggestionsPage from "./pages/SuggestionsPage.jsx";
 function AppContent() {
 
 const location = useLocation();
@@ -53,6 +53,7 @@ const location = useLocation();
     /^\/books$/, /^\/books\/[\w-]+$/,
     /^\/characters$/, /^\/characters\/[a-f\d]{24}$/,
     /^\/spells$/, /^\/spells\/[a-f\d]{24}$/,
+    /^\/suggestions$/, /^\/suggestions\/[a-f\d]{24}$/,
     /^\/staff$/, /^\/staff\/[a-f\d]{24}$/,
     /^\/students$/, /^\/students\/[a-f\d]{24}$/,
     // Add more if needed
@@ -99,6 +100,8 @@ if (!isValidPath) {
           <Route path="/students/:id" element={<StudentsDetail />} />
           <Route path="/staff" element={<Staff />} />
           <Route path="/staff/:id" element={<StaffDetail />} />
+          <Route path="/suggestions" element={<SuggestionsPage />} />
+
 
           {/* Google Auth Routes  <Route path="/profile" element={<GoogleProfile />} />*/}
           <Route path="/login" element={<GoogleLoginPage />} />

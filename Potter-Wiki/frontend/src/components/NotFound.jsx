@@ -19,6 +19,7 @@ const NotFound = () => {
       "/fantasy",
       "/magical",
       "/adventure",
+      "/suggestions",
     ];
 
     for (const section of validSections) {

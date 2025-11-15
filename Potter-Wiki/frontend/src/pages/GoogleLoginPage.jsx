@@ -21,24 +21,21 @@ const GoogleLoginPage = () => {
     toast.loading("Signing in with Google...");
 
     try {
-      // ✅ Always POST — sending token in request body
       const res = await api.post("/auth/google-auth", { token });
 
+      // ✅ Save token for Axios interceptor
+      localStorage.setItem("authToken", res.data.token);
 
-      // ✅ Save auth data in your context/localStorage
-      login(res.data);
+      // ✅ Save user in context
+      login(res.data.user);
 
       toast.dismiss();
       toast.success(`Welcome back, ${res.data.user.firstname || "User"}!`);
-
-      // ✅ Navigate to protected route
       navigate("/profile");
     } catch (err) {
       toast.dismiss();
-
       console.error("❌ Google login error:", err.response?.data || err.message || err);
-      const message =
-        err.response?.data?.message || "Google login failed. Please try again.";
+      const message = err.response?.data?.message || "Google login failed. Please try again.";
       toast.error(message);
     }
   };

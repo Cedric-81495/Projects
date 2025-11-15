@@ -122,7 +122,7 @@ const SuggestionsPage = () => {
     <PageWrapper loading={loading}>
       <section className="min-h-screen flex flex-col md:flex-row gap-6 px-4 pt-6 w-full max-w-7xl mx-auto">
         {/* 📝 Suggestion Form (only for publicUser who hasn't posted) */}
-        {isPublicUser && !hasPosted && (
+        {isPublicUser && hasPosted && (
           <div className="w-full md:w-1/4">
             <h2 className="text-xl font-bold mb-4">Submit a Suggestion</h2>
             <form onSubmit={handleSubmit} className="space-y-4 border border-black rounded-lg p-4 bg-white shadow">
@@ -144,14 +144,14 @@ const SuggestionsPage = () => {
         )}
 
         {/* 📋 Suggestions List */}
-        <div className="w-full md:w-3/4 space-y-6">
+        <div className="w-full md:w-3/4 space-y-6 mb-5">
           <h2 className="text-xl text-black font-bold mb-4">All Suggestions</h2>
           {suggestions.map((s) => {
             const isOwner = s.user === user?._id;
             const isEditing = editingMap[s._id];
 
             return (
-              <div key={s._id} className="border p-4 rounded shadow-sm bg-gray-200">
+              <div key={s._id} className="border p-4 rounded shadow-sm bg-white">
                 {isEditing ? (
                   <>
                   
@@ -178,18 +178,25 @@ const SuggestionsPage = () => {
                 ) : (
                   <>
                     <p className="mt-2 text-gray-700">{s.content}</p>
-                      {(isPublicUser && s.user === user?._id) && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        You posted on:{" "}
-                        <span className="font-medium">
-                          {new Date(s.createdAt).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric"
-                          })}
-                        </span>
-                      </p>
-                    )}
+
+                      {isPublicUser && s.user === user?._id && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          You posted on:{" "}
+                          <span className="font-medium">
+                            {new Date(s.createdAt).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric"
+                            })}{" "}
+                            at{" "}
+                            {new Date(s.createdAt).toLocaleTimeString("en-US", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: true
+                            })}
+                          </span>
+                        </p>
+                      )}
 
               
 

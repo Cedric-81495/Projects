@@ -35,14 +35,6 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-// Health check route
-app.get("/", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    message: "✅ Backend connected successfully",
-    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-  });
-});
 
 // API routes
 app.use("/api/auth", authRoutes);
@@ -65,6 +57,15 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
+
+// ✅ Move health check AFTER frontend serving
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "✅ Backend connected successfully",
+    mongo: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+  });
+});
 
 connectDB().then(() => {
   app.listen(PORT, () => {

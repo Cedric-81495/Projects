@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import connectDB from "../config/db.js";
+import connectDB from "../src/config/db.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import characterRoutes from "./src/routes/characterRoutes.js";
 import spellRoutes from "./src/routes/spellRoutes.js";

@@ -1,6 +1,6 @@
 // frontend/src/pages/admin/AdminSpells.jsx 
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { AuthContext } from "../../context/AuthProvider";
 
 const AdminSpells = () => {
@@ -15,7 +15,7 @@ const AdminSpells = () => {
 
    const fetchSpells = async () => {
     try {
-      const res = await axios.get(`/api/spells`);
+      const res = await api.get(`/spells`);
       setSpells(res.data);
       setFiltered(res.data);
     } catch (err) {
@@ -56,7 +56,7 @@ const AdminSpells = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`/api/spells`, newSpells);
+      const res = await api.post(`/spells`, newSpells);
       const updated = [...spells, res.data];
       setSpells(updated);
       setFiltered(updated);
@@ -70,7 +70,7 @@ const AdminSpells = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/spells/${editingId}`, newSpells);
+      await api.put(`/spells/${editingId}`, newSpells);
       const updated = spells.map((spell) =>
         spell._id === editingId ? { ...spell, ...newSpells } : spell
       );
@@ -86,7 +86,7 @@ const AdminSpells = () => {
 
   const handleDelete = async (id) => {
       try {
-        await axios.delete(`/api/spells/${id}`);
+        await api.delete(`/spells/${id}`);
         const updatedList = spells.filter((spell) => spell._id !== id);
         setSpells(updatedList);
         setFiltered(updatedList);

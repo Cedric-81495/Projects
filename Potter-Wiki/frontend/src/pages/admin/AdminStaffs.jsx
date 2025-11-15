@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { AuthContext } from "../../context/AuthProvider";
 
 const AdminStaffs = () => {
@@ -24,7 +24,7 @@ const AdminStaffs = () => {
 useEffect(() => {
   const fetchStaffs = async () => {
     try {
-      const res = await axios.get("/api/staff");
+      const res = await api.get("/staff");
 
       const cleaned = res.data.map((staff) => ({
           _id: staff._id,
@@ -69,7 +69,7 @@ useEffect(() => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/staff", newStaff);
+      const res = await api.post("/staff", newStaff);
       const updated = [...staffs, res.data];
       setStaffs(updated);
       setFiltered(updated);
@@ -83,7 +83,7 @@ useEffect(() => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/staff/${editingId}`, newStaff);
+      await api.put(`/staff/${editingId}`, newStaff);
       const updated = staffs.map((s) =>
         s._id === editingId ? { ...s, ...newStaff } : s
       );
@@ -99,7 +99,7 @@ useEffect(() => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/staff/${id}`);
+      await api.delete(`/staff/${id}`);
       const updated = staffs.filter((s) => s._id !== id);
       setStaffs(updated);
       setFiltered(updated);

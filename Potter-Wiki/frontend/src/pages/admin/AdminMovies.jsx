@@ -1,6 +1,6 @@
 // frontend/src/pages/admin/AdminMovie.jsx
 import { useEffect, useState, useContext, useCallback } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { AuthContext } from "../../context/AuthProvider";
 
 const AdminMovie = () => {
@@ -38,7 +38,7 @@ const AdminMovie = () => {
 
 const fetchMovies = useCallback(async () => {
   try {
-    const res = await axios.get(`/api/movies`);
+    const res = await api.get(`/movies`);
     const moviesData = res.data.map(normalizeItem);
     setMovies(moviesData);
     setFiltered(moviesData);
@@ -84,7 +84,7 @@ useEffect(() => {
     e.preventDefault();
     try {
       // POST request to create a new movie
-      const { data: createMovie } = await axios.post("/api/movies", newMovies);
+      const { data: createMovie } = await api.post("/movies", newMovies);
       await fetchMovies();
       // Update state immediately to reflect new data in UI
       const updated = [...movies, createMovie];
@@ -113,8 +113,8 @@ useEffect(() => {
 const handleUpdate = async (e) => {
   e.preventDefault();
   try {
-    const { data: updatedMovie } = await axios.put(
-      `/api/movies/${editingId}`,
+    const { data: updatedMovie } = await api.put(
+      `/movies/${editingId}`,
       newMovies
     );
 
@@ -147,7 +147,7 @@ const handleUpdate = async (e) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/movies/${id}`);
+      await api.delete(`/movies/${id}`);
 
       // Update local state manually
       const updatedList = movies.filter((char) => char.id !== id);

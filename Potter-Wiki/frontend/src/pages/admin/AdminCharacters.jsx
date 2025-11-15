@@ -1,6 +1,6 @@
 // frontend/src/pages/admin/AdminCharacters.jsx
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { AuthContext } from "../../context/AuthProvider";
 import { formatDate } from "../../utils/dateUtils";
 
@@ -27,7 +27,7 @@ const AdminCharacters = () => {
 
   const fetchCharacters = async () => {
     try {
-      const res = await axios.get(`/api/characters`);
+      const res = await api.get(`/characters`);
       setCharacters(res.data);
       setFiltered(res.data);
     } catch (err) {
@@ -71,7 +71,7 @@ const AdminCharacters = () => {
     e.preventDefault();
     try {
       // POST request to create a new character
-      const { data: createCharacter } = await axios.post("/api/characters", newCharacter);
+      const { data: createCharacter } = await api.post("/characters", newCharacter);
       await fetchCharacters();
       // Update state immediately to reflect new data in UI
       const updated = [...characters, createCharacter];
@@ -102,8 +102,8 @@ const AdminCharacters = () => {
 const handleUpdate = async (e) => {
   e.preventDefault();
   try {
-    const { data: updatedCharacter } = await axios.put(
-      `/api/characters/${editingId}`,
+    const { data: updatedCharacter } = await api.put(
+      `/characters/${editingId}`,
       newCharacter
     );
 
@@ -138,7 +138,7 @@ const handleUpdate = async (e) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/characters/${id}`);
+      await api.delete(`/characters/${id}`);
 
       // Update local state manually
       const updatedList = characters.filter((char) => char._id !== id);

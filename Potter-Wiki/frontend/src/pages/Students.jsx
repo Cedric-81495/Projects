@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import { AuthContext } from "../context/AuthProvider";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
@@ -16,7 +16,7 @@ const Students = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get("/api/students");
+        const res = await api.get("/students");
         const data = Array.isArray(res.data?.students)
           ? res.data.students
           : Array.isArray(res.data)

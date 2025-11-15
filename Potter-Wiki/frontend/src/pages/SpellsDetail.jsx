@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import NotFound from "../components/NotFound";
@@ -17,7 +17,7 @@ const SpellsDetail = () => {
   useEffect(() => {
     const fetchSpells = async () => {
       try {
-        const res = await axios.get("/api/spells");
+        const res = await api.get("/spells");
         setSpells(res.data);
         console.log("Fetched Spells:", res.data);
         const found = res.data.find((s) => s._id === id);

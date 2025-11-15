@@ -1,7 +1,7 @@
 // src/pages/Spells.jsx
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import { AuthContext} from "../context/AuthProvider";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
@@ -18,7 +18,7 @@ const Spells = () => {
   useEffect(() => {
     const fetchSpells = async () => {
       try {
-        const res = await axios.get(`/api/spells`);
+        const res = await api.get(`/spells`);
         setSpells(res.data);
         //console.log("API Response:", res.data);
       } catch (err) {

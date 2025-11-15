@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
-import axios from "axios";
+import api from "../lib/axios";
 import bgImage from "../assets/aesthetic-bg.jpg";
 
 const Register = () => {
@@ -35,7 +35,7 @@ const handleSubmit = async (e) => {
       role,
     };
 
-    const res = await axios.post("/api/admin/super-admins/admins", payload, {
+    const res = await api.post("/admin/super-admins/admins", payload, {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },

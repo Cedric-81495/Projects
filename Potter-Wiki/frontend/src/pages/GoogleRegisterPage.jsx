@@ -1,7 +1,7 @@
 // frontend/src/pages/GoogleRegisterPage.jsx
 import { GoogleLogin } from "@react-oauth/google";
 //import { jwtDecode } from "jwt-decode";
-import axios from "axios";
+import api from "../lib/axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
@@ -15,7 +15,7 @@ const GoogleRegisterPage = () => {
     try {
       toast.loading("Registering with Google...");
 
-      const res = await axios.post(`/api/auth/google-auth`, {
+      const res = await api.post(`/auth/google-auth`, {
         token: credentialResponse.credential,
        
       });

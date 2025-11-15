@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
-import axios from "axios";
+import api from "../lib/axios";
 import aestheticbg from "../assets/aesthetic-bg.jpg";
 import { toast } from "react-hot-toast";
 
@@ -30,7 +30,7 @@ const Login = () => {
   toast.loading("Logging in...");
   
   try {
-    const res = await axios.post("/api/auth/login", { email, password }, { withCredentials: true });
+    const res = await api.post("/auth/login", { email, password }, { withCredentials: true });
     login(res.data);
     setSuccessMessage("Login successful!");
     setErrorMessage("");

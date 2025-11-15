@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 import { useEffect, useState } from "react";
 import PageWrapper from "../components/PageWrapper";
 
@@ -13,7 +13,7 @@ export default function BookContents() {
   useEffect(() => {
   async function fetchChapter() {
     try {
-      const res = await axios.get(`/api/books/${id}`);
+      const res = await api.get(`/books/${id}`);
       const book = res.data;
       const found = book.relationships?.chapters?.data.find(
         (ch) => ch.id === chapterId // also fix _id (see next issue)

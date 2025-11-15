@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import NotFound from "../components/NotFound";
@@ -18,7 +18,7 @@ const MovieDetails = () => {
   useEffect(() => {
     const fetchMovies = async () => {
         try {
-        const res = await axios.get("/api/movies");
+        const res = await api.get("/movies");
         const data = Array.isArray(res.data?.movies)
             ? res.data.movies
             : Array.isArray(res.data)

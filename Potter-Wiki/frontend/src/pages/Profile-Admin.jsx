@@ -1,12 +1,11 @@
-import { useContext, useState } from "react";
+import { useContext  } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
-import axios from "axios";
 
 const Profile = () => {
   const { user } = useContext(AuthContext);
-  const [newPassword, setNewPassword] = useState("");
-  const [status, setStatus] = useState("");
+  //const [newPassword, setNewPassword] = useState("");
+  //const [status, setStatus] = useState("");
 
   if (!user) {
     return (

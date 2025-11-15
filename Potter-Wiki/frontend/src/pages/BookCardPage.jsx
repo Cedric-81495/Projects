@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import { formatDate } from "../utils/dateUtils";
@@ -9,7 +9,6 @@ export default function BookCardPage() {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
   const [book, setBook] = useState(null);
-  const [chapters, setChapters] = useState([]);
   const [nextBookId, setNextBookId] = useState(null);
   const [prevBookId, setPrevBookId] = useState(null);
 
@@ -19,7 +18,7 @@ export default function BookCardPage() {
     async function fetchBookDetails() {
       try {
       
-        const res = await axios.get(`/api/books/${id}`);
+        const res = await api.get(`/books/${id}`);
         const data = res.data;
 
         //if (!data || !data.attributes) throw new Error("Book not found.");
@@ -29,10 +28,8 @@ export default function BookCardPage() {
           ...data.attributes,
         });
 
-        const chapters = data.relationships?.chapters?.data || [];
-        setChapters(chapters);
 
-        const all = await axios.get("/api/books");
+        const all = await api.get("/books");
         const allBooks = Array.isArray(all.data) ? all.data : [];
         const index = allBooks.findIndex((b) => b.id === data.id);
         setPrevBookId(index > 0 ? allBooks[index - 1].id : null);
@@ -104,25 +101,6 @@ export default function BookCardPage() {
             <p className="italic text-gray-600 mt-4">Dedication: “{book.dedication}”</p>
           )}
 
-          {/* Chapters */}
-          {chapters.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-lg font-semibold mb-3">Chapters</h2>
-              <ul className="list-disc pl-5 space-y-1">
-                {chapters.map((ch, index) => (
-                  <li key={ch._id}>
-                    <Link
-                      to={`/books/${book.id}/contents/${ch._id}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Chapter {index + 1}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           {/* Buttons */}
           <div className="flex justify-between mt-8 flex-wrap gap-2">
             {prevBookId && (
@@ -134,10 +112,10 @@ export default function BookCardPage() {
               </Link>
             )}
             <Link
-              to={`/books/${book.id}/contents`}
+              to={`/books`}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
             >
-              📖 Read Book
+              Back to Books
             </Link>
             {nextBookId && (
               <Link

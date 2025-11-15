@@ -1,6 +1,6 @@
 // frontend/src/pages/Books.jsx
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios"; 
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
@@ -31,7 +31,7 @@ export default function Books() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const res = await axios.get("/api/books");
+        const res = await api.get("/books");
         const rawBooks = Array.isArray(res.data) ? res.data : [];
 
         // Normalize PotterDB structure

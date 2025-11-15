@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { AuthContext } from "../../context/AuthProvider";
 
 const AdminStudents = () => {
@@ -35,7 +35,7 @@ const AdminStudents = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await axios.get(`/api/students`);
+        const res = await api.get(`/students`);
         setStudents(res.data.students);
         setFiltered(res.data.students);
       } catch (err) {
@@ -73,7 +73,7 @@ const AdminStudents = () => {
     e.preventDefault();
     try {
 
-      const res = await axios.post(`api/students`, newStudent);
+      const res = await api.post(`api/students`, newStudent);
       const updated = [...students, res.data];
       setStudents(updated);
       setFiltered(updated);
@@ -87,7 +87,7 @@ const AdminStudents = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/students/${editingId}`, newStudent);
+      await api.put(`/students/${editingId}`, newStudent);
       const updated = students.map((s) =>
         s._id === editingId ? { ...s, ...newStudent } : s
       );
@@ -102,7 +102,7 @@ const AdminStudents = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/students/${id}`);
+      await api.delete(`/students/${id}`);
       const updated = students.filter((s) => s._id !== id);
       setStudents(updated);
       setFiltered(updated);

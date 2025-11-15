@@ -14,33 +14,24 @@ import adminRoutes from "./routes/adminRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
 import registerRoutes from "./routes/registerRoutes.js";
 import movieRoutes from "./routes/movieRoutes.js";
+import path from "path";
 
 dotenv.config();
-connectDB();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+const __dirname = path.resolve()
 
-// ✅ Robust CORS configuration
-const allowedOrigins = [
-  process.env.FRONTEND_URL || "http://localhost:5173",
-  "http://localhost:5173",
-  "https://potterwikiapp.vercel.app"
-];
+// middleware to parse JSON body to  controllers
+app.use(express.json());
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error("❌ Blocked by CORS:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
-
-// ✅ Handle preflight requests globally
-app.options(/.*/, cors());
+if (process.env.NODE_ENV !== "production"){
+    app.use(
+        cors({
+            origin: "http://localhost:5173",
+        }
+    ));
+}
 
 // ✅ Parse incoming JSON
 app.use(express.json());
@@ -54,7 +45,6 @@ app.get("/", (req, res) => {
   });
 });
 
-
 app.use("/api/auth", authRoutes);
 app.use("/api/characters", characterRoutes);
 app.use("/api/spells", spellRoutes);
@@ -67,6 +57,16 @@ app.use("/api/books", bookRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/users", adminRoutes);
 
-// ✅ Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+    app.get("*", (req, res) =>{
+        res.sendFile(path.join(__dirnamem, "../frontend", "dist", "index.html"));
+    });
+}
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log("Sever started on PORT:", PORT);
+    });
+});

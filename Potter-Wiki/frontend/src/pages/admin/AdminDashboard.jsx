@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../../lib/axios";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthProvider";
@@ -28,8 +28,7 @@ const AdminDashboard = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    axios
-      .get("/api/admin/all")
+      api.get("/admin/all")
       .then((res) => setAdmins(res.data))
       .catch((err) => console.error("Error fetching admins:", err));
   }, [user]);
@@ -48,7 +47,7 @@ const AdminDashboard = () => {
     const handleCreate = async (e) => {
       e.preventDefault();
       try {
-      const res = await axios.post("/api/admin/super-admins/admins", editForm);
+      const res = await api.post("/admin/super-admins/admins", editForm);
       const updated = [...admins, res.data];
       setAdmins(updated);
       setEditForm({ firstname: "", lastname: "", email: "", role: "", username: "" });
@@ -62,7 +61,7 @@ const AdminDashboard = () => {
       e.preventDefault();
       try {
   
-        const res = await axios.put(`/api/admin/super-admins/${editingId}`, editForm);
+        const res = await api.put(`/admin/super-admins/${editingId}`, editForm);
         console.log("🛠️ Update response:", res.data);
         console.log("🧾 Editing ID:", editingId);
         console.log("🧑‍💻 Current user ID:", user._id);
@@ -99,7 +98,7 @@ const AdminDashboard = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`/api/admin/super-admins/${id}`);
+      await api.delete(`/admin/super-admins/${id}`);
       const updated = admins.filter((admin) => admin._id !== id);
       setAdmins(updated);
       if (selectedAdmin?._id === id) {

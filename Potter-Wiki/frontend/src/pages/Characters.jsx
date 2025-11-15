@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import { AuthContext } from "../context/AuthProvider";
 import PageWrapper from "../components/PageWrapper";
 import SearchBar from "../components/SearchBar";
@@ -16,7 +16,7 @@ const Characters = () => {
   useEffect(() => {
     const fetchCharacters = async () => {
       try {
-        const res = await axios.get(`/api/characters`);
+        const res = await api.get(`/characters`);
         setCharacters(res.data);
       } catch (err) {
         console.error("Failed to fetch characters:", err);

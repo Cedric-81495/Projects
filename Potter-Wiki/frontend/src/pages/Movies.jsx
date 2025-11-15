@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 import PageWrapper from "../components/PageWrapper";
 import SearchBar from "../components/SearchBar";
 import { useEffect, useState, useContext } from "react";
@@ -19,7 +19,7 @@ export default function Movies() {
 useEffect(() => {
   async function fetchCarouselMovies() {
     try {
-      const res = await axios.get("/api/movies ");
+      const res = await api.get("/movies ");
       const movies = Array.isArray(res.data) ? res.data : [];
       setCarouselMovies(movies.slice(0, 5)); // show first 5 movies
     } catch (err) {
@@ -43,7 +43,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get("/api/movies");
+        const res = await api.get("/movies");
         const rawMovies = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data?.data)

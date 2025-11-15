@@ -1,6 +1,6 @@
 // frontend/src/pages/GoogleLoginPage.jsx
 import { GoogleLogin } from "@react-oauth/google";
-import axios from "axios";
+import api from "../lib/axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
@@ -22,7 +22,7 @@ const GoogleLoginPage = () => {
 
     try {
       // ✅ Always POST — sending token in request body
-      const res = await axios.post("/api/auth/google-auth", { token });
+      const res = await api.post("/auth/google-auth", { token });
 
       // ✅ Save auth data in your context/localStorage
       login(res.data);

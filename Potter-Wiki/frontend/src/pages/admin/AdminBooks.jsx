@@ -1,6 +1,6 @@
 // frontend/src/pages/admin/AdminBooks.jsx
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../../lib/axios";
 import { AuthContext } from "../../context/AuthProvider";
 import { formatDate } from "../../utils/dateUtils";
 
@@ -24,7 +24,7 @@ const AdminBooks = () => {
 
   const fetchBooks = async () => {
     try {
-      const res = await axios.get(`/api/books`);
+      const res = await api.get(`/books`);
       const booksData = res.data.map((item) => ({
         id: item.id,
         ...item.attributes, // spreads title, author, cover, etc.
@@ -73,7 +73,7 @@ const AdminBooks = () => {
     e.preventDefault();
     try {
       // POST request to create a new book
-      const { data: createBooks } = await axios.post("/api/books", newBooks);
+      const { data: createBooks } = await api.post("/books", newBooks);
       await fetchBooks();
       // Update state immediately to reflect new data in UI
       const updated = [...books, createBooks];
@@ -101,8 +101,8 @@ const AdminBooks = () => {
 const handleUpdate = async (e) => {
   e.preventDefault();
   try {
-    const { data: updatedBooks } = await axios.put(
-      `/api/books/${editingId}`,
+    const { data: updatedBooks } = await api.put(
+      `/books/${editingId}`,
       newBooks
     );
 
@@ -134,7 +134,7 @@ const handleUpdate = async (e) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/books/${id}`);
+      await api.delete(`/books/${id}`);
 
       // Update local state manually
       const updatedList = books.filter((char) => char.id !== id);

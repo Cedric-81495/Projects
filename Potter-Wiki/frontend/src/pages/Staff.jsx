@@ -1,7 +1,7 @@
 // src/pages/Staff.jsx
 import { Link } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import { AuthContext} from "../context/AuthProvider";
 import Card from "../components/Card";
 import PageWrapper from "../components/PageWrapper";
@@ -18,7 +18,7 @@ const Staff = () => {
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const res = await axios.get("/api/staff");
+        const res = await api.get("/staff");
         const data = Array.isArray(res.data?.staff)
           ? res.data.staff
           : Array.isArray(res.data)

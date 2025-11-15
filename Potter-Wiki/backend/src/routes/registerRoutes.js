@@ -2,7 +2,7 @@
 import express from "express";
 import { registerAdmin } from "../controllers/adminController.js";
 import { validateRequest } from "../middleware/validateRequest.js";
-import { adminRegistrationRules } from "../validators/adminValidators.js
+import { adminRegistrationRules } from "../validators/adminValidators.js";
 
 const router = express.Router();
 

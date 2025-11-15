@@ -24,6 +24,7 @@ const GoogleLoginPage = () => {
       // ✅ Always POST — sending token in request body
       const res = await api.post("/auth/google-auth", { token });
 
+
       // ✅ Save auth data in your context/localStorage
       login(res.data);
 

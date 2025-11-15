@@ -103,7 +103,7 @@ useEffect(() => {
                     </div>
                   )}
                   <div className="absolute md:pb-[25px] bottom-0 left-0 right-0 bg-black/50 text-white text-center py-3">
-                    <h3 className="text-lg font-bold">{b.title}</h3>
+                    <h3 className="text-lg font-bold px-4 pb-7 md:px-6 md:py-3">{b.title}</h3>
                     <p className="text-sm">{b.author}</p>
                   </div>
                 </Link>

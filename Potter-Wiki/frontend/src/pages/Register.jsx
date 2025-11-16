@@ -3,52 +3,70 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import api from "../lib/axios";
 import bgImage from "../assets/aesthetic-bg.jpg";
+import toast, { Toaster } from "react-hot-toast";
 
 const Register = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [middlename, setMiddlename] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [username, setUsername] = useState("");
-  const [role, setRole] = useState("");
+  const [editForm, setEditForm] = useState({
+    firstname: "",
+    middlename: "",
+    lastname: "",
+    username: "",
+    email: "",
+    password: "",
+    role: "",
+  });
+
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm({ ...editForm, [name]: value });
+  };
 
-  if (!user?.token) {
-    alert("You must be logged in as a SuperUser to create an account.");
-    return;
-  }
+  const handleCreate = async (e) => {
+    e.preventDefault();
 
-  try {
-    const payload = {
-      firstname,
-      middlename,
-      lastname,
-      username,
-      email,
-      password,
-      role,
-    };
+    if (!editForm.role) {
+      toast.error("Please select a role");
+      return;
+    }
 
-    const res = await api.post("/admin/super-admins/admins", payload, {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
+    if (!user?.token && editForm.role !== "superUser") {
+      toast.error("You must be logged in as a SuperUser to create an Admin account.");
+      return;
+    }
 
-    console.log("✅ Created:", res.data);
-    alert("Account created successfully!");
-    navigate("/dashboard");
-  } catch (err) {
-    console.error("❌ Registration failed:", err);
-    alert("Failed to create account. Please check your input and try again.");
-  }
-};
+    try {
+      const endpoint =
+        editForm.role === "superUser"
+          ? "/admin/super"
+          : "/admin/super-admins/admins";
+
+      const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
+
+      const res = await api.post(endpoint, editForm, { headers });
+
+      toast.success(`${res.data.role} created successfully!`); // <- toast on success
+
+      // Reset form
+      setEditForm({
+        firstname: "",
+        middlename: "",
+        lastname: "",
+        username: "",
+        email: "",
+        password: "",
+        role: "",
+      });
+
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Error creating user:", err);
+      toast.error(err.response?.data?.message || "Something went wrong"); // <- toast on error
+    }
+  };
 
   const handleGoBack = () => {
     if (location.key !== "default") {
@@ -63,34 +81,37 @@ const handleSubmit = async (e) => {
       className="relative flex items-center justify-center min-h-screen px-4 py-20 bg-cover bg-center"
       style={{ backgroundImage: `url(${bgImage})` }}
     >
+      <Toaster position="top-right" /> {/* <- Toast container */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-0" />
       <div className="relative z-10 w-full max-w-xl bg-[#1b1b2f] border border-[#cfae6d] text-[#f5e6c8] shadow-lg hover:shadow-xl transition duration-300 rounded-2xl p-6 sm:p-10">
         <h2 className="text-3xl sm:text-4xl font-serif font-bold text-center mb-8">
           Create Admin / SuperUser
         </h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleCreate} className="flex flex-col gap-5">
           {[
-            { value: firstname, setter: setFirstname, placeholder: "Firstname" },
-            { value: middlename, setter: setMiddlename, placeholder: "Middle Name" },
-            { value: lastname, setter: setLastname, placeholder: "Last Name" },
-            { value: username, setter: setUsername, placeholder: "Username" },
-            { value: email, setter: setEmail, placeholder: "Email", type: "email" },
-            { value: password, setter: setPassword, placeholder: "Password", type: "password" },
-          ].map(({ value, setter, placeholder, type = "text" }, i) => (
+            { name: "firstname", placeholder: "Firstname" },
+            { name: "middlename", placeholder: "Middle Name" },
+            { name: "lastname", placeholder: "Last Name" },
+            { name: "username", placeholder: "Username" },
+            { name: "email", placeholder: "Email", type: "email" },
+            { name: "password", placeholder: "Password", type: "password" },
+          ].map(({ name, placeholder, type = "text" }, i) => (
             <input
               key={i}
               type={type}
-              value={value}
-              onChange={(e) => setter(e.target.value)}
+              name={name}
+              value={editForm[name]}
+              onChange={handleChange}
               placeholder={placeholder}
               className="w-full px-4 py-2 border border-[#cfae6d] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#cfae6d] bg-[#2c2c44] text-white placeholder:text-[#f5e6c8] text-sm sm:text-base"
             />
           ))}
 
           <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
+            name="role"
+            value={editForm.role}
+            onChange={handleChange}
             className="w-full px-4 py-2 border border-[#cfae6d] rounded-lg bg-[#2c2c44] text-white text-sm sm:text-base"
             required
           >

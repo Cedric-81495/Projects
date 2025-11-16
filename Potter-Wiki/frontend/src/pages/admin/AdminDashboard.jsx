@@ -28,7 +28,7 @@ const AdminDashboard = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-      api.get("/admin/all")
+    api.get("/admin/all")
       .then((res) => setAdmins(res.data))
       .catch((err) => console.error("Error fetching admins:", err));
   }, [user]);
@@ -46,41 +46,16 @@ const AdminDashboard = () => {
 
     const handleCreate = async (e) => {
       e.preventDefault();
-
-      if (!editForm.role) {
-        alert("Please select a role");
-        return;
-      }
-
       try {
-        // Choose endpoint based on role
-        const endpoint =
-          editForm.role === "superUser"
-            ? "/admin/super"
-            : "/admin/super-admins/admins";
-
-        const res = await api.post(endpoint, editForm);
-
-        setAdmins([...admins, res.data]);
-
-        // Reset form
-        setEditForm({
-          firstname: "",
-          middlename: "",
-          lastname: "",
-          username: "",
-          email: "",
-          password: "",
-          role: "",
-        });
-
-        setSuccessMessage(`${res.data.role} created successfully!`);
-      } catch (err) {
-        console.error("Error creating user:", err);
-        alert(err.response?.data?.message || "Something went wrong");
-      }
-    };
-
+      const res = await api.post("/admin/super-admins/admins", editForm);
+      const updated = [...admins, res.data];
+      setAdmins(updated);
+      setEditForm({ firstname: "", lastname: "", email: "", role: "", username: "" });
+      setSuccessMessage("Admin created successfully!");
+    } catch (err) {
+      console.error("Error creating admin:", err);
+    }
+  };
 
     const handleUpdate = async (e) => {
       e.preventDefault();
@@ -191,7 +166,7 @@ const AdminDashboard = () => {
         <button onClick={() => navigate("/dashboard/staff")} className="btn-red">Staff</button>
         <button onClick={() => navigate("/dashboard/movies")} className="btn-red">Movies</button>
         <button onClick={() => navigate("/dashboard/books")} className="btn-red">Books</button>
-        <button onClick={() => navigate("/register-admin")} className="btn-red">Create User</button>
+        <button onClick={() => navigate("/register-admin")} className="btn-red">Create Admin</button>
       </nav>
 
       {isDashboardRoot && (
@@ -199,67 +174,57 @@ const AdminDashboard = () => {
           <h3 className="text-xl font-semibold mb-3 border-b border-gray-600 pb-2">Admin Accounts</h3>
           
           {user.role === "superUser" && (
-              <form
-                onSubmit={editingId ? handleUpdate : handleCreate}
-                className="grid grid-cols-2 gap-4 mb-6 bg-[#251c5a] p-4 rounded-lg"
+          <form
+            onSubmit={editingId ? handleUpdate : handleCreate}
+            className="grid grid-cols-2 gap-4 mb-6 bg-[#251c5a] p-4 rounded-lg"
+          >
+            {["username", "firstname", "lastname", "email"].map((field) => (
+              <input
+                key={field}
+                type="text"
+                name={field}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={editForm[field]}
+                onChange={handleChange}
+                className="px-3 py-2 rounded bg-[#1a1244] text-white border border-gray-500"
+              />
+            ))}
+            <select
+              name="role"
+              value={editForm.role}
+              onChange={handleChange}
+              className="px-3 py-2 rounded bg-[#1a1244] text-white border border-gray-500 col-span-2"
+            >
+              <option value="">Select Role</option>
+              <option value="adminUser">Admin User</option>
+              <option value="superUser">Super User</option>
+            </select>
+
+            <div className="col-span-2 flex gap-3">
+              <button
+                type="submit"
+                className={`${
+                  editingId ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-600 hover:bg-green-700"
+                } text-white px-4 py-2 rounded`}
               >
-                {["username", "firstname", "middlename", "lastname", "email", "password"].map((field) => (
-                  <input
-                    key={field}
-                    type={field === "password" ? "password" : "text"}
-                    name={field}
-                    placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                    value={editForm[field]}
-                    onChange={handleChange}
-                    className="px-3 py-2 rounded bg-[#1a1244] text-white border border-gray-500"
-                  />
-                ))}
-
-                <select
-                  name="role"
-                  value={editForm.role}
-                  onChange={handleChange}
-                  className="px-3 py-2 rounded bg-[#1a1244] text-white border border-gray-500 col-span-2"
+                {editingId ? "Update Admin" : "Create Admin"}
+              </button>
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingId(null);
+                    setSelectedAdmin(null);
+                    setEditForm({ firstname: "", lastname: "", email: "", role: "", username: "" });
+                  }}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
                 >
-                  <option value="">Select Role</option>
-                  <option value="adminUser">Admin User</option>
-                  <option value="superUser">Super User</option>
-                </select>
-
-                <div className="col-span-2 flex gap-3">
-                  <button
-                    type="submit"
-                    className={`${
-                      editingId ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-600 hover:bg-green-700"
-                    } text-white px-4 py-2 rounded`}
-                  >
-                    {editingId ? "Update Admin" : "Create Admin"}
-                  </button>
-                  {editingId && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingId(null);
-                        setSelectedAdmin(null);
-                        setEditForm({
-                          firstname: "",
-                          middlename: "",
-                          lastname: "",
-                          username: "",
-                          email: "",
-                          password: "",
-                          role: "",
-                        });
-                      }}
-                      className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              </form>
-            )}
-
+                  Cancel
+                </button>
+              )}
+            </div>
+          </form>
+          )}
 
           <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 border border-gray-700 rounded-lg scrollbar-thin scrollbar-thumb-[#4338ca] scrollbar-track-[#1a1244] scrollbar-thumb-rounded scrollbar-track-rounded">
             {sortedAdmins.map((admin) => (

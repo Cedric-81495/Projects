@@ -247,10 +247,13 @@ const Navbar = () => {
 
         {/* Mobile Dropdown */}
         {menuOpen && (
-          <div
-            ref={menuRef}
-            className="md:hidden bg-[#020325] py-4 transition-all duration-300 max-h-[calc(100vh-80px)] overflow-y-auto"
-          >
+        <div
+          ref={menuRef}
+          className="md:hidden absolute top-full left-0 w-full bg-[#020325] 
+                    py-4 transition-all duration-300 max-h-[calc(100vh-80px)] 
+                    overflow-y-auto z-40"
+            >
+
             <div className="flex flex-col items-center space-y-3 text-sm font-semibold uppercase tracking-wide">
               {/* Home */}
               <button className="text-white hover:text-amber-300 transition flex items-center gap-1">

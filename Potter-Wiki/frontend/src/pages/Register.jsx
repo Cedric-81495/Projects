@@ -52,7 +52,7 @@ const handleSubmit = async (e) => {
 
   const handleGoBack = () => {
     if (location.key !== "default") {
-      navigate(-1);coilot
+      navigate(-1);
     } else {
       navigate("/");
     }

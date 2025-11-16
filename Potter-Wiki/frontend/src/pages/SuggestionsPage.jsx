@@ -103,7 +103,7 @@ const SuggestionsPage = () => {
   if (!user) {
     return (
       <PageWrapper>
-        <div className="text-center py-20 text-gray-600 space-y-6">
+        <div className="text-center pt-[250px] md:pt-[250px] lg:pt-[250px] text-gray-600 space-y-6">
           <p>Please log in with your Gmail account to view and post suggestions.</p>
           <div className="w-full max-w-xs mx-auto">
             <Link

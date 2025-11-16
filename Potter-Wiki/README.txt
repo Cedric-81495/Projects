@@ -99,41 +99,52 @@ frontend/
 └── vite.config.js           // Vite build configurations
 
 
-
 Admin Role Permissions
-adminUser
-- Cannot self-register, update, or delete
-- Can view all admins via GET /admins/all
-- Cannot manage other accounts or change roles
-superUser
-- Can create adminUser and superUser accounts
-- Can update and delete any adminUser or superUser
-- Can change roles via PUT /super-admins/:id/role
-- Cannot delete themselves (enforced in controller)
-- All privileged actions require token and are logged
+
+- adminUser
+
+Cannot self-register, update, or delete
+Can view all admins via GET /api/admin/all
+Cannot manage other accounts or change roles
+
+- superUser
+
+Can create adminUser and superUser accounts
+Can update and delete any adminUser or superUser
+Can change roles via PUT /api/admin/super-admins/:id/role
+Cannot delete themselves (enforced in controller)
+All privileged actions require token and are logged
 
 SuperUser Management
+
 Create superUser
-- Login with existing superUser
-- POST /api/admin/super with Bearer token
+
+Login with existing superUser
+POST /api/admin/super with Bearer token
 Delete superUser
-- Login with superUser
-- DELETE /api/admin/super-admins/:id
+Login with superUser
+DELETE /api/admin/super-admins/:id
 Note: Cannot delete self unless controller check is removed
+
 Update superUser
-PUT /api/admins/super-admins/:id
+PUT /api/admin/super-admins/:id
 Payload: firstname, lastname, email, role
+
 Create adminUser
-POST /api/admins/super-admins/admins
+POST /api/admin/super-admins/admins
 Payload: firstname, lastname, username, email, password
+
 Read adminUser(s)
 GET /api/admin/all
 Returns array of adminUser and superUser accounts
+
 Update adminUser
-PUT /api/admins/super-admins/:id
+PUT /api/admin/super-admins/:id
+
 Payload: firstname, lastname, email, role
 Delete adminUser
-DELETE /api/admins/super-admins/:id
+
+DELETE /api/admin/super-admins/:id
 Returns: { "message": "User deleted successfully" }
 
 Local API Endpoints
@@ -147,7 +158,6 @@ Auth Login: POST /api/auth/login
 Health Check: GET /
 Frontend Dev: http://localhost:5173
 Backend Dev: http://localhost:3000
-
 
 External API References
 PotterDB Movies: https://api.potterdb.com/v1/movies

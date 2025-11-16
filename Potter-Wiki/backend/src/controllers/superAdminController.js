@@ -51,12 +51,21 @@ const getSuperAdmins = asyncHandler(async (req, res) => {
 
 // ✅ Create adminUser
 const createAdminBySuperUser = asyncHandler(async (req, res) => {
-  const { firstname, middlename, lastname, username, email, password } = req.body;
+  const { firstname, middlename, lastname, username, email, password, role } = req.body;
 
   const exists = await User.findOne({ email });
   if (exists) {
     res.status(400);
     throw new Error("Admin already exists");
+  }
+
+  // Default role is adminUser if role is not provided
+  const finalRole = role || "adminUser";
+
+  // Only allow superUser creation if the logged-in user is superUser
+  if (finalRole === "superUser" && req.user.role !== "superUser") {
+    res.status(403);
+    throw new Error("Only superUser can create superUser");
   }
 
   const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt(10));
@@ -68,7 +77,7 @@ const createAdminBySuperUser = asyncHandler(async (req, res) => {
     username,
     email,
     password: hashedPassword,
-    role: "adminUser",
+    role: finalRole,
   });
 
   res.status(201).json({
@@ -82,6 +91,7 @@ const createAdminBySuperUser = asyncHandler(async (req, res) => {
     token: generateToken(admin._id, admin.role),
   });
 });
+
 
 // ✅ Update adminUser
 const updateAdminBySuperUser = asyncHandler(async (req, res) => {

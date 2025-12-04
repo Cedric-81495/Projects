@@ -40,7 +40,7 @@ export default function Projects() {
             <div className="relative z-10 p-6 flex flex-col h-full">
               <h3 className="text-2xl font-bold text-white mb-2">Todo Board</h3>
               <p className="text-sm text-gray-100 mb-6">
-                A task management tool built for productivity and organization.
+                A task management tool built for productivity and organization. 
               </p>
 
               <div className="mt-auto pt-6">

@@ -11,7 +11,7 @@ const FeaturesSection = () => {
                     <HiShoppingBag className="text-xl" />
                 </div>
                 <h4 className="tracking-tighter mb-2">FREE INTERNATIONAL SHIPPING</h4>
-                <p clasName="text-gray-600 text-sm tracking-tighter">
+                <p className="text-gray-600 text-sm tracking-tighter">
                     On all orders over ₱1,000
                 </p>
             </div>
@@ -21,7 +21,7 @@ const FeaturesSection = () => {
                     <HiArrowPathRoundedSquare className="text-xl" />
                 </div>
                 <h4 className="tracking-tighter mb-2">45 DAYS RETURN</h4>
-                <p clasName="text-gray-600 text-sm tracking-tighter">
+                <p className="text-gray-600 text-sm tracking-tighter">
                     Money back guarantee
                 </p>
             </div>
@@ -31,7 +31,7 @@ const FeaturesSection = () => {
                     <HiOutlineCreditCard className="text-xl" />
                 </div>
                 <h4 className="tracking-tighter mb-2">SECURE CHECKOUT</h4>
-                <p clasName="text-gray-600 text-sm tracking-tighter">
+                <p className="text-gray-600 text-sm tracking-tighter">
                     100% Checkout process
                 </p>
             </div>

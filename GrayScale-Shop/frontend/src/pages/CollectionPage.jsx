@@ -8,6 +8,7 @@ const CollectionPage = () => {
   const [products, setProducts] = useState([]);
   const sidebarRef = useRef(null);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
+  const buttonRef = useRef(null);
 
   const toggleSidebar = () => {
     setIsSideBarOpen(!isSideBarOpen);
@@ -15,7 +16,10 @@ const CollectionPage = () => {
 
   const handleClickOutside = (e) => {
     // if the user clicked within the side bar don't close it
-    if(sidebarRef.current && !sidebarRef.current.contains(e.target)) {
+    if(sidebarRef.current && !sidebarRef.current.contains(e.target) &&
+        buttonRef.current && 
+        !buttonRef.current.contains(e.target)
+    ) {
       setIsSideBarOpen(false);
     }
   };
@@ -91,6 +95,7 @@ const CollectionPage = () => {
     <div className="flex flex-col lg:flex-row">
       {/*Mobile Filter button  */}
       <button 
+        ref={buttonRef}
         onClick={toggleSidebar}
         className="lg:hidden border p-2 flex justify-center items-center">
         <FaFilter className="mr-2"/>Filters

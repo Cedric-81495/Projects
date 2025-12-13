@@ -106,7 +106,7 @@ const UserManagement = () => {
       </div>
 
       {/* User List Management */}
-      <div className="over-flow-x-auto p-6 shadow-md sm:rounded-lg bg-gray-300">
+      <div className="overflow-x-auto p-6 shadow-md sm:rounded-lg bg-gray-300">
         <h3 className="text-lg font-bold mb-4">User List</h3>
         <table className="min-w-full text=left text-gray-500">
             <thead className="bg-gray-100 text-xs uppcase text-gray-700">

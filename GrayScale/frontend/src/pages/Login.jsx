@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import loginpage from "../assets/loginpage.jpg"
+import { loginUser } from "../../redux/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
     const [email, setEmaiil] = useState("");
     const [password, setPassword] = useState("");
+    const dispath = useDispatch();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log({ email, password });
-        
-    }
+        dispath(loginUser({ email, password }));
+    };
 
 
   return (

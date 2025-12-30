@@ -1,20 +1,24 @@
-import { Outlet } from 'react-router-dom';
-import Home from '../../pages/Home';
-import Footer from '../Common/Footer';
-import Header from '../Common/Header';
+import { Outlet } from "react-router-dom";
+import Footer from "../Common/Footer";
+import Header from "../Common/Header";
+import PageWrapper from "../../pages/PageWrapper"
 
 const UserLayout = () => {
   return (
-    <>
-       {/* Header */}
-       <Header />
-       {/* Main Content */}
-       <main>
-         <Outlet />
-       </main>
-       {/* Footer */}
-       <Footer />
-    </>  
+    <div className="flex flex-col min-h-screen">
+      {/* Header */}
+      <Header />
+
+      {/* Main Content */}
+      <main className="flex-grow">
+        <PageWrapper>
+          <Outlet />
+      </PageWrapper>
+      </main>
+
+      {/* Footer */}
+      <Footer />
+    </div>
   );
 };
 

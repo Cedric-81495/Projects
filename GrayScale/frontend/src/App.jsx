@@ -17,6 +17,7 @@ import UserManagement from "./components/Admin/UserManagement";
 import ProductManagement from "./components/Admin/ProductManagement";
 import EditProductPage from "./components/Admin/EditProductPage";
 import OrderManagement from "./components/Admin/OrderManagement";
+import ScrollToTop from "./components/Common/ScrollToTop";
 
 import { Provider } from "react-redux";
 import store from "../redux/store";
@@ -26,6 +27,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <BrowserRouter>
+       <ScrollToTop />
         <Toaster position="top-right" />
         <Routes>
           {/* User Layout */}

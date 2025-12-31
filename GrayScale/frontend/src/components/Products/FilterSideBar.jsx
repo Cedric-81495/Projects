@@ -109,8 +109,11 @@ const FilterSideBar = () => {
             <button
               key={c}
               onClick={() => toggleArrayParam("color", c)}
-              className={`w-8 h-8 rounded-full border transition hover:scale-105
-                ${filters.color.includes(c) ? "ring-2 ring-blue-500" : ""}`}
+              className={`w-8 h-8 rounded-full transition-all duration-200
+                ${filters.color.includes(c)
+                ? "ring-2 ring-black ring-offset-2"
+                : "border border-gray-400 hover:scale-10 hover:ring-1 hover:ring-black"
+                }`}
               style={{ backgroundColor: c.toLowerCase() }}
             />
           ))}

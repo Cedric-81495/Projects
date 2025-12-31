@@ -62,15 +62,15 @@ return (
 
       {/* Filter Side Bar*/}
       <div 
-        ref={sidebarRef}
-        className={`${isSideBarOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed inset-y-0 z-50 left-0 w-64 bg-white overflow-y-auto transition-transform duration-300
-        lg:static lg:translate-x-0`}
-      >
-        <FilterSideBar />
+          ref={sidebarRef}
+          className={`${isSideBarOpen ? "translate-x-0" : "-translate-x-full"
+          } fixed inset-y-0 z-50 left-0 w-64 bg-white overflow-y-auto transition-transform duration-300
+          lg:static lg:translate-x-0`}
+        >
+          <FilterSideBar />
       </div>
       <div className="flex-grow p-4">
-        <h2 className="text-2xl uppercase mb-4">Mens Collection</h2>
+        <h2 className="text-2xl uppercase">Mens Collection</h2>
 
         {/* Sort Options */}
         <SortOptions />

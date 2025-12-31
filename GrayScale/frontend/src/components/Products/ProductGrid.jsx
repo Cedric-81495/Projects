@@ -9,11 +9,11 @@ const ProductGrid = ({ products, loading, error }) => {
         return <p className="text-center">Error: {error} </p>
     }
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
+    <div className="grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-5">
         {products.map((product, index) => (
             <Link key={index} to={`/product/${product._id}`} >
                 <div className="bg-white p-4 rounded-lg">
-                    <div className="w-[250px] h-[300px] mb-4">
+                    <div className="w-full h-96 md:w-[250px] md:h-[300px] lg:w-[300px] lg:h-[290px] mb-4">
                         <img 
                             src={product.images[0].url}
                             alt={product.images[0].altText || product.name}

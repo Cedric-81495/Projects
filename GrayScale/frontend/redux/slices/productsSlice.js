@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Async Thunk Fetch Products by collection and optional filters
 export const fetchProductsByFilters = createAsyncThunk(
-  "product/fetchByFilters",
+  "products/fetchByFilters",
   async ({
     collection,
     size,
@@ -19,9 +19,9 @@ export const fetchProductsByFilters = createAsyncThunk(
     limit,
   }) => {
     const query = new URLSearchParams();
-    if (collection) query.append("collection", collection);
+    if (collection) query.append("collections", collection);
     if (size) query.append("size", size);
-    if (color) query.append("color", color);
+    if (color) query.append("colors", color);
     if (gender) query.append("gender", gender);
     if (minPrice) query.append("minPrice", minPrice);
     if (maxPrice) query.append("maxPrice", maxPrice);
@@ -126,7 +126,14 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProductsByFilters.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = Array.isArray(action.payload) ? action.payload : [];
+        // handle both array and object payloads safely
+        if (Array.isArray(action.payload)) {
+          state.products = action.payload;
+        } else if (Array.isArray(action.payload.products)) {
+          state.products = action.payload.products;
+        } else {
+          state.products = [];
+        }
       })
       .addCase(fetchProductsByFilters.rejected, (state, action) => {
         state.loading = false;

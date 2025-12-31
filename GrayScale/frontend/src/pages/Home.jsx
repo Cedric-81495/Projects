@@ -49,7 +49,7 @@ const Home = () => {
       {bestSellerProduct ? ( 
         <ProductDetails productId={bestSellerProduct._id} /> 
       ) : (
-        <p className="text-center">Loading best seller products ...</p>
+         <p className="text-center">No product found</p>
       )}
     
       <div className="container mx-auto">

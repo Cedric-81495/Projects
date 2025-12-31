@@ -24,6 +24,7 @@ import store from "../redux/store";
 
 
 const App = () => {
+  const loading = false;
   return (
     <Provider store={store}>
       <BrowserRouter>
@@ -55,6 +56,7 @@ const App = () => {
         </Routes>
       </BrowserRouter>
     </Provider>
+ 
   );
 };
 

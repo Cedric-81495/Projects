@@ -11,9 +11,9 @@ const UserLayout = () => {
 
       {/* Main Content */}
       <main className="flex-grow">
-        <PageWrapper>
+        <PageWrapper className="h-full">
           <Outlet />
-      </PageWrapper>
+        </PageWrapper>
       </main>
 
       {/* Footer */}
@@ -23,3 +23,4 @@ const UserLayout = () => {
 };
 
 export default UserLayout;
+

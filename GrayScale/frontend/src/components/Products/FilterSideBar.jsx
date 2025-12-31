@@ -44,7 +44,7 @@ const FilterSideBar = () => {
     material: getArrayParam("material"),
     brand: getArrayParam("brand"),
     minPrice: Number(getParam("minPrice")) || 0,
-    maxPrice: Number(getParam("maxPrice")) || 100,
+    maxPrice: Number(getParam("maxPrice")) || 15000,
   };
 
   // filter options
@@ -168,7 +168,7 @@ const FilterSideBar = () => {
         <input
           type="range"
           min={0}
-          max={100}
+          max={15000}
           value={filters.maxPrice}
           onChange={handlePriceChange}
           className="w-full"

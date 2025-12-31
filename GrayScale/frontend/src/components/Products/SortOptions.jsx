@@ -5,8 +5,9 @@ const SortOptions = () => {
   
   const handleSortChange = (e) => {
     const sortBy = e.target.value;
-    searchParams.set("sort by", sortBy);
-    setSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
+    params.set("sortBy", sortBy);
+    setSearchParams(params);
   };
 
   return (

@@ -1,97 +1,56 @@
-import { useEffect, useRef, useState } from "react";
-import { FaFilter } from "react-icons/fa"
+import { useEffect, useRef, useState, useMemo } from "react";
+import { FaFilter } from "react-icons/fa";
 import FilterSideBar from "../components/Products/FilterSideBar";
 import SortOptions from "../components/Products/SortOptions";
 import ProductGrid from "../components/Products/ProductGrid";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProductsByFilters } from "../../redux/slices/productsSlice";
 
 const CollectionPage = () => {
-  const [products, setProducts] = useState([]);
-  const sidebarRef = useRef(null);
-  const [isSideBarOpen, setIsSideBarOpen] = useState(false);
-  const buttonRef = useRef(null);
+  const { collection } = useParams();
+  const [searchParams] = useSearchParams();
+  const dispatch = useDispatch();
+  const { products, loading, error } = useSelector((state) => state.products);
 
-  const toggleSidebar = () => {
-    setIsSideBarOpen(!isSideBarOpen);
-  }
+  // Use stringified searchParams as stable dependency
+  const queryString = searchParams.toString();
+  const queryParams = useMemo(
+    () => Object.fromEntries([...searchParams]),
+    [queryString]
+  );
+
+  const sidebarRef = useRef(null);
+  const buttonRef = useRef(null);
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      dispatch(fetchProductsByFilters({ collection, ...queryParams }));
+    }, 150); // debounce to smooth out rapid changes
+
+    return () => clearTimeout(timeout);
+  }, [dispatch, collection, queryString]);
+
+  const toggleSidebar = () => setIsSideBarOpen((prev) => !prev);
 
   const handleClickOutside = (e) => {
-    // if the user clicked within the side bar don't close it
-    if(sidebarRef.current && !sidebarRef.current.contains(e.target) &&
-        buttonRef.current && 
-        !buttonRef.current.contains(e.target)
+    if (
+      sidebarRef.current &&
+      !sidebarRef.current.contains(e.target) &&
+      buttonRef.current &&
+      !buttonRef.current.contains(e.target)
     ) {
       setIsSideBarOpen(false);
     }
   };
 
   useEffect(() => {
-    // Add Event listener for clicks
     document.addEventListener("mousedown", handleClickOutside);
-    // Clean event listener
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [])
-
-  useEffect(() => {
-    setTimeout(() => {
-      const fetchProduct = [
-        {
-          _id: 1,
-          name: "Product 1",
-          price: 1800,
-          images: [{ url: "https://picsum.photos/200/300?random=1" }],
-        },
-        {
-           _id: 2,
-            name: "Product 2",
-            price: 1800,
-            images: [{ url: "https://picsum.photos/200/300?random=2" }],
-        },
-        {
-            _id: 3,
-            name: "Product 3",
-            price: 1800,
-            images: [{ url: "https://picsum.photos/200/300?random=3" }],
-        },
-        {
-            _id: 4,
-            name: "Product 4",
-            price: 1800,
-            images: [{ url: "https://picsum.photos/200/300?random=4" }],
-        },
-        {
-            _id: 5,
-            name: "Product 5",
-            price: 1800,
-            images: [{ url: "https://picsum.photos/200/300?random=5" }],
-        },
-        {
-            _id: 6,
-            name: "Product 6",
-            price: 1800,
-            images: [{ url: "https://picsum.photos/200/300?random=6" }],
-        }, 
-        {
-            _id: 7,
-            name: "Product 7",
-            price: 1800,
-            images: [{ url: "https://picsum.photos/200/300?random=7" }],
-        }, 
-        {
-            _id: 8,
-            name: "Product 8",
-            price: 1800,
-            images: [{ url: "https://picsum.photos/200/300?random=8" }],
-        },  
-      ];
-      setProducts(fetchProduct);
-    }, 1000);
-    
- 
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  return (
+return (
     <div className="flex flex-col lg:flex-row">
       {/*Mobile Filter button  */}
       <button 
@@ -116,8 +75,17 @@ const CollectionPage = () => {
         {/* Sort Options */}
         <SortOptions />
 
-        {/* Product Grid */}
-        <ProductGrid products={products}/>
+       {loading && <p className="text-center">Loading...</p>}
+        {error && <p className="text-center text-red-500">Error: {error}</p>}
+        {!loading && !error && products.length === 0 && (
+          <p className="text-center text-gray-500">
+            No products found for the selected filters.
+          </p>
+        )}
+
+        {products.length > 0 && (
+          <ProductGrid products={products} loading={loading} error={error} />
+        )}
       </div>
     </div>
   );

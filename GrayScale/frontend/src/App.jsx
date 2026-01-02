@@ -24,7 +24,6 @@ import store from "../redux/store";
 
 
 const App = () => {
-  const loading = false;
   return (
     <Provider store={store}>
       <BrowserRouter>
@@ -37,7 +36,7 @@ const App = () => {
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="profile" element={<Profile />} />
-            <Route path="collection/:collection" element={<CollectionPage />} />
+            <Route path="collections/:collection" element={<CollectionPage />} />
             <Route path="product/:id" element={<ProductDetails />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="order-confirmation" element={<OrderConfirmationPage />} />

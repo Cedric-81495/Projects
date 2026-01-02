@@ -52,12 +52,20 @@ const Home = () => {
          <p className="text-center">No product found</p>
       )}
     
-      <div className="container mx-auto">
-        <h2 className="text-3xl text-center font-bold mb-4">
-          Top Wears for Women
-        </h2>
-        <ProductGrid products={products} loading={loading} error={error} />
-      </div>
+      {products.length > 0 ? (
+        <div className="container mx-auto">
+          <h2 className="text-3xl text-center font-bold mb-4">
+            Top Wears for Women
+          </h2>
+          <ProductGrid products={products} loading={loading} error={error} />
+        </div>
+      ) : (
+        !loading && !error && (
+          <div className="container mx-auto">
+            <p className="text-center">No product found</p>
+          </div>
+        )
+      )}
       <FeaturedCollection />
       <FeaturesSection />
     </div>

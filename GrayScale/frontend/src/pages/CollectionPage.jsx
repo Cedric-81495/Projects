@@ -14,10 +14,9 @@ const CollectionPage = () => {
   const { products, loading, error } = useSelector((state) => state.products);
 
   // Use stringified searchParams as stable dependency
-  const queryString = searchParams.toString();
   const queryParams = useMemo(
     () => Object.fromEntries([...searchParams]),
-    [queryString]
+    [searchParams]
   );
 
   const sidebarRef = useRef(null);
@@ -27,10 +26,10 @@ const CollectionPage = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       dispatch(fetchProductsByFilters({ collection, ...queryParams }));
-    }, 150); // debounce to smooth out rapid changes
+    }, 200); // debounce to smooth out rapid changes
 
     return () => clearTimeout(timeout);
-  }, [dispatch, collection, queryString]);
+  }, [dispatch, collection, queryParams]);
 
   const toggleSidebar = () => setIsSideBarOpen((prev) => !prev);
 
@@ -62,21 +61,25 @@ return (
 
       {/* Filter Side Bar*/}
       <div 
-          ref={sidebarRef}
-          className={`${isSideBarOpen ? "translate-x-0" : "-translate-x-full"
-          } fixed inset-y-0 z-50 left-0 w-64 bg-white overflow-y-auto transition-transform duration-300
+        ref={sidebarRef}
+        className={`${isSideBarOpen ? "translate-x-0" : "-translate-x-full"}
+          fixed inset-y-0 z-50 left-0
+          w-[200px] flex-shrink-0
+          bg-gray-200 overflow-y-auto
+          transition-transform duration-300
           lg:static lg:translate-x-0`}
-        >
-          <FilterSideBar />
+      >
+        <FilterSideBar />
       </div>
+
       <div className="flex-grow p-4">
         <h2 className="text-2xl uppercase">Mens Collection</h2>
 
         {/* Sort Options */}
         <SortOptions />
 
-       {loading && <p className="text-center">Loading...</p>}
-        {error && <p className="text-center text-red-500">Error: {error}</p>}
+        {/*{loading && <p className="text-center">Loading...</p>}
+        {error && <p className="text-center text-red-500">Error: {error}</p>}*/}
         {!loading && !error && products.length === 0 && (
           <p className="text-center text-gray-500">
             No products found for the selected filters.

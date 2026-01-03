@@ -72,18 +72,24 @@ export const registerUser = createAsyncThunk(
     }
 );
 
+// Async Thunk for User Logout
+// Async Thunk for User Logout (no backend request)
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { fulfillWithValue }) => {
+    // Simulate async so loading spinner can show
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return fulfillWithValue(true);
+  }
+);
+
+
+
 // Slice 
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        logout: (state) =>{
-            state.user = null;
-            state.guestId = `guest_${new Date().getTime()}`; // Reset guest ID on logout
-            localStorage.removeItem("userInfo");
-            localStorage.removeItem("userToken");
-            localStorage.setItem("guestId", state.guestId);  // Set new guest ID in localStorage
-        },
         generateNewGuestId: (state) => {
             state.guestId = `guest_${new Date().getTime()}`;
             localStorage.setItem("guestId", state.guestId);
@@ -92,6 +98,7 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // LOGIN
             .addCase(loginUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -99,7 +106,6 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
-                state.error = null;
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -109,16 +115,33 @@ const authSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
+            // REGISTER 
             .addCase(registerUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.user = action.payload;
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload.message;
             })
+            // LOGOUT 
+            .addCase(logoutUser.pending, (state) => {
+            state.loading = true;
+            })
+            .addCase(logoutUser.fulfilled, (state) => {
+            state.loading = false;
+            state.user = null;
+            state.guestId = `guest_${new Date().getTime()}`;
+
+            localStorage.removeItem("userInfo");
+            localStorage.removeItem("userToken");
+            localStorage.setItem("guestId", state.guestId);
+            })
+            .addCase(logoutUser.rejected, (state) => {
+            state.loading = false;
+            });
     },
 });
 
-export const { logout, generateNewGuestId } = authSlice.actions;
+export const { generateNewGuestId } = authSlice.actions;
 export default authSlice.reducer;

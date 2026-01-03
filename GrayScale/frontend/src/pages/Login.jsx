@@ -1,13 +1,38 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+// frontend/src/pages/Login.jsx
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import loginpage from "../assets/loginpage.jpg"
 import { loginUser } from "../../redux/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { mergeCart } from "../../redux/slices/cartSlice";
+import PageWrapper from "./PageWrapper";
+
 
 const Login = () => {
     const [email, setEmaiil] = useState("");
     const [password, setPassword] = useState("");
     const dispath = useDispatch();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { user, guestId } = useSelector((state) => state.auth);
+    const { cart } = useSelector((state) => state.cart);
+    const { loading } = useSelector((state) => state.auth);
+
+    // Get the redirect parameter and check if it'c checkout or somthing else
+    const redirect = new URLSearchParams(location.search).get("redirect") || "/";
+    const isCheckoutRedirect = redirect.includes("checkout");
+
+    useEffect(() => {
+        if (user) {
+            if (cart?.products?.length > 0 && guestId){
+                dispath(mergeCart({ guestId, user})).then(() => {
+                    navigate(isCheckoutRedirect ? "/checkout" : "/");
+                });
+            } else {
+                navigate(isCheckoutRedirect ? "/checkout" : "/");
+            }
+        }
+    }, [user, guestId, cart, dispath, navigate, isCheckoutRedirect]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -16,6 +41,7 @@ const Login = () => {
 
 
   return (
+    <PageWrapper loading={loading}>
     <div className="flex">
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-12">
             <form onSubmit={handleSubmit} className="w-full max-w-md bg-gray-300 p-8 rounded-lg border shadow-sm">
@@ -52,7 +78,7 @@ const Login = () => {
                 </button>
                 <p className="mt-6 text-center text-sm">
                     Don't have an account?
-                    <Link to="/register" className="text-blue-500"> Register</Link>
+                    <Link to={`/register?redirect=${encodeURIComponent(redirect)}`} className="text-blue-500"> Register</Link>
                 </p>
             </form>
         </div>
@@ -66,6 +92,7 @@ const Login = () => {
             </div>
         </div>
     </div>
+    </PageWrapper>
   );
 };
 

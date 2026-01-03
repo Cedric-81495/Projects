@@ -1,10 +1,14 @@
 import { useState } from "react"
 import { HiMagnifyingGlass, HiMiniXMark } from "react-icons/hi2";
-
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { fetchProductsByFilters, setFilters } from "../../../redux/slices/productsSlice";
 
 const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSearchToggle = () => {
     setIsOpen(!isOpen);
@@ -12,7 +16,9 @@ const SearchBar = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log("Search Term: ", searchTerm);
+    dispatch(setFilters({ search: searchTerm}));
+    dispatch(fetchProductsByFilters({ search: searchTerm}));
+    navigate(`/collections/all?sear=${searchTerm}`);
     setIsOpen(false);
   }
 
@@ -22,14 +28,14 @@ const SearchBar = () => {
     >
         {isOpen ? (
             <form onSubmit={handleSearch}
-            className="relative flex items-center justify-center w-full">
+            className="relative h-[140px] flex items-center justify-center w-full">
                 <div className="relative w-1/2">
                     <input
                     type="text"
                     placeholder="Serach"
                     value={searchTerm} 
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="bg-gray-100 py-2 pl-2 pr-12 rounded-lg focus:outline-none w-full placeholder:text-gray-700" 
+                    className="bg-gray-200 py-2 pl-2 pr-12 rounded-lg focus:outline-none w-full placeholder:text-gray-700" 
                     />
                     {/* Search Icon */}
                     <button 

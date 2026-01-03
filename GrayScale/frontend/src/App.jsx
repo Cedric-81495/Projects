@@ -18,6 +18,7 @@ import ProductManagement from "./components/Admin/ProductManagement";
 import EditProductPage from "./components/Admin/EditProductPage";
 import OrderManagement from "./components/Admin/OrderManagement";
 import ScrollToTop from "./components/Common/ScrollToTop";
+import ProtectedRoute from "./pages/ProtectedRoute";
 
 import { Provider } from "react-redux";
 import store from "../redux/store";
@@ -35,7 +36,12 @@ const App = () => {
             <Route index element={<Home />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
-            <Route path="profile" element={<Profile />} />
+
+            <Route path="profile" element={
+               <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
             <Route path="collections/:collection" element={<CollectionPage />} />
             <Route path="product/:id" element={<ProductDetails />} />
             <Route path="checkout" element={<Checkout />} />

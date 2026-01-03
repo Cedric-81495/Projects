@@ -1,39 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-
+import { useDispatch, useSelector } from "react-redux";
+import { fetchOrderDetails } from "../../redux/slices/orderSlice";
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
-  const [orderDetails, setOrderDetails] = useState(null);
+  const dispatch = useDispatch();
+  const { orderDetails, loading, error } = useSelector((state) => state.orders);
 
   useEffect(() => {
-    const mockOrderDetails = {
-      _id: id,
-      createdAt: new Date(),
-      isPaid: true,
-      isDelivered: false,
-      paymentMethod: "PayPal",
-      shippingMethod: "Standard",
-      shippingAddress: {city: "Manila", country: "Philippines"},
-      orderItems: [
-        {
-          productId: "1",
-          name: "Jacket",
-          price: 1200,
-          quantity: 1,
-          image: "https://picsum.photos/150?random=1",
-        },
-        {
-          productId: "2",
-          name: "Jeans",
-          price: 1300,
-          quantity: 1,
-          image: "https://picsum.photos/150?random=2",
-        },
-      ]
-    };
-    setOrderDetails(mockOrderDetails);
-}, [id]);
+    dispatch(fetchOrderDetails(id));
+  }, [dispatch, id]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
@@ -82,7 +62,7 @@ const OrderDetailsPage = () => {
               </div>
                <div>
                 <h4 className="text-lg font-semibold mb-2">Shipping Info</h4>
-                <p>Shpping Method: {orderDetails.shippingMethod}</p>
+                <p>Shipping Method: {orderDetails.shippingMethod}</p>
                 <p>Address: {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.country}</p>
               </div>
           </div>
@@ -93,14 +73,14 @@ const OrderDetailsPage = () => {
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="py-2 px-4">Name</th>
-                      <th className="py-2 px-4">Unit Price</th>
-                      <th className="py-2 px-4">Quantity</th>
-                      <th className="py-2 px-4">Total</th>
+                      <th className="py-2 px-4 text-left">Unit Price</th>
+                      <th className="py-2 px-4 text-left">Quantity</th>
+                      <th className="py-2 px-4 text-left">Total</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {orderDetails.orderItems.map((item) => (
-                      <tr key={item.productId} className="border-b">
+                    {orderDetails.orderItems.map((item, index) => (
+                       <tr key={`${item.productId}-${index}`} className="border-b">
                         <td className="py-2 px-4 flex items-center">
                           <img 
                             src={item.image}
@@ -113,9 +93,10 @@ const OrderDetailsPage = () => {
                           >
                           {item.name}</Link>
                         </td>
-                        <td className="py-2 px-4">${item.price}</td>
-                        <td className="py-2 px-4">${item.quantity}</td>
-                        <td className="py-2 px-4">${item.price * item.quantity}</td>
+                        <td className="py-2 px-4">{item.price}</td>
+                        <td className="py-2 px-4">{item.quantity}</td>
+                        <td className="py-2 px-4">₱{(item.price * item.quantity).toLocaleString()}</td>
+
                       </tr>
                     ))}
                   </tbody>

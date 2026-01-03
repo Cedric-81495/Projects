@@ -11,7 +11,7 @@ const Register = () => {
     const [name, setName] = useState("");
     const [email, setEmaiil] = useState("");
     const [password, setPassword] = useState("");
-        const dispath = useDispatch();
+    const dispath = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
     const { user, guestId } = useSelector((state) => state.auth);
@@ -89,7 +89,7 @@ const Register = () => {
                 </button>
                 <p className="mt-6 text-center text-sm">
                     Don't have an account?
-                    <Link to="/login" className="text-blue-500"> Login</Link>
+                    <Link to={`/login?redirect=${encodeURIComponent(redirect)}`} className="text-blue-500"> Login</Link>
                 </p>
             </form>
         </div>

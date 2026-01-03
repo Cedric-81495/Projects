@@ -10,14 +10,14 @@ export const createCheckout = createAsyncThunk(
                 `${import.meta.env.VITE_BACKEND_URL}/api/checkout`,
                 checkoutdata,
                 {
-                    header: {
+                    headers: {
                         Authorization: `Bearer ${localStorage.getItem("userToken")}`,
                     },
                 }
             );
             return response.data;
         } catch (error) {
-            console.log(error);
+            console.log("Error creating checkout:", error);
             return rejectWithValue(error.response.data);
         }
     }

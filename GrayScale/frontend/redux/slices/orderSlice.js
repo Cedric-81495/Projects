@@ -5,7 +5,7 @@ import axios from "axios";
 export const fetchUserOrders = createAsyncThunk("orders/fetchUserOrders", 
     async (_, { rejectWithValue}) => {
         try {
-            const response = axios.get(
+            const response = await axios.get(
                 `${import.meta.env.VITE_BACKEND_URL}/api/orders/my-orders`,
                 {
                     headers: {
@@ -64,7 +64,7 @@ const orderSlice = createSlice({
         })
         .addCase(fetchUserOrders.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload.message;
+            state.error = action.payload?.message || "Failed to fetch orders";
         })
         // Fetch order details
         .addCase(fetchOrderDetails.pending, (state) => {

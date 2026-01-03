@@ -1,36 +1,30 @@
-const checkout = {
-    _id: "1234",
-    createdAt: new Date(),
-    checkoutItems: [
-        {
-            productId: "1",
-            name: "Jacket",
-            color: "gray",
-            size: "M",
-            price: 1500,
-            quantity: 1,
-            image: "https://picsum.photos/150?random=1",
-        },
-                {
-            productId: "2",
-            name: "Jeans",
-            color: "black",
-            size: "M",
-            price: 1600,
-            quantity: 1,
-            image: "https://picsum.photos/150?random=2",
-        },
-    ],
-    shippingAddress: {
-        address: "122 Bonifacio Street",
-        city: "Manila",
-        country: "Philippines",
-    },
-};
-
+import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { clearCart } from "../../redux/slices/cartSlice";
 
 const OrderConfirmationPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { checkout } = useSelector((state) => state.checkout);
 
+  // Clear the cart when the order is confirmed
+    useEffect(() => {
+    if (!checkout) return;
+
+    if (checkout) {
+        dispatch(clearCart());
+        localStorage.removeItem("cart");
+    }
+    }, [checkout, dispatch]);
+
+    if (!checkout) {
+    navigate("/my-orders");
+    return null;
+    }
+
+  
   const calculatedEstimatedDelivery = () => {
     const orderDate = new Date(checkout.createdAt);
         orderDate.setDate(orderDate.getDate() + 10); // Add 10 days to the order date
@@ -59,8 +53,8 @@ const OrderConfirmationPage = () => {
             </div>
             {/* Ordered Items */}
             <div className="mb-20">
-                {checkout.checkoutItems.map((item) => (
-                    <div key={item.productId} className="flex items-center mb-4">
+                {checkout.checkoutItems.map((item, index) => (
+                    <div key={`${item.productId}-${index}`} className="flex items-center mb-4">
                         <img 
                             src={item.image}
                             alt={item.name}
@@ -96,7 +90,8 @@ const OrderConfirmationPage = () => {
                     </p>
                 </div>
             </div>
-         
+                   {/* Back to Orders */}
+          <Link to="/my-orders" className="text-blue-500 hover:underline">Back to My Orders</Link>
         </div>
         )}
     </div> 

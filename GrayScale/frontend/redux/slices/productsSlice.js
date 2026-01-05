@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_BACKEND_URL}` || "https://grayscale-alpha.vercel.app";
-
+const API_URL = import.meta.env.VITE_BACKEND_URL || "https://grayscale-alpha.vercel.app";
 
 // Async Thunk Fetch Products by collection and optional filters
 export const fetchProductsByFilters = createAsyncThunk(

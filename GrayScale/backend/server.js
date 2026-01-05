@@ -22,7 +22,7 @@ const app = express();
 
 // ---------- CORS Setup ----------
 const allowedOrigins = [
-  "https://grayscale-pik2t82xr-cedrics-projects-188a68e7.vercel.app", // frontend prod
+  "https://grayscale-ui.vercel.app", // frontend prod
   "http://localhost:5173" // frontend dev
 ];
 

@@ -1,136 +1,69 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { fetchAdminProducts } from "../../redux/slices/adminProductSlice";
+import { fetchAllOrders } from "../../redux/slices/adminOrderSlice";
 
-;const AdminHomePage = () => {
-    const orders = [
-        {
-            _id: 12345123451,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-        {
-            _id: 12345123452,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-              {
-            _id: 12345123453,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-              {
-            _id: 12345123454,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-              {
-            _id: 12345123455,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-              {
-            _id: 12345123456,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-              {
-            _id: 12345123457,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-              {
-            _id: 12345123458,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-              {
-            _id: 12345123459,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-                      {
-            _id: 123451234510,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-                      {
-            _id: 123451234511,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-                      {
-            _id: 123451234512,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-                      {
-            _id: 123451234513,
-            user: {
-                name: "Cedric",
-            },
-            totalPrice: 1200,
-            status: "Processing",
-        },
-    ];
+const AdminHomePage = () => {
+  const dispatch = useDispatch();
+  const {
+    products,
+    loading: productsLoading,
+    error: productsError,
+  } = useSelector((state) => state.adminProducts);
+
+  const {
+    orders,
+    totalOrders,
+    totalSales,
+    loading: ordersLoading,
+    error: ordersError,
+  } = useSelector((state) => state.adminOrders);
+
+  useEffect(() => {
+    dispatch(fetchAdminProducts());
+    dispatch(fetchAllOrders())
+  }, [dispatch]);
+
+  function formatRevenue(amount) {
+  return new Intl.NumberFormat('en-PH', {
+    style: 'currency',
+    currency: 'PHP',
+    minimumFractionDigits: 2,
+  }).format(amount);
+}
 
   return (
     <div className="max-w-7xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+        {productsLoading || ordersLoading ? (
+            <p>Loading...</p>
+        ) : productsError ? (
+            <p className="text-red-500">Error fetching products: {productsError}</p>
+        ) : ordersError ? (
+            <p className="text-red-500">Error fetching orders: {ordersError}</p>
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="p-4 shadow-mc rounded-lg">
                 <h2 className="text-xl font-semibold">Revenue</h2>
-                <p className="text-2xl">₱20,000</p>
+                <p className="text-2xl"> {formatRevenue(totalSales)}</p> 
             </div>
             <div className="p-4 shadow-mc rounded-lg">
                 <h2 className="text-xl font-semibold">Total Orders</h2>
-                <p className="text-2xl">200</p>
-                <Link to="/admin/orders" className="text-blue-500 hover:underline">
+                <p className="text-2xl">{totalOrders}</p>         
+                <Link to="/admin/orders" className="text-blue-500 hover:under<L>e">
                     Manage Orders
                 </Link>
             </div>
             <div className="p-4 shadow-mc rounded-lg">
                  <h2 className="text-xl font-semibold">Total Products</h2>
-                <p className="text-2xl">100</p>
-                <Link to="/admin/produts" className="text-blue-500 hover:underline">
+                <p className="text-2xl">{products.length}</p>
+                <Link to="/admin/products" className="text-blue-500 hover:underline">
                     Manage Products
                 </Link>
             </div>  
         </div>
+        )}
         <div className="mt-6">
             <h2 className="text-2xl font-bold mb-4">Recent Orders</h2>
             <div className="max-h-[400px] overflow-y-auto">
@@ -148,7 +81,7 @@ import { Link } from "react-router-dom";
                         orders.map((order) =>(
                             <tr key={order._id} className="border-b hover:bg-gray-50 cursor-pointer">
                                <td className="p-4">{order._id}</td>
-                               <td className="p-4">{order.user.name}</td>
+                               <td className="p-4">{order.user?.name}</td>
                                <td className="p-4">₱{order.totalPrice.toLocaleString()}</td>
                                <td className="p-4">{order.status}</td>
                             </tr>

@@ -18,7 +18,7 @@ const productSchema = new mongoose.Schema({
     discountPrice: {
         type: Number,
     },
-    countItStock: {
+    countInStock: {
         type: Number,
         required: true,
         default: 0,
@@ -30,7 +30,7 @@ const productSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        rquired: true,
+        required: true,
     },
     brand: {
         type: [String],

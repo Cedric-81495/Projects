@@ -1,33 +1,37 @@
-import { Link } from "react-router-dom";
-const ProductManagement = () => {
-    const products = [
-        {
-            _id: 1,
-            name: "Shirt",
-            price: 1100,
-            sku: "12"
-        },
-        {
-            _id: 2,
-            name: "Polo",
-            price: 1200,
-            sku: "123"
-        },
-                {
-            _id: 3,
-            name: "Jeans",
-            price: 1300,
-            sku: "1245"
-        },
-    ];
+import { useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect,  } from "react";
+import { fetchAdminProducts, deleteProduct } from "../../../redux/slices/adminProductSlice";
+import PageWrapper from "../Common/PageWrapper";
 
+const ProductManagement = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { user } = useSelector((state) => state.auth);
+    const { products, loading, error } = useSelector((state) => state.adminProducts);
+
+    useEffect(() => {
+        if (!user) return;
+    
+        if (user.role !== "admin") {
+          navigate("/");
+        } else {
+          dispatch(fetchAdminProducts());
+        }
+      }, [dispatch, user, navigate]);
+    
   const handleEdit = (id) => {
     if (window.confirm("Are you sure you want to delete the Product?")){
-    console.log("Delete product id: ", id);
+    dispatch(deleteProduct(id));
     }
   }
 
+
+  if(error) return <p>Session expired. Please Logout and re-login</p>
+
   return (
+     <PageWrapper loading={loading}>
     <div className="max-w-7xl mx-auto p-6">
         <h2 className="text-2xl font-bold mb-6">Product Management</h2>
         <div className="overflow-x-auto shadow-md sm:rounded-lg ">
@@ -35,8 +39,10 @@ const ProductManagement = () => {
                 <thead className="bg-gray-300 text-xs uppercase text-gray-900">
                     <tr>
                         <th className="py-3 px-4">Name</th>
+                        <th className="py-3 px-4">Category</th>
                         <th className="py-3 px-4">Price</th>
                         <th className="py-3 px-4">Sku</th>
+                        <th className="py-3 px-4">Stock</th>
                         <th className="py-3 px-4">Actions</th>
                     </tr>
                 </thead>
@@ -50,8 +56,10 @@ const ProductManagement = () => {
                             <td className="p-4 font-medium text-gray-900 whitespace-nowrap">
                                 {product.name}
                             </td>
+                            <td className="p-4"> {product.category}</td>
                             <td className="p-4"> {product.price}</td>
                             <td className="p-4"> {product.sku}</td>
+                            <td className="p-4"> {product.countInStock}</td>
                             <td className="p-4">
                                 <Link 
                                     to={`/admin/products/${product._id}/edit`}
@@ -68,13 +76,14 @@ const ProductManagement = () => {
                         </tr>  
                         )) : (
                             <tr>
-                                <td colspan={4} className="p-4 text-gray-500 text-center">No Products Found</td>
+                                <td colSpan={6} className="p-4 text-gray-500 text-center">No Products Found</td>
                             </tr>
                         )}
                 </tbody>
             </table>
         </div>
     </div>
+    </PageWrapper>
   );
 };
 

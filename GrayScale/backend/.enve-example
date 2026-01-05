@@ -1,0 +1,9 @@
+# backend/.env
+PORT=test_port_number
+MONGO_URI=connection_link
+JWT_SECRET=secret_key
+CLOUDINARY_CLOUD_NAME=name
+CLOUDINARY_API_KEY=api_secret_key
+CLOUDINARY_API_SECRET=api_secret
+VITE_EXCHANGE_API_KEY=enxhange_api_key
+

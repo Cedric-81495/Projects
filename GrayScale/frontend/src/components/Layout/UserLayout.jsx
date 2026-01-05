@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Footer from "../Common/Footer";
 import Header from "../Common/Header";
-import PageWrapper from "../../pages/PageWrapper"
+import PageWrapper from "../Common/PageWrapper"
 
 const UserLayout = () => {
   return (

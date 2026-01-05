@@ -3,8 +3,28 @@ import { RiTwitterXLine } from "react-icons/ri";
 import { TbBrandMeta } from "react-icons/tb";
 import { FiPhoneCall } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useState } from "react";
 
 const Footer = () => {
+ const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/subscribe`,
+        { email }
+      );
+      setMessage(res.data.message);
+      setEmail("");
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Subscription failed");
+    }
+  };
+
   return (
     <footer className="border-t py-12 bg-gray-scale ">
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-4 lg:px-1 ">
@@ -13,24 +33,32 @@ const Footer = () => {
                 <p className="text-white mb-4">
                   Be the first to hear about new products, exclusive events, and online offers.  
                 </p>
-                <p className="font-meduim text-sm text-white mb-6">Sign up and get 10% off your first order.</p>
+                <p className="font-medium text-sm text-white mb-6">Sign up and get 10% off your first order.</p>
 
                 {/* Newsletter Form */}
-                <form className="flex">
-                    <input
-                        type="email"
-                        placeholder="Enter you email"
-                        className="p-3 w-full text-sm border-t border-l border-b border-gray-300 rounded-l-md
-                        focus:outlin-none focus:ring-2 focus:ring-gray-500 transition-all"
-                        required
-                    />
-                    <button
-                        type="submit"
-                        className="bg-black text-white px-6 py-3 text-sm rounded-r-md hover:bg-gray-800 transition-all"
-                    >
+                <form className="flex" onSubmit={handleSubscribe}>
+                <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="p-3 w-full text-sm border-t border-l border-b border-gray-300 rounded-l-md
+                    focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all"
+                    required
+                />
+                <button
+                    type="submit"
+                    className="bg-black text-white px-6 py-3 text-sm rounded-r-md hover:bg-gray-800 transition-all"
+                >
                     Subscribe
-                    </button>
+                </button>
                 </form>
+
+                {message && (
+                <p className="text-sm mt-2 text-white">{message}</p>
+                )}
+
+
             </div>
 
             {/* Shop Links */}
@@ -38,16 +66,16 @@ const Footer = () => {
                 <h3 className="text-ls text-white mb-4">Shop</h3>
                 <ul className="space-y-2 text-gray-600">
                     <li>
-                        <Link to="#" className="hover:text-gray-500 text-white transition-colors">Men's top Wear</Link>
+                        <Link to="/collections/all?gender=Men&category=Top+Wear" className="hover:text-gray-500 text-white transition-colors">Men's top Wear</Link>
                     </li>
                      <li>
-                        <Link to="#" className="hover:text-gray-500 text-white transition-colors">Women's top Wear</Link>
+                        <Link to="/collections/all?gender=Women&category=Top+Wear" className="hover:text-gray-500 text-white transition-colors">Women's top Wear</Link>
                     </li>
                      <li>
-                        <Link to="#" className="hover:text-gray-500 text-white transition-colors">Mens Top Wear</Link>
+                        <Link to="/collections/all?gender=Men&category=Bottom+Wear" className="hover:text-gray-500 text-white transition-colors">Mens Bottom Wear</Link>
                     </li>
                     <li>
-                        <Link to="#" className="hover:text-gray-500 text-white transition-colors">Womens Bottom Wear</Link>
+                        <Link to="/collections/all?gender=Women&category=Bottom+Wear" className="hover:text-gray-500 text-white transition-colors">Womens Bottom Wear</Link>
                     </li>
                 </ul>
             </div>

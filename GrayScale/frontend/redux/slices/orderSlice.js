@@ -1,18 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../src/utils/axiosInstance";
 
 // Async Thunk to fetch user orders
 export const fetchUserOrders = createAsyncThunk("orders/fetchUserOrders", 
     async (_, { rejectWithValue}) => {
         try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/orders/my-orders`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-                    },
-                }
-            );
+            const response = await axiosInstance.get("/api/orders/my-orders");
             return response.data;
         } catch (error) {
             console.log(error);
@@ -25,18 +18,16 @@ export const fetchUserOrders = createAsyncThunk("orders/fetchUserOrders",
 export const fetchOrderDetails = createAsyncThunk("orders/fetchOrderDetails",
     async (orderId, { rejectWithValue }) => {
         try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/orders/${orderId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-                    },
-                }
+            const response = await axiosInstance.get(
+                `/api/orders/${orderId}`,
             );
             return response.data;
         } catch (error) {
             console.log(error);
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(
+            error.response?.data?.message || "Something went wrong"
+            );
+
         }
     }
 );
@@ -77,7 +68,8 @@ const orderSlice = createSlice({
         })
         .addCase(fetchOrderDetails.rejected, (state, action) => {
             state.loading = false;
-            state.error = action.payload.message;
+            state.error = action.payload || "Failed to fetch order details";
+
         })
     }
 });

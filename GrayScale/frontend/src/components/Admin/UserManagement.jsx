@@ -1,20 +1,26 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { addUser, updateUser, deleteUser, fetchUser } from "../../../redux/slices/adminSlice";
+import PageWrapper from "../Common/PageWrapper";
 const UserManagement = () => {
-    const users = [
-        {
-            _id: 112314234,
-            name: "Cedric",
-            email: "cedric@example.com",
-            role: "customer",
-        },
-        {
-            _id: 212314,
-            name: "Ralph",
-            email: "ralph@example.com",
-            role: "admin",
-        },
-    ];
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { user } = useSelector((state) => state.auth);
+    const { users, loading, error } = useSelector((state) => state.admin);
+
+    useEffect(() => {
+        if (user && user.role !== "admin") {
+        navigate("/");
+        }
+    }, [user, navigate]);
+
+    useEffect(() => {
+        if (user && user.role === "admin") {
+            dispatch(fetchUser());
+        }
+    }, [dispatch, user]);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -32,30 +38,35 @@ const UserManagement = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData);
-        // Reset form after submission
-        setFormData({
-            name: "",
-            email: "",
-            password: "",
-            role: "customer",
+        dispatch(addUser(formData)).then(() => {
+            dispatch(fetchUser());
         });
+
+        setFormData({ name: "", email: "", password: "", role: "newRole" });
     };
 
     const handleRoleChange = (userId, newRole) => {
-        console.log({id: userId, role: newRole});
-    }
+    dispatch(updateUser({ id: userId, role: newRole })).then(() => {
+        dispatch(fetchUser());
+    });
+    };
+    
     const handleDeleteUser = (userId) => {
         if(window.confirm("Are you sure to delete this user?")) {
-        console.log("Deleting user with ID: ", userId);
+            dispatch(deleteUser(userId));
         }
     }
 
+
+  if(error) return <p>Session expired. Please Logout and re-login</p>
+   
   return (
+    <PageWrapper loading={loading}>
     <div className="max-w-7xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-6">User Management</h2>
+
       {/* Add New User Form */}
-      <div className="p-6 rounded-lg mb-6 bg-gray-300">
+      <div className="p-6 rounded-lg mb-6">
         <h3 className="text-lg font-bold mb-4">Add New User</h3>
         <form onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -65,7 +76,7 @@ const UserManagement = () => {
                     name="name"
                     value={formData.name} 
                     onChange={handleChange}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border border-black rounded"
                     required
                 />
             </div>
@@ -76,7 +87,7 @@ const UserManagement = () => {
                     name="email"
                     value={formData.email} 
                     onChange={handleChange}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border border-black rounded"
                 />
             </div>
              <div className="mb-4">
@@ -86,7 +97,7 @@ const UserManagement = () => {
                     name="password"  
                     value={formData.password} 
                     onChange={handleChange}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border  border-black rounded"
                 />
             </div>
             <div className="mb-4">
@@ -95,7 +106,7 @@ const UserManagement = () => {
                     name="role"
                     value={formData.role} 
                     onChange={handleChange}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border border-black rounded"
                 >
                     <option value="customer">Customer</option>
                     <option value="admin">Admin</option>
@@ -106,7 +117,7 @@ const UserManagement = () => {
       </div>
 
       {/* User List Management */}
-      <div className="overflow-x-auto p-6 shadow-md sm:rounded-lg bg-gray-300">
+      <div className="overflow-x-auto p-6 shadow-md sm:rounded-lg">
         <h3 className="text-lg font-bold mb-4">User List</h3>
         <table className="min-w-full text=left text-gray-500">
             <thead className="bg-gray-100 text-xs uppcase text-gray-700">
@@ -117,9 +128,10 @@ const UserManagement = () => {
                     <th className="px-4 py-3">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-               {users.map((user) => (
-                    <tr key={user._id} className="border-b hover:bg-gray-50">
+             <tbody>
+            {users.length > 0 ? (
+                users.map((user) => (
+                    <tr key={user._id} className="border-b hover:bg-black/10">
                         <td className="p-4 font-medium text-gray-900 whitespace-nowrap">
                             {user.name}
                         </td>
@@ -145,12 +157,24 @@ const UserManagement = () => {
                             </button>
                         </td>
                     </tr>
-               ))}
+               ))
+             ) : (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="text-center p-4 text-gray-500"
+                >
+                  No orders found.
+                </td>
+              </tr>
+            )}
             </tbody>
+
         </table>
         
       </div>
     </div>
+    </PageWrapper>
   );
 };
 

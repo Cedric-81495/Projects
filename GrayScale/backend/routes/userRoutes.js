@@ -32,7 +32,7 @@ router.post("/register", async (req, res) => {
     const token = jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: "40m" } // minutes, not seconds
+      { expiresIn: "7d" } // minutes, not seconds
     );
 
     // Send response ONCE

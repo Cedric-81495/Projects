@@ -14,6 +14,8 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+
+
 // Multer setup using memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -40,11 +42,15 @@ router.post("/", upload.single("image"), async (req, res) => {
             });
         };
 
+
         // Call the streamUpload function
         const result = await streamUpload(req.file.buffer);
+        if (!result?.secure_url) throw new Error("No URL from Cloudinary");
 
         // Respond with the uploaded image URL
         res.json({ imageUrl: result.secure_url });
+        console.log(process.env.CLOUDINARY_CLOUD_NAME, process.env.CLOUDINARY_API_KEY, process.env.CLOUDINARY_API_SECRET);
+        console.log(req.file);
     } catch(error){
         console.log(error);
         res.status(500).json({ message: "Server Error "});

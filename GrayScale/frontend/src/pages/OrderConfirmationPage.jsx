@@ -16,15 +16,16 @@ const OrderConfirmationPage = () => {
     if (checkout) {
         dispatch(clearCart());
         localStorage.removeItem("cart");
+        localStorage.removeItem("checkout");
+        navigate("/my-orders");
     }
-    }, [checkout, dispatch]);
+    }, [checkout, dispatch, navigate]);
 
     if (!checkout) {
     navigate("/my-orders");
     return null;
     }
 
-  
   const calculatedEstimatedDelivery = () => {
     const orderDate = new Date(checkout.createdAt);
         orderDate.setDate(orderDate.getDate() + 10); // Add 10 days to the order date
@@ -32,8 +33,8 @@ const OrderConfirmationPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white">
-        <h1 className="text-4xl font-bold text-center text-emerald-700 mb-8">Thank You for Your Order</h1>
+    <div className="min-h-screen max-w-4xl mx-auto p-6 bg-white">
+        <h1 className="text-4xl font-bold text-center pt-[50px] text-emerald-700 mb-8">Thank You for Your Order</h1>
         {checkout && (
         <div className="p-6 rounded-lg  bg-gray-300 border">
             <div className="flex justify-between  mb-20">
@@ -70,13 +71,21 @@ const OrderConfirmationPage = () => {
                         </div>
                     </div>
                 ))}
+                <div className="text-right">
+                <p className="text-gray-900 font-bold">
+                    Total Amount Paid:<span className="text-gray-600"> ₱{checkout.totalPrice.toLocaleString()}</span> 
+                    
+                </p>      
+                </div>
             </div>
+      
+
              {/* Payment and Delivery Info */}
             <div className="grid grid-cols-2 gap-8">
                 {/* Payment */}
                 <div>
                     <h4 className="text-lg font-semibold mb-2">Payment</h4>
-                    <p className="text-gray-600">PayPal</p>
+                    <p className="text-gray-600">{checkout.paymentMethod}</p>
                 </div>
                 {/* Delivery Info */}
                 <div>
@@ -90,7 +99,7 @@ const OrderConfirmationPage = () => {
                     </p>
                 </div>
             </div>
-                   {/* Back to Orders */}
+            {/* Back to Orders */}
           <Link to="/my-orders" className="text-blue-500 hover:underline">Back to My Orders</Link>
         </div>
         )}

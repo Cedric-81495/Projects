@@ -245,7 +245,7 @@ router.get("/", async (req, res) => {
         let sort = {};
         if (sortBy) {
             switch (sortBy) {
-                case "priceAcs": 
+                case "priceAsc": 
                     sort = { price: 1};
                     break;
                 case "priceDesc": 
@@ -263,7 +263,7 @@ router.get("/", async (req, res) => {
     // Fetch products and apply sorting and limit
     let products = await Product.find(query)
         .sort(sort)
-        .limit(Number(limit) || 0 );
+        .limit(Number(limit) || 0);
         res.json(products);
     } 
     catch (error) {
@@ -337,7 +337,7 @@ router.get("/similar/:id", async (req, res) => {
             return res.status(404).json({ message: "Product not found"});
         }
 
-        const similarProducts = await Product.find({
+        const similarProducts = await Product.find({     
             _id: { $ne: id}, // Exclude the current product ID
             gender: product.gender,
             category: product.category,

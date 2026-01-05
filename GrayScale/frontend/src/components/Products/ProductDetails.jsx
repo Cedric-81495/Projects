@@ -78,12 +78,25 @@ const ProductDetails = ({ productId }) => {
       .catch(() => toast.error("Failed to add product to cart.", { duration: 1000 }))
       .finally(() => setIsButtonDisabled(false));
   };
- 
-  if (loading) return <p className="text-center pt-[20px]">Loading...</p>;
-  if (error) return <p className="text-center pt-[20px]">Error: {error}</p>;
+    
+if (loading)
+  return (
+    <div className="min-h-[1500px] flex items-center justify-center">
+      <div className="flex flex-col items-center">
+      </div>
+    </div>
+  );
+
+if (error)
+  return (
+    <div className="min-h-[1440px] flex items-center justify-center">
+      <p className="text-center text-lg text-red-600">Error: {error}</p>
+    </div>
+  );
 
   return (
         <div className="p-6">
+            
             {selectedProduct ? (
             <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg">
                 <div className="flex flex-col md:flex-row">

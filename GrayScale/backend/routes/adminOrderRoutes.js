@@ -30,7 +30,9 @@ router.put("/:id", protect, admin, async (req, res) => {
             order.deliveredAt = 
                 req.body.status === "Delivered" ? Date.now() : order.deliveredAt;
 
-            const updatedOrder = await order.save();
+             await order.save();
+             const  updatedOrder = await Order.findById(order._id)
+      .populate("user", "name email");
             res.json(updatedOrder);
         } else {
             res.status(404).json({ message: "Order not found" });

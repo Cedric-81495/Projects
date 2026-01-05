@@ -18,7 +18,7 @@ const SearchBar = () => {
     e.preventDefault();
     dispatch(setFilters({ search: searchTerm}));
     dispatch(fetchProductsByFilters({ search: searchTerm}));
-    navigate(`/collections/all?sear=${searchTerm}`);
+    navigate(`/collections/all?search=${searchTerm}`);
     setIsOpen(false);
   }
 

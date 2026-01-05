@@ -11,6 +11,7 @@ const AdminLayout = () => {
     };
 
   return (
+  
     <div className="min-h-screen flex flex-col md:flex-row relative">
         {/* Movile Toggle Button */}
         <div className="flex md:hidden p-4 bg-gray-900 text-white">
@@ -32,7 +33,7 @@ const AdminLayout = () => {
         {/* Sidebar */}
         <div
             className={`bg-gray-900 w-64 min-h-screen text-white absolute md:relative transform ${
-                isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                isSidebarOpen ? "translate-x-0 relative" : "-translate-x-full"
             } transition-transform duration-300 md:translate-x-0 md:static md:block z-20`}
         >
             {/* Sidebar Component*/}
@@ -44,6 +45,7 @@ const AdminLayout = () => {
             <Outlet />
         </div>
     </div>
+
   );
 };
 

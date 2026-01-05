@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom"; 
-import { HiOutlineShoppingBag, HiOutlineUser, HiBars3BottomRight } from "react-icons/hi2";
+import { HiOutlineShoppingBag, HiOutlineUser, HiBars3BottomRight, HiUserPlus   } from "react-icons/hi2";
+
 import SearchBar from "./SearchBar";
 import CartDrawer from "../Layout/CartDrawer";
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useSelector } from "react-redux";
-
 
 const Navbar = () => {
   const [drawOpen, setDrawerOpen] = useState(false);
@@ -40,11 +40,13 @@ const Navbar = () => {
         </div>
         {/* Right - Icons */}
         <div className="flex items-center space-x-4">
-           <Link 
+            {user && user.role === "admin" && (
+                 <Link 
             to="/admin" 
             className="block bg-black px-2 rounded text-sm text-white">
               Admin
             </Link>
+            )}
             {user && (
               <Link to="/profile">
                 <HiOutlineUser className="text-2xl cursor-pointer" />
@@ -66,8 +68,16 @@ const Navbar = () => {
            <div className="over-flow-hidden">
                 <SearchBar />
            </div>
-           
-
+          {user === null && (
+              <>
+                <Link to="/register">
+                  <HiUserPlus className="text-2xl cursor-pointer" />
+                </Link>
+                <Link to="/login">
+                  <HiOutlineUser className="text-2xl cursor-pointer" />
+                </Link>
+              </>
+            )}
            <button onClick={toggleNavDrawer} className="md:hidden">
              <HiBars3BottomRight className="h-6 w-6 text-gray-700" />
            </button>
@@ -117,9 +127,8 @@ const Navbar = () => {
               className="block text-gray-600 hover:text-black"
             >
             Bottom Wear
-            </Link>
-            
-          </nav>
+            </Link>          
+         </nav>
       </div>
      </div>
     </>

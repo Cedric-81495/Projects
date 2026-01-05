@@ -2,15 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { logoutUser } from "../../redux/slices/authSlice";
-//import { clearCart } from "../../redux/slices/cartSlice";
+import { clearCart } from "../../redux/slices/cartSlice";
 import MyOrdersPage from "./MyOrdersPage";
-import PageWrapper from "./PageWrapper";
 
 const Profile = () => {
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (!user) {
@@ -20,12 +18,11 @@ const Profile = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    //dispatch(clearCart());
+    dispatch(clearCart());
     navigate("/login");
   }
 
   return (
-    <PageWrapper loading={loading}>
     <div className="min-h-screen flex flex-col">
         <div className="flex-grow container mx-auto p-4 md:p-6">
             <div className="flex flex-col md:flex-row space-y-6 md:space-x-6 md:space-y-0">
@@ -46,7 +43,6 @@ const Profile = () => {
             </div>
         </div>
     </div>
-    </PageWrapper>
   );
 };
 

@@ -18,11 +18,10 @@ import ProductManagement from "./components/Admin/ProductManagement";
 import EditProductPage from "./components/Admin/EditProductPage";
 import OrderManagement from "./components/Admin/OrderManagement";
 import ScrollToTop from "./components/Common/ScrollToTop";
-import ProtectedRoute from "./pages/ProtectedRoute";
+import ProtectedRoute from "../src/components/Common/ProtectedRoute";
 
 import { Provider } from "react-redux";
 import store from "../redux/store";
-
 
 const App = () => {
   return (
@@ -44,14 +43,30 @@ const App = () => {
             } />
             <Route path="collections/:collection" element={<CollectionPage />} />
             <Route path="product/:id" element={<ProductDetails />} />
-            <Route path="checkout" element={<Checkout />} />
-            <Route path="order-confirmation" element={<OrderConfirmationPage />} />
-            <Route path="order/:id" element={<OrderDetailsPage />} />
-            <Route path="my-orders" element={<MyOrdersPage />} />
+            <Route path="checkout" element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>} />
+            <Route path="order-confirmation" element={
+              <ProtectedRoute>
+                <OrderConfirmationPage />
+              </ProtectedRoute>} />
+            <Route path="order/:id" element={
+              <ProtectedRoute>
+                <OrderDetailsPage />
+              </ProtectedRoute>
+              } />
+            <Route path="my-orders" element={
+              <ProtectedRoute>
+                <MyOrdersPage />
+              </ProtectedRoute>} />
           </Route>
 
           {/* Admin Layout */}
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={ 
+            <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>}>
             <Route index element={<AdminHomePage />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="products" element={<ProductManagement />} />

@@ -1,6 +1,6 @@
 // frontend/redux/slice/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../src/utils/axiosInstance";
 
 // Retrieve user info and token from localstorage if available
 let userFromStorage = null;
@@ -33,8 +33,8 @@ export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async (userData, { rejectWithValue }) => {
         try { 
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/users/login`,
+            const response = await axiosInstance.post(
+                `/api/users/login`,
                 userData
             );
     
@@ -55,8 +55,8 @@ export const registerUser = createAsyncThunk(
     "auth/registerUser",
     async (userData, { rejectWithValue }) => {
         try { 
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/users/register`,
+            const response = await axiosInstance.post(
+                `/api/users/register`,
                 userData
             );
             // Save info in loca storage if login works
@@ -82,8 +82,6 @@ export const logoutUser = createAsyncThunk(
     return fulfillWithValue(true);
   }
 );
-
-
 
 // Slice 
 const authSlice = createSlice({
@@ -131,8 +129,9 @@ const authSlice = createSlice({
             .addCase(logoutUser.fulfilled, (state) => {
             state.loading = false;
             state.user = null;
-            state.guestId = `guest_${new Date().getTime()}`;
 
+            state.guestId = `guest_${new Date().getTime()}`;
+            
             localStorage.removeItem("userInfo");
             localStorage.removeItem("userToken");
             localStorage.setItem("guestId", state.guestId);

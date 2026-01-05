@@ -9,7 +9,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { cart, loading, error } = useSelector((state) => state.cart);
-  const { user, userId } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
   const [checkoutId, setCheckoutId] = useState(null);
   const [shippingAddress, setShippingAddress] = useState({
@@ -64,7 +64,6 @@ const handleCreateCheckout = async (e) => {
         await handleFinalizeCheckout(checkoutId); // Finalize checkout after payment is successful
     } catch (error) {
         console.error("Error verifying payment:", error);
-        
     }
     // navigate("/order-confirmation");
     };
@@ -80,11 +79,10 @@ const handleCreateCheckout = async (e) => {
                 }
             }
         );
-        await cart.deleteMany({ user: userId});
+
         navigate("/order-confirmation");
         } catch (error) {
-            console.log(error)
-            
+            console.log(error)  
         }
     };
 

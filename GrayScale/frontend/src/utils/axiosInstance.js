@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+  baseURL: "https://grayscale-alpha.vercel.app"
 });
 
 axiosInstance.interceptors.request.use((config) => {

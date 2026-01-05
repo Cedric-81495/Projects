@@ -1,7 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../../src/utils/axiosInstance";
+import axios from "axios";
 
-// Async Thunk: Fetch Products by collection and optional filters
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}` || "https://grayscale-alpha.vercel.app";
+
+
+// Async Thunk Fetch Products by collection and optional filters
 export const fetchProductsByFilters = createAsyncThunk(
   "products/fetchByFilters",
   async ({
@@ -17,66 +20,61 @@ export const fetchProductsByFilters = createAsyncThunk(
     material,
     brand,
     limit,
-  }, { rejectWithValue }) => {
-    try {
-      const query = new URLSearchParams();
-      if (collection) query.append("collections", collection);
-      if (size) query.append("size", size);
-      if (color) query.append("color", color);
-      if (gender) query.append("gender", gender);
-      if (minPrice) query.append("minPrice", minPrice);
-      if (maxPrice) query.append("maxPrice", maxPrice);
-      if (sortBy) query.append("sortBy", sortBy);
-      if (search) query.append("search", search);
-      if (category) query.append("category", category);
-      if (material) query.append("material", material);
-      if (brand) query.append("brand", brand);
-      if (limit) query.append("limit", limit);
+  }) => {
+    const query = new URLSearchParams();
+    if (collection) query.append("collections", collection);
+    if (size) query.append("size", size);
+    if (color) query.append("color", color);
+    if (gender) query.append("gender", gender);
+    if (minPrice) query.append("minPrice", minPrice);
+    if (maxPrice) query.append("maxPrice", maxPrice);
+    if (sortBy) query.append("sortBy", sortBy);
+    if (search) query.append("search", search);
+    if (category) query.append("category", category);
+    if (material) query.append("material", material);
+    if (brand) query.append("brand", brand);
+    if (limit) query.append("limit", limit);
 
-      const response = await axiosInstance.get(`/api/products?${query.toString()}`);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch products");
-    }
+    const response = await axios.get(
+      `${API_URL}/api/products?${query.toString()}`
+    );
+    return response.data;
   }
 );
 
-// Async Thunk: Fetch Product Details
 export const fetchProductDetails = createAsyncThunk(
   "products/fetchProductDetails",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get(`/api/products/${id}`);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch product details");
-    }
+  async (id) => {
+    const response = await axios.get(
+      `${API_URL }/api/products/${id}`
+    );
+    return response.data;
   }
 );
 
-// Async Thunk: Update Product
 export const updateProduct = createAsyncThunk(
   "products/updateProduct",
-  async ({ id, productData }, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.put(`/api/products/${id}`, productData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to update product");
-    }
+  async ({ id, productData }) => {
+    const response = await axios.put(
+      `${API_URL}/api/products/${id}`,
+      productData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+      }
+    );
+    return response.data;
   }
 );
 
-// Async Thunk: Fetch Similar Products
 export const fetchSimilarProducts = createAsyncThunk(
   "products/fetchSimilarProducts",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get(`/api/products/similar/${id}`);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch similar products");
-    }
+  async (id) => {
+    const response = await axios.get(
+      `${API_URL}/api/products/similar/${id}`
+    );
+    return response.data;
   }
 );
 
@@ -131,6 +129,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProductsByFilters.fulfilled, (state, action) => {
         state.loading = false;
+        // handle both array and object payloads safely
         if (Array.isArray(action.payload)) {
           state.products = action.payload;
         } else if (Array.isArray(action.payload.products)) {
@@ -141,7 +140,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProductsByFilters.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || action.error.message;
+        state.error = action.error.message;
       })
 
       // fetchProductDetails
@@ -155,7 +154,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProductDetails.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || action.error.message;
+        state.error = action.error.message;
       })
 
       // updateProduct
@@ -175,7 +174,7 @@ const productsSlice = createSlice({
       })
       .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || action.error.message;
+        state.error = action.error.message;
       })
 
       // fetchSimilarProducts
@@ -189,7 +188,7 @@ const productsSlice = createSlice({
       })
       .addCase(fetchSimilarProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || action.error.message;
+        state.error = action.error.message;
       });
   },
 });

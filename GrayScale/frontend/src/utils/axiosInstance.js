@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://grayscale-alpha.vercel.app"
+  baseURL: import.meta.env.VITE_BACKEND_URL || "https://mern-grayscale.onrender.com",
 });
 
 axiosInstance.interceptors.request.use((config) => {

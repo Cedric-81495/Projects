@@ -7,7 +7,7 @@ const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db");
 
-// Import Routes
+// API Routes
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
@@ -16,15 +16,20 @@ const orderRoutes = require("./routes/orderRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const subscribeRoute = require("./routes/subscribeRoute");
 const adminOrderRoutes = require("./routes/adminOrderRoutes");
+
+// Admin Routes
 const adminRoutes = require("./routes/adminRoutes");
 const productAdminRoutes = require("./routes/productAdminRoutes");
 
 const app = express();
 
+// ---------- Middleware ----------
+app.use(express.json());
+
 // ---------- CORS Setup ----------
 const allowedOrigins = [
-  "https://mern-grayscale.onrender.com", // frontend prod
-  "http://localhost:5173" // frontend dev
+  "http://localhost:5173", // local dev frontend
+  "https://mern-grayscale.onrender.com" // production frontend
 ];
 
 app.use(
@@ -32,20 +37,15 @@ app.use(
     origin: function (origin, callback) {
       // allow requests like Postman (no origin)
       if (!origin) return callback(null, true);
-
       if (allowedOrigins.indexOf(origin) === -1) {
         const msg = `CORS error: ${origin} is not allowed`;
         return callback(new Error(msg), false);
       }
-
       return callback(null, true);
     },
     credentials: true,
   })
 );
-
-// Parse JSON bodies
-app.use(express.json());
 
 // ---------- Connect to MongoDB ----------
 connectDB();
@@ -59,27 +59,32 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api", subscribeRoute);
 
-// ---------- Admin Routes ----------
+// Admin Routes
 app.use("/api/admin/users", adminRoutes);
 app.use("/api/admin/products", productAdminRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 
 // ---------- Serve Frontend ----------
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-// ---------- Test Route ----------
-app.get("/", (req, res) => {
-  res.send("Welcome to GrayScale API!");
-});
-
-// ---------- React Router Fallback ----------
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
-});
+  // React Router fallback
+  app.get("/.*/", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  });
+} else {
+  // Dev route
+  app.get("/", (req, res) => {
+    res.send("Welcome to GrayScale API!");
+    console.log("Welcome to GrayScale");
+  });
+}
 
 // ---------- Start Server ----------
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(
+    `Server running on http://localhost:${PORT} (mode: ${process.env.NODE_ENV || "development"})`
+  );
 });

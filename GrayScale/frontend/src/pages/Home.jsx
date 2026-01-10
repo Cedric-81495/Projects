@@ -30,6 +30,7 @@ const Home = () => {
       const response = await axiosInstance.get(
         `/api/products/best-seller`
       );
+      console.log("Best Seller Response:", response.data);
       setBestSellerProduct(response.data);
     } catch (error) {
       console.log(error);

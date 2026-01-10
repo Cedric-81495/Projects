@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_BACKEND_URL || "https://mern-grayscale.onrender.com";
+import axiosInstance from "../../src/utils/axiosInstance";
 
 // Async Thunk Fetch Products by collection and optional filters
 export const fetchProductsByFilters = createAsyncThunk(
@@ -34,8 +32,8 @@ export const fetchProductsByFilters = createAsyncThunk(
     if (brand) query.append("brand", brand);
     if (limit) query.append("limit", limit);
 
-    const response = await axios.get(
-      `${API_URL}/api/products?${query.toString()}`
+    const response = await axiosInstance.get(
+      `/api/products?${query.toString()}`
     );
     return response.data;
   }
@@ -44,8 +42,8 @@ export const fetchProductsByFilters = createAsyncThunk(
 export const fetchProductDetails = createAsyncThunk(
   "products/fetchProductDetails",
   async (id) => {
-    const response = await axios.get(
-      `${API_URL}/api/products/${id}`
+    const response = await axiosInstance.get(
+      `/api/products/${id}`
     );
     return response.data;
   }
@@ -54,8 +52,8 @@ export const fetchProductDetails = createAsyncThunk(
 export const updateProduct = createAsyncThunk(
   "products/updateProduct",
   async ({ id, productData }) => {
-    const response = await axios.put(
-      `${API_URL}/api/products/${id}`,
+    const response = await axiosInstance.put(
+      `/api/products/${id}`,
       productData,
       {
         headers: {
@@ -70,8 +68,8 @@ export const updateProduct = createAsyncThunk(
 export const fetchSimilarProducts = createAsyncThunk(
   "products/fetchSimilarProducts",
   async (id) => {
-    const response = await axios.get(
-      `${API_URL}/api/products/similar/${id}`
+    const response = await axiosInstance.get(
+      `/api/products/similar/${id}`
     );
     return response.data;
   }

@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "", // same origin
+  baseURL: import.meta.env.DEV
+    ? "http://localhost:5000" // Local backend during development
+    : "/",                 // Production: same origin as frontend
 });
 
 axiosInstance.interceptors.request.use((config) => {

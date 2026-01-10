@@ -80,11 +80,13 @@ return (
 
         {/*{loading && <p className="text-center">Loading...</p>}
         {error && <p className="text-center text-red-500">Error: {error}</p>}*/}
+        <div className="min-h-[200px] flex items-center justify-center">
         {!loading && !error && products.length === 0 && (
           <p className="text-center text-gray-500">
             No products found for the selected filters.
           </p>
         )}
+      </div>
 
         {products.length > 0 && (
           <ProductGrid products={products} loading={loading} error={error} />

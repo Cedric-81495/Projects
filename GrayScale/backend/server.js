@@ -29,7 +29,7 @@ app.use(express.json());
 // ---------- CORS Setup ----------
 const allowedOrigins = [
   "http://localhost:5173", // local dev frontend
-  "https://mern-grayscale.onrender.com" // production frontend
+  "https://mern-grayscale2.onrender.com" // production frontend
 ];
 
 app.use(

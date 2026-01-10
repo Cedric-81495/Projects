@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState} from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance";
 
 const NewArivals = () => {
   const scrollRef = useRef(null);
@@ -16,8 +16,8 @@ const NewArivals = () => {
   useEffect(() => {
     const fetchNewArrivals = async () => {
         try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/products/new-arrivals`
+            const response = await axiosInstance.get(
+                `/api/products/new-arrivals`
             );
             setNewArrivals(response.data);
         } catch (error) {

@@ -4,6 +4,7 @@ dotenv.config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require("./config/db");
 
 // Import Routes
@@ -26,31 +27,28 @@ const allowedOrigins = [
   "http://localhost:5173" // frontend dev
 ];
 
-app.use(cors({
-  origin: function(origin, callback) {
-    // allow requests like Postman (no origin)
-    if (!origin) return callback(null, true);
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests like Postman (no origin)
+      if (!origin) return callback(null, true);
 
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `CORS error: ${origin} is not allowed`;
-      return callback(new Error(msg), false);
-    }
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = `CORS error: ${origin} is not allowed`;
+        return callback(new Error(msg), false);
+      }
 
-    return callback(null, true);
-  },
-  credentials: true
-}));
+      return callback(null, true);
+    },
+    credentials: true,
+  })
+);
 
 // Parse JSON bodies
 app.use(express.json());
 
 // ---------- Connect to MongoDB ----------
 connectDB();
-
-// ---------- Test Route ----------
-app.get("/", (req, res) => {
-  res.send("Welcome to GrayScale API!");
-});
 
 // ---------- API Routes ----------
 app.use("/api/users", userRoutes);
@@ -65,6 +63,19 @@ app.use("/api", subscribeRoute);
 app.use("/api/admin/users", adminRoutes);
 app.use("/api/admin/products", productAdminRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
+
+// ---------- Serve Frontend ----------
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// ---------- Test Route ----------
+app.get("/", (req, res) => {
+  res.send("Welcome to GrayScale API!");
+});
+
+// ---------- React Router Fallback ----------
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
 
 // ---------- Start Server ----------
 const PORT = process.env.PORT || 5000;

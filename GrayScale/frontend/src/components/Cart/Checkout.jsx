@@ -1,7 +1,8 @@
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PayPalbutton from "./PayPalbutton";
+import GCashButton from "./GCashButton";
 import { useDispatch, useSelector } from "react-redux";
 import { createCheckout } from "../../../redux/slices/checkoutSlice";
 
@@ -46,13 +47,10 @@ const handleCreateCheckout = async (e) => {
   } 
 }; 
 
-
-
-
-  const handlePaymentSuccess = async (details) => {
+  const handlePaymentSuccessGCash = async (details) => {
     try {
-         await axios.put(
-            `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}/pay`,
+         await axiosInstance.put(
+            `/api/checkout/${checkoutId}/pay`,
             { paymentStatus: "paid", paymentDetails: details },
             {
                 headers: {
@@ -61,17 +59,17 @@ const handleCreateCheckout = async (e) => {
             }
         );
         
-        await handleFinalizeCheckout(checkoutId); // Finalize checkout after payment is successful
+        await handleFinalizeCheckoutGCash(checkoutId); // Finalize checkout after payment is successful
     } catch (error) {
         console.error("Error verifying payment:", error);
     }
     // navigate("/order-confirmation");
     };
   
-    const handleFinalizeCheckout = async (checkoutId) => {
+        const handleFinalizeCheckoutGCash = async (checkoutId) => {
         try {
-            await axios.post(
-            `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}/finalize`,
+            await axiosInstance.post(
+            `/api/checkout/${checkoutId}/finalize`,
             {},
             {
                 headers: {
@@ -86,11 +84,64 @@ const handleCreateCheckout = async (e) => {
         }
     };
 
-  if (loading) return <p>Loading cart...</p>; 
-  if (error) return <p>Error: {error}</p>;
-  if (!cart || !cart.products || cart.products.length === 0) {
-    return <p>Your cart is empty.</p>;
-  }
+
+
+  const handlePaymentSuccessPayPal = async (details) => {
+    try {
+         await axiosInstance.put(
+            `${import.meta.env.VITE_BACKEND_URL}/api/checkout/${checkoutId}/pay`,
+            { paymentStatus: "paid", paymentDetails: details },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+                },
+            }
+        );
+        
+        await handleFinalizeCheckoutPayPal(checkoutId); // Finalize checkout after payment is successful
+    } catch (error) {
+        console.error("Error verifying payment:", error);
+    }
+    // navigate("/order-confirmation");
+    };
+  
+    const handleFinalizeCheckoutPayPal = async (checkoutId) => {
+        try {
+            await axiosInstance.post(
+            `/api/checkout/${checkoutId}/finalize`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+                }
+            }
+        );
+
+        navigate("/order-confirmation");
+        } catch (error) {
+            console.log(error)  
+        }
+    };
+
+  {loading && (
+    <div className="min-h-[200px] flex items-center justify-center">
+        <p className="text-gray-500">Loading cart...</p>
+    </div>
+    )}
+   
+    {error && (
+    <div className="min-h-[200px] flex items-center justify-center">
+        <p>Error: {error}</p>
+    </div>
+    )}
+
+    {!cart || !cart.products || cart.products.length === 0 && (
+    <div className="min-h-[200px] flex items-center justify-center">
+        <p>Your cart is empty.</p>
+    </div>
+    )}
+
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto py-10 px-6 tracking-tighter">
@@ -218,12 +269,21 @@ const handleCreateCheckout = async (e) => {
                     <div>
                         <h3 className="text-lg mb-4">Pay with PayPal</h3>
                             {/*  */}
+                            <GCashButton 
+                                amount={cart.totalPrice}
+                                onSuccess={handlePaymentSuccessGCash}
+                                onError={() => alert("Payment failed. Try again.")}
+                                  className="mb-2"
+
+                            />
+                            
                             <PayPalbutton 
                                 amount={cart.totalPrice}
-                                onSuccess={handlePaymentSuccess}
+                                onSuccess={handlePaymentSuccessPayPal}
                                 onError={() => alert("Payment failed. Try again.")}
                             />
-                        </div>
+                          
+                    </div>
                     )}    
                 </div>
             </form>

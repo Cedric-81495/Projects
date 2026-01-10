@@ -27,7 +27,7 @@ const GCashButton = ({ amount, onSuccess, onError }) => {
     <button
       type="button"
       onClick={handleClick}
-      className="w-full bg-green-600 text-white py-3 rounded hover:bg-green-700 transition"
+      className="w-full bg-green-600 text-white py-3 mb-2 rounded hover:bg-green-700 transition"
     >
       Pay PHP {amount} with GCash
     </button>

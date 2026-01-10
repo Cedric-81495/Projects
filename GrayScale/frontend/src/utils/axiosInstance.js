@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || "https://mern-grayscale.onrender.com",
+  baseURL: "", // same origin
 });
 
 axiosInstance.interceptors.request.use((config) => {
@@ -19,7 +19,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("userToken");
-      window.location.href = "/login"; // or dispatch logout
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

@@ -38,11 +38,15 @@ export const loginUser = createAsyncThunk(
                 userData
             );
     
-            // Save info in loca storage if login works
-            localStorage.setItem("userInfo", JSON.stringify(response.data.user));
-            localStorage.setItem("userToken", response.data.token);
-            // Return the user object from response
-            return response.data.user; 
+            const userWithToken = {
+            ...response.data.user,
+            token: response.data.token,
+            };
+            localStorage.setItem("userInfo", JSON.stringify(userWithToken));
+            localStorage.setItem("userToken", response.data.token); // important
+
+// Return user WITH token
+return userWithToken;
         } 
         catch(error) {
             return rejectWithValue(error.response.data);
@@ -59,12 +63,17 @@ export const registerUser = createAsyncThunk(
                 `/api/users/register`,
                 userData
             );
-            // Save info in loca storage if login works
-            localStorage.setItem("userInfo", JSON.stringify(response.data.user));
-            localStorage.setItem("userToken", response.data.token);
+            const userWithToken = {
+            ...response.data.user,
+            token: response.data.token,
+            };
 
-            // Return the user object from response
-            return response.data.user; 
+            localStorage.setItem("userInfo", JSON.stringify(userWithToken));
+
+// Return user WITH token
+return userWithToken;
+
+
         } 
         catch(error) {
             return rejectWithValue(error.response.data);
@@ -120,7 +129,7 @@ const authSlice = createSlice({
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload.message;
+                  state.error = action.payload?.message || "Register failed";
             })
             // LOGOUT 
             .addCase(logoutUser.pending, (state) => {
@@ -133,7 +142,6 @@ const authSlice = createSlice({
             state.guestId = `guest_${new Date().getTime()}`;
             
             localStorage.removeItem("userInfo");
-            localStorage.removeItem("userToken");
             localStorage.setItem("guestId", state.guestId);
             })
             .addCase(logoutUser.rejected, (state) => {

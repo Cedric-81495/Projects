@@ -11,7 +11,7 @@ import PageWrapper from "../components/Common/PageWrapper";
 const Login = () => {
     const [email, setEmaiil] = useState("");
     const [password, setPassword] = useState("");
-    const dispath = useDispatch();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
     const { user, guestId, loading } = useSelector((state) => state.auth);
@@ -24,18 +24,18 @@ const Login = () => {
     useEffect(() => {
         if (user) {
             if (cart?.products?.length > 0 && guestId){
-                dispath(mergeCart({ guestId, user})).then(() => {
+                dispatch(mergeCart({ guestId, user})).then(() => {
                     navigate(isCheckoutRedirect ? "/checkout" : "/");
                 });
             } else {
                 navigate(isCheckoutRedirect ? "/checkout" : "/");
             }
         }
-    }, [user, guestId, cart, dispath, navigate, isCheckoutRedirect]);
+    }, [user, guestId, cart, dispatch, navigate, isCheckoutRedirect]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispath(loginUser({ email, password }));
+        dispatch(loginUser({ email, password }));
     };
 
 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { logoutUser } from "../../redux/slices/authSlice";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.DEV
@@ -8,7 +9,7 @@ const axiosInstance = axios.create({
 
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("userToken");
+  const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -18,11 +19,11 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+(response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("userToken");
-      window.location.href = "/login";
+      const { default: store } = import("../../redux/store");
+      store.dispatch(logoutUser());
     }
     return Promise.reject(error);
   }

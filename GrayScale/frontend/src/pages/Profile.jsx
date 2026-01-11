@@ -11,8 +11,8 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!user) {
-        navigate("/login");
+    if (!user  || !user.token) {
+        navigate("/");
     }
   }, [user, navigate]);
 

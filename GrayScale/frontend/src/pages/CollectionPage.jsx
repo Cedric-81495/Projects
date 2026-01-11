@@ -73,20 +73,22 @@ return (
       </div>
 
       <div className="flex-grow p-4">
-        <h2 className="text-2xl uppercase">Mens Collection</h2>
+        <h2 className="text-2xl uppercase">All Collection</h2>
 
         {/* Sort Options */}
         <SortOptions />
 
         {/*{loading && <p className="text-center">Loading...</p>}
         {error && <p className="text-center text-red-500">Error: {error}</p>}*/}
-        <div className="min-h-[200px] flex items-center justify-center">
+        
         {!loading && !error && products.length === 0 && (
+          <div className="min-h-[200px] flex items-center justify-center">
           <p className="text-center text-gray-500">
             No products found for the selected filters.
           </p>
+          </div>
         )}
-      </div>
+     
 
         {products.length > 0 && (
           <ProductGrid products={products} loading={loading} error={error} />

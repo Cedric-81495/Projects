@@ -1,7 +1,7 @@
 // GCashButton.jsx
 import { toast } from "sonner";
 
-const GCashButton = ({ amount, onSuccess, onError }) => {
+const GCashButton = ({ amount, onSuccess, onError, }) => {
   const handleClick = (e) => {
     e.preventDefault();
 

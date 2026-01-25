@@ -47,7 +47,7 @@ const handleCreateCheckout = async (e) => {
   } 
 }; 
 
-  const handlePaymentSuccessGCash = async (details) => {
+  {/*  const handlePaymentSuccessGCash = async (details) => {
     try {
          await axiosInstance.put(
             `/api/checkout/${checkoutId}/pay`,
@@ -66,7 +66,7 @@ const handleCreateCheckout = async (e) => {
     navigate("/order-confirmation");
     };
   
-  {/* const handleFinalizeCheckoutGCash = async (checkoutId) => {
+ const handleFinalizeCheckoutGCash = async (checkoutId) => {
         try {
             await axiosInstance.post(
             `/api/checkout/${checkoutId}/finalize`,
@@ -102,7 +102,7 @@ const handleCreateCheckout = async (e) => {
     } catch (error) {
         console.error("Error verifying payment:", error);
     }
-    // navigate("/order-confirmation");
+    navigate("/order-confirmation");
     };
   
     const handleFinalizeCheckoutPayPal = async (checkoutId) => {

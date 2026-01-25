@@ -16,11 +16,13 @@ const Profile = () => {
     }
   }, [user, navigate]);
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
     dispatch(clearCart());
+    localStorage.removeItem("persist:cart"); // if using redux-persist
     navigate("/login");
-  }
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col">

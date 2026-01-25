@@ -17,8 +17,21 @@ const MyOrdersPage = () => {
     navigate(`/order/${orderId}`)
   }
 
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error: {error}</p>
+ if (loading)
+  return (
+    <div className="min-h-[1500px] flex items-center justify-center">
+      <div className="flex flex-col items-center">
+      </div>
+    </div>
+  );
+
+if (error)
+  return (
+    <div className="min-h-[1440px] flex items-center justify-center">
+      <p className="text-center text-lg text-red-600">Error: {error}</p>
+    </div>
+  );
+
   return (
     <div className="min-h-screen max-w-7xl mx-auto p-4 sm:p-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-6">My Orders</h2>

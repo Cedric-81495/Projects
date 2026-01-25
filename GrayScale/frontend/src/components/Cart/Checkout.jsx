@@ -2,7 +2,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PayPalbutton from "./PayPalbutton";
-import GCashButton from "./GCashButton";
+//import GCashButton from "./GCashButton";
 import { useDispatch, useSelector } from "react-redux";
 import { createCheckout } from "../../../redux/slices/checkoutSlice";
 
@@ -63,10 +63,10 @@ const handleCreateCheckout = async (e) => {
     } catch (error) {
         console.error("Error verifying payment:", error);
     }
-    // navigate("/order-confirmation");
+    navigate("/order-confirmation");
     };
   
-        const handleFinalizeCheckoutGCash = async (checkoutId) => {
+  {/* const handleFinalizeCheckoutGCash = async (checkoutId) => {
         try {
             await axiosInstance.post(
             `/api/checkout/${checkoutId}/finalize`,
@@ -82,7 +82,7 @@ const handleCreateCheckout = async (e) => {
         } catch (error) {
             console.log(error)  
         }
-    };
+    }; */}
 
 
 
@@ -268,14 +268,14 @@ const handleCreateCheckout = async (e) => {
                      ) : (
                     <div>
                         <h3 className="text-lg mb-4">Pay with PayPal</h3>
-                            {/*  */}
-                            <GCashButton 
+                           
+                            {/* <GCashButton 
                                 amount={cart.totalPrice}
                                 onSuccess={handlePaymentSuccessGCash}
                                 onError={() => alert("Payment failed. Try again.")}
                                   className="mb-2"
 
-                            />
+                            />*/}
                             
                             <PayPalbutton 
                                 amount={cart.totalPrice}

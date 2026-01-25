@@ -85,7 +85,6 @@ export const updateCartItemQuantity = createAsyncThunk(
 );
 
 // Remove an item from the cart
-// Remove an item from the cart
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (

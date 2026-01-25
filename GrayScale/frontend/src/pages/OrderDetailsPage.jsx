@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderDetails } from "../../redux/slices/orderSlice";
+import PageWrapper from "../components/Common/PageWrapper";
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -29,6 +30,7 @@ if (error)
 
 
   return (
+    <PageWrapper loading={loading}>
     <div className="min-h-screen max-w-7xl mx-auto p-4 sm:p-6">
       <h2 className="text-2xl md:text-3xl font-bold mb-6">Order Details</h2>
       {!orderDetails ? (
@@ -122,6 +124,7 @@ if (error)
         </div>
       )}
     </div>
+   </PageWrapper>
   );
 };
 

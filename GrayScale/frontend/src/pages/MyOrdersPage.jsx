@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchUserOrders } from "../../redux/slices/orderSlice";
+import PageWrapper from "../components/Common/PageWrapper";
 
 const MyOrdersPage = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const MyOrdersPage = () => {
  if (loading)
   return (
     <div className="min-h-[1500px] flex items-center justify-center">
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center">Loading..
       </div>
     </div>
   );
@@ -33,6 +34,7 @@ if (error)
   );
 
   return (
+    <PageWrapper loading={loading}>
     <div className="min-h-screen max-w-7xl mx-auto p-4 sm:p-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-6">My Orders</h2>
         <div className="relative shadow-md sm:rounded-lg overflow-auto">
@@ -107,6 +109,7 @@ if (error)
             </table>
         </div>
     </div>
+    </PageWrapper>
   );
 };
 

@@ -3,11 +3,12 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearCart } from "../../redux/slices/cartSlice";
+import PageWrapper from "../components/Common/PageWrapper";
 
 const OrderConfirmationPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { checkout } = useSelector((state) => state.checkout);
+  const { checkout, loading } = useSelector((state) => state.checkout);
 
   // Clear the cart when the order is confirmed
     useEffect(() => {
@@ -33,6 +34,7 @@ const OrderConfirmationPage = () => {
   };
 
   return (
+    <PageWrapper loading={loading}>
     <div className="min-h-screen max-w-4xl mx-auto p-6 bg-white">
         <h1 className="text-4xl font-bold text-center pt-[50px] text-emerald-700 mb-8">Thank You for Your Order</h1>
         {checkout && (
@@ -104,6 +106,7 @@ const OrderConfirmationPage = () => {
         </div>
         )}
     </div> 
+    </PageWrapper>
   );
 };
 

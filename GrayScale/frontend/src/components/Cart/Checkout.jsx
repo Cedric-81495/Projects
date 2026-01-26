@@ -23,7 +23,7 @@ const Checkout = () => {
     phone: "",
   });
 
-  // Endure cart is not empty before proceeding to checkout
+  // Ensure cart is not empty before proceeding to checkout
   useEffect(() => {
       if (!cart || !cart.products || cart.products.length === 0 ) {
     navigate("/");
@@ -47,45 +47,6 @@ const handleCreateCheckout = async (e) => {
   } 
 }; 
 
-  {/*  const handlePaymentSuccessGCash = async (details) => {
-    try {
-         await axiosInstance.put(
-            `/api/checkout/${checkoutId}/pay`,
-            { paymentStatus: "paid", paymentDetails: details },
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-                },
-            }
-        );
-        
-        await handleFinalizeCheckoutGCash(checkoutId); // Finalize checkout after payment is successful
-    } catch (error) {
-        console.error("Error verifying payment:", error);
-    }
-    navigate("/order-confirmation");
-    };
-  
- const handleFinalizeCheckoutGCash = async (checkoutId) => {
-        try {
-            await axiosInstance.post(
-            `/api/checkout/${checkoutId}/finalize`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-                }
-            }
-        );
-
-        navigate("/order-confirmation");
-        } catch (error) {
-            console.log(error)  
-        }
-    }; */}
-
-
-
   const handlePaymentSuccessPayPal = async (details) => {
     try {
          await axiosInstance.put(
@@ -102,7 +63,9 @@ const handleCreateCheckout = async (e) => {
     } catch (error) {
         console.error("Error verifying payment:", error);
     }
-    navigate("/order-confirmation");
+   navigate("/order-confirmation", {
+        state: { checkoutId }
+        });
     };
   
     const handleFinalizeCheckoutPayPal = async (checkoutId) => {
@@ -117,7 +80,7 @@ const handleCreateCheckout = async (e) => {
             }
         );
 
-        navigate("/order-confirmation");
+    
         } catch (error) {
             console.log(error)  
         }
@@ -274,15 +237,12 @@ const handleCreateCheckout = async (e) => {
                                 onSuccess={handlePaymentSuccessGCash}
                                 onError={() => alert("Payment failed. Try again.")}
                                   className="mb-2"
-
                             />*/}
-                            
                             <PayPalbutton 
                                 amount={cart.totalPrice}
                                 onSuccess={handlePaymentSuccessPayPal}
                                 onError={() => alert("Payment failed. Try again.")}
                             />
-                          
                     </div>
                     )}    
                 </div>

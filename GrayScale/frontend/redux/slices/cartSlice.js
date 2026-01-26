@@ -85,6 +85,7 @@ export const updateCartItemQuantity = createAsyncThunk(
 );
 
 // Remove an item from the cart
+// Remove an item from the cart
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (
@@ -130,62 +131,96 @@ const cartSlice = createSlice({
     },
     reducers: {
         clearCart: (state) => {
-            state.cart = { products: [] };
+            state.cart = {  products: []};
             localStorage.removeItem("cart");
         },
     },
     extraReducers: (builder) => {
-        builder
+    builder
         // Fetch Cart
         .addCase(fetchCart.pending, (state) => {
-            state.loading = true;
-            state.error = null;
+        state.loading = true;
+        state.error = null;
         })
         .addCase(fetchCart.fulfilled, (state, action) => {
-            state.loading = false;
-            state.cart = action.payload;
-            state.error = null;
-            saveCartToStorage(action.payload);
+        state.loading = false;
+        state.cart = action.payload;
+        state.error = null;
+        saveCartToStorage(action.payload);
         })
         .addCase(fetchCart.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.error.message || "Failed to fetch cart";
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch cart";
         })
 
         // Add to Cart
+        .addCase(addToCart.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        })
         .addCase(addToCart.fulfilled, (state, action) => {
-            state.loading = false;
-            state.cart = action.payload;
-            state.error = null;
-            saveCartToStorage(action.payload);
+        state.loading = false;
+        state.cart = action.payload;
+        state.error = null;
+        saveCartToStorage(action.payload);
+        })
+        .addCase(addToCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to add to cart";
         })
 
-        // Update Cart item quantity
+        // Update Cart Item Quantity
+        .addCase(updateCartItemQuantity.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        })
         .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
-            state.loading = false;
-            state.cart = action.payload;
-            state.error = null;
-            saveCartToStorage(action.payload);
+        state.loading = false;
+        state.cart = action.payload;
+        state.error = null;
+        saveCartToStorage(action.payload);
+        })
+        .addCase(updateCartItemQuantity.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+            action.payload?.message || "Failed to update item quantity";
         })
 
-        // Remove from cart
+        // Remove From Cart
+        .addCase(removeFromCart.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        })
         .addCase(removeFromCart.fulfilled, (state, action) => {
-            state.loading = false;
-            state.cart = action.payload;
-            state.error = null;
-            saveCartToStorage(action.payload);
+        state.loading = false;
+        state.cart = action.payload;
+        state.error = null;
+        saveCartToStorage(action.payload);
+        })
+        .addCase(removeFromCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+            action.payload?.message || "Failed to remove item";
         })
 
         // Merge Cart
+        .addCase(mergeCart.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        })
         .addCase(mergeCart.fulfilled, (state, action) => {
-            state.loading = false;
-            state.cart = action.payload;
-            state.error = null;
-            saveCartToStorage(action.payload);
+        state.loading = false;
+        state.cart = action.payload;
+        state.error = null;
+        saveCartToStorage(action.payload);
+        })
+        .addCase(mergeCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+            action.payload?.message || "Failed to merge cart";
         });
     },
 });
-
 
 export const { clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

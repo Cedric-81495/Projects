@@ -11,18 +11,16 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!user  || !user.token) {
-        navigate("/");
+    if (!user) {
+        navigate("/login");
     }
   }, [user, navigate]);
 
-  const handleLogout = async () => {
-    await dispatch(logoutUser());
+  const handleLogout = () => {
+    dispatch(logoutUser());
     dispatch(clearCart());
-    localStorage.removeItem("persist:cart"); // if using redux-persist
     navigate("/login");
-  };
-
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

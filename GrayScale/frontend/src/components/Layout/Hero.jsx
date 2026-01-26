@@ -16,7 +16,7 @@ const Hero = () => {
                     </h1>
 
                 <p className="text-sm tracking-tighter md:text-lg mb-6 drop-shadow-[2px_2px_0px_black]">
-                    Discover vacation-ready outfits with fast and worldwide shipping.
+                    Discover vacation-ready outfits with fast and nationwide shipping.
                 </p>
             </div>
         </div>

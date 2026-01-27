@@ -12,7 +12,7 @@ Technologies Used
 Backend: Node.js, Express.js, MongoDB, Mongoose
 Frontend: React, Vite, Tailwind CSS
 State Management: Redux Toolkit
-Authentication: JWT (JSON Web Tokens)
+Authentication: JWT (JSON Web Tokens), Google OAuth (Google Sign-In)
 File Uploads: Cloudinary, Multer
 Payment Methods: PayPal
 
@@ -39,13 +39,18 @@ Checkout using or PayPal
 
 View order history and order details
 
+Login Options:
+
+- Email and password login (JWT-based)
+- Google OAuth login (Sign in with Google)
+
 Frontend Features (React)
 
 Home page with featured products and collections
 
 Product listings and product detail pages
 
-User registration, login, and profile management
+User registration, login, and profile management (includes Google Login)
 
 Cart management and checkout process
 
@@ -60,6 +65,8 @@ RESTful API endpoints for users, products, cart, orders, checkout, and subscript
 Admin routes for product, order, and user management
 
 JWT authentication and admin authorization
+
+Google OAuth authentication endpoint (`/api/users/google-login`)
 
 Image upload via Cloudinary
 
@@ -78,7 +85,7 @@ Project Structure
 Backend (Node.js / Express / MongoDB)
 
 backend/
-├─ .env-example              # Example environment variables (DB URI, JWT secret, Cloudinary credentials, etc.)
+├─ .env-example              # Example environment variables (DB URI, JWT secret, Cloudinary credentials, Google OAuth client ID, etc.)
 ├─ package.json              # Node.js project manifest (dependencies, scripts, project metadata)
 ├─ server.js                 # Backend entry point (starts Express server and connects to DB)
 ├─ seeder.js                 # Script to seed database with initial data (products, users, orders)
@@ -102,15 +109,13 @@ backend/
 │   ├─ productRoutes.js      # Public product routes (list, filter, view details)
 │   ├─ subscribeRoute.js     # Newsletter subscription endpoint
 │   ├─ uploadRoutes.js       # File/image upload endpoint (Cloudinary)
-│   └─ userRoutes.js         # User account management routes (register, login, profile)
+│   └─ userRoutes.js         # User account management routes (register, login, profile, Google OAuth)
 ├─ middleware/               # Custom Express middleware
 │   └─ authMiddleware.js     # Protect routes & admin authorization
 └─ data/                     # Optional: seed/sample data for testing or initial setup
 
-
-
 frontend/
-├─ .env-example               # .env-example # Example env file for reference / documentation
+├─ .env-example               # .env-example # Example env file for reference / documentation, includes VITE_GOOGLE_CLIENT_ID
 ├─ package.json               # Node.js project manifest for frontend dependencies
 ├─ package-lock.json          # Exact dependency versions
 ├─ index.html                 # HTML template for React app
@@ -127,7 +132,7 @@ frontend/
 │   │   ├─ adminOrderSlice.js    # Redux slice for admin order management
 │   │   ├─ adminProductSlice.js  # Redux slice for admin product management
 │   │   ├─ adminSlice.js         # Redux slice for general admin data
-│   │   ├─ authSlice.js          # Redux slice for user authentication
+│   │   ├─ authSlice.js          # Redux slice for user authentication (includes Google login thunk)
 │   │   ├─ cartSlice.js          # Redux slice for cart management
 │   │   ├─ checkoutSlice.js      # Redux slice for checkout process
 │   │   ├─ orderSlice.js         # Redux slice for user order history
@@ -186,7 +191,7 @@ frontend/
 │   │   ├─ AdminHomePage.jsx
 │   │   ├─ CollectionPage.jsx
 │   │   ├─ Home.jsx
-│   │   ├─ Login.jsx
+│   │   ├─ Login.jsx            # Supports both email/password login and Google login
 │   │   ├─ MyOrdersPage.jsx
 │   │   ├─ OrderConfirmationPage.jsx
 │   │   ├─ OrderDetailsPage.jsx
@@ -196,7 +201,6 @@ frontend/
 │   └─ utils/
 │       └─ axiosInstance.js     # Axios instance with base URL and interceptors
 
-
 Notes
 
 Backend handles all API operations and database interactions.
@@ -204,6 +208,8 @@ Backend handles all API operations and database interactions.
 Frontend handles UI, user interactions, and communicates with the backend via API endpoints.
 
 Middleware in backend protects private routes and checks admin permissions.
+
+Google OAuth allows users to login with their Google accounts using a client-side token that is verified by the backend.
 
 data/ folder is optional but useful for seeding initial data.
 

@@ -95,9 +95,9 @@ if (error)
   );
 
   return (
-        <div className="p-6">
+        <div>
             {selectedProduct ? (
-            <div className="max-w-7xl mx-auto bg-white p-8 rounded-lg">
+            <div className="max-w-full sm:max-w-7xl md:max-w-8xl lg:max-w-8xl xl:max-w-8xl mx-auto bg-white p-4 sm:p-8 rounded-lg">
                 <div className="flex flex-col md:flex-row">
                     {/* Left Thumbnail */}
                     {selectedProduct?.images?.length > 0 && (

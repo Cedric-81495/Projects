@@ -1,9 +1,14 @@
 // backend/routes/userRoutes.js
 const express = require("express");
+const { OAuth2Client } = require("google-auth-library");
+const generateToken = require("../utils/generateToken");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { protect} = require("../middleware/authMiddleware");
 const router = express.Router();
+
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // @route POST /api/users/register
 // @desc Register a new user
@@ -29,11 +34,7 @@ router.post("/register", async (req, res) => {
     };
 
     // Sign token
-    const token = jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" } // minutes, not seconds
-    );
+    const token = generateToken(user);
 
     // Send response ONCE
     res.status(201).json({
@@ -77,11 +78,8 @@ router.post("/login", async (req, res) => {
         };
 
         // Sign token
-        const token = jwt.sign(
-        payload,
-        process.env.JWT_SECRET,
-        { expiresIn: "40m" } // minutes, not seconds
-        );
+        const token = generateToken(user);
+
 
         // Send response ONCE
         res.json({
@@ -101,6 +99,55 @@ router.post("/login", async (req, res) => {
 
     }
 });
+
+
+// @route POST /api/users/google-login
+// @desc Login/Register user via Google
+// @access Public
+router.post("/google-login", async (req, res) => {
+  const { idToken } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId, email_verified } = payload;
+
+    if (!email_verified) {
+      return res.status(401).json({ message: "Google email not verified" });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        isGoogleUser: true,
+      });
+    }
+
+    const token = generateToken(user);
+
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Google auth error:", error);
+    res.status(401).json({ message: "Invalid Google token" });
+  }
+});
+
 
 // @route GET /api/users/profile
 // @desc Get logged-in user's profile (Protected Route)

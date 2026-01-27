@@ -20,7 +20,7 @@ const Profile = () => {
   const handleLogout = () => {
     dispatch(logoutUser());
     dispatch(clearCart());
-    navigate("/login");
+    navigate("/");
   }
 
   return (

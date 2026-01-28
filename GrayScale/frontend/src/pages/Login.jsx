@@ -15,7 +15,7 @@ const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, guestId, loading } = useSelector((state) => state.auth);
+    const { user, guestId, loading, error } = useSelector((state) => state.auth);
     const { cart } = useSelector((state) => state.cart);
 
     const redirect = new URLSearchParams(location.search).get("redirect") || "/";
@@ -52,7 +52,7 @@ const Login = () => {
                         </div>
                         <h2 className="text-2xl font-bold text-center mb-6">Hey There!</h2>
                         <p className="text-center mb-6">Enter your name and password to Login</p>
-
+                       
                         {/* Email */}
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2">Email</label>
@@ -83,6 +83,11 @@ const Login = () => {
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </button>
                         </div>
+                         {error && ( 
+                            <div className="mb-4 text-sm text-red-600 text-center">
+                                {error}
+                            </div>
+                        )}
 
                         <button
                             type="submit"
@@ -91,7 +96,7 @@ const Login = () => {
                             {loading ? "Logging in..." : "Sign In"}
                         </button>
 
-                        <div className="my-4 flex justify-center h-[50px]">
+                        <div className="mt-4 flex justify-center h-[50px]">
                             <GoogleLoginButton onLoginSuccess={handleGoogleLogin} />
                         </div>
 

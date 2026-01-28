@@ -69,11 +69,11 @@ export const loginUser = createAsyncThunk(
             localStorage.setItem("userInfo", JSON.stringify(userWithToken));
             localStorage.setItem("userToken", response.data.token); // important
 
-// Return user WITH token
-return userWithToken;
+            // Return user WITH token
+            return userWithToken;
         } 
         catch(error) {
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data?.message || "Login failed. Incorrect user credentials!");
         }
     }
 );
@@ -156,7 +156,7 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.message || "Login failed";
+                state.error = action.payload?.message || "Login failed. Incorrect user credentials";
             })
             .addCase(registerUser.pending, (state) => {
                 state.loading = true;

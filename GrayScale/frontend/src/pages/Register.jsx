@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import registerpage from "../assets/registerpage.jpg"
 import { registerUser } from "../../redux/slices/authSlice";
+import { loginUser, loginWithGoogle } from "../../redux/slices/authSlice";
+import GoogleLoginButton from "../components/GoogleLoginButton";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { mergeCart } from "../../redux/slices/cartSlice";
@@ -14,12 +16,16 @@ const Register = () => {
     const dispath = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, guestId, loading } = useSelector((state) => state.auth);
+    const { user, guestId, loading, error } = useSelector((state) => state.auth);
     const { cart } = useSelector((state) => state.cart);
 
     // Get the redirect parameter and check if it'c checkout or somthing else
     const redirect = new URLSearchParams(location.search).get("redirect") || "/";
     const isCheckoutRedirect = redirect.includes("checkout");
+
+    const handleGoogleLogin = (idToken) => {
+            dispatch(loginWithGoogle(idToken));
+    };
 
     useEffect(() => {
         if (user) {
@@ -80,12 +86,20 @@ const Register = () => {
                         placeholder="Enter your password"
                     />
                 </div>
+                {error && ( 
+                    <div className="mb-4 text-sm text-red-600 text-center">
+                        {error}
+                    </div>
+                )}
                 <button 
                     type="submit"
                     className="w-full bg-black text-white p-2 rounded-lg font-semibold hover:bg-gray-800 transition"
                 >
                 {loading ? "Registering..." : "Sign Up"}
                 </button>
+                <div className="mt-4 flex justify-center h-[50px]">
+                    <GoogleLoginButton onLoginSuccess={handleGoogleLogin} />
+                </div>
                 <p className="mt-6 text-center text-sm">
                     Already have an account?
                     <Link to={`/login?redirect=${encodeURIComponent(redirect)}`} className="text-blue-500"> Login</Link>

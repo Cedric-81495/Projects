@@ -49,7 +49,7 @@ router.post("/register", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Password must be between 6 and 12 characters." });
   }
 });
 
@@ -63,7 +63,7 @@ router.post("/login", async (req, res) => {
         // Find the user by email
         let user = await User.findOne({ email });
 
-        if (!user) return res.status(401).json({ message: "Invalid Credentials" });
+        if (!user) return res.status(401).json({ message: "Account does not exist" });
         
         const isMatch = await user.matchPassword(password);
 

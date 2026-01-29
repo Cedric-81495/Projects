@@ -20,7 +20,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <div className="text-xl font-bold text-blue-600 dark:text-white">
+          <div className="text-xl font-bold mb-4 opacity-0 animate-fade-in-down">
             <a href="#hero">My Portfolio</a>
           </div>
 

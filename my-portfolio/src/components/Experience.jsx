@@ -2,9 +2,9 @@ export default function Experience() {
   return (
     <section
       id="experience"
-      className="py-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-6 transition-colors duration-500"
+      className="min-h-screen py-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-6 transition-colors duration-500"
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto pt-[50px]">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 animate-fade-in-down">
           Experience
         </h2>

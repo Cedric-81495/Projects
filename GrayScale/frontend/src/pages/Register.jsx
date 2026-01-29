@@ -60,7 +60,7 @@ const Register = () => {
     <PageWrapper loading={loading}>
     <div className="flex">
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-12 ">
-            <form onSubmit={handleSubmit} className="w-full max-w-md  p-8 rounded-lg border shadow-sm mt-[-75px] bg-gray-300">
+            <form onSubmit={handleSubmit} className="w-full max-w-md  p-8 rounded-lg border shadow-sm bg-gray-300">
                 <div className="flex justify-center mb-6">
                     <h2 className="text-xl font-medium">GrayScale</h2>
                 </div>

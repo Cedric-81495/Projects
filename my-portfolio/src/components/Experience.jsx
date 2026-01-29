@@ -77,6 +77,27 @@ export default function Experience() {
                     GitHub
                   </a>
                 </li>
+                  <li>
+                  <strong>GrayScale</strong> – A full-stack MERN e-commerce web application for fashion products
+                  <br/>
+                  <a
+                    href="https://mern-grayscale.onrender.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline ml-1"
+                  >
+                    Live Demo
+                  </a>
+                  <span> | </span>
+                  <a
+                    href="https://github.com/Cedric-81495/Projects/tree/main/GrayScale"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    GitHub
+                  </a>
+                </li>
               </ul>
             </div>
           </div>

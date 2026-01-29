@@ -18,7 +18,7 @@ const ProductGrid = ({ products, loading, error }) => {
   }
   
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
   {products.map((product) => (
     <Link key={product._id} to={`/product/${product._id}`}>
       <div className="bg-white p-4 rounded-lg">

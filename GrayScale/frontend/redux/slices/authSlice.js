@@ -28,30 +28,6 @@ const initialState = {
     error: null,
 };
 
-// Async Thunk for Google Login
-export const loginWithGoogle = createAsyncThunk(
-  "auth/loginWithGoogle",
-  async (idToken, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post("/api/users/google-login", { idToken });
-
-      const userWithToken = {
-        ...response.data.user,
-        token: response.data.token,
-      };
-
-      // Save in localStorage
-      localStorage.setItem("userInfo", JSON.stringify(userWithToken));
-      localStorage.setItem("userToken", response.data.token);
-
-      return userWithToken;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Google login failed" });
-    }
-  }
-);
-
-
 // Async Thunk for User Login
 export const loginUser = createAsyncThunk(
     "auth/loginUser",
@@ -73,10 +49,34 @@ export const loginUser = createAsyncThunk(
             return userWithToken;
         } 
         catch(error) {
-            return rejectWithValue(error.response?.data?.message || "Login failed. Incorrect user credentials!");
+            return rejectWithValue(error.response.data);
         }
     }
 );
+
+// Async Thunk for Google Login
+export const loginWithGoogle = createAsyncThunk(
+  "auth/loginWithGoogle",
+  async (credential, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/api/users/google", { credential });
+
+      const userWithToken = {
+        ...response.data.user,
+        token: response.data.token,
+      };
+
+      // Save to localStorage
+      localStorage.setItem("userInfo", JSON.stringify(userWithToken));
+      localStorage.setItem("userToken", response.data.token);
+
+      return userWithToken;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: "Google login failed" });
+    }
+  }
+);
+
 
 // Async Thunk for User Registration
 export const registerUser = createAsyncThunk(
@@ -129,7 +129,7 @@ const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Google Login
+            // GOOGLE LOGIN
             .addCase(loginWithGoogle.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -137,14 +137,11 @@ const authSlice = createSlice({
             .addCase(loginWithGoogle.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
-                state.error = null;
             })
             .addCase(loginWithGoogle.rejected, (state, action) => {
                 state.loading = false;
-                state.user = action.payload?.message || "Google login failed";
-                state.error = null;
+                state.error = action.payload?.message || "Google login failed";
             })
-            
             // LOGIN
             .addCase(loginUser.pending, (state) => {
                 state.loading = true;
@@ -156,7 +153,7 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.message || "Login failed. Incorrect user credentials";
+                state.error = action.payload?.message || "Login failed incorrect email or password";
             })
             .addCase(registerUser.pending, (state) => {
                 state.loading = true;

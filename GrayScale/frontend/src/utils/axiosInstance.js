@@ -1,4 +1,3 @@
-// frontend/srcx/utils/axiosInstance.js
 import axios from "axios";
 import { logoutUser } from "../../redux/slices/authSlice";
 

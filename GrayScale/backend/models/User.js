@@ -16,26 +16,15 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: [/.+\@.+\..+/, "Please enter a valid email address"],
     },
-
-    // Google Auth fields
-    googleId: {
-      type: String,
-      default: null,
-    },
-    isGoogleUser: {
-      type: Boolean,
-      default: false,
-    },
-
     password: {
-      type: String,
+      type: String, // ❗ NOT required anymore
       minlength: 6,
-      required: function () {
-        // password required ONLY if not a Google user
-        return !this.isGoogleUser;
-      },
     },
-
+    provider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
     role: {
       type: String,
       enum: ["customer", "admin"],
@@ -45,14 +34,16 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.pre('save', async function () {
-  if (!this.isModified('password') || !this.password) return;
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+// Password Hash Middleware
+userSchema.pre("save", async function () {
+  // 🔒 Only hash if password exists AND was modified
+  if (!this.password || !this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
-
-userSchema.methods.matchPassword = async function(enteredPassword) {
+// Match user entered password with hashed password
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password) return false; // Google users
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

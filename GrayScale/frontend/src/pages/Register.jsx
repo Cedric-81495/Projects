@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import registerpage from "../assets/registerpage.jpg"
 import { registerUser } from "../../redux/slices/authSlice";
-import { loginUser, loginWithGoogle } from "../../redux/slices/authSlice";
-import GoogleLoginButton from "../components/GoogleLoginButton";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import { loginWithGoogle } from "../../redux/slices/authSlice";
 import { mergeCart } from "../../redux/slices/cartSlice";
-import PageWrapper from "../components/Common/PageWrapper";    
+import PageWrapper from "../components/Common/PageWrapper"; 
+import { FaEye, FaEyeSlash } from "react-icons/fa";    
 
 const Register = () => {
     const [name, setName] = useState("");
     const [email, setEmaiil] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const dispath = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,9 +24,18 @@ const Register = () => {
     // Get the redirect parameter and check if it'c checkout or somthing else
     const redirect = new URLSearchParams(location.search).get("redirect") || "/";
     const isCheckoutRedirect = redirect.includes("checkout");
+    const dispatch = useDispatch();
 
-    const handleGoogleLogin = (idToken) => {
-            dispatch(loginWithGoogle(idToken));
+    const handleGoogleSuccess = (credentialResponse) => {
+    if (!credentialResponse?.credential) {
+        console.error("No ID token received from Google");
+        return;
+    }
+    dispatch(loginWithGoogle(credentialResponse.credential));
+    };
+
+    const handleGoogleError = () => {
+    console.error("Google login failed");
     };
 
     useEffect(() => {
@@ -76,32 +87,43 @@ const Register = () => {
                         placeholder="Enter your email address"
                     />
                  </div>
-                <div className="mb-4">
-                    <label className="block text-sm font-semibold mb-2">Password</label>
-                    <input 
-                        type="password"
-                        value={password}
-                        onChange={((e) => setPassword(e.target.value) )}
-                        className="w-full p-2 border rounded" 
-                        placeholder="Enter your password"
-                    />
-                </div>
-                {error && ( 
-                    <div className="mb-4 text-sm text-red-600 text-center">
-                        {error}
-                    </div>
-                )}
+                  <div className="mb-4 relative">
+                <label className="block text-sm font-semibold mb-2">Password</label>
+                <input
+                    type={showPassword ? "text" : "password"} // 🔹 toggle type
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full p-2 border rounded pr-10"
+                    placeholder="Enter your password"
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 pt-7 pr-5  transform -translate-y-1/2 text-gray-600"
+                >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+            </div>
+            {error && ( 
+              <div className="mb-4 text-sm text-gray-600 text-center">
+                  {error}
+              </div>
+            )}
                 <button 
                     type="submit"
                     className="w-full bg-black text-white p-2 rounded-lg font-semibold hover:bg-gray-800 transition"
                 >
                 {loading ? "Registering..." : "Sign Up"}
                 </button>
-                <div className="mt-4 flex justify-center h-[50px]">
-                    <GoogleLoginButton onLoginSuccess={handleGoogleLogin} />
+                <div className="mt-4 flex justify-center">
+                <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                />
                 </div>
+
                 <p className="mt-6 text-center text-sm">
-                    Already have an account?
+                    Don't have an account?
                     <Link to={`/login?redirect=${encodeURIComponent(redirect)}`} className="text-blue-500"> Login</Link>
                 </p>
             </form>

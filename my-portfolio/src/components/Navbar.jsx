@@ -21,7 +21,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <div className="text-xl font-bold text-blue-600 dark:text-white">
-            My Portfolio
+            <a href="#hero">My Portfolio</a>
           </div>
 
           {/* Desktop Menu */}

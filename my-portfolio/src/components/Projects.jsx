@@ -4,7 +4,7 @@ export default function Projects() {
       id="projects"
       className="min-h-screen py-20 bg-gray-200 dark:bg-gray-950 text-gray-900 dark:text-white px-6"
     >
-      <div className="max-w-6xl mx-auto text-center pt-[150px]">
+      <div className="max-w-6xl mx-auto text-center pt-[20px] md:pt-[150px] lg:pt-[150px] xl:pt-[150px]">
         <h2 className="text-3xl md:text-4xl font-bold mb-10">Projects</h2>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">

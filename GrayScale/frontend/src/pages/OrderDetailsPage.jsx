@@ -78,8 +78,8 @@ if (error)
                 <p>Status: {orderDetails.isPaid ? "Paid" : "Unpaid"}</p>
               </div>
                <div>
-                <h4 className="text-lg font-semibold mb-2">Shipping Info</h4>
-                <p>Shipping Method: {orderDetails.shippingMethod}</p>
+                <h4 className="text-lg font-semibold mb-2">Shipping Info</h4> 
+                
                 <p>Address: {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.country}</p>
               </div>
           </div>

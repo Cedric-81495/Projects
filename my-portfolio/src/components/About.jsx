@@ -17,7 +17,7 @@ export default function About() {
         </h2>
 
         {/* Content card */}
-        <div className="bg-gray-190 dark:bg-gray-800 rounded-2xl p-6 md:p-10 shadow-xl">
+        <div className="bg-gray-190 dark:bg-gray-800 rounded-xl p-6 md:p-10 shadow-xl">
           <p className="text-lg leading-relaxed">
             I’m Cedric, a full-stack web developer based in the Philippines,
             focused on building modern, scalable, and user-centric web

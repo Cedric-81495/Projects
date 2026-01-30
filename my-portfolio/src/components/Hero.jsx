@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white px-6 transition-colors duration-500"
+      className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-white px-6 transition-colors duration-500 p-6"
     >
       <div className="max-w-5xl mx-auto pt-24 md:pt-32">
         {/* Section label */}

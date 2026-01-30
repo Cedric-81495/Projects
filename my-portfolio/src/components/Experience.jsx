@@ -62,7 +62,7 @@ export default function Experience() {
 
 function ExperienceCard({ title, company, period, description, children }) {
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-sm">
+    <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-xl">
       <h3 className="text-xl font-semibold">
         {title} <span className="text-gray-500 dark:text-gray-400">— {company}</span>
       </h3>

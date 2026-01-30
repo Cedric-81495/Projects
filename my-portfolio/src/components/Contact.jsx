@@ -2,7 +2,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 px-6"
+      className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 p-6"
     >
       <div className="max-w-5xl mx-auto pt-24 md:pt-32">
         {/* Section label */}
@@ -16,7 +16,7 @@ export default function Contact() {
         </h2>
 
         {/* Contact Card */}
-        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-sm">
+        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-xl">
           <form
             action="https://formspree.io/f/xanjaagb"
             method="POST"

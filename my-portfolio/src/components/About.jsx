@@ -3,7 +3,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 px-6"
+      className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-6"
     >
       <div className="max-w-5xl mx-auto pt-24 md:pt-32">
         {/* Section label */}
@@ -17,7 +17,7 @@ export default function About() {
         </h2>
 
         {/* Content card */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 md:p-10 shadow-sm">
+        <div className="bg-gray-190 dark:bg-gray-800 rounded-2xl p-6 md:p-10 shadow-xl">
           <p className="text-lg leading-relaxed">
             I’m Cedric, a full-stack web developer based in the Philippines,
             focused on building modern, scalable, and user-centric web

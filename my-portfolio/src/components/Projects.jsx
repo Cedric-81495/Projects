@@ -44,7 +44,7 @@ export default function Projects() {
 
 function ProjectCard({ title, description, link }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-lg transition flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl hover:shadow-lg transition flex flex-col">
       <h3 className="text-xl font-semibold mb-3">
         {title}
       </h3>

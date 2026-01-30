@@ -2,106 +2,112 @@ export default function Experience() {
   return (
     <section
       id="experience"
-      className="min-h-screen py-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-6 transition-colors duration-500"
+      className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6"
     >
-      <div className="max-w-4xl mx-auto text-center pt-24 md:pt-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 animate-fade-in-down">
+      <div className="max-w-5xl mx-auto pt-24 md:pt-32">
+        {/* Section label */}
+        <p className="text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">
+          Background
+        </p>
+
+        {/* Heading */}
+        <h2 className="text-3xl md:text-4xl font-bold mb-12">
           Experience
         </h2>
-        <div className="space-y-8">
-            {/* Existing Experience */}
-            <div className="bg-gray-200 dark:bg-gray-800 p-6 rounded-xl shadow-md animate-fade-in-up">
-              <h3 className="text-xl font-semibold">Software Engineer – Straive</h3>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                <em>May 2022 – Present</em>
-              </p>
-              <p className="mt-2 text-gray-800 dark:text-gray-200">
-                Maintained and developed publishing platforms with XML workflows and Perl tools.
-                Automated data processes and enhanced data features for internal tools.
-              </p>
-            </div>
 
-            {/* New Experience – Personal Projects */}
-            <div className="bg-gray-200 dark:bg-gray-800 p-6 rounded-xl shadow-md animate-fade-in-up">
-              <h3 className="text-xl font-semibold">Full-Stack Developer – Personal Projects</h3>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                <em>2024 – Present</em>
-              </p>
-              <p className="mt-2 text-gray-800 dark:text-gray-200">
-                Built and deployed full-stack MERN applications focusing on authentication, REST API 
-                development, responsive UI, and real-world interactive features. Applied modern best 
-                practices in React, Node.js, MongoDB, Express.js, and Tailwind CSS.
-              </p>
+        <div className="space-y-10">
+          {/* Professional Experience */}
+          <ExperienceCard
+            title="Software Engineer"
+            company="Straive"
+            period="May 2022 – Present"
+            description="Maintained and enhanced publishing platforms using XML-based workflows and Perl tooling. Automated internal data processes and improved data reliability across editorial systems."
+          />
 
-              <ul className="mt-3 list-disc list-inside text-gray-800 dark:text-gray-200 space-y-1">
-                <li>
-                  <strong>Potter Wiki</strong> – A modern character encyclopedia with authentication, 
-                  search system, and interactive UI.  <br/>
-                  <a
-                    href="https://mern-potter-wiki.onrender.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline ml-1"
-                  >
-                    Live Demo
-                  </a>
-                  <span> | </span>
-                  <a
-                    href="https://github.com/Cedric-81495/Projects/tree/main/Potter-Wiki"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                  >
-                    GitHub
-                  </a>
-                </li>
+          {/* Personal Projects */}
+          <ExperienceCard
+            title="Full-Stack Developer"
+            company="Personal Projects"
+            period="2024 – Present"
+            description="Designed and deployed full-stack MERN applications with a focus on authentication, RESTful APIs, responsive UI, and real-world workflows. Applied modern best practices using React, Node.js, Express, MongoDB, and Tailwind CSS."
+          >
+            <ul className="mt-4 space-y-3 text-sm">
+              <ProjectItem
+                name="Potter Wiki"
+                description="Character encyclopedia with authentication, search functionality, and interactive UI."
+                live="https://mern-potter-wiki.onrender.com"
+                github="https://github.com/Cedric-81495/Projects/tree/main/Potter-Wiki"
+              />
 
-                <li>
-                  <strong>ToDo Board</strong> – A productivity task manager with drag-and-drop UI,
-                  real-time updates, and responsive layout.  <br/>
-                  <a
-                    href="https://mern-todoboard.onrender.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline ml-1"
-                  >
-                    Live Demo
-                  </a>
-                  <span> | </span>
-                  <a
-                    href="https://github.com/Cedric-81495/Projects/tree/main/ToDoBoard"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                  >
-                    GitHub
-                  </a>
-                </li>
-                  <li>
-                  <strong>GrayScale</strong> – A full-stack MERN e-commerce web application for fashion products
-                  <br/>
-                  <a
-                    href="https://mern-grayscale.onrender.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline ml-1"
-                  >
-                    Live Demo
-                  </a>
-                  <span> | </span>
-                  <a
-                    href="https://github.com/Cedric-81495/Projects/tree/main/GrayScale"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                  >
-                    GitHub
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
+              <ProjectItem
+                name="Todo Board"
+                description="Productivity-focused task manager with drag-and-drop interactions and responsive layout."
+                live="https://mern-todoboard.onrender.com"
+                github="https://github.com/Cedric-81495/Projects/tree/main/ToDoBoard"
+              />
+
+              <ProjectItem
+                name="GrayScale"
+                description="Full-stack MERN e-commerce platform for fashion products with real-world user and admin workflows."
+                live="https://mern-grayscale.onrender.com"
+                github="https://github.com/Cedric-81495/Projects/tree/main/GrayScale"
+              />
+            </ul>
+          </ExperienceCard>
+        </div>
       </div>
     </section>
+  );
+}
+
+function ExperienceCard({ title, company, period, description, children }) {
+  return (
+    <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-sm">
+      <h3 className="text-xl font-semibold">
+        {title} <span className="text-gray-500 dark:text-gray-400">— {company}</span>
+      </h3>
+
+      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        {period}
+      </p>
+
+      <p className="mt-4 leading-relaxed text-gray-700 dark:text-gray-300">
+        {description}
+      </p>
+
+      {children}
+    </div>
+  );
+}
+
+function ProjectItem({ name, description, live, github }) {
+  return (
+    <li>
+      <p className="font-medium">
+        {name}
+      </p>
+      <p className="text-gray-600 dark:text-gray-400">
+        {description}
+      </p>
+
+      <div className="mt-1 flex gap-3">
+        <a
+          href={live}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-blue-500 hover:underline"
+        >
+          Live Demo
+        </a>
+        <a
+          href={github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-blue-500 hover:underline"
+        >
+          GitHub
+        </a>
+      </div>
+    </li>
   );
 }

@@ -41,7 +41,7 @@ export default function Experience() {
 
               <ProjectItem
                 name="Todo Board"
-                description="Productivity-focused task manager with drag-and-drop interactions and responsive layout."
+                description="Productivity-focused task manager with responsive layout."
                 live="https://mern-todoboard.onrender.com"
                 github="https://github.com/Cedric-81495/Projects/tree/main/ToDoBoard"
               />

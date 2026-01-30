@@ -1,3 +1,7 @@
+import potterWiki from "../assets/potterWiki.jpg";
+import grayScale from "../assets/grayScale.jpg";
+import toDo from "../assets/toDo.jpg";
+
 export default function Projects() {
   return (
     <section
@@ -22,18 +26,21 @@ export default function Projects() {
             title="Potter Wiki"
             description="A full-stack MERN application for exploring Harry Potter data, featuring authentication, admin CRUD functionality, and a clean Tailwind-based UI."
             link="https://mern-potter-wiki.onrender.com"
+            imgSrc={potterWiki}
           />
 
           <ProjectCard
             title="Todo Board"
             description="A task management application designed to improve productivity through organized workflows and a simple, intuitive interface."
             link="https://mern-todoboard.onrender.com"
+            imgSrc={toDo}
           />
 
           <ProjectCard
             title="GrayScale"
             description="A full-stack MERN e-commerce platform for fashion products, supporting real-world user flows, admin management, and secure transactions."
             link="https://mern-grayscale.onrender.com"
+            imgSrc={grayScale}
           />
         </div>
       </div>
@@ -42,30 +49,45 @@ export default function Projects() {
 }
 
 
-function ProjectCard({ title, description, link }) {
+function ProjectCard({ title, description, link, imgSrc }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl hover:shadow-lg transition flex flex-col">
-      <h3 className="text-xl font-semibold mb-3">
-        {title}
-      </h3>
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-lg transition flex flex-col overflow-hidden">
+      
+      {/* Project Image */}
+      {imgSrc && (
+        <div className="w-full h-48 md:h-56 overflow-hidden">
+          <img
+            src={imgSrc}
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          />
+        </div>
+      )}
 
-      <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-        {description}
-      </p>
+      {/* Card Content */}
+      <div className="p-6 flex flex-col flex-1">
+        <h3 className="text-xl font-semibold mb-3">
+          {title}
+        </h3>
 
-      <div className="mt-auto pt-6">
-        <a
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block w-full text-center rounded-md
-                     bg-gray-900 dark:bg-white
-                     text-white dark:text-gray-900
-                     py-2 font-medium
-                     hover:opacity-90 transition"
-        >
-          View Project
-        </a>
+        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed flex-1">
+          {description}
+        </p>
+
+        <div className="mt-6">
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block w-full text-center rounded-md
+                       bg-gray-900 dark:bg-white
+                       text-white dark:text-gray-900
+                       py-2 font-medium
+                       hover:opacity-90 transition"
+          >
+            View Project
+          </a>
+        </div>
       </div>
     </div>
   );

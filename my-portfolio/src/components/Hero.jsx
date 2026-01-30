@@ -23,21 +23,28 @@ export default function Hero() {
           <div className="flex flex-col md:flex-row items-center gap-8">
             
             {/* Text */}
-            <div className="flex-1 text-center md:text-left">
-              <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
-                A full-stack web developer based in the Philippines, crafting
-                modern, responsive, and scalable web applications using
-                React, Tailwind CSS, and Node.js.
-              </p>
+             <div className="flex-1 text-center md:text-left">
+                <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+                  A full-stack web developer based in the Philippines, building modern, 
+                  responsive, and scalable web applications with React, Tailwind CSS, 
+                  and Node.js. I leverage AI tools and technologies to enhance 
+                  development efficiency, improve user experience, and stay at the 
+                  forefront of industry trends.
+                </p>
 
-              <div className="mt-6">
-                <a
-                  href="#projects"
-                  className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300"
-                >
-                  View My Work
-                </a>
-              </div>
+
+              <div className="pt-6">
+                  <a
+                    href="#projects"
+                    className="inline-block w-[200px] text-center rounded-md
+                              bg-gray-900 dark:bg-white
+                              text-white dark:text-gray-900
+                              py-2 font-medium
+                              hover:opacity-90 transition"
+                  >
+                    View my Projects
+                  </a>
+                </div>
             </div>
 
             {/* Profile image */}

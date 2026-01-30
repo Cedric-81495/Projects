@@ -10,8 +10,7 @@ export default function About() {
           I'm passionate about creating intuitive and dynamic user experiences.
         </p>
         <p className="text-lg mt-4 leading-relaxed">
-          In my free time, I enjoy learning new technologies, contributing to open-source projects, 
-          and continuously improving my development skills.
+          In my free time, I enjoy learning new technologies and continuously improving my development skills.
         </p>
       </div>
     </section>

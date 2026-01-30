@@ -4,7 +4,7 @@ export default function Contact() {
       id="contact"
       className="min-h-screen py-16 bg-gray-200 dark:bg-gray-950 text-gray-900 dark:text-white px-6 transition-colors duration-500"
     >
-      <div className="max-w-3xl mx-auto md:pt-[150px] lg:pt-[150px] xl:pt-[150px]">
+      <div className="max-w-3xl mx-auto pt-[120px] md:pt-[150px] lg:pt-[150px] xl:pt-[150px]">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 animate-fade-in-down">
           Get in Touch
         </h2>

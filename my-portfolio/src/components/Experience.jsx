@@ -4,7 +4,7 @@ export default function Experience() {
       id="experience"
       className="min-h-screen py-20 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-6 transition-colors duration-500"
     >
-      <div className="max-w-4xl mx-auto pt-[20px] md:pt-[50px] lg:pt-[50px] xl:pt-[50px]">
+      <div className="max-w-4xl mx-auto text-center pt-24 md:pt-16">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 animate-fade-in-down">
           Experience
         </h2>

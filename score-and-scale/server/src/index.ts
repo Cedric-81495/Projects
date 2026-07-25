@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 dotenv.config();
 
+console.log("CLIENT_URL =", process.env.CLIENT_URL);
+
 import { connectDB } from './lib/db';
 import authRoutes from './routes/auth.routes';
 import contactRoutes from './routes/contact.routes';

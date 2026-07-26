@@ -3,7 +3,10 @@ import { gateway } from "../lib/braintree";
 import { requireAuth } from "../middleware/requireAuth";
 import { clientTokenLimiter, checkoutLimiter } from "../middleware/rateLimit";
 import { Enrollment } from "../models/Enrollment";
+import { Payment } from "../models/Payment";
 import { Program } from "../models/Program";
+import { User } from "../models/User";
+import { sendMail } from "../lib/mailer";
 
 const router = Router();
 
@@ -22,6 +25,10 @@ router.get("/client-token", requireAuth, clientTokenLimiter, async (_req: Reques
   }
 });
 
+function formatCents(cents: number) {
+  return `$${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+}
+
 /**
  * POST /api/checkout
  * Body: { paymentMethodNonce: string, programSlug: string }
@@ -32,8 +39,14 @@ router.get("/client-token", requireAuth, clientTokenLimiter, async (_req: Reques
  * real price. The frontend still displays the price for UX, but this route
  * ignores whatever it sends and looks up the real price itself.
  *
- * On success, upserts an Enrollment for (userId, programId) — this is what
- * makes a purchased program show up as "Enrolled" on the dashboard.
+ * On success:
+ *  - upserts an Enrollment for (userId, programId) — this is what makes a
+ *    purchased program show up as "Enrolled" on the dashboard.
+ *  - creates a Payment record tied to that Enrollment — this is what
+ *    powers the admin revenue KPI.
+ *  - emails a receipt to the paying user and a notification copy to the
+ *    business (CONTACT_NOTIFY_EMAIL, same address used for contact form
+ *    submissions) — neither is allowed to fail the user-facing request.
  */
 router.post("/", requireAuth, checkoutLimiter, async (req: Request, res: Response) => {
   const { paymentMethodNonce, programSlug } = req.body;
@@ -88,6 +101,70 @@ router.post("/", requireAuth, checkoutLimiter, async (req: Request, res: Respons
     }
 
     await enrollment.save();
+
+    // Record the payment itself. Guarded with its own try/catch so that if
+    // this ever fails (e.g. a duplicate braintreeTransactionId on a retried
+    // request), the user still gets their success response and active
+    // enrollment rather than a 500 — the charge and enrollment are the
+    // source of truth; this is a reporting record.
+    try {
+      await Payment.create({
+        enrollmentId: enrollment._id,
+        braintreeTransactionId: result.transaction.id,
+        amountCents: program.priceCents,
+        status: "succeeded",
+      });
+    } catch (paymentErr) {
+      console.error(
+        `Failed to record Payment for transaction ${result.transaction.id} (enrollment ${enrollment._id}) — charge succeeded, revenue reporting may be incomplete`,
+        paymentErr
+      );
+    }
+
+    // Receipt emails — best-effort, never block the response on these.
+    // A failed email should not make a successful charge look like a
+    // failure to the person who just paid.
+    try {
+      const user = await User.findById(userId).select("email name");
+      const priceFormatted = formatCents(program.priceCents);
+      const receiptHtml = `
+        <p>Hi ${user?.name ?? "there"},</p>
+        <p>Thanks for your payment — here's your receipt.</p>
+        <table cellpadding="6" style="border-collapse: collapse;">
+          <tr><td><strong>Program</strong></td><td>${program.name}</td></tr>
+          <tr><td><strong>Amount</strong></td><td>${priceFormatted}</td></tr>
+          <tr><td><strong>Transaction ID</strong></td><td>${result.transaction.id}</td></tr>
+          <tr><td><strong>Date</strong></td><td>${new Date().toLocaleDateString()}</td></tr>
+        </table>
+        <p>You can view your enrollment status any time from your dashboard.</p>
+      `;
+
+      if (user?.email) {
+        await sendMail({
+          to: user.email,
+          subject: `Receipt for your ${program.name} payment`,
+          html: receiptHtml,
+        }).catch((err) => console.error("Failed to send receipt email to user:", err));
+      }
+
+      if (process.env.CONTACT_NOTIFY_EMAIL) {
+        await sendMail({
+          to: process.env.CONTACT_NOTIFY_EMAIL,
+          subject: `New payment received — ${program.name} (${priceFormatted})`,
+          html: `
+            <p>New payment received.</p>
+            <table cellpadding="6" style="border-collapse: collapse;">
+              <tr><td><strong>User</strong></td><td>${user?.email ?? "unknown"}</td></tr>
+              <tr><td><strong>Program</strong></td><td>${program.name}</td></tr>
+              <tr><td><strong>Amount</strong></td><td>${priceFormatted}</td></tr>
+              <tr><td><strong>Transaction ID</strong></td><td>${result.transaction.id}</td></tr>
+            </table>
+          `,
+        }).catch((err) => console.error("Failed to send payment notification email to business:", err));
+      }
+    } catch (emailErr) {
+      console.error("Failed to send receipt/notification emails (charge succeeded, this is non-blocking):", emailErr);
+    }
 
     res.json({
       transactionId: result.transaction.id,

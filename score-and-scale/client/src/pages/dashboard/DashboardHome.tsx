@@ -142,6 +142,18 @@ export function DashboardHome() {
     }
   }
 
+  // Explicit navigation after logout — do NOT rely on ProtectedRoute to
+  // react to the cleared user and improvise a redirect. If it does, it
+  // stamps location.state.from with wherever we were standing (e.g.
+  // /dashboard), and the NEXT login (possibly as a different user/role)
+  // would then honor that stale `from` over the correct role-based
+  // destination in Login.tsx.
+  async function handleLogout() {
+    setSidebarOpen(false);
+    await logout();
+    navigate('/login', { replace: true });
+  }
+
   return (
     <div className={darkMode ? 'dark' : ''}>
       <div className="min-h-screen flex bg-white dark:bg-black transition-colors duration-150">
@@ -229,10 +241,7 @@ export function DashboardHome() {
 
           <div className="mt-auto pt-6 border-t border-gray-200 dark:border-[#232323]">
             <button
-              onClick={() => {
-                setSidebarOpen(false);
-                logout();
-              }}
+              onClick={handleLogout}
               className="text-xs text-gray-500 dark:text-[#9A9A9A] hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               Log out

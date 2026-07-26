@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const NAV = [
@@ -28,9 +28,21 @@ function CloseIcon() {
 // they're on — reduces the risk of an admin acting as if in the customer view.
 export function AdminLayout() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   // Off-canvas on mobile, static column from md: up — closed by default
   // on small screens so it doesn't cover the page on first load.
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Explicit navigation after logout — do NOT rely on AdminRoute to react
+  // to the cleared user and improvise a redirect. If it does, it stamps
+  // location.state.from with wherever we were standing (e.g. /admin), and
+  // the NEXT login (possibly as a non-admin) would then honor that stale
+  // `from` over the correct role-based destination in Login.tsx.
+  async function handleLogout() {
+    setSidebarOpen(false);
+    await logout();
+    navigate('/login', { replace: true });
+  }
 
   return (
     <div className="min-h-screen flex bg-[#0A0A0A] text-gray-200">
@@ -74,7 +86,7 @@ export function AdminLayout() {
           ))}
         </nav>
         <div className="text-xs text-gray-500 mb-2">{user?.email}</div>
-        <button onClick={logout} className="text-xs text-gray-500 hover:text-white text-left">
+        <button onClick={handleLogout} className="text-xs text-gray-500 hover:text-white text-left">
           Log out
         </button>
       </aside>

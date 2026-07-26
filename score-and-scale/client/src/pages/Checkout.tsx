@@ -12,7 +12,7 @@ export default function Checkout() {
 
   if (!programSlug) {
     return (
-      <div className="max-w-md mx-auto py-16 text-center">
+      <div className="max-w-md mx-auto px-4 py-16 text-center">
         <p className="text-red-600">Missing program selection. Please choose a program again.</p>
       </div>
     );
@@ -20,7 +20,7 @@ export default function Checkout() {
 
   if (done) {
     return (
-      <div className="max-w-md mx-auto py-16 text-center">
+      <div className="max-w-md mx-auto px-4 py-16 text-center">
         <h1 className="text-2xl font-semibold mb-2">Payment received</h1>
         <p className="text-gray-600 mb-6">Thanks — your enrollment is confirmed.</p>
         <button
@@ -34,7 +34,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="max-w-md mx-auto py-16">
+    <div className="max-w-md mx-auto px-4 py-16">
       <h1 className="text-2xl font-semibold mb-6">Complete your payment</h1>
       <PaymentForm
         amount={amount}

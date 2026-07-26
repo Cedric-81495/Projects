@@ -12,10 +12,12 @@ export function Login() {
   const navigate = useNavigate();
   const { refetch } = useAuth();
 
-  const from =
-    (location.state as { from?: { pathname: string; search: string } })?.from
-      ? `${(location.state as any).from.pathname}${(location.state as any).from.search}`
-      : '/dashboard';
+  // Only set when ProtectedRoute/AdminRoute redirected here from a
+  // specific protected page. Not set when the person navigates to
+  // /login directly (e.g. typing the URL, clicking a nav link).
+  const from = (location.state as { from?: { pathname: string; search: string } })?.from
+    ? `${(location.state as any).from.pathname}${(location.state as any).from.search}`
+    : null;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -37,7 +39,12 @@ export function Login() {
         setError("We couldn't start your session. Please try signing in again.");
         return;
       }
-      navigate(from, { replace: true });
+
+      // Redirect-back takes priority (came from a specific protected
+      // page). Otherwise send admins to the admin console and everyone
+      // else to their dashboard.
+      const destination = from ?? (me.role === 'admin' ? '/admin' : '/dashboard');
+      navigate(destination, { replace: true });
     } catch (err) {
       if (err instanceof ApiError && err.code === 'INVALID_CREDENTIALS') {
         setError('Incorrect email or password.');

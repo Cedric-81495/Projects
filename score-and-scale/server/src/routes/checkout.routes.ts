@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { gateway } from "../lib/braintree";
 import { requireAuth } from "../middleware/requireAuth";
+import { clientTokenLimiter, checkoutLimiter } from "../middleware/rateLimit";
 import { Enrollment } from "../models/Enrollment";
 import { Program } from "../models/Program";
 
@@ -11,7 +12,7 @@ const router = Router();
  * Frontend calls this first to initialize Drop-in / Hosted Fields.
  * A fresh token should be requested per checkout attempt.
  */
-router.get("/client-token", requireAuth, async (_req: Request, res: Response) => {
+router.get("/client-token", requireAuth, clientTokenLimiter, async (_req: Request, res: Response) => {
   try {
     const { clientToken } = await gateway.clientToken.generate({});
     res.json({ clientToken });
@@ -34,7 +35,7 @@ router.get("/client-token", requireAuth, async (_req: Request, res: Response) =>
  * On success, upserts an Enrollment for (userId, programId) — this is what
  * makes a purchased program show up as "Enrolled" on the dashboard.
  */
-router.post("/", requireAuth, async (req: Request, res: Response) => {
+router.post("/", requireAuth, checkoutLimiter, async (req: Request, res: Response) => {
   const { paymentMethodNonce, programSlug } = req.body;
 
   if (!paymentMethodNonce || !programSlug) {

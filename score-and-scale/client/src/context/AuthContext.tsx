@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { apiFetch } from '../lib/api';
+import { apiFetch, ApiError } from '../lib/api';
 
 export interface AuthUser {
   id: string;
@@ -11,7 +11,9 @@ export interface AuthUser {
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
-  refetch: () => Promise<void>;
+  sessionMessage: string | null;
+  clearSessionMessage: () => void;
+  refetch: () => Promise<AuthUser | null>;
   logout: () => Promise<void>;
 }
 
@@ -20,15 +22,21 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionMessage, setSessionMessage] = useState<string | null>(null);
 
-  async function fetchMe() {
+  async function fetchMe(): Promise<AuthUser | null> {
     try {
-      // GET /api/auth/me will exist once the server is built — it reads the
-      // httpOnly cookie server-side and returns the current user, or 401.
       const me = await apiFetch<AuthUser>('/api/auth/me');
       setUser(me);
-    } catch {
+      return me;
+    } catch (err) {
       setUser(null);
+      // A guest with no session (NOT_AUTHENTICATED) is normal and silent.
+      // A session that genuinely expired is worth telling the person about.
+      if (err instanceof ApiError && err.code === 'SESSION_EXPIRED') {
+        setSessionMessage('Your session has expired. Please sign in again.');
+      }
+      return null;
     } finally {
       setLoading(false);
     }
@@ -44,7 +52,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, refetch: fetchMe, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        sessionMessage,
+        clearSessionMessage: () => setSessionMessage(null),
+        refetch: fetchMe,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

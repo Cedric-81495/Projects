@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { apiFetch } from '../lib/api';
+import { apiFetch, ApiError } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 
 export function Login() {
@@ -27,10 +27,25 @@ export function Login() {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
-      await refetch();
+
+      // Confirm the session actually took before navigating — this is
+      // what catches a cookie that silently failed to attach (e.g. a
+      // sameSite/CORS misconfig) instead of dropping the person on the
+      // dashboard only to get bounced straight back by ProtectedRoute.
+      const me = await refetch();
+      if (!me) {
+        setError("We couldn't start your session. Please try signing in again.");
+        return;
+      }
       navigate(from, { replace: true });
-    } catch {
-      setError('Login isn’t connected yet — the backend is next.');
+    } catch (err) {
+      if (err instanceof ApiError && err.code === 'INVALID_CREDENTIALS') {
+        setError('Incorrect email or password.');
+      } else if (err instanceof ApiError && err.code === 'INVALID_INPUT') {
+        setError('Please enter a valid email and password.');
+      } else {
+        setError("Couldn't sign in right now. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

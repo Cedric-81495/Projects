@@ -1,17 +1,10 @@
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { ContactSubmission } from '../models/ContactSubmission';
 import { sendMail } from '../lib/mailer';
+import { contactLimiter } from '../middleware/rateLimit';
 
 const router = Router();
-
-// Unauthenticated endpoint — worth its own limiter separate from any global one.
-const contactLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 5,
-  message: { error: 'Too many messages sent — please try again later.' },
-});
 
 const contactSchema = z.object({
   name: z.string().min(1).max(200),

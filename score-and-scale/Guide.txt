@@ -1,0 +1,171 @@
+Layer	Choice
+Frontend	React + TypeScript, built with Vite (fast dev server, no Next.js SSR overhead)
+Backend	Node.js + Express + TypeScript, separate service
+Routing	React Router (client-side)
+Styling	Tailwind CSS
+DB	MongoDB + Mongoose
+Auth	JWT (issued by Express, stored in httpOnly cookie) instead of NextAuth
+Payments	Stripe (same as before — Checkout Session + webhook)
+
+Folder Structure (monorepo, two apps)
+
+score-and-scale/
+├── client/                        # React + Vite + TS
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Home.tsx           # funnel page
+│   │   │   ├── Contact.tsx        # full-page contact form
+│   │   │   ├── Checkout.tsx       # hosts PaymentForm (replaces Stripe redirect flow)
+│   │   │   ├── NotFound.tsx       # NEW — catch-all 404, "Go back" + "Back to home"
+│   │   │   ├── Login.tsx          # CHANGED — fixed stray navigate() call that ran on every render/keystroke
+│   │   │   ├── Register.tsx
+│   │   │   ├── dashboard/
+│   │   │   │   └── DashboardHome.tsx
+│   │   │   └── admin/
+│   │   │       ├── AdminHome.tsx
+│   │   │       └── EnrollmentsTable.tsx
+│   │   ├── components/
+│   │   │   ├── marketing/
+│   │   │   │   ├── Header.tsx      # CHANGED — section nav links use SectionLink (route-aware)
+│   │   │   │   ├── Footer.tsx      # CHANGED — same SectionLink fix for footer nav
+│   │   │   │   ├── Tiers.tsx       # CHANGED — navigates to /checkout instead of placeholder Stripe URL fetch
+│   │   │   │   ├── PaymentForm.tsx # Braintree Drop-in UI
+│   │   │   │   └── (Hero, Dial, Faq, ...)
+│   │   │   ├── ui/
+│   │   │   │   ├── FadeUp.tsx
+│   │   │   │   ├── Spinner.tsx           # NEW — inline loading spinner, used in PaymentForm's Pay button
+│   │   │   │   ├── BackToTop.tsx         # NEW — floating scroll-to-top button, fades in past 400px scroll
+│   │   │   │   ├── ScrollToTop.tsx       # NEW — resets scroll to top on route change; scrolls to #hash if present
+│   │   │   │   ├── PageTransitionBar.tsx # NEW — top loading bar animation on every route change
+│   │   │   │   └── SectionLink.tsx       # NEW — shared route-aware link (anchor on Home, Link+hash elsewhere)
+│   │   │   ├── auth/
+│   │   │   │   └── SessionManager.tsx    # NEW — idle-timeout warning modal + auto-logout, wired to AuthContext
+│   │   │   ├── dashboard/ (StatusBadge, Timeline)
+│   │   │   └── admin/ (DataTable, StatusSelect)
+│   │   ├── hooks/
+│   │   │   └── useIdleTimer.ts     # NEW — tracks activity, fires warning/idle callbacks
+│   │   ├── routes/
+│   │   │   ├── ProtectedRoute.tsx  # checks auth context, redirects
+│   │   │   └── AdminRoute.tsx      # checks role === 'admin'
+│   │   ├── context/AuthContext.tsx
+│   │   ├── types/
+│   │   │   └── braintree-web-drop-in.d.ts  # local type declarations (package ships none)
+│   │   ├── lib/api.ts              # fetch wrapper (apiFetch), base URL from env — unchanged
+│   │   └── App.tsx                 # CHANGED — added /checkout, catch-all 404 route, ScrollToTop, PageTransitionBar, BackToTop, SessionManager
+│   ├── tailwind.config.ts
+│   ├── vite.config.ts              # unchanged (no alias needed after @babel/runtime downgrade; lucide-react removed, using inline SVG instead)
+│   └── .env                        # VITE_API_URL
+│
+├── server/                        # Express + TS
+│   ├── src/
+│   │   ├── routes/
+│   │   │   ├── auth.routes.ts      # unchanged — register/login/logout/refresh/me, confirmed duplicate-email 409 check
+│   │   │   ├── contact.routes.ts
+│   │   │   ├── enrollments.routes.ts
+│   │   │   ├── checkout.routes.ts  # client-token + nonce-based sale (was Stripe Checkout Session)
+│   │   │   └── webhooks.routes.ts  # Braintree webhook parsing, form-encoded body (optional; disputes/subscriptions only)
+│   │   ├── middleware/
+│   │   │   ├── requireAuth.ts
+│   │   │   └── requireAdmin.ts
+│   │   ├── models/                 # same Mongoose schemas as before
+│   │   │   ├── ContactSubmission.ts
+│   │   │   ├── Enrollement.ts
+│   │   │   ├── Payment.ts
+│   │   │   ├── Programs.ts
+│   │   │   └── User.ts
+│   │   ├── scripts/
+│   │   │   └── seedPrograms.ts     # dns.setServers(...) added at top to force Node's DNS resolver
+│   │   ├── lib/ (db.ts, braintree.ts, mailer.ts, cookies.ts)  # braintree.ts REPLACES stripe.ts
+│   │   └── index.ts                # Express entry — express.urlencoded() added; no more express.raw() for webhooks; dns.setServers(...) recommended at top
+│   ├── tsconfig.json                # moduleResolution updated node10 → node16 (paired with module: node16)
+│   └── .env                        # BT_ENV / BT_MERCHANT_ID / BT_PUBLIC_KEY / BT_PRIVATE_KEY replace STRIPE_* vars
+│
+└── package.json                    # workspace root (npm workspaces: client, server)
+
+npm create vite@latest client -- --template react-ts
+cd client
+npm install
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+npm install react-router-dom
+cd ..
+
+mkdir -p client/src/pages/dashboard client/src/pages/admin \
+         client/src/components/marketing client/src/components/dashboard client/src/components/admin \
+         client/src/routes client/src/context client/src/lib
+
+mkdir server && cd server
+npm init -y
+npm install express cors cookie-parser jsonwebtoken bcrypt mongoose stripe dotenv
+npm install -D typescript ts-node-dev @types/express @types/node @types/cors @types/cookie-parser @types/jsonwebtoken @types/bcrypt
+npx tsc --init
+cd ..
+
+mkdir -p server/src/routes server/src/middleware server/src/models server/src/lib
+
+
+git add .
+git commit -m "Initial scaffold: client (Vite+React+TS) and server (Express+TS)"
+
+npm run dev:server   # in one terminal
+npm run dev:client   # in another
+
+
+mongodb+srv://scoreandscale-admin:2BKsZ9Vi9xjc7LuB@scoreandscalecluster.fcqld74.mongodb.net/?appName=ScoreAndScaleCluster
+
+stripe login
+
+Step 3 — Log in to Stripe CLI
+powershell
+stripe login
+
+This opens a browser window asking you to authorize the CLI with your Stripe account. Click Allow access. You'll see Done! The Stripe CLI is configured in the terminal.
+
+Step 4 — Start the webhook listener
+
+Make sure your Express server is running first (npm run dev in the server/ folder), then in a separate terminal:
+
+powershell
+stripe listen --forward-to localhost:4000/api/webhooks/stripe
+
+The CLI will print something like this:
+
+> Ready! Your webhook signing secret is whsec_a1b2c3d4e5f6...
+
+That whsec_... value is your STRIPE_WEBHOOK_SECRET — copy it and paste into server/.env:
+
+env
+STRIPE_WEBHOOK_SECRET=whsec_a1b2c3d4e5f6...
+
+Restart the server after updating .env:
+
+powershell
+# stop server with Ctrl+C, then:
+npm run dev
+Step 5 — Verify it's working
+
+The Stripe CLI terminal will show events arriving in real time when you test checkout. You should see lines like:
+
+2026-07-25 --> checkout.session.completed [evt_xxx]
+2026-07-25 <-- [200] POST http://localhost:4000/api/webhooks/stripe
+
+That 200 means your server received and handled the event correctly.
+
+Remove-Item -Recurse -Force node_modules
+Remove-Item package-lock.json
+npm install
+
+rmdir /s /q node_modules
+del package-lock.json
+npm install
+
+
+mongodb+srv://scoreandscale-admi:acCSDlISSMbmQRUw@scoreandscalecluster.fcqld74.mongodb.net/?appName=ScoreAndScaleCluster
+
+Scoreandscale
+baded4d86cb356be
+
+4111 1111 1111 1111
+
+cedricsusmerano@gmail.com
+Test1234

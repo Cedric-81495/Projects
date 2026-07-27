@@ -75,6 +75,9 @@ export function Register() {
         <p className="text-sm text-paper2 text-center">
           Already have an account? <Link to="/login" className="text-brassBright hover:text-brass">Sign in</Link>
         </p>
+        <p className="text-sm text-paper2 text-center">
+          <Link to="/" className="text-brassBright hover:text-brass">Back to Home</Link>
+        </p>
       </form>
     </div>
   );

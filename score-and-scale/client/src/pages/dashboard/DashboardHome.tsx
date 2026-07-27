@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { apiFetch } from '../../lib/api';
 import { StatusBadge, EnrollmentStatus } from '../../components/dashboard/StatusBadge';
+import { DocumentUpload } from '../../components/dashboard/DocumentUpload';
+import { PaymentHistory } from '../../components/dashboard/PaymentHistory';
 
 interface Enrollment {
   id: string;
@@ -287,6 +289,7 @@ export function DashboardHome() {
                     <h2 className="text-[17px] font-medium text-gray-900 dark:text-white">
                       {enrollment.programName}
                     </h2>
+                    <DocumentUpload enrollmentId={enrollment.id} />
                     <StatusBadge status={enrollment.status} />
                   </div>
 
@@ -321,7 +324,7 @@ export function DashboardHome() {
                     )}
                     {enrollment.status === 'funded' && (
                       <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                        🎉 Funded — this program is complete.
+                        Funded — this program is complete.
                       </span>
                     )}
                   </div>
@@ -335,6 +338,9 @@ export function DashboardHome() {
               </p>
             </div>
           )}
+          <div className="mt-8">
+            <PaymentHistory />
+          </div>
         </main>
       </div>
     </div>

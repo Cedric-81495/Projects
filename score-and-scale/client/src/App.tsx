@@ -17,6 +17,8 @@ import { EnrollmentsTable } from './pages/admin/EnrollmentsTable';
 import { ContactsInbox } from './pages/admin/ContactsInbox';
 import Checkout from './pages/Checkout';
 import { NotFound } from './pages/NotFound';
+import { DocumentsReview } from './pages/admin/DocumentsReview';
+import { PaymentsTable } from './pages/admin/PaymentsTable';
 
 export default function App() {
   return (
@@ -36,6 +38,8 @@ export default function App() {
 
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminLayout />}>
+            <Route path="documents" element={<DocumentsReview />} />
+            <Route path="payments" element={<PaymentsTable />} />
               <Route index element={<AdminHome />} />
               <Route path="enrollments" element={<EnrollmentsTable />} />
               <Route path="contacts" element={<ContactsInbox />} />

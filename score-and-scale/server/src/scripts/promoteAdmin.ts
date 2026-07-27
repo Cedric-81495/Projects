@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 async function run() {
   const email = process.argv[2];
   if (!email) {
-    console.error('Usage: npx ts-node src/scripts/promoteAdmin.ts cedricsusmerano@gmail.com');
+    console.error('Usage: npx ts-node src/scripts/promoteAdmin.ts sample-email@gmail.com');
     process.exit(1);
   }
 

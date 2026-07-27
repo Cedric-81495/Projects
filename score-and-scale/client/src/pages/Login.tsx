@@ -126,6 +126,9 @@ export function Login() {
         <p className="text-sm text-paper2 text-center">
           No account? <Link to="/register" className="text-brassBright hover:text-brass">Register</Link>
         </p>
+        <p className="text-sm text-paper2 text-center">
+          <Link to="/" className="text-brassBright hover:text-brass">Back to Home</Link>
+        </p>
       </form>
     </div>
   );

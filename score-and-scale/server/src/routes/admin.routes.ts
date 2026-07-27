@@ -48,4 +48,31 @@ router.get('/contacts', async (_req, res) => {
   res.json(submissions);
 });
 
+router.get('/payments', async (_req, res) => {
+  const payments = await Payment.find()
+    .sort({ createdAt: -1 })
+    .populate({
+      path: 'enrollmentId',
+      populate: [
+        { path: 'userId', select: 'email' },
+        { path: 'programId', select: 'name' },
+      ],
+    });
+
+  res.json(
+    payments.map((p) => {
+      const enrollment = p.enrollmentId as any;
+      return {
+        id: p._id,
+        userEmail: enrollment?.userId?.email ?? 'unknown',
+        programName: enrollment?.programId?.name ?? 'unknown',
+        amountCents: p.amountCents,
+        status: p.status,
+        braintreeTransactionId: p.braintreeTransactionId,
+        createdAt: p.createdAt,
+      };
+    })
+  );
+});
+
 export default router;

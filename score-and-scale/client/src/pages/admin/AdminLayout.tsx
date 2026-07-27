@@ -6,6 +6,8 @@ const NAV = [
   { to: '/admin', label: 'Overview', end: true },
   { to: '/admin/enrollments', label: 'Enrollments' },
   { to: '/admin/contacts', label: 'Contact Inbox' },
+  { to: '/admin/documents', label: 'Documents' },
+  { to: '/admin/payments', label: 'Payments' },
 ];
 
 function MenuIcon() {

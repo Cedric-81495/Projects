@@ -17,6 +17,8 @@ import webhookRoutes from './routes/webhooks.routes';
 import enrollmentsRoutes from './routes/enrollments.routes';
 import programsRoutes from './routes/programs.routes';
 import adminRoutes from './routes/admin.routes';
+import documentsRouter from './routes/documents.routes';
+import paymentsRouter from './routes/payments.routes';
 
 const app = express();
 
@@ -46,6 +48,8 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/enrollments', enrollmentsRoutes);
 app.use('/api/programs', programsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/documents', documentsRouter);
+app.use('/api/payments', paymentsRouter);
 
 const PORT = process.env.PORT ?? 4000;
 

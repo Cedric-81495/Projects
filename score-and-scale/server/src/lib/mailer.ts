@@ -1,16 +1,37 @@
-import { Resend } from 'resend';
+import { Resend } from "resend";
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
-export async function sendMail(opts: { to: string; subject: string; html: string }) {
+export interface SendMailOptions {
+  to: string | string[];
+  subject: string;
+  html: string;
+}
+
+export async function sendMail({
+  to,
+  subject,
+  html,
+}: SendMailOptions): Promise<void> {
   if (!resend) {
-    console.warn('RESEND_API_KEY not set — skipping email send:', opts.subject);
+    console.warn(
+      "[Mailer] RESEND_API_KEY is not configured. Email was skipped.",
+      { subject, to }
+    );
     return;
   }
-  await resend.emails.send({
-    from: 'Score & Scale <no-reply@scoreandscale.com>',
-    to: opts.to,
-    subject: opts.subject,
-    html: opts.html,
+
+  const { error } = await resend.emails.send({
+    from: "Score & Scale <no-reply@scoreandscale.com>",
+    to,
+    subject,
+    html,
   });
+
+  if (error) {
+    console.error("[Mailer] Failed to send email:", error);
+    throw new Error(error.message);
+  }
 }

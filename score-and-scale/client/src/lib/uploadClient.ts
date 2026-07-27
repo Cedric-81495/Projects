@@ -1,6 +1,8 @@
-// client/src/lib/uploadClient.ts  (NEW FILE — do NOT merge into api.ts)
+// client/src/lib/uploadClient.ts  (UPDATED — upload step now goes through
+// supabase-js instead of a plain PUT)
 
 import { apiFetch } from './api';
+import { supabase, DOCUMENTS_BUCKET } from './supabaseClient';
 
 export type DocType = 'id' | 'credit_report' | 'business_doc';
 
@@ -26,13 +28,13 @@ export function validateFile(file: File): string | null {
 // Kept separate from apiFetch on purpose: apiFetch always sets
 // Content-Type: application/json, which the login/session flow depends on.
 // This helper uses apiFetch for the JSON steps (talking to our own API),
-// then PUTs the raw file straight to S3 via the presigned URL — the file
-// bytes never pass through our Express server at all.
+// then uploads the raw file straight to Supabase Storage via a signed
+// token — the file bytes never pass through our Express server.
 export async function uploadDocument({ file, enrollmentId, type }: UploadableFile) {
   const validationError = validateFile(file);
   if (validationError) throw new Error(validationError);
 
-  const { uploadUrl, s3Key } = await apiFetch<{ uploadUrl: string; s3Key: string }>('/api/documents/upload-url', {
+  const { token, s3Key } = await apiFetch<{ token: string; s3Key: string }>('/api/documents/upload-url', {
     method: 'POST',
     body: JSON.stringify({
       enrollmentId,
@@ -43,12 +45,8 @@ export async function uploadDocument({ file, enrollmentId, type }: UploadableFil
     }),
   });
 
-  const uploadRes = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': file.type },
-    body: file,
-  });
-  if (!uploadRes.ok) throw new Error('Upload to storage failed. Please try again.');
+  const { error } = await supabase.storage.from(DOCUMENTS_BUCKET).uploadToSignedUrl(s3Key, token, file);
+  if (error) throw new Error('Upload to storage failed. Please try again.');
 
   return apiFetch('/api/documents', {
     method: 'POST',

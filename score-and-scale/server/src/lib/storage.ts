@@ -1,30 +1,24 @@
-// server/src/lib/storage.ts  (NEW FILE)
+// server/src/lib/storage.ts  (REPLACES the AWS S3 version — same filename)
 
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
 
 // Required env vars (server/.env):
-//   AWS_ACCESS_KEY_ID=...
-//   AWS_SECRET_ACCESS_KEY=...
-//   AWS_REGION=...
-//   S3_BUCKET_NAME=...
-const required = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_REGION', 'S3_BUCKET_NAME'] as const;
+//   SUPABASE_URL=...
+//   SUPABASE_SERVICE_ROLE_KEY=...   (secret — server only, never send to client)
+//   SUPABASE_STORAGE_BUCKET=...
+const required = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_STORAGE_BUCKET'] as const;
 for (const key of required) {
   if (!process.env[key]) {
     throw new Error(`Missing required env var: ${key}`);
   }
 }
 
-const BUCKET = process.env.S3_BUCKET_NAME!;
+const BUCKET = process.env.SUPABASE_STORAGE_BUCKET!;
 
-const s3 = new S3Client({
-  region: process.env.AWS_REGION!,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
+// Service role key bypasses Row Level Security entirely — this client must
+// only ever be instantiated server-side.
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 export const ALLOWED_MIME_TYPES = ['application/pdf', 'image/jpeg', 'image/png'] as const;
 export const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
@@ -34,22 +28,21 @@ export function buildDocumentKey(userId: string, enrollmentId: string, originalF
   return `documents/${userId}/${enrollmentId}/${randomUUID()}.${ext}`;
 }
 
-// Presigned PUT — the browser uploads the file bytes directly to S3; our
-// server never receives or buffers the raw file. Expiry is short since
-// it's used immediately after being issued.
-export async function getUploadUrl(key: string, mimeType: string) {
-  const command = new PutObjectCommand({
-    Bucket: BUCKET,
-    Key: key,
-    ContentType: mimeType,
-    ServerSideEncryption: 'AES256',
-  });
-  return getSignedUrl(s3, command, { expiresIn: 300 }); // 5 minutes
+// Returns a short-lived signed upload token for a given storage path. The
+// client uses this with supabase-js's uploadToSignedUrl() — NOT a plain
+// fetch PUT — since Supabase's signed-upload flow expects the storage-js
+// client to attach the token in its own request format.
+export async function getUploadToken(path: string) {
+  const { data, error } = await supabase.storage.from(BUCKET).createSignedUploadUrl(path);
+  if (error || !data) throw new Error(`Failed to create signed upload url: ${error?.message}`);
+  return { token: data.token, path: data.path };
 }
 
 // Presigned GET — used whenever a user or admin needs to view/download a
-// document. Never return a permanent public URL for anything in this bucket.
-export async function getDownloadUrl(key: string) {
-  const command = new GetObjectCommand({ Bucket: BUCKET, Key: key });
-  return getSignedUrl(s3, command, { expiresIn: 900 }); // 15 minutes
+// document. The bucket itself stays private; this signed URL is the only
+// way in.
+export async function getDownloadUrl(path: string) {
+  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 900); // 15 min
+  if (error || !data) throw new Error(`Failed to create signed download url: ${error?.message}`);
+  return data.signedUrl;
 }

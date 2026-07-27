@@ -1,4 +1,5 @@
-// server/src/routes/documents.routes.ts  (NEW FILE)
+// server/src/routes/documents.routes.ts  (UPDATED — only the upload-url
+// handler changes; everything else is identical to the S3 version)
 
 import { Router } from 'express';
 import { z } from 'zod';
@@ -7,7 +8,7 @@ import { Enrollment } from '../models/Enrollment';
 import { requireAuth } from '../middleware/requireAuth';
 import { requireAdmin } from '../middleware/requireAdmin';
 import {
-  getUploadUrl,
+  getUploadToken,
   getDownloadUrl,
   buildDocumentKey,
   ALLOWED_MIME_TYPES,
@@ -24,9 +25,12 @@ const uploadUrlSchema = z.object({
   sizeBytes: z.number().positive().max(MAX_FILE_SIZE_BYTES),
 });
 
-// POST /api/documents/upload-url — customer requests a presigned S3 upload
-// URL for a specific enrollment. Validates the enrollment actually belongs
-// to the requesting user before issuing anything.
+// POST /api/documents/upload-url — customer requests a signed upload token
+// for a specific enrollment. Validates the enrollment actually belongs to
+// the requesting user before issuing anything.
+// CHANGED: returns { token, s3Key } instead of { uploadUrl, s3Key } — the
+// client now uses supabase-js's uploadToSignedUrl(s3Key, token, file)
+// rather than a plain PUT.
 router.post('/upload-url', requireAuth, async (req, res) => {
   const parsed = uploadUrlSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -38,9 +42,9 @@ router.post('/upload-url', requireAuth, async (req, res) => {
   if (!enrollment) return res.status(404).json({ error: 'Enrollment not found' });
 
   const s3Key = buildDocumentKey(req.user!.userId, enrollmentId, originalFilename);
-  const uploadUrl = await getUploadUrl(s3Key, mimeType);
+  const { token } = await getUploadToken(s3Key);
 
-  res.json({ uploadUrl, s3Key, sizeBytes, mimeType, type });
+  res.json({ token, s3Key, sizeBytes, mimeType, type });
 });
 
 const confirmSchema = z.object({
@@ -52,9 +56,10 @@ const confirmSchema = z.object({
   sizeBytes: z.number().positive().max(MAX_FILE_SIZE_BYTES),
 });
 
-// POST /api/documents — customer confirms the S3 upload succeeded; only now
-// does the server create the DB record, so a Document row always
-// corresponds to an object that was actually written to the bucket.
+// POST /api/documents — customer confirms the upload succeeded; only now
+// does the server create the DB record. Unchanged from the S3 version —
+// s3Key is kept as the field name to avoid a schema migration, even though
+// it now stores a Supabase Storage path rather than an S3 key.
 router.post('/', requireAuth, async (req, res) => {
   const parsed = confirmSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -78,8 +83,8 @@ router.post('/', requireAuth, async (req, res) => {
   res.status(201).json({ id: doc._id, type: doc.type, status: doc.status, originalFilename: doc.originalFilename });
 });
 
-// GET /api/documents?enrollmentId=... — the current user's own documents
-// for one enrollment.
+// GET /api/documents?enrollmentId=... — unchanged, getDownloadUrl still
+// takes the same s3Key/path and returns a signed URL.
 router.get('/', requireAuth, async (req, res) => {
   const { enrollmentId } = req.query;
   if (typeof enrollmentId !== 'string') {
@@ -103,9 +108,7 @@ router.get('/', requireAuth, async (req, res) => {
   res.json(withUrls);
 });
 
-// GET /api/documents/admin/all — every submitted document, most recent
-// first. Kept on this router (rather than admin.routes.ts) so the whole
-// document feature stays in one file; it's still admin-gated per-route.
+// GET /api/documents/admin/all — unchanged.
 router.get('/admin/all', requireAuth, requireAdmin, async (_req, res) => {
   const docs = await EnrollmentDocument.find()
     .sort({ createdAt: -1 })
@@ -133,7 +136,7 @@ const reviewSchema = z.object({
   reviewNote: z.string().optional(),
 });
 
-// PATCH /api/documents/:id/review — admin approves/rejects a submitted document.
+// PATCH /api/documents/:id/review — unchanged.
 router.patch('/:id/review', requireAuth, requireAdmin, async (req, res) => {
   const parsed = reviewSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: 'Invalid request' });

@@ -21,7 +21,7 @@ const REFRESH_TTL_DAYS = 30
 export const REFRESH_TTL_MS = REFRESH_TTL_DAYS * 24 * 60 * 60 * 1000
 
 export function signAccessToken(claims: AccessTokenClaims): string {
-  return jwt.sign(claims, env.JWT_ACCESS_SECRET, { expiresIn: ACCESS_TTL })
+  return jwt.sign(claims, env.JWT_SECRET, { expiresIn: ACCESS_TTL })
 }
 
 export function signRefreshToken(claims: RefreshTokenClaims): string {
@@ -29,7 +29,7 @@ export function signRefreshToken(claims: RefreshTokenClaims): string {
 }
 
 export function verifyAccessToken(token: string): AccessTokenClaims {
-  return jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenClaims & jwt.JwtPayload
+  return jwt.verify(token, env.JWT_SECRET) as AccessTokenClaims & jwt.JwtPayload
 }
 
 export function verifyRefreshToken(token: string): RefreshTokenClaims {

@@ -5,6 +5,7 @@ import { ApiError } from '../lib/api'
 import { Button } from '../components/ui/Button'
 import { FormError, TextField } from '../components/ui/Field'
 import { AuthShell } from '../components/auth/AuthShell'
+import { AuthDivider, GoogleButton } from '../components/auth/GoogleButton'
 
 const MIN_PASSWORD_LENGTH = 10
 
@@ -85,9 +86,23 @@ export function Register() {
         </>
       }
     >
-      <form onSubmit={onSubmit} noValidate className="space-y-5">
-        {error && <FormError>{error}</FormError>}
+      {error && (
+        <div className="mb-5">
+          <FormError>{error}</FormError>
+        </div>
+      )}
 
+      {/*
+        Same endpoint as sign-in. If the Google email already has an account the
+        server links the identity instead of creating a duplicate, so a visitor
+        who signed up with a password and later clicks this lands in the same
+        account rather than a second one.
+      */}
+      <GoogleButton mode="signup" next={next} />
+
+      <AuthDivider label="or sign up with email" />
+
+      <form onSubmit={onSubmit} noValidate className="space-y-5">
         <TextField
           label="Full name"
           name="name"

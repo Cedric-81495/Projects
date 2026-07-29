@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import { primaryClientOrigin, readOptionalGroup } from './env'
+import { primaryClientUrl, readOptionalGroup } from './env'
 import { logger } from './logger'
 
 let resend: Resend | null = null
@@ -71,7 +71,7 @@ function layout(heading: string, bodyHtml: string): string {
       <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3">${heading}</h1>
       ${bodyHtml}
       <p style="margin:32px 0 0;font-size:13px;color:#6b7280">
-        <a href="${primaryClientOrigin}" style="color:#1a56db;text-decoration:none">${primaryClientOrigin.replace(/^https?:\/\//, '')}</a>
+        <a href="${primaryClientUrl}" style="color:#1a56db;text-decoration:none">${primaryClientUrl.replace(/^https?:\/\//, '')}</a>
       </p>
     </td></tr>
   </table>
@@ -108,9 +108,9 @@ export async function sendContactNotification(input: {
   topic: string
   message: string
 }): Promise<boolean> {
-  const to = process.env.ADMIN_NOTIFICATION_EMAIL
+  const to = process.env.CONTACT_NOTIFY_EMAIL
   if (!to) {
-    logger.warn('ADMIN_NOTIFICATION_EMAIL not set — skipping internal contact notification')
+    logger.warn('CONTACT_NOTIFY_EMAIL not set — skipping internal contact notification')
     return false
   }
 
@@ -141,7 +141,7 @@ export async function sendEnrollmentStatusEmail(input: {
          Hi ${escapeHtml(input.name)}, your <strong>${escapeHtml(input.programName)}</strong>
          enrollment is now <strong>${escapeHtml(input.status.replace(/_/g, ' '))}</strong>.
        </p>
-       <a href="${primaryClientOrigin}/dashboard"
+       <a href="${primaryClientUrl}/dashboard"
           style="display:inline-block;background:#12161c;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600">
           View your dashboard
        </a>`,

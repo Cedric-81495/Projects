@@ -22,23 +22,26 @@ services:
       - key: PORT
         value: 10000
 
-      # Browser origins permitted by CORS. Must include the Netlify site, or
-      # every request from the frontend is blocked.
-      - key: CLIENT_ORIGIN
+      # Browser origin(s) permitted by CORS, and the base for OAuth redirects
+      # and email links. Must include the Netlify site or every request from the
+      # frontend is blocked. Comma-separated; the first entry is canonical.
+      - key: CLIENT_URL
         value: https://score-and-scale.netlify.app
 
       - key: MONGODB_URI
         sync: false
 
-      # Two different long random strings. Reusing one for both would let a
-      # refresh token be replayed as an access token.
-      - key: JWT_ACCESS_SECRET
+      # Two different secrets. Reusing one for both would let a refresh token be
+      # replayed as an access token, and the server refuses to boot if they match.
+      - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
 
+      # ---------------------------------------------------------------------
       # Optional integrations. Each is validated lazily, so the API boots and
-      # serves every unrelated route even while these are blank.
+      # serves every unrelated route while these are blank.
+      # ---------------------------------------------------------------------
       - key: BT_ENV
         value: sandbox
       - key: BT_MERCHANT_ID
@@ -53,14 +56,20 @@ services:
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: SUPABASE_STORAGE_BUCKET
-        value: enrollment-documents
+        value: documents
 
+      - key: CONTACT_NOTIFY_EMAIL
+        value: cedricsusmerano@gmail.com
       - key: RESEND_API_KEY
         sync: false
       - key: MAIL_FROM
         sync: false
-      - key: ADMIN_NOTIFICATION_EMAIL
-        sync: false
 
+      # Google OAuth 2.0 authorization-code flow. GOOGLE_CALLBACK_URL must match
+      # an Authorised redirect URI in the Google Cloud console exactly.
       - key: GOOGLE_CLIENT_ID
         sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        value: https://score-and-scale-api.onrender.com/api/auth/google/callback

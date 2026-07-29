@@ -24,10 +24,18 @@ interface AuthContextValue {
   initialising: boolean
   login: (email: string, password: string) => Promise<AuthUser>
   register: (name: string, email: string, password: string) => Promise<AuthUser>
-  loginWithGoogle: (credential: string) => Promise<AuthUser>
   logout: () => Promise<void>
   refetch: () => Promise<AuthUser | null>
 }
+
+/**
+ * Google sign-in has no method here on purpose.
+ *
+ * The authorization-code flow is a full-page redirect handled entirely by the
+ * server, which sets the session cookies before returning the browser. By the
+ * time this provider mounts again the session already exists, so the initial
+ * /me call picks up both the user and the CSRF token with no client-side step.
+ */
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
@@ -111,17 +119,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [adopt],
   )
 
-  const loginWithGoogle = useCallback(
-    async (credential: string) => {
-      const data = await apiFetch<AuthResponse>('/api/auth/google', {
-        method: 'POST',
-        body: { credential },
-      })
-      return adopt(data)
-    },
-    [adopt],
-  )
-
   const logout = useCallback(async () => {
     // Bumped first so a pending /me cannot restore the user after sign-out.
     fetchIdRef.current += 1
@@ -137,8 +134,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ user, initialising, login, register, loginWithGoogle, logout, refetch: fetchMe }),
-    [user, initialising, login, register, loginWithGoogle, logout, fetchMe],
+    () => ({ user, initialising, login, register, logout, refetch: fetchMe }),
+    [user, initialising, login, register, logout, fetchMe],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

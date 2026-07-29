@@ -1,14 +1,26 @@
 import { Router } from 'express'
-import { OAuth2Client } from 'google-auth-library'
 import { z } from 'zod'
 import {
+  OAUTH_STATE_COOKIE,
   REFRESH_COOKIE,
   clearAuthCookies,
+  clearOAuthStateCookie,
   setAccessCookie,
+  setOAuthStateCookie,
   setRefreshCookie,
 } from '../lib/cookies'
-import { readOptionalGroup } from '../lib/env'
-import { conflict, integrationUnavailable, unauthorized } from '../lib/errors'
+import { safeClientRedirect } from '../lib/env'
+import { conflict, unauthorized } from '../lib/errors'
+import {
+  buildFailureRedirect,
+  buildGoogleAuthUrl,
+  createOAuthState,
+  exchangeCodeForProfile,
+  isGoogleOAuthConfigured,
+  nonceMatches,
+  parseOAuthState,
+  type GoogleProfile,
+} from '../lib/googleOAuth'
 import {
   hashToken,
   isTokenExpiredError,
@@ -47,10 +59,6 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email('Please enter a valid email address'),
   password: z.string().min(1, 'Please enter your password'),
-})
-
-const googleSchema = z.object({
-  credential: z.string().min(1, 'Missing Google credential'),
 })
 
 /** Shape returned to the client for the signed-in user. */
@@ -186,72 +194,149 @@ router.post(
   }),
 )
 
+/**
+ * Resolves a Google profile to a local account.
+ *
+ * One function serves both "sign in with Google" and "sign up with Google" —
+ * they are the same operation, distinguished only by whether the email already
+ * exists. Keeping it in one place is what guarantees a returning user is linked
+ * rather than duplicated.
+ */
+async function resolveGoogleUser(profile: GoogleProfile): Promise<{
+  user: UserDocument
+  created: boolean
+}> {
+  const existing = (await User.findOne({ email: profile.email }).select(
+    '+refreshSessions',
+  )) as UserDocument | null
+
+  if (existing) {
+    /**
+     * Link the Google identity to the account that already owns this email.
+     * The address is verified by Google at this point, so this is the intended
+     * "same person, new sign-in method" path rather than a takeover.
+     *
+     * Existing fields are preserved: a user who set their own name or avatar
+     * should not have it overwritten by their Google profile on every sign-in.
+     */
+    if (!existing.googleId) existing.googleId = profile.googleId
+    if (!existing.avatarUrl && profile.picture) existing.avatarUrl = profile.picture
+    existing.emailVerified = true
+
+    return { user: existing, created: false }
+  }
+
+  const created = (await User.create({
+    name: profile.name,
+    email: profile.email,
+    googleId: profile.googleId,
+    avatarUrl: profile.picture,
+    emailVerified: true,
+    // Role is always 'user'. Elevation happens only through the CLI script, so
+    // no OAuth path can mint an administrator.
+    role: 'user',
+  })) as UserDocument
+
+  return { user: created, created: true }
+}
+
 // ---------------------------------------------------------------------------
-// POST /api/auth/google
+// GET /api/auth/google — begin the authorization-code flow
 // ---------------------------------------------------------------------------
-router.post(
+router.get(
   '/google',
   authLimiter,
-  validate(googleSchema),
   asyncHandler(async (req, res) => {
-    const config = readOptionalGroup(['GOOGLE_CLIENT_ID'] as const)
-    if (!config) throw integrationUnavailable('Google sign-in')
-
-    const { credential } = req.body as z.infer<typeof googleSchema>
-    const oauthClient = new OAuth2Client(config.GOOGLE_CLIENT_ID)
-
-    let payload
-    try {
-      const ticket = await oauthClient.verifyIdToken({
-        idToken: credential,
-        audience: config.GOOGLE_CLIENT_ID,
-      })
-      payload = ticket.getPayload()
-    } catch {
-      throw unauthorized('GOOGLE_TOKEN_INVALID', 'We could not verify that Google sign-in.')
+    /**
+     * This route is a browser navigation, so an unconfigured integration must
+     * redirect with an error code rather than throw — a raw 503 JSON body is not
+     * something to show someone who just clicked a button.
+     */
+    if (!isGoogleOAuthConfigured()) {
+      res.redirect(buildFailureRedirect('GOOGLE_NOT_CONFIGURED'))
+      return
     }
 
-    if (!payload?.email || !payload.sub) {
-      throw unauthorized('GOOGLE_TOKEN_INVALID', 'That Google account did not provide an email.')
-    }
+    const requestedNext = typeof req.query.next === 'string' ? req.query.next : undefined
 
     /**
-     * Google's own verification of the address is required before we trust it
-     * to match an existing local account — otherwise an unverified Google
-     * profile claiming a known email would take over that account.
+     * The nonce goes to Google in `state` and its twin into an httpOnly cookie.
+     * On the way back the two must match, which is what stops an attacker
+     * replaying their own authorization code in a victim's browser.
      */
-    if (payload.email_verified === false) {
-      throw unauthorized('GOOGLE_EMAIL_UNVERIFIED', 'That Google email is not verified.')
+    const { cookieValue, nonce } = createOAuthState(requestedNext)
+    setOAuthStateCookie(res, cookieValue)
+
+    res.redirect(buildGoogleAuthUrl(nonce))
+  }),
+)
+
+// ---------------------------------------------------------------------------
+// GET /api/auth/google/callback — Google returns the browser here
+// ---------------------------------------------------------------------------
+router.get(
+  '/google/callback',
+  authLimiter,
+  asyncHandler(async (req, res) => {
+    const state = parseOAuthState(req.cookies?.[OAUTH_STATE_COOKIE])
+    // Single-use: consumed whatever the outcome, so a code cannot be retried.
+    clearOAuthStateCookie(res)
+
+    /**
+     * This endpoint is a browser navigation, not an XHR. Failures therefore
+     * redirect to the login page with an error code rather than returning JSON
+     * the user would see as raw text.
+     */
+    if (typeof req.query.error === 'string') {
+      res.redirect(buildFailureRedirect('GOOGLE_ACCESS_DENIED'))
+      return
     }
 
-    const email = payload.email.toLowerCase()
-    let user = (await User.findOne({ email }).select('+refreshSessions')) as UserDocument | null
+    const code = typeof req.query.code === 'string' ? req.query.code : undefined
+    const returnedState = typeof req.query.state === 'string' ? req.query.state : undefined
 
-    if (user) {
-      // Link the Google identity to the existing account on first use.
-      if (!user.googleId) user.googleId = payload.sub
-      if (!user.avatarUrl && payload.picture) user.avatarUrl = payload.picture
-      user.emailVerified = true
-    } else {
-      user = (await User.create({
-        name: payload.name ?? email.split('@')[0] ?? 'Member',
-        email,
-        googleId: payload.sub,
-        avatarUrl: payload.picture ?? '',
-        emailVerified: true,
-        role: 'user',
-      })) as UserDocument
+    if (!code || !state || !nonceMatches(state.nonce, returnedState)) {
+      logger.warn('Rejected a Google callback with a missing or mismatched state', {
+        hasCode: Boolean(code),
+        hasStateCookie: Boolean(state),
+      })
+      res.redirect(buildFailureRedirect('GOOGLE_STATE_INVALID'))
+      return
     }
 
+    let profile: GoogleProfile
+    try {
+      profile = await exchangeCodeForProfile(code)
+    } catch (error) {
+      const failureCode =
+        error instanceof Error && 'code' in error && typeof error.code === 'string'
+          ? error.code
+          : 'GOOGLE_SIGNIN_FAILED'
+      res.redirect(buildFailureRedirect(failureCode))
+      return
+    }
+
+    const { user, created } = await resolveGoogleUser(profile)
+
+    // Identical session issuance to password login: same cookies, same rotation
+    // lineage, same 15-minute access token.
     const { accessToken, refreshToken } = await issueSession(user, requestContext(req))
     setAccessCookie(res, accessToken)
     setRefreshCookie(res, refreshToken)
 
-    res.json({
-      code: 'LOGIN_OK',
-      user: publicUser(user),
-      csrfToken: deriveCsrfToken(refreshToken),
+    logger.info(created ? 'Created an account via Google' : 'Signed in via Google', {
+      userId: String(user._id),
     })
+
+    /**
+     * Administrators land on the admin console, everyone else on the dashboard,
+     * unless an explicit destination survived the round trip.
+     *
+     * The CSRF token cannot travel in a redirect — there is no readable body —
+     * so the client picks it up from /me on the next page load.
+     */
+    const fallback = user.role === 'admin' ? '/admin' : '/dashboard'
+    res.redirect(safeClientRedirect(state.next, fallback))
   }),
 )
 

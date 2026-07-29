@@ -19,9 +19,17 @@ const coreSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(4000),
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
-  JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters'),
-  CLIENT_ORIGIN: z.string().default('http://localhost:5173'),
+  /**
+   * Browser origin(s) permitted by CORS and used as the base for redirects and
+   * links in outbound email.
+   *
+   * Accepts a comma-separated list so one deployment can serve the production
+   * site alongside a preview or a local dev server, without introducing a second
+   * variable name.
+   */
+  CLIENT_URL: z.string().default('http://localhost:5173'),
 })
 
 function loadCore() {
@@ -36,27 +44,37 @@ function loadCore() {
 
   const data = parsed.data
 
-  if (data.JWT_ACCESS_SECRET === data.JWT_REFRESH_SECRET) {
+  if (data.JWT_SECRET === data.JWT_REFRESH_SECRET) {
     throw new Error(
-      'JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must differ. Reusing one secret for both ' +
+      'JWT_SECRET and JWT_REFRESH_SECRET must differ. Reusing one secret for both ' +
         'token types lets a refresh token be replayed as an access token.',
     )
+  }
+
+  const clientUrls = data.CLIENT_URL.split(',')
+    .map((origin) => origin.trim().replace(/\/$/, ''))
+    .filter(Boolean)
+
+  if (clientUrls.length === 0) {
+    throw new Error('CLIENT_URL must contain at least one origin.')
   }
 
   return {
     ...data,
     isProduction: data.NODE_ENV === 'production',
-    /** Every browser origin permitted by CORS. */
-    clientOrigins: data.CLIENT_ORIGIN.split(',')
-      .map((origin) => origin.trim().replace(/\/$/, ''))
-      .filter(Boolean),
+    clientUrls,
   }
 }
 
 export const env = loadCore()
 
-/** The canonical frontend origin, used when building links in outbound email. */
-export const primaryClientOrigin = env.clientOrigins[0] ?? 'http://localhost:5173'
+/**
+ * The canonical frontend origin — the first entry in CLIENT_URL.
+ *
+ * Used when the server must build an absolute link on its own (OAuth redirects,
+ * transactional email) rather than reflecting a caller's origin.
+ */
+export const primaryClientUrl = env.clientUrls[0] as string
 
 /**
  * Reads a group of optional integration variables, returning null when the
@@ -74,4 +92,34 @@ export function readOptionalGroup<const K extends readonly string[]>(
   }
 
   return out as Record<K[number], string>
+}
+
+/**
+ * Resolves a post-authentication redirect target against the allowlist.
+ *
+ * OAuth hands us a caller-supplied destination, which is a classic open-redirect
+ * vector: an attacker who can choose the landing URL can bounce a freshly
+ * authenticated user to a look-alike site. Only same-origin paths under a known
+ * client URL are accepted; anything else falls back to the canonical origin.
+ */
+export function safeClientRedirect(target: string | undefined, fallbackPath = '/dashboard'): string {
+  const base = primaryClientUrl
+
+  if (!target) return `${base}${fallbackPath}`
+
+  // A bare path is the common case and the only shape we mint ourselves.
+  // Reject protocol-relative ("//evil.com") which a naive check would allow.
+  if (target.startsWith('/') && !target.startsWith('//')) {
+    return `${base}${target}`
+  }
+
+  try {
+    const parsed = new URL(target)
+    const origin = parsed.origin.replace(/\/$/, '')
+    if (env.clientUrls.includes(origin)) return parsed.toString()
+  } catch {
+    // Not a parsable absolute URL — fall through to the safe default.
+  }
+
+  return `${base}${fallbackPath}`
 }

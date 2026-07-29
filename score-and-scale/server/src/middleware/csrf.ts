@@ -18,7 +18,9 @@ export const CSRF_HEADER = 'x-csrf-token'
  * Instead the token is derived server-side as an HMAC of the refresh cookie and
  * returned in the *response body* of /login, /refresh and /me. Only a caller
  * permitted by CORS can read that body, and the value cannot be forged without
- * the signing secret. Two independent barriers therefore protect every mutating
+ * the signing secret. The Google OAuth callback is a browser redirect with no
+ * readable body, so a session created that way collects its token from /me on
+ * the next page load. Two independent barriers therefore protect every mutating
  * authenticated route:
  *
  *   1. The custom header forces a CORS preflight, which a disallowed origin

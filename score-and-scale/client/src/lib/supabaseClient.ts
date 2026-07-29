@@ -31,6 +31,7 @@ export function getSupabaseClient(): SupabaseClient {
   return client
 }
 
+/** Falls back to the same default the server uses, so the two cannot drift. */
 export function getStorageBucket(): string {
-  return import.meta.env.VITE_SUPABASE_STORAGE_BUCKET ?? 'enrollment-documents'
+  return import.meta.env.VITE_SUPABASE_STORAGE_BUCKET ?? 'documents'
 }

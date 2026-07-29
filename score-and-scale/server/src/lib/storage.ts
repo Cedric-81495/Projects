@@ -23,14 +23,13 @@ const DOWNLOAD_URL_TTL_SECONDS = 15 * 60
 let client: SupabaseClient | null = null
 let bucket: string | null = null
 
+/** Bucket name, with a default so only the credentials are truly required. */
+const DEFAULT_BUCKET = 'documents'
+
 function getClient(): { client: SupabaseClient; bucket: string } {
   if (client && bucket) return { client, bucket }
 
-  const config = readOptionalGroup([
-    'SUPABASE_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'SUPABASE_STORAGE_BUCKET',
-  ] as const)
+  const config = readOptionalGroup(['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] as const)
 
   if (!config) throw integrationUnavailable('Supabase Storage')
 
@@ -39,19 +38,13 @@ function getClient(): { client: SupabaseClient; bucket: string } {
   client = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
-  bucket = config.SUPABASE_STORAGE_BUCKET
+  bucket = process.env.SUPABASE_STORAGE_BUCKET || DEFAULT_BUCKET
 
   return { client, bucket }
 }
 
 export function isStorageConfigured(): boolean {
-  return (
-    readOptionalGroup([
-      'SUPABASE_URL',
-      'SUPABASE_SERVICE_ROLE_KEY',
-      'SUPABASE_STORAGE_BUCKET',
-    ] as const) !== null
-  )
+  return readOptionalGroup(['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] as const) !== null
 }
 
 /**

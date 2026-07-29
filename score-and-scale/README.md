@@ -77,9 +77,16 @@ Required — the API refuses to boot without these:
 | Variable | Notes |
 | -------- | ----- |
 | `MONGODB_URI` | MongoDB connection string |
-| `JWT_ACCESS_SECRET` | 32+ chars. Must differ from the refresh secret |
+| `JWT_SECRET` | 32+ chars. Must differ from the refresh secret, or boot fails |
 | `JWT_REFRESH_SECRET` | 32+ chars |
-| `CLIENT_ORIGIN` | Comma-separated CORS allowlist. Must include the Netlify URL |
+
+Has a default, but should be set explicitly in production:
+
+| Variable | Default | Notes |
+| -------- | ------- | ----- |
+| `CLIENT_URL` | `http://localhost:5173` | CORS allowlist **and** the base for OAuth redirects and email links. Comma-separated; the first entry is canonical |
+| `PORT` | `4000` | Render injects its own |
+| `NODE_ENV` | `development` | Must be `production` on Render, or cookies are not `Secure`/`SameSite=None` and cross-site auth silently fails |
 
 Optional — validated lazily on first use, so the API boots and serves every
 unrelated route while these are unset. Routes that need a missing integration
@@ -88,9 +95,9 @@ return `503 INTEGRATION_NOT_CONFIGURED`:
 | Group | Variables |
 | ----- | --------- |
 | Braintree | `BT_ENV`, `BT_MERCHANT_ID`, `BT_PUBLIC_KEY`, `BT_PRIVATE_KEY` |
-| Supabase | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET` |
-| Email | `RESEND_API_KEY`, `MAIL_FROM`, `ADMIN_NOTIFICATION_EMAIL` |
-| Google OAuth | `GOOGLE_CLIENT_ID` |
+| Supabase | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_STORAGE_BUCKET` (defaults to `documents`) |
+| Email | `RESEND_API_KEY`, `CONTACT_NOTIFY_EMAIL`, `MAIL_FROM` |
+| Google OAuth | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL` — all three, or Google sign-in reports itself unconfigured |
 
 `SUPABASE_SERVICE_ROLE_KEY` bypasses Row Level Security. It is confined to
 `server/src/lib/storage.ts` and must never reach the browser.
@@ -99,10 +106,13 @@ return `503 INTEGRATION_NOT_CONFIGURED`:
 
 | Variable | Notes |
 | -------- | ----- |
-| `VITE_API_URL` | `https://score-and-scale-api.onrender.com` |
 | `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Public anon key — safe to ship in the bundle |
-| `VITE_SUPABASE_STORAGE_BUCKET` | `enrollment-documents` |
+| `VITE_SUPABASE_STORAGE_BUCKET` | `documents` |
+| `VITE_API_URL` | `https://score-and-scale-api.onrender.com` — **required**; there is no runtime discovery of the API host, so an unset value falls back to `http://localhost:4000` and every deployed request fails |
+
+Google sign-in needs no frontend variable: the authorization-code flow is
+entirely server-side, so no Google client id reaches the bundle.
 
 > **These must be set in Netlify's *build* environment, not just at runtime.**
 > Vite inlines `import.meta.env.*` at build time. With the Supabase variables
@@ -117,6 +127,8 @@ return `503 INTEGRATION_NOT_CONFIGURED`:
 | Control | Where |
 | ------- | ----- |
 | Password hashing | bcrypt, cost 12 (`models/User.ts`) |
+| Google OAuth | Authorization-code flow with a nonce in `state` matched against an httpOnly cookie (`lib/googleOAuth.ts`) |
+| Open-redirect defence | Post-auth destinations resolved against the `CLIENT_URL` allowlist (`safeClientRedirect`) |
 | Access tokens | 15-minute JWT in an httpOnly cookie |
 | Refresh rotation | New token per use, SHA-256 hashed at rest, reuse revokes the whole lineage (`routes/auth.routes.ts`) |
 | Cross-site cookies | `SameSite=None; Secure` in production, `Lax` locally (`lib/cookies.ts`) |
@@ -145,7 +157,8 @@ file size from storage before recording anything.
 
 | Method | Path | Access |
 | ------ | ---- | ------ |
-| `POST` | `/api/auth/register` · `/login` · `/google` · `/refresh` · `/logout` | Public |
+| `POST` | `/api/auth/register` · `/login` · `/refresh` · `/logout` | Public |
+| `GET` | `/api/auth/google` · `/api/auth/google/callback` | Public (browser redirect) |
 | `GET` | `/api/auth/me` | Authenticated |
 | `GET` | `/api/programs` | Public |
 | `POST` | `/api/contact` | Public |
@@ -164,6 +177,45 @@ file size from storage before recording anything.
 | `GET` | `/api/admin/kpis` · `/enrollments` · `/contacts` · `/payments` · `/audit-log` · `/customers` | Admin |
 | `POST` | `/api/webhooks/braintree` | Signature-verified |
 | `GET` | `/health` | Public |
+
+## Google sign-in
+
+Uses the OAuth 2.0 **authorization-code** flow, which is what
+`GOOGLE_CLIENT_SECRET` and `GOOGLE_CALLBACK_URL` describe — the secret is only
+meaningful for a server-to-server code exchange. Consequences worth knowing:
+
+- No Google SDK ships to the browser and no client id appears in the bundle. The
+  button is a plain link to `/api/auth/google`.
+- Sign-in and sign-up are the same endpoint. If the Google email already has an
+  account the identity is **linked**; if not, a customer account is created. A
+  user's existing name and avatar are never overwritten by their Google profile.
+- An unverified Google email is rejected outright, so a Google profile claiming a
+  known address cannot take over that account.
+- The role is always `user` on creation. Elevation happens only through
+  `promote-admin`, so no OAuth path can mint an administrator.
+- Sessions are issued identically to password login: same cookies, same rotation
+  lineage, same 15-minute access token. The CSRF token cannot travel in a
+  redirect, so the client collects it from `/me` on the next page load.
+- Failures redirect to `/login?error=CODE` rather than returning JSON, because
+  the callback is a browser navigation. `Login.tsx` maps each code to copy.
+
+### Google Cloud console setup
+
+Under **APIs & Services → Credentials → OAuth 2.0 Client ID** (Web application),
+add both **Authorised redirect URIs**:
+
+```
+http://localhost:4000/api/auth/google/callback
+https://score-and-scale-api.onrender.com/api/auth/google/callback
+```
+
+These must match `GOOGLE_CALLBACK_URL` byte for byte — Google compares exactly,
+including scheme, port, and trailing path. A mismatch fails with
+`redirect_uri_mismatch` before reaching this app.
+
+Note the callback is on the **API** domain, not the Netlify domain. Google
+returns the browser to the server so it can exchange the code and set cookies,
+and only then redirects to the frontend.
 
 ## Deployment
 

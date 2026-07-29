@@ -1,23 +1,60 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../lib/api'
 import { Button } from '../components/ui/Button'
 import { FormError, TextField } from '../components/ui/Field'
 import { AuthShell } from '../components/auth/AuthShell'
+import { AuthDivider, GoogleButton } from '../components/auth/GoogleButton'
 
 interface RedirectState {
   from?: string
+}
+
+/**
+ * Messages for the codes the Google callback can redirect back with.
+ *
+ * The OAuth flow is a browser navigation, so a failure cannot return JSON — it
+ * arrives as ?error=CODE on this page instead. Mapping is done here so the
+ * server never has to send user-facing copy through a URL.
+ */
+const OAUTH_ERRORS: Record<string, string> = {
+  GOOGLE_ACCESS_DENIED: 'You cancelled the Google sign-in. You can try again or use your password.',
+  GOOGLE_STATE_INVALID: 'That sign-in attempt expired or was interrupted. Please try again.',
+  GOOGLE_EMAIL_UNVERIFIED:
+    'That Google account has an unverified email address. Verify it with Google, or sign in with a password.',
+  GOOGLE_CODE_INVALID: 'We could not complete that Google sign-in. Please try again.',
+  GOOGLE_TOKEN_INVALID: 'We could not verify that Google sign-in. Please try again.',
+  GOOGLE_TOKEN_MISSING: 'Google did not return the expected identity details. Please try again.',
+  GOOGLE_PROFILE_INCOMPLETE: 'That Google account did not share an email address.',
+  GOOGLE_NOT_CONFIGURED: 'Google sign-in is not available right now. Please use your password.',
+  GOOGLE_SIGNIN_FAILED: 'We could not complete that Google sign-in. Please try again.',
 }
 
 export function Login() {
   const { login, refetch } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const [searchParams] = useSearchParams()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const from = (location.state as RedirectState | null)?.from
+
+  /**
+   * A redirect-back destination can arrive two ways: in router state when a
+   * guard bounced the user here, or as ?next= when they came from a link. Only
+   * same-site paths are honoured, so neither can be used as an open redirect.
+   */
+  const nextParam = searchParams.get('next')
+  const safeNext =
+    nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : null
+  const destination = from ?? safeNext
+
+  const oauthErrorCode = searchParams.get('error')
+  const oauthError = oauthErrorCode
+    ? (OAUTH_ERRORS[oauthErrorCode] ?? 'We could not complete that sign-in. Please try again.')
+    : null
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -40,8 +77,8 @@ export function Login() {
        */
       const confirmed = (await refetch()) ?? user
 
-      if (from) {
-        navigate(from, { replace: true })
+      if (destination) {
+        navigate(destination, { replace: true })
         return
       }
 
@@ -75,9 +112,21 @@ export function Login() {
         </>
       }
     >
-      <form onSubmit={onSubmit} noValidate className="space-y-5">
-        {error && <FormError>{error}</FormError>}
+      {(error ?? oauthError) && (
+        <div className="mb-5">
+          <FormError>{error ?? oauthError}</FormError>
+        </div>
+      )}
 
+      {/*
+        OAuth sits above the password form: it is the faster path, and a
+        returning Google user should not have to scan past a form they never use.
+      */}
+      <GoogleButton mode="signin" next={destination} />
+
+      <AuthDivider label="or sign in with email" />
+
+      <form onSubmit={onSubmit} noValidate className="space-y-5">
         <TextField
           label="Email"
           name="email"

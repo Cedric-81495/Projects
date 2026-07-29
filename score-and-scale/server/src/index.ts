@@ -6,6 +6,7 @@ import { connectDatabase } from './lib/db'
 import { env } from './lib/env'
 import { logger } from './lib/logger'
 import { isBraintreeConfigured } from './lib/braintree'
+import { isGoogleOAuthConfigured } from './lib/googleOAuth'
 import { isStorageConfigured } from './lib/storage'
 import { requireCsrf, CSRF_HEADER } from './middleware/csrf'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
@@ -67,7 +68,7 @@ app.use(
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || env.clientOrigins.includes(origin.replace(/\/$/, ''))) {
+      if (!origin || env.clientUrls.includes(origin.replace(/\/$/, ''))) {
         callback(null, true)
         return
       }
@@ -99,7 +100,9 @@ app.get('/health', (_req, res) => {
       braintree: isBraintreeConfigured(),
       storage: isStorageConfigured(),
       email: Boolean(process.env.RESEND_API_KEY),
-      googleOAuth: Boolean(process.env.GOOGLE_CLIENT_ID),
+      // True only when the client id, secret, and callback URL are all present —
+      // the code flow needs all three, so a partial config must not read as ready.
+      googleOAuth: isGoogleOAuthConfigured(),
     },
   })
 })
@@ -135,7 +138,7 @@ async function start(): Promise<void> {
       nodeEnv: env.NODE_ENV,
       // Confirms the production cookie policy is active in Render's logs.
       crossSiteCookies: env.isProduction,
-      allowedOrigins: env.clientOrigins,
+      allowedOrigins: env.clientUrls,
     })
   })
 }

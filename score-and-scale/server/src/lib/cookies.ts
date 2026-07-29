@@ -5,8 +5,10 @@ import { REFRESH_TTL_MS } from './jwt'
 export const ACCESS_COOKIE = 'sas_access'
 export const REFRESH_COOKIE = 'sas_refresh'
 export const CSRF_COOKIE = 'sas_csrf'
+export const OAUTH_STATE_COOKIE = 'sas_oauth_state'
 
 const ACCESS_TTL_MS = 15 * 60 * 1000
+const OAUTH_STATE_TTL_MS = 10 * 60 * 1000
 
 /**
  * In production the browser (Netlify) and API (Render) sit on different sites,
@@ -36,6 +38,22 @@ export function setRefreshCookie(res: Response, token: string): void {
  */
 export function setCsrfCookie(res: Response, token: string): void {
   res.cookie(CSRF_COOKIE, token, { ...baseOptions(), httpOnly: false, maxAge: REFRESH_TTL_MS })
+}
+
+/**
+ * Short-lived cookie holding the OAuth state nonce and intended destination.
+ *
+ * httpOnly, because only the server ever reads it back. SameSite must permit the
+ * cookie to survive Google's top-level redirect back to the callback: 'lax' does
+ * allow that for a GET navigation, and production needs 'none' anyway since the
+ * API and the site are on different sites.
+ */
+export function setOAuthStateCookie(res: Response, value: string): void {
+  res.cookie(OAUTH_STATE_COOKIE, value, { ...baseOptions(), maxAge: OAUTH_STATE_TTL_MS })
+}
+
+export function clearOAuthStateCookie(res: Response): void {
+  res.clearCookie(OAUTH_STATE_COOKIE, baseOptions())
 }
 
 export function clearAuthCookies(res: Response): void {

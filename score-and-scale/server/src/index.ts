@@ -6,8 +6,15 @@ import { connectDatabase } from './lib/db'
 import { env } from './lib/env'
 import { logger } from './lib/logger'
 import { isBraintreeConfigured } from './lib/braintree'
-import { isGoogleOAuthConfigured } from './lib/googleOAuth'
+import {
+  DEFAULT_CALLBACK_PATH,
+  auditGoogleConfig,
+  getConfiguredCallbackPath,
+  isGoogleOAuthConfigured,
+} from './lib/googleOAuth'
 import { isStorageConfigured } from './lib/storage'
+import { authLimiter } from './middleware/rateLimit'
+import { googleCallbackHandler } from './routes/auth.routes'
 import { requireCsrf, CSRF_HEADER } from './middleware/csrf'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { globalLimiter } from './middleware/rateLimit'
@@ -116,6 +123,25 @@ app.use('/api', globalLimiter)
 app.use('/api', requireCsrf)
 
 app.use('/api/auth', authRouter)
+
+/**
+ * Also serve the OAuth callback at whatever path GOOGLE_CALLBACK_URL names.
+ *
+ * Google redirects to the URL registered in its console and compares it exactly,
+ * so a deployment configured with a versioned prefix (…/api/v1/auth/google/
+ * callback) would otherwise land on a 404 after a successful sign-in. Reading the
+ * path from the environment keeps the route and the credential in step without
+ * renaming every other endpoint.
+ */
+const configuredCallbackPath = getConfiguredCallbackPath()
+
+if (configuredCallbackPath && configuredCallbackPath !== DEFAULT_CALLBACK_PATH) {
+  app.get(configuredCallbackPath, authLimiter, googleCallbackHandler)
+  logger.info('Serving the Google OAuth callback at an additional configured path', {
+    configuredPath: configuredCallbackPath,
+    defaultPath: DEFAULT_CALLBACK_PATH,
+  })
+}
 app.use('/api/programs', programsRouter)
 app.use('/api/contact', contactRouter)
 app.use('/api/enrollments', enrollmentsRouter)
@@ -130,6 +156,21 @@ app.use(notFoundHandler)
 app.use(errorHandler)
 
 async function start(): Promise<void> {
+  /**
+   * Configuration problems that only bite a real user are reported before the
+   * first request, not after a support message.
+   */
+  for (const warning of auditGoogleConfig()) {
+    logger.warn(`Google OAuth configuration problem: ${warning}`)
+  }
+
+  if (env.isProduction && env.clientUrls.some((origin) => origin.includes('localhost'))) {
+    logger.warn(
+      'CLIENT_URL contains a localhost origin while NODE_ENV=production. ' +
+        'Remove it so the production CORS allowlist and redirect target are the deployed site.',
+    )
+  }
+
   await connectDatabase()
 
   app.listen(env.PORT, () => {
@@ -139,6 +180,7 @@ async function start(): Promise<void> {
       // Confirms the production cookie policy is active in Render's logs.
       crossSiteCookies: env.isProduction,
       allowedOrigins: env.clientUrls,
+      googleCallbackPath: configuredCallbackPath ?? DEFAULT_CALLBACK_PATH,
     })
   })
 }

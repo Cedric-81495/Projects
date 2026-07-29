@@ -32,8 +32,28 @@ const coreSchema = z.object({
   CLIENT_URL: z.string().default('http://localhost:5173'),
 })
 
+/**
+ * Trims every value before validation.
+ *
+ * Copying credentials between a dashboard and a file very easily carries a
+ * trailing space, and an untrimmed secret fails authentication with an error
+ * from the provider that says nothing about whitespace. A value that is only
+ * whitespace is treated as absent rather than as a valid empty string.
+ */
+function trimmedEnv(): Record<string, string> {
+  const out: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(process.env)) {
+    if (typeof value !== 'string') continue
+    const trimmed = value.trim()
+    if (trimmed) out[key] = trimmed
+  }
+
+  return out
+}
+
 function loadCore() {
-  const parsed = coreSchema.safeParse(process.env)
+  const parsed = coreSchema.safeParse(trimmedEnv())
 
   if (!parsed.success) {
     const details = parsed.error.issues
@@ -59,10 +79,28 @@ function loadCore() {
     throw new Error('CLIENT_URL must contain at least one origin.')
   }
 
+  const isProduction = data.NODE_ENV === 'production'
+
+  /**
+   * Outside production, the local dev server is added to the allowlist
+   * automatically.
+   *
+   * CLIENT_URL in a deployed environment names only the deployed site, so
+   * running the API locally against that same value would have CORS reject
+   * every request from Vite. Appending the dev origins here means one variable
+   * works in both places, and it can never widen the allowlist in production.
+   */
+  const devOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173']
+  const allOrigins = isProduction
+    ? clientUrls
+    : [...clientUrls, ...devOrigins.filter((origin) => !clientUrls.includes(origin))]
+
   return {
     ...data,
-    isProduction: data.NODE_ENV === 'production',
-    clientUrls,
+    isProduction,
+    clientUrls: allOrigins,
+    /** Only the configured origins — used for redirects, never widened by dev. */
+    canonicalClientUrls: clientUrls,
   }
 }
 
@@ -86,12 +124,20 @@ export function readOptionalGroup<const K extends readonly string[]>(
   const out: Record<string, string> = {}
 
   for (const key of keys) {
-    const value = process.env[key]
+    // Trimmed for the same reason as the core config: a pasted credential very
+    // often carries a trailing space, and providers reject it with an error that
+    // never mentions whitespace.
+    const value = process.env[key]?.trim()
     if (!value) return null
     out[key] = value
   }
 
   return out as Record<K[number], string>
+}
+
+/** Single trimmed optional value, with an optional default. */
+export function readOptional(key: string, fallback?: string): string | undefined {
+  return process.env[key]?.trim() || fallback
 }
 
 /**

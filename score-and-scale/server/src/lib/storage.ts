@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import path from 'node:path'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { readOptionalGroup } from './env'
+import { readOptional, readOptionalGroup } from './env'
 import { integrationUnavailable } from './errors'
 
 /**
@@ -38,7 +38,7 @@ function getClient(): { client: SupabaseClient; bucket: string } {
   client = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
-  bucket = process.env.SUPABASE_STORAGE_BUCKET || DEFAULT_BUCKET
+  bucket = readOptional('SUPABASE_STORAGE_BUCKET', DEFAULT_BUCKET) as string
 
   return { client, bucket }
 }

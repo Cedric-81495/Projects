@@ -26,6 +26,75 @@ export function isGoogleOAuthConfigured(): boolean {
   return readOptionalGroup(GOOGLE_CONFIG_KEYS) !== null
 }
 
+/** The path the router mounts its own callback on. */
+export const DEFAULT_CALLBACK_PATH = '/api/auth/google/callback'
+
+/**
+ * The path component of GOOGLE_CALLBACK_URL.
+ *
+ * Google redirects to the URL registered in its console, and it compares that
+ * value byte for byte. If the configured path is not one this server answers on,
+ * the browser lands on a 404 after a successful sign-in — a failure that looks
+ * like broken auth but is pure configuration.
+ *
+ * Rather than force the deployment to match a path hard-coded here, the server
+ * reads the path back out of the configured URL and also serves it. Whatever is
+ * registered with Google works, including a versioned prefix such as
+ * /api/v1/auth/google/callback.
+ */
+export function getConfiguredCallbackPath(): string | null {
+  const raw = process.env.GOOGLE_CALLBACK_URL?.trim()
+  if (!raw) return null
+
+  try {
+    const path = new URL(raw).pathname.replace(/\/+$/, '')
+    return path || null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Configuration problems worth shouting about at boot.
+ *
+ * Both of these produce a flow that appears to work right up until the moment a
+ * real user tries it, so they are surfaced on startup rather than discovered
+ * from a support message.
+ */
+export function auditGoogleConfig(): string[] {
+  const warnings: string[] = []
+  const raw = process.env.GOOGLE_CALLBACK_URL?.trim()
+
+  if (!raw) return warnings
+
+  let parsed: URL
+  try {
+    parsed = new URL(raw)
+  } catch {
+    warnings.push(`GOOGLE_CALLBACK_URL is not a valid URL: "${raw}"`)
+    return warnings
+  }
+
+  const isLoopback = ['localhost', '127.0.0.1', '[::1]'].includes(parsed.hostname)
+
+  if (env.isProduction && isLoopback) {
+    warnings.push(
+      `GOOGLE_CALLBACK_URL points at ${parsed.origin} while NODE_ENV=production. ` +
+        "Google will redirect your users to their own machine after sign-in, where nothing is listening. " +
+        'Set it to this API\'s public URL, e.g. https://<your-api-host>/api/auth/google/callback.',
+    )
+  }
+
+  if (env.isProduction && parsed.protocol !== 'https:') {
+    warnings.push(
+      `GOOGLE_CALLBACK_URL uses ${parsed.protocol} in production. Session cookies are ` +
+        'Secure-only there, so the callback must be served over https.',
+    )
+  }
+
+  return warnings
+}
+
 function getConfig() {
   const config = readOptionalGroup(GOOGLE_CONFIG_KEYS)
   if (!config) throw integrationUnavailable('Google sign-in')

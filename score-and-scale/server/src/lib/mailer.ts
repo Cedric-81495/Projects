@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import { primaryClientUrl, readOptionalGroup } from './env'
+import { primaryClientUrl, readOptional, readOptionalGroup } from './env'
 import { logger } from './logger'
 
 let resend: Resend | null = null
@@ -12,7 +12,7 @@ function getResend(): { client: Resend; from: string } | null {
 
   return {
     client: resend,
-    from: process.env.MAIL_FROM ?? 'Score and Scale <noreply@scoreandscale.com>',
+    from: readOptional('MAIL_FROM', 'Score and Scale <noreply@scoreandscale.com>') as string,
   }
 }
 
@@ -108,7 +108,7 @@ export async function sendContactNotification(input: {
   topic: string
   message: string
 }): Promise<boolean> {
-  const to = process.env.CONTACT_NOTIFY_EMAIL
+  const to = readOptional('CONTACT_NOTIFY_EMAIL')
   if (!to) {
     logger.warn('CONTACT_NOTIFY_EMAIL not set — skipping internal contact notification')
     return false

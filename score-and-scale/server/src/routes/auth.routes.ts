@@ -273,11 +273,11 @@ router.get(
 
 // ---------------------------------------------------------------------------
 // GET /api/auth/google/callback — Google returns the browser here
+//
+// Exported so index.ts can additionally serve it at whatever path
+// GOOGLE_CALLBACK_URL specifies, without duplicating the handler.
 // ---------------------------------------------------------------------------
-router.get(
-  '/google/callback',
-  authLimiter,
-  asyncHandler(async (req, res) => {
+export const googleCallbackHandler = asyncHandler(async (req, res) => {
     const state = parseOAuthState(req.cookies?.[OAUTH_STATE_COOKIE])
     // Single-use: consumed whatever the outcome, so a code cannot be retried.
     clearOAuthStateCookie(res)
@@ -337,8 +337,9 @@ router.get(
      */
     const fallback = user.role === 'admin' ? '/admin' : '/dashboard'
     res.redirect(safeClientRedirect(state.next, fallback))
-  }),
-)
+})
+
+router.get('/google/callback', authLimiter, googleCallbackHandler)
 
 // ---------------------------------------------------------------------------
 // POST /api/auth/refresh — rotation with reuse detection

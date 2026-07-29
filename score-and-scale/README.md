@@ -47,6 +47,10 @@ score-and-scale/
     └── render.yaml             # Render blueprint
 ```
 
+Full setup, environment, and verification instructions live in
+[DEPLOYMENT.md](./DEPLOYMENT.md). Changes are tracked in
+[CHANGELOG.md](./CHANGELOG.md).
+
 ## Running locally
 
 Requires Node 20+ and a MongoDB connection string.

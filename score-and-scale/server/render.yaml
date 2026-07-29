@@ -1,0 +1,66 @@
+# Render blueprint for the Score and Scale API.
+#
+# Root directory for the service should be `score-and-scale/server`.
+# Secrets are marked sync:false so Render prompts for them rather than storing
+# them in this file — nothing here should ever hold a credential.
+
+services:
+  - type: web
+    name: score-and-scale-api
+    runtime: node
+    plan: free
+    rootDir: score-and-scale/server
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # Render injects PORT; the app reads it from the environment.
+      - key: PORT
+        value: 10000
+
+      # Browser origins permitted by CORS. Must include the Netlify site, or
+      # every request from the frontend is blocked.
+      - key: CLIENT_ORIGIN
+        value: https://score-and-scale.netlify.app
+
+      - key: MONGODB_URI
+        sync: false
+
+      # Two different long random strings. Reusing one for both would let a
+      # refresh token be replayed as an access token.
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+      # Optional integrations. Each is validated lazily, so the API boots and
+      # serves every unrelated route even while these are blank.
+      - key: BT_ENV
+        value: sandbox
+      - key: BT_MERCHANT_ID
+        sync: false
+      - key: BT_PUBLIC_KEY
+        sync: false
+      - key: BT_PRIVATE_KEY
+        sync: false
+
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: enrollment-documents
+
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: ADMIN_NOTIFICATION_EMAIL
+        sync: false
+
+      - key: GOOGLE_CLIENT_ID
+        sync: false

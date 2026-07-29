@@ -1,0 +1,7 @@
+# Fallback for the headers declared in netlify.toml.
+# Netlify merges both; this file keeps the essential protections in place if the
+# toml is ever moved or its base directory misconfigured.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY

@@ -18,6 +18,9 @@ out/
 
 # TypeScript incremental build artifacts
 *.tsbuildinfo
+# `tsc -b` emits these next to vite.config.ts; they are build output, not source
+client/vite.config.d.ts
+client/vite.config.js
 
 # Logs
 *.log

@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Design tokens.
+ *
+ * Every colour lives here as an `R G B` channel triplet so Tailwind's
+ * `/<alpha-value>` modifiers keep working. The dark theme redefines the same
+ * token names, which means components carry no theme-specific classes at all —
+ * they ask for `bg-surface` and get the right answer in both modes.
+ */
+@layer base {
+  :root {
+    --color-canvas: 250 250 248;
+    --color-surface: 255 255 255;
+    --color-raised: 246 246 243;
+
+    --color-ink: 14 17 22;
+    --color-muted: 90 98 110;
+    --color-subtle: 132 140 152;
+    --color-line: 226 227 224;
+
+    /* Jade — growth without resorting to default SaaS blue. */
+    --color-accent: 13 111 92;
+    --color-accent-soft: 232 245 240;
+    --color-accent-ink: 255 255 255;
+
+    --color-positive: 21 128 96;
+    --color-warning: 168 108 12;
+    --color-critical: 186 51 51;
+
+    --shadow-rgb: 14 17 22;
+
+    color-scheme: light;
+  }
+
+  :root[data-theme='dark'] {
+    --color-canvas: 9 11 14;
+    --color-surface: 18 21 26;
+    --color-raised: 25 29 35;
+
+    --color-ink: 244 245 246;
+    --color-muted: 158 166 176;
+    --color-subtle: 118 126 137;
+    --color-line: 39 44 52;
+
+    /* Lifted for contrast against a dark surface. */
+    --color-accent: 52 176 148;
+    --color-accent-soft: 20 41 36;
+    --color-accent-ink: 6 20 17;
+
+    --color-positive: 62 186 145;
+    --color-warning: 214 158 62;
+    --color-critical: 240 113 113;
+
+    --shadow-rgb: 0 0 0;
+
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-line;
+  }
+
+  html {
+    /* Anchored sections need the offset so the sticky header never covers a heading. */
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variant-ligatures: contextual;
+    text-rendering: optimizeLegibility;
+  }
+
+  /**
+   * A visible focus ring is a non-negotiable accessibility affordance, but it
+   * should not appear on mouse clicks. :focus-visible gives keyboard users the
+   * ring without visual noise for everyone else.
+   */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent/60 ring-offset-2 ring-offset-canvas;
+  }
+
+  ::selection {
+    @apply bg-accent/20;
+  }
+
+  /**
+   * Honour a reduced-motion preference globally rather than per-component, so a
+   * new animation cannot accidentally ignore it.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Constrains every section to one shared measure and gutter. */
+  .container-page {
+    @apply mx-auto w-full max-w-container px-5 sm:px-8;
+  }
+
+  .eyebrow {
+    @apply text-eyebrow font-semibold uppercase text-accent;
+  }
+
+  /* Skip link — offscreen until focused. */
+  .skip-link {
+    @apply fixed left-4 top-4 z-[100] -translate-y-20 rounded-lg bg-ink px-4 py-2 text-sm
+      font-semibold text-canvas transition-transform focus-visible:translate-y-0;
+  }
+
+  /**
+   * Hairline grid used behind the hero. Kept as a component class because the
+   * gradient maths is verbose and reused.
+   */
+  .grid-backdrop {
+    background-image:
+      linear-gradient(to right, rgb(var(--color-line) / 0.55) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--color-line) / 0.55) 1px, transparent 1px);
+    background-size: 4rem 4rem;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+}

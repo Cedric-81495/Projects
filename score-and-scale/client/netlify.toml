@@ -1,0 +1,66 @@
+# Netlify configuration for the Score and Scale frontend.
+# Base directory is this folder (client), so Netlify's "Base directory" setting
+# should be `score-and-scale/client`.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# ---------------------------------------------------------------------------
+# SPA fallback
+# ---------------------------------------------------------------------------
+# React Router owns every path client-side. Without this, a hard refresh on
+# /dashboard asks Netlify for a file that does not exist and returns its own 404
+# instead of the app — so deep links and refreshes appear broken.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# ---------------------------------------------------------------------------
+# Security headers
+# ---------------------------------------------------------------------------
+[[headers]]
+  for = "/*"
+
+  [headers.values]
+    # connect-src must name the Render API and Supabase explicitly: the app is
+    # served from Netlify but talks to both, and a default-src of 'self' alone
+    # would block those requests.
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://js.braintreegateway.com https://assets.braintreegateway.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://assets.braintreegateway.com;
+      font-src 'self' https://fonts.gstatic.com data:;
+      img-src 'self' data: https: blob:;
+      connect-src 'self' https://score-and-scale-api.onrender.com https://*.supabase.co https://api.braintreegateway.com https://client-analytics.braintreegateway.com https://*.braintree-api.com;
+      frame-src https://assets.braintreegateway.com https://*.braintreegateway.com https://*.paypal.com;
+      base-uri 'none';
+      form-action 'self';
+      object-src 'none';
+      frame-ancestors 'none'
+    """
+
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+# Hashed build assets are immutable, so they can be cached indefinitely.
+[[headers]]
+  for = "/assets/*"
+
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# index.html must never be cached, or a deploy would keep serving stale
+# references to asset filenames that no longer exist.
+[[headers]]
+  for = "/index.html"
+
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

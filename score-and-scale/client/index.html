@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>Score and Scale — Build the credit profile lenders approve</title>
+    <meta
+      name="description"
+      content="We audit your personal and business credit, fix what is holding you back, and prepare the funding package underwriters approve — with an advisor working your file alongside you."
+    />
+
+    <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fafaf8" media="(prefers-color-scheme: light)" />
+
+    <!-- Open Graph, so shared links render as a card rather than a bare URL. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Score and Scale" />
+    <meta property="og:title" content="Build the credit profile lenders say yes to" />
+    <meta
+      property="og:description"
+      content="Credit strategy and funding preparation for founders who are done being declined."
+    />
+    <meta property="og:url" content="https://score-and-scale.netlify.app/" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="canonical" href="https://score-and-scale.netlify.app/" />
+
+    <!--
+      Inter, self-hosted via Google Fonts with preconnect so the handshake
+      overlaps with HTML parsing. display=swap means text paints in the fallback
+      immediately rather than blocking on the font file.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+
+    <!--
+      Sets the stored theme before first paint. Without this the page renders in
+      the default light theme for a frame and then flips, which is visible as a
+      flash for anyone using dark mode.
+    -->
+    <script>
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('sas-theme')
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+          document.documentElement.dataset.theme = theme
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

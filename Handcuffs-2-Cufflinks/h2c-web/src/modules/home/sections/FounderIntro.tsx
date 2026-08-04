@@ -6,7 +6,7 @@ import { founder, ecosystem } from '@/data/content';
 
 export function FounderIntro() {
   return (
-    <section id="founder" className="section-y bg-onyx">
+    <section id="founder" className="section-y bg-green">
       <Container>
         <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           {/* Portrait stand-in */}

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { Logo } from '@/components/brand/Logo';
 import { ButtonLink } from '@/components/ui/Button';
 import { Container } from '@/components/ui/Container';
 import { primaryLinks } from '@/data/nav';
@@ -27,12 +26,11 @@ export function Navbar() {
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-colors duration-500 ease-ease',
         scrolled || open
-          ? 'border-b border-faint/30 bg-ink/85 backdrop-blur-xl'
+          ? 'border-b border-gold/20 bg-green-deep/90 backdrop-blur-xl'
           : 'border-b border-transparent',
       )}
     >
       <Container className="flex h-16 items-center justify-between sm:h-20">
-        <Logo />
 
         <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
           {primaryLinks.map((item) => (
@@ -70,11 +68,16 @@ export function Navbar() {
       {/* Mobile drawer */}
       <div
         className={cn(
-          'overflow-hidden border-t border-faint/20 bg-ink/95 backdrop-blur-xl transition-[max-height] duration-500 ease-ease lg:hidden',
+          'overflow-hidden border-t border-gold/15 bg-green-deep/95 backdrop-blur-xl transition-[max-height] duration-500 ease-ease lg:hidden',
           open ? 'max-h-[32rem]' : 'max-h-0',
         )}
       >
         <Container className="flex flex-col gap-1 py-4">
+          <img
+            src="/brand/logo-mark.png"
+            alt="Handcuffs 2 Cufflinks"
+            className="mb-3 h-9 w-auto self-start"
+          />
           {primaryLinks.map((item) => (
             <Link
               key={item.to}

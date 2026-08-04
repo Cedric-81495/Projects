@@ -2,7 +2,6 @@ import { Container } from '@/components/ui/Container';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Reveal } from '@/components/ui/Reveal';
 import { ButtonLink } from '@/components/ui/Button';
-import { TransformationMark } from '@/components/brand/TransformationMark';
 import { values, journey } from '@/data/movement';
 
 export function MovementPage() {
@@ -14,9 +13,8 @@ export function MovementPage() {
         intro="Handcuffs 2 Cufflinks is built on one idea: the worst chapter of a life doesn't have to be the last. Here is what that means, and why it matters."
       />
 
-      <section className="section-y bg-ink">
+      <section className="section-y bg-green">
         <Container size="prose">
-          <TransformationMark className="mx-auto h-24 w-full max-w-md" animate={false} />
           <div className="mt-12 space-y-6 text-pretty text-lg leading-relaxed text-muted">
             <p>
               A handcuff is fastened <span className="text-bone">to</span> you. It marks a moment you
@@ -37,11 +35,11 @@ export function MovementPage() {
         </Container>
       </section>
 
-      <section className="section-y bg-onyx">
+      <section className="section-y bg-green-deep">
         <Container>
           <div className="grid gap-px overflow-hidden rounded-2xl border border-faint/40 bg-faint/20 sm:grid-cols-3">
             {values.map((v, i) => (
-              <Reveal key={v.title} delay={i * 90} className="bg-onyx">
+              <Reveal key={v.title} delay={i * 90} className="bg-green-deep">
                 <div className="flex h-full flex-col gap-4 p-8">
                   <span className="font-mono text-xs text-gold/70">
                     {String(i + 1).padStart(2, '0')}
@@ -55,7 +53,7 @@ export function MovementPage() {
         </Container>
       </section>
 
-      <section className="section-y bg-ink">
+      <section className="section-y bg-green">
         <Container>
           <h2 className="font-display text-display-md font-semibold text-bone">The journey.</h2>
           <ol className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">

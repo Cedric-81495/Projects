@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
-import { TransformationMark } from '@/components/brand/TransformationMark';
 import { navGroups, socials } from '@/data/nav';
 import { subscribeNewsletter } from '@/services/forms';
 import { useSubmit } from '@/hooks/useSubmit';
@@ -20,12 +19,12 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative overflow-hidden border-t border-faint/30 bg-onyx">
+    <footer className="relative overflow-hidden border-t border-gold/20 bg-green-deep">
       <Container className="py-20">
         <div className="grid gap-14 lg:grid-cols-[1.2fr_1fr]">
           {/* Newsletter */}
           <div>
-            <TransformationMark className="h-16 w-56" animate={false} />
+            <img src="/brand/logo-dark.png" alt="Handcuffs 2 Cufflinks" className="h-14 w-auto" />
             <h2 className="mt-8 max-w-md text-balance font-display text-3xl font-semibold text-bone">
               Get the next chapter first.
             </h2>

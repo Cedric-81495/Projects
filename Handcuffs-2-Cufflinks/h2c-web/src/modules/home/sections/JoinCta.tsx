@@ -1,7 +1,6 @@
 import { Container } from '@/components/ui/Container';
 import { Reveal } from '@/components/ui/Reveal';
 import { ButtonLink } from '@/components/ui/Button';
-import { TransformationMark } from '@/components/brand/TransformationMark';
 
 export function JoinCta() {
   return (
@@ -11,7 +10,6 @@ export function JoinCta() {
       </div>
       <Container className="relative py-28 sm:py-40">
         <Reveal className="mx-auto flex max-w-3xl flex-col items-center text-center">
-          <TransformationMark className="h-20 w-64" animate={false} />
           <h2 className="mt-10 text-balance font-display text-display-lg font-semibold text-bone">
             Your chapter starts <span className="gold-text">here.</span>
           </h2>

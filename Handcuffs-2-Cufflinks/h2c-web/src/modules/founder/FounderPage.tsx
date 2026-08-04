@@ -6,7 +6,7 @@ export function FounderPage() {
   return (
     <>
       <PageHeader eyebrow="The Founder" title={founder.role + '.'} />
-      <section className="section-y bg-ink">
+      <section className="section-y bg-green">
         <Container size="prose">
           <blockquote className="border-l-2 border-gold pl-6">
             <p className="text-balance font-display text-3xl font-medium leading-tight text-bone">

@@ -159,6 +159,17 @@ npm run preview    # serve dist/ locally
 ```
 
 ## Changelog
+- **v0.6 (branding & responsive fixes):** Applied official H2C brand — fonts
+  Cormorant Garamond (display) + Montserrat (body/eyebrow); palette Obsidian
+  #0B0B0C, Charcoal #24272A, Graphite #555A60, Platinum #BFC3C7, Prestige Gold
+  #C8A34A, Emerald #0D5B3F (via CSS tokens). Integrated real assets as **static
+  files** in `public/brand/` (logo-mark.png = platinum/gold wordmark for dark bg,
+  logo-dark.png for light bg, hero.jpg) — Logo + Hero now use them; OG/Twitter image
+  set to hero. Fixed navbar breakpoint (Join CTA was `sm`, hamburger `lg` → both
+  showed on tablet; CTA now `lg`, so <lg shows only the hamburger). Fixed podcast
+  rows overflowing on mobile (added `min-w-0` so guest/title truncate; tighter gap).
+  Added `vercel.json` cache headers (immutable assets, no-cache index.html).
+  NOTE: built on the v0.5 base — does NOT include Phase 4 (SEO/analytics/CI) yet.
 - **v0.5 (Phase 3 — items 6 & 7):** Admin content CRUD UI (generic page for
   stories/episodes/tracks under a shared admin layout), public approved-stories
   gallery on the Community page, reusable click-to-load `VideoEmbed` wired into the

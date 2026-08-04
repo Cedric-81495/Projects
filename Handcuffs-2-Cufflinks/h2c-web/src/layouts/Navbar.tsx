@@ -52,7 +52,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <ButtonLink to="/join" size="md" variant="gold" className="hidden sm:inline-flex">
+          <ButtonLink to="/join" size="md" variant="gold" className="hidden lg:inline-flex">
             Join the movement
           </ButtonLink>
           <button

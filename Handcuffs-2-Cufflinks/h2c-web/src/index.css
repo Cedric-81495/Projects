@@ -8,20 +8,21 @@
    works (e.g. text-gold/60).
 ------------------------------------------------------------------------ */
 :root {
-  --c-ink: 11 11 13; /* #0B0B0D  page */
-  --c-onyx: 20 20 24; /* #141418  section base */
-  --c-raise: 28 28 33; /* #1C1C21  cards / raised */
-  --c-bone: 242 236 224; /* #F2ECE0  primary text */
-  --c-muted: 158 152 138; /* #9E988A  secondary text */
-  --c-faint: 88 85 78; /* #58554E  tertiary / rules */
+  /* Official H2C palette — Obsidian, Charcoal, Graphite, Platinum, Gold, Emerald */
+  --c-ink: 11 11 12; /* #0B0B0C  Obsidian Black — page */
+  --c-onyx: 20 22 25; /* subtle raise above page */
+  --c-raise: 36 39 42; /* #24272A  Charcoal — cards / raised */
+  --c-bone: 233 235 237; /* bright platinum — primary text */
+  --c-muted: 191 195 199; /* #BFC3C7  Platinum — secondary text */
+  --c-faint: 85 90 96; /* #555A60  Graphite Gray — tertiary / rules */
 
-  --c-gold: 198 161 91; /* #C6A15B  burnished gold */
-  --c-gold-bright: 232 206 138; /* #E8CE8A */
-  --c-gold-deep: 154 118 55; /* #9A7637 */
+  --c-gold: 200 163 74; /* #C8A34A  Prestige Gold */
+  --c-gold-bright: 224 194 122; /* lifted gold */
+  --c-gold-deep: 154 124 56; /* deep gold */
 
-  --c-green: 31 122 77; /* #1F7A4D  redemption green */
-  --c-green-bright: 52 165 107; /* #34A56B */
-  --c-green-deep: 18 74 47; /* #124A2F */
+  --c-green: 13 91 63; /* #0D5B3F  Emerald Accent */
+  --c-green-bright: 22 128 90; /* lifted emerald */
+  --c-green-deep: 8 59 41; /* deep emerald */
 }
 
 @layer base {

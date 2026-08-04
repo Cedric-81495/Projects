@@ -28,14 +28,14 @@ export default {
         },
       },
       fontFamily: {
-        display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
-        sans: ['Archivo', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['"Space Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        display: ['"Cormorant Garamond"', 'ui-serif', 'Georgia', 'serif'],
+        sans: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        'display-xl': ['clamp(3.25rem, 9vw, 8.5rem)', { lineHeight: '0.94', letterSpacing: '-0.02em' }],
-        'display-lg': ['clamp(2.5rem, 6vw, 5rem)', { lineHeight: '0.98', letterSpacing: '-0.015em' }],
-        'display-md': ['clamp(2rem, 4vw, 3.25rem)', { lineHeight: '1.02', letterSpacing: '-0.01em' }],
+        'display-xl': ['clamp(3.25rem, 9vw, 8.5rem)', { lineHeight: '0.98', letterSpacing: '-0.005em' }],
+        'display-lg': ['clamp(2.5rem, 6vw, 5rem)', { lineHeight: '1.02', letterSpacing: '0' }],
+        'display-md': ['clamp(2rem, 4vw, 3.25rem)', { lineHeight: '1.08', letterSpacing: '0' }],
       },
       letterSpacing: {
         eyebrow: '0.28em',

@@ -9,14 +9,19 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 export function RouteError() {
   const error = useRouteError();
 
+  // Always log the full error so it's visible in the browser console (F12),
+  // even in production where the UI copy stays friendly.
+  if (typeof console !== 'undefined') console.error('[RouteError]', error);
+
   let title = 'Something broke on our end.';
   let detail = 'An unexpected error stopped this page from loading. The movement continues — try again.';
+  let technical: string | null = null;
 
   if (isRouteErrorResponse(error)) {
     title = `${error.status} — ${error.statusText}`;
     detail = error.data?.message ?? detail;
-  } else if (error instanceof Error && import.meta.env.DEV) {
-    detail = error.message;
+  } else if (error instanceof Error) {
+    technical = error.message;
   }
 
   return (
@@ -25,6 +30,11 @@ export function RouteError() {
         <Eyebrow className="justify-center">Error</Eyebrow>
         <h1 className="mt-6 font-display text-display-md font-semibold text-bone">{title}</h1>
         <p className="mx-auto mt-4 max-w-md text-pretty text-muted">{detail}</p>
+        {technical && (
+          <p className="mx-auto mt-4 max-w-md break-words font-mono text-xs text-faint">
+            {technical}
+          </p>
+        )}
         <div className="mt-10 flex items-center justify-center gap-4">
           <Link
             to="/"

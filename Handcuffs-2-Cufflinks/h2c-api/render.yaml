@@ -1,0 +1,25 @@
+# Render Blueprint for the H2C API (Express web service).
+services:
+  - type: web
+    name: h2c-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true      # Render generates a strong secret
+      - key: JWT_EXPIRES_IN
+        value: 2h
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false

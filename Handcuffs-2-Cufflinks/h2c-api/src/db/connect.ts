@@ -1,3 +1,8 @@
+import dns from 'node:dns';
+// Force a public DNS resolver so Atlas SRV (mongodb+srv://) lookups succeed
+// even when the local/network resolver refuses SRV queries.
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 import mongoose from 'mongoose';
 import { env } from '../config/env.js';
 

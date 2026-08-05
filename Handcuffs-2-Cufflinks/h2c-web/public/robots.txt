@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Update with your production domain once live:
-# Sitemap: https://your-domain.com/sitemap.xml

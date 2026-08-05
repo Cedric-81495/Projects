@@ -33,7 +33,17 @@ export function Footer() {
         <div className="wrap">
           <div className="ftr-top">
             <div>
-              <p className="mark" style={{ fontSize: '1.4rem' }}>H<span>2</span>C</p>
+             <Link to="/" className="ftr-logo" aria-label="Handcuffs 2 Cufflinks, home">
+                <img
+                  className="w-36 sm:w-44 md:w-56 h-auto"
+                  src="/assets/logo.png"
+                  width={900}
+                  height={529}
+                  loading="lazy"
+                  decoding="async"
+                  alt="Handcuffs 2 Cufflinks"
+                />
+              </Link>
               <p className="ftr-mission">
                 A global movement built for people who refused to remain trapped by their
                 past. From struggle to success. Faith. Family. Freedom. Legacy in motion.

@@ -12,7 +12,7 @@ export function GwopPage() {
   useReveal('gwop');
   return (
     <>
-      <section className="sec t-light" style={{ paddingBottom: 0 }}>
+      <section className="sec t-forest" style={{ paddingBottom: 0 }}>
         <div className="wrap means">
           <div>
             <Eyebrow>The ecosystem · a connected brand</Eyebrow>
@@ -31,7 +31,7 @@ export function GwopPage() {
         </div>
       </section>
 
-      <section className="sec t-light" style={{ paddingTop: 'clamp(30px,4vw,54px)' }}>
+      <section className="sec t-forest" style={{ paddingTop: 'clamp(30px,4vw,54px)' }}>
         <div className="wrap">
           <div className="grid4">
             {facets.map((f, i) => (

@@ -18,7 +18,7 @@ export function Header() {
   return (
     <header className={cn('hdr', stuck && 'stuck')}>
       <Link to="/" className="mark" aria-label="Handcuffs 2 Cufflinks, home">
-        H<span>2</span>C
+        Handcuffs<span>2</span>Cufflinks
       </Link>
 
       <nav className="nav" aria-label="Primary">
@@ -26,6 +26,7 @@ export function Header() {
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.to === '/'}
             className={({ isActive }) => cn(isActive && 'active')}
           >
             {item.label}

@@ -23,7 +23,7 @@ export function LookbookSection() {
         </Reveal>
         <Lookbook entries={lookbook} />
         <Reveal className="btn-row">
-          <Link className="btn btn--ghost" to="/lookbook" style={{ marginTop: 34 }}>See the full lookbook</Link>
+          <Link className="btn btn--ghost" to="/lookbook" style={{ marginTop: 34 }}>See all collections</Link>
         </Reveal>
       </div>
     </section>
@@ -177,7 +177,7 @@ export function JoinTeaser() {
       <div className="wrap" style={{ textAlign: 'center' }}>
         <Reveal as="h2" delay={1} className="h2">Join the movement</Reveal>
         <Reveal delay={1} className="lede" as="p" style={{ margin: '0 auto 1.5em' }}>
-          The next episode, the new record, the next chapter of the lookbook — the movement
+          The next episode, the new record, the next drop in the collections — the movement
           hears about all of it a day before anyone else.
         </Reveal>
         <Reveal delay={2} className="btn-row">

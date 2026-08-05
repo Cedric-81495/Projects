@@ -40,7 +40,7 @@ export function LookbookPage() {
             }
             empty={
               <EmptyState
-                title="The lookbook is being shot"
+                title="The collections are being shot"
                 note="The chapters of the arc will appear here once the campaign imagery is ready."
                 action={<Link className="btn btn--ghost btn--sm" to="/movement">Read the movement</Link>}
               />

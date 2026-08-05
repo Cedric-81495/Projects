@@ -43,7 +43,7 @@
 
 @layer base {
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; width: 100%; }
   body {
     margin: 0;
     background: var(--pitch);
@@ -329,10 +329,12 @@ html[data-noanno] .hdr { top: 0; }
 
 /* ---------- Mobile nav ---------- */
 .mnav {
-  position: fixed; inset: 0; z-index: 95; background: var(--pitch); padding: 88px var(--gut) 40px;
-  display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.5s var(--ease); overflow-y: auto;
+  position: fixed; inset: 0; z-index: 97; width: 100%; max-width: 100vw; background: var(--pitch); padding: 88px var(--gut) 40px;
+  display: flex; flex-direction: column; transform: translateX(100%); overflow-y: auto;
+  visibility: hidden; pointer-events: none;
+  transition: transform 0.5s var(--ease), visibility 0s linear 0.5s;
 }
-.mnav.open { transform: none; }
+.mnav.open { transform: none; visibility: visible; pointer-events: auto; transition: transform 0.5s var(--ease), visibility 0s; }
 .mnav a { font-family: var(--f-display); font-weight: 700; text-transform: uppercase; font-size: 2rem; line-height: 1; padding: 15px 0; border-bottom: 1px solid rgba(247, 243, 233, 0.1); display: flex; align-items: baseline; gap: 14px; }
 .mnav a span { font-family: var(--f-ui); font-size: 0.6rem; letter-spacing: 0.16em; color: var(--steel); }
 .mnav-close { position: absolute; top: 22px; right: var(--gut); }

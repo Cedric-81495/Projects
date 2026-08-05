@@ -54,7 +54,7 @@ export function SearchOverlay() {
     () => [
       ...stories.map((e) => ({ kind: `Story · ${e.cat}`, label: plain(e.title), to: '/stories' })),
       ...podcastEpisodes.map((e) => ({ kind: 'Podcast', label: plain(e.title), to: '/podcast' })),
-      ...lookbook.map((l) => ({ kind: 'Lookbook', label: l.name, to: '/lookbook' })),
+      ...lookbook.map((l) => ({ kind: 'Collections', label: l.name, to: '/lookbook' })),
     ],
     []
   );

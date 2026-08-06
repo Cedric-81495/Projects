@@ -2,6 +2,8 @@ import { Schema, model, InferSchemaType } from 'mongoose';
 
 const communityStorySchema = new Schema(
   {
+    // Set when a signed-in member submits; null for anonymous public submissions.
+    authorUserId: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, lowercase: true, trim: true },
     title: { type: String, required: true, trim: true },

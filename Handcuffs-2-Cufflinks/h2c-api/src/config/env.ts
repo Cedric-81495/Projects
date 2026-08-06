@@ -14,6 +14,13 @@ const schema = z.object({
   // ── Admin auth ──
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 chars'),
   JWT_EXPIRES_IN: z.string().default('2h'),
+  // How long a Google member stays signed in.
+  USER_JWT_EXPIRES_IN: z.string().default('7d'),
+
+  // ── Google sign-in (visitors) ──
+  // OAuth 2.0 Web client ID from Google Cloud Console. Same value used by the
+  // frontend Google button; the API verifies ID tokens against it.
+  GOOGLE_CLIENT_ID: z.string().min(10, 'GOOGLE_CLIENT_ID is required for member sign-in'),
   ADMIN_EMAIL: z.string().email('ADMIN_EMAIL must be a valid email'),
   // bcrypt hash of the admin password (generate with `npm run hash -- "yourpass"`).
   ADMIN_PASSWORD_HASH: z.string().min(20, 'ADMIN_PASSWORD_HASH is required'),

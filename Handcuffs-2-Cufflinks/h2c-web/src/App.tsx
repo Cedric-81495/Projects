@@ -12,6 +12,14 @@ import { CommunityPage } from '@/modules/community/CommunityPage';
 import { JoinPage } from '@/modules/join/JoinPage';
 import { LegalPage } from '@/modules/legal/LegalPage';
 import { NotFound } from '@/modules/NotFound';
+import { SignInPage } from '@/modules/auth/SignInPage';
+import { ProfilePage } from '@/modules/profile/ProfilePage';
+import { RequireUser } from '@/shared/RequireUser';
+import { AdminLayout } from '@/modules/admin/AdminLayout';
+import { AdminLoginPage } from '@/modules/admin/AdminLoginPage';
+import { DashboardPage } from '@/modules/admin/DashboardPage';
+import { UsersPage } from '@/modules/admin/UsersPage';
+import { ModerationPage } from '@/modules/admin/ModerationPage';
 
 const router = createBrowserRouter([
   {
@@ -27,8 +35,21 @@ const router = createBrowserRouter([
       { path: '/about', element: <AboutPage /> },
       { path: '/community', element: <CommunityPage /> },
       { path: '/join', element: <JoinPage /> },
+      { path: '/signin', element: <SignInPage /> },
+      { path: '/profile', element: <RequireUser><ProfilePage /></RequireUser> },
       { path: '/legal', element: <LegalPage /> },
       { path: '*', element: <NotFound /> },
+    ],
+  },
+  // Admin lives inside this app but outside the marketing chrome.
+  { path: '/admin/login', element: <AdminLoginPage /> },
+  {
+    path: '/admin',
+    element: <AdminLayout />,
+    children: [
+      { index: true, element: <DashboardPage /> },
+      { path: 'users', element: <UsersPage /> },
+      { path: 'moderation', element: <ModerationPage /> },
     ],
   },
 ]);

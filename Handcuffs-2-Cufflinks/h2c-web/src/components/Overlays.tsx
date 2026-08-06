@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { primaryNav } from '@/shared/nav';
 import { useUI } from '@/shared/UIContext';
+import { useAuth } from '@/shared/AuthContext';
 import { lookbook, stories, podcastEpisodes } from '@/data';
 import { plain } from '@/lib/text';
 import { cn } from '@/lib/cn';
@@ -23,6 +24,7 @@ export function Veil() {
 
 export function MobileNav() {
   const { overlay, closeOverlay } = useUI();
+  const { user, logout } = useAuth();
   const open = overlay === 'menu';
   return (
     <nav className={cn('mnav', open && 'open')} aria-label="Mobile" aria-hidden={!open}>
@@ -38,6 +40,31 @@ export function MobileNav() {
       <Link to="/join" onClick={closeOverlay}>
         Join<span>The movement</span>
       </Link>
+      {user ? (
+        <>
+          <Link to="/profile" onClick={closeOverlay}>
+            Profile<span>Your account</span>
+          </Link>
+          {user.role === 'admin' && (
+            <Link to="/admin" onClick={closeOverlay}>
+              Admin<span>Dashboard</span>
+            </Link>
+          )}
+          <Link
+            to="/"
+            onClick={() => {
+              closeOverlay();
+              void logout();
+            }}
+          >
+            Sign out<span>{user.email}</span>
+          </Link>
+        </>
+      ) : (
+        <Link to="/signin" onClick={closeOverlay}>
+          Sign in<span>Members</span>
+        </Link>
+      )}
     </nav>
   );
 }

@@ -17,11 +17,15 @@ import {
   storyPatchSchema,
   episodePatchSchema,
   trackPatchSchema,
+  adminUserUpdateSchema,
 } from '../validation/schemas.js';
 import { CommunityStoryModel } from '../models/CommunityStory.js';
 import { StoryModel } from '../models/Story.js';
 import { EpisodeModel } from '../models/Episode.js';
 import { TrackModel } from '../models/Track.js';
+import { UserModel, toPublicUser } from '../models/User.js';
+import { MemberModel } from '../models/Member.js';
+import { NewsletterModel } from '../models/Newsletter.js';
 
 export const adminRouter = Router();
 
@@ -58,6 +62,150 @@ adminRouter.use(requireAdmin);
 adminRouter.get('/me', (req, res) => {
   res.json({ admin: req.admin });
 });
+
+// ── Dashboard overview ──
+adminRouter.get(
+  '/stats',
+  asyncHandler(async (_req, res) => {
+    const [
+      users,
+      admins,
+      suspended,
+      pendingStories,
+      approvedStories,
+      publishedStories,
+      episodes,
+      tracks,
+      members,
+      newsletter,
+    ] = await Promise.all([
+      UserModel.countDocuments({}),
+      UserModel.countDocuments({ role: 'admin' }),
+      UserModel.countDocuments({ status: 'suspended' }),
+      CommunityStoryModel.countDocuments({ status: 'pending' }),
+      CommunityStoryModel.countDocuments({ status: 'approved' }),
+      StoryModel.countDocuments({ published: true }),
+      EpisodeModel.countDocuments({}),
+      TrackModel.countDocuments({}),
+      MemberModel.countDocuments({}),
+      NewsletterModel.countDocuments({}),
+    ]);
+
+    const recentUsers = await UserModel.find({})
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean();
+
+    res.json({
+      stats: {
+        users,
+        admins,
+        suspended,
+        pendingStories,
+        approvedStories,
+        publishedStories,
+        episodes,
+        tracks,
+        members,
+        newsletter,
+      },
+      recentUsers: recentUsers.map(toPublicUser),
+    });
+  }),
+);
+
+// ── User management ──
+// GET /api/admin/users?search=&status=&role=&page=&limit=
+adminRouter.get(
+  '/users',
+  asyncHandler(async (req, res) => {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const { search, status, role } = req.query as Record<string, string | undefined>;
+
+    const filter: Record<string, unknown> = {};
+    if (status === 'active' || status === 'suspended') filter.status = status;
+    if (role === 'user' || role === 'admin') filter.role = role;
+    if (search && search.trim()) {
+      const rx = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      filter.$or = [{ name: rx }, { email: rx }];
+    }
+
+    const [docs, total] = await Promise.all([
+      UserModel.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      UserModel.countDocuments(filter),
+    ]);
+
+    res.json({
+      data: docs.map(toPublicUser),
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+    });
+  }),
+);
+
+// GET /api/admin/users/:id — one member plus their submissions.
+adminRouter.get(
+  '/users/:id',
+  asyncHandler(async (req, res) => {
+    const user = await UserModel.findById(req.params.id).lean();
+    if (!user) throw new HttpError(404, 'User not found.');
+    const submissions = await CommunityStoryModel.find({ authorUserId: user._id })
+      .sort({ createdAt: -1 })
+      .select('title status createdAt')
+      .lean();
+    res.json({
+      user: toPublicUser(user),
+      submissions: submissions.map((s) => ({
+        id: String(s._id),
+        title: s.title,
+        status: s.status,
+        submittedAt: s.createdAt,
+      })),
+    });
+  }),
+);
+
+// PATCH /api/admin/users/:id — change role / status / tier.
+adminRouter.patch(
+  '/users/:id',
+  validateBody(adminUserUpdateSchema),
+  asyncHandler(async (req, res) => {
+    // Guard: an admin acting as a member can't demote or suspend themselves
+    // (prevents locking yourself out of the dashboard).
+    if (req.admin?.sub === req.params.id) {
+      if (req.body.role === 'user' || req.body.status === 'suspended') {
+        throw new HttpError(400, 'You cannot revoke your own admin access.');
+      }
+    }
+    const user = await UserModel.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true },
+    ).lean();
+    if (!user) throw new HttpError(404, 'User not found.');
+    res.json({ user: toPublicUser(user) });
+  }),
+);
+
+// DELETE /api/admin/users/:id — remove a member account.
+adminRouter.delete(
+  '/users/:id',
+  asyncHandler(async (req, res) => {
+    if (req.admin?.sub === req.params.id) {
+      throw new HttpError(400, 'You cannot delete your own account.');
+    }
+    const user = await UserModel.findByIdAndDelete(req.params.id).lean();
+    if (!user) throw new HttpError(404, 'User not found.');
+    res.json({ ok: true });
+  }),
+);
 
 // Community moderation
 adminRouter.get(

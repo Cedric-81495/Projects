@@ -66,3 +66,32 @@ export const trackInputSchema = z.object({
 export const storyPatchSchema = storyInputSchema.partial();
 export const episodePatchSchema = episodeInputSchema.partial();
 export const trackPatchSchema = trackInputSchema.partial();
+
+// ── Members (Google sign-in) ──
+export const googleAuthSchema = z.object({
+  credential: z.string().min(20, 'A Google credential is required.'),
+});
+
+export const profileUpdateSchema = z
+  .object({
+    name: z.string().min(1).max(120).optional(),
+    bio: z.string().max(600).optional(),
+    location: z.string().max(120).optional(),
+    interests: z.array(z.string().max(80)).max(20).optional(),
+  })
+  .refine((v) => Object.keys(v).length > 0, { message: 'No changes provided.' });
+
+// A signed-in member submitting their own story (name/email come from the account).
+export const myStorySchema = z.object({
+  title: z.string().min(1, 'A title is required.').max(160),
+  story: z.string().min(20, 'Please share a little more of your story.').max(10_000),
+});
+
+// ── Admin: user management ──
+export const adminUserUpdateSchema = z
+  .object({
+    role: z.enum(['user', 'admin']).optional(),
+    status: z.enum(['active', 'suspended']).optional(),
+    tier: z.enum(['member', 'vip']).optional(),
+  })
+  .refine((v) => Object.keys(v).length > 0, { message: 'No changes provided.' });

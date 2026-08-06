@@ -13,7 +13,7 @@ import { plain } from '@/lib/text';
 export function LookbookSection() {
   if (lookbook.length === 0) return null;
   return (
-    <section className="sec t-3" id="lookbook">
+    <section className="sec t-5" id="lookbook">
       <div className="wrap">
         <Eyebrow>Wear your story · eight chapters</Eyebrow>
         <Reveal as="h2" delay={1} className="h2">One journey,<br />eight looks.</Reveal>
@@ -42,7 +42,7 @@ export function StoriesTeaser() {
           <Reveal delay={1}>
             <VideoPlayer asset={ep.media} label="30-second teaser" />
           </Reveal>
-          <Reveal delay={2}>
+          <Reveal delay={2}>This did not start in a boardroom. It starte
             <span className="tag">Episode {ep.n} · {ep.cat}</span>
             <h3 className="h3" dangerouslySetInnerHTML={{ __html: ep.title }} />
             <p className="body">{ep.blurb}</p>
@@ -81,7 +81,7 @@ export function PodcastTeaser() {
 export function MusicTeaser() {
   if (music.length === 0) return null;
   return (
-    <section className="sec t-7" id="music">
+    <section className="sec t-green" id="music">
       <div className="wrap">
         <Eyebrow>Kitchen Muzik Management · the sound of it</Eyebrow>
         <Reveal as="h2" delay={1} className="h2">Transformation, in another key</Reveal>
@@ -108,7 +108,7 @@ export function MusicTeaser() {
 
 export function GwopTeaser() {
   return (
-    <section className="sec t-light" id="gwop">
+    <section className="sec t-forest" id="gwop">
       <div className="wrap means">
         <div>
           <Eyebrow>The ecosystem</Eyebrow>
@@ -131,7 +131,7 @@ export function GwopTeaser() {
 
 export function CommunityTeaser() {
   return (
-    <section className="sec t-3" id="community">
+    <section className="sec t-6" id="community">
       <div className="wrap">
         <Eyebrow>The community · your turn</Eyebrow>
         <Reveal as="h2" delay={1} className="h2">Become part of it</Reveal>
@@ -173,7 +173,7 @@ export function FounderTeaser() {
 
 export function JoinTeaser() {
   return (
-    <section className="sec t-light" id="join">
+    <section className="sec t-forest" id="join">
       <div className="wrap" style={{ textAlign: 'center' }}>
         <Reveal as="h2" delay={1} className="h2">Join the movement</Reveal>
         <Reveal delay={1} className="lede" as="p" style={{ margin: '0 auto 1.5em' }}>

@@ -92,6 +92,13 @@
   --surface: var(--forest); --fg: var(--bone); --fg-quiet: #9DB3A6;
   --rule: rgba(247, 243, 233, 0.16); --accent: var(--brass-lit);
 }
+
+.t-green {
+  --surface: linear-gradient(180deg, var(--forest-lit) 0%, var(--forest) 55%, #04160E 100%);
+  --fg: var(--bone); --fg-quiet: #9DB3A6;
+  --rule: rgba(247, 243, 233, 0.16); --accent: var(--brass-lit);
+}
+
 .arc-shift {
   height: clamp(150px, 22vw, 320px);
   background: linear-gradient(180deg, var(--slate) 0%, #33443B 30%, #1C5A3C 60%, var(--forest) 100%);
@@ -262,7 +269,7 @@
 .said { padding: 16px 18px; border: 1px solid var(--accent); color: var(--accent); font-size: 0.85rem; line-height: 1.5; }
 
 /* ---------- Footer ---------- */
-.ftr { background: var(--pitch); color: var(--bone); padding: var(--stack) var(--gut) 30px; }
+.ftr { background: var(--surface); color: var(--fg); padding: var(--stack) var(--gut) 30px; }
 .ftr-top { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: clamp(24px, 3vw, 50px); }
 @media (max-width: 900px) { .ftr-top { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .ftr-top { grid-template-columns: 1fr; } }

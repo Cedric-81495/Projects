@@ -13,7 +13,7 @@ export function LookbookPage() {
 
   return (
     <>
-      <section className="sec t-3" style={{ paddingBottom: 0 }}>
+      <section className="sec t-5" style={{ paddingBottom: 0 }}>
         <div className="wrap">
           <Eyebrow>Brand expression · wear your story</Eyebrow>
           <Reveal as="h2" delay={1} className="h2">One journey,<br />eight looks.</Reveal>
@@ -25,7 +25,7 @@ export function LookbookPage() {
         </div>
       </section>
 
-      <section className="sec t-3" style={{ paddingTop: 'clamp(30px,4vw,50px)' }}>
+      <section className="sec t-forest" style={{ paddingTop: 'clamp(30px,4vw,50px)' }}>
         <div className="wrap">
           <AsyncContent
             status={status}

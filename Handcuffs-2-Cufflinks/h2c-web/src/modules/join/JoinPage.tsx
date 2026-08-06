@@ -5,7 +5,7 @@ import { JoinForm } from './JoinForm';
 export function JoinPage() {
   useReveal('join');
   return (
-    <section className="sec t-paper" style={{ minHeight: '70vh' }}>
+    <section className="sec t-5" style={{ minHeight: '70vh' }}>
       <div className="wrap" style={{ textAlign: 'center' }}>
         <Eyebrow>Engagement · become part of it</Eyebrow>
         <Reveal as="h2" delay={1} className="h2">Join the movement</Reveal>

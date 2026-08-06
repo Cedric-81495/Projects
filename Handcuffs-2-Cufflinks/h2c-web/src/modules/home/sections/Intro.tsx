@@ -3,7 +3,7 @@ import { Eyebrow, PhotoWell, PlayIcon, Reveal } from '@/shared/ui';
 
 export function Trailer() {
   return (
-    <section className="sec t-1" id="trailer">
+    <section className="sec t-forest" id="trailer">
       <div className="wrap">
         <Eyebrow>The movement trailer · 45 seconds</Eyebrow>
         <Reveal as="h2" delay={1} className="h2">
@@ -34,7 +34,7 @@ export function Trailer() {
 
 export function MovementMeaning() {
   return (
-    <section className="sec t-2" id="movement">
+    <section className="sec t-forest" id="movement">
       <div className="wrap means">
         <div>
           <Eyebrow>What the brand means</Eyebrow>
@@ -79,7 +79,7 @@ export function MovementMeaning() {
 
 export function Boston() {
   return (
-    <section className="sec t-4" id="boston">
+    <section className="sec t-forest" id="boston">
       <div className="wrap">
         <Eyebrow>Boston, Massachusetts</Eyebrow>
         <Reveal as="h2" delay={1} className="h2">Built in <span className="gold-t">Boston</span></Reveal>

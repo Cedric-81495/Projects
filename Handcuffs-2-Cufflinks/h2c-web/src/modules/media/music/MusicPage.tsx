@@ -12,7 +12,7 @@ export function MusicPage() {
 
   return (
     <>
-      <section className="sec t-7" style={{ paddingBottom: 0 }}>
+      <section className="sec t-5" style={{ paddingBottom: 0 }}>
         <div className="wrap">
           <Eyebrow>Kitchen Muzik Management</Eyebrow>
           <Reveal as="h2" delay={1} className="h2">Transformation,<br />in another key</Reveal>
@@ -24,7 +24,7 @@ export function MusicPage() {
         </div>
       </section>
 
-      <section className="sec t-7" style={{ paddingTop: 'clamp(28px,4vw,44px)' }}>
+      <section className="sec t-forest" style={{ paddingTop: 'clamp(28px,4vw,44px)' }}>
         <div className="wrap">
           <h3 className="h3 rise">Releases</h3>
           <div style={{ marginTop: 18 }}>
@@ -78,7 +78,7 @@ export function MusicPage() {
         </div>
       </section>
 
-      <section className="sec t-light">
+      <section className="sec t-green">
         <div className="wrap" style={{ textAlign: 'center' }}>
           <Reveal as="h2" delay={1} className="h2">Listen everywhere</Reveal>
           <Reveal delay={1} className="btn-row">

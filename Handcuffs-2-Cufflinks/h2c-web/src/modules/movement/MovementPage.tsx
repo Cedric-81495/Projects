@@ -14,7 +14,7 @@ export function MovementPage() {
   useReveal('movement');
   return (
     <>
-      <section className="sec t-2">
+      <section className="sec t-5">
         <div className="wrap">
           <Eyebrow>The movement</Eyebrow>
           <Reveal as="h2" delay={1} className="h2">From limitation<br />to liberation</Reveal>
@@ -26,7 +26,7 @@ export function MovementPage() {
         </div>
       </section>
 
-      <section className="sec t-3">
+      <section className="sec t-green">
         <div className="wrap means">
           <div>
             <h3 className="h3 rise">Handcuffs</h3>

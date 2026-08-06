@@ -12,7 +12,7 @@ export function CommunityPage() {
 
   return (
     <>
-      <section className="sec t-3" style={{ paddingBottom: 0 }}>
+      <section className="sec t-forest" style={{ paddingBottom: 0 }}>
         <div className="wrap">
           <Eyebrow>The community · participation, not spectating</Eyebrow>
           <Reveal as="h2" delay={1} className="h2">Your journey<br />belongs here</Reveal>
@@ -24,7 +24,7 @@ export function CommunityPage() {
         </div>
       </section>
 
-      <section className="sec t-3" style={{ paddingTop: 'clamp(28px,4vw,44px)' }}>
+      <section className="sec t-6" style={{ paddingTop: 'clamp(28px,4vw,44px)' }}>
         <div className="wrap means" style={{ alignItems: 'start' }}>
           <div>
             <h3 className="h3 rise">Share your story</h3>

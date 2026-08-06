@@ -16,7 +16,7 @@ export type AsyncStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error';
 // assets degrade gracefully to a branded placeholder.
 export type MediaKind = 'image' | 'video' | 'audio';
 export type MediaProvider = 'file' | 'youtube' | 'vimeo';
-export type MediaRatio = '3x4' | '4x5' | '2x3' | '1x1' | '16x9' | '21x9';
+export type MediaRatio = '2x3' | '3x4' | '4x5' | '1x1' | '16x9' | '21x9';
 
 export interface MediaAsset {
   kind: MediaKind;

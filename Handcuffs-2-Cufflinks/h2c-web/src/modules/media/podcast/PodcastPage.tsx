@@ -24,7 +24,7 @@ export function PodcastPage() {
         </div>
       </section>
 
-      <section className="sec t-6" style={{ paddingTop: 'clamp(28px,4vw,44px)' }}>
+      <section className="sec t-forest" style={{ paddingTop: 'clamp(28px,4vw,44px)' }}>
         <div className="wrap">
           <h3 className="h3 rise">Clips</h3>
           <div style={{ marginTop: 18 }}>

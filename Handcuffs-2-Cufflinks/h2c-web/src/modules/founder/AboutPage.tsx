@@ -8,9 +8,9 @@ export function AboutPage() {
   useReveal('about');
   return (
     <>
-      <section className="sec t-paper" style={{ paddingBottom: 0 }}>
+      <section className="sec t-paper" style={{ paddingBottom: '50px' }}>
         <div className="wrap means">
-          <Reveal delay={1}><PhotoWell src="/assets/look8.jpg" alt="The founder" ratio="4x5" /></Reveal>
+          <Reveal delay={1}><PhotoWell src="/assets/founder.jpg" alt="The founder" ratio="4x5" /></Reveal>
           <div>
             <Eyebrow>The founder · authority through experience</Eyebrow>
             <Reveal as="h2" delay={1} className="h2">One of them<br />walked in.</Reveal>

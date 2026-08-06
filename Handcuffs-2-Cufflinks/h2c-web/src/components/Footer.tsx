@@ -28,8 +28,7 @@ const socials = [
 export function Footer() {
   return (
     <>
-      <div className="arc-shift" aria-hidden="true" />
-      <footer className="ftr">
+      <footer className="ftr t-green">
         <div className="wrap">
           <div className="ftr-top">
             <div>

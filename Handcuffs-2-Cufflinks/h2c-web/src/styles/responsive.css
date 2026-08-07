@@ -1,0 +1,31 @@
+/* Ported verbatim from the approved reference build. Values here are the
+   design contract — change them only with client approval. */
+
+/* Breakpoints: 1279 (nav collapses), 900 (columns collapse), 620 (single col) */
+/* ------------------------------------------------------------ responsive */
+@media (max-width:1279px){
+  .nav{display:none}
+  .burger{display:grid}
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .socials{grid-template-columns:repeat(3,1fr)}
+  .ftr-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:900px){
+  .split,.g2,.g3,.look,.eco,.stats{grid-template-columns:1fr}
+  .split--rev>*:first-child{order:0}
+  .eco,.stats{gap:1px}
+  .hero-figs{grid-template-columns:1fr 1fr}
+  .hero-figs>*:nth-child(3){display:none}
+  .look-pieces{grid-template-columns:repeat(2,1fr);gap:12px}
+}
+@media (max-width:620px){
+  .g4,.socials,.g2f{grid-template-columns:1fr}
+  .hero-support{font-size:1.62rem}
+  .hero-figs{grid-template-columns:1fr}
+  .hero-figs>*:nth-child(2){display:none}
+  .ftr-grid{grid-template-columns:1fr}
+  .cookie{left:12px;right:12px;max-width:none}
+  .saved{grid-template-columns:52px 1fr}
+  .saved>*:last-child{grid-column:2}
+  .pull{font-size:1.32rem}
+}

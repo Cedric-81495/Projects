@@ -1,0 +1,288 @@
+/* Ported verbatim from the approved reference build. Values here are the
+   design contract — change them only with client approval. */
+
+/* Buttons and inline links */
+/* ---------------------------------------------------------------- buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--sans);font-size:.72rem;font-weight:600;letter-spacing:.17em;
+  text-transform:uppercase;padding:16px 30px;border:1px solid transparent;
+  transition:background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease),transform .3s var(--ease);
+  cursor:pointer;text-align:center}
+.btn:hover{transform:translateY(-2px)}
+.btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.btn--gold{background:var(--gold);color:var(--obsidian);border-color:var(--gold)}
+.btn--gold:hover{background:var(--gold-lit);border-color:var(--gold-lit)}
+.btn--ghost{border-color:currentColor;color:var(--fg);opacity:.9}
+.btn--ghost:hover{background:var(--fg);color:var(--surface);opacity:1}
+.s-light .btn--ghost:hover,.s-light-2 .btn--ghost:hover{background:var(--obsidian);color:var(--platinum-hi)}
+.btn--emerald{background:var(--emerald);color:var(--platinum-hi);border-color:var(--emerald)}
+.btn--emerald:hover{background:#0F6E4B;border-color:#0F6E4B}
+.btn--sm{padding:11px 18px;font-size:.64rem;letter-spacing:.14em}
+.btn--wide{width:100%}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.row--c{justify-content:center}
+
+.link{display:inline-flex;align-items:center;gap:9px;font-size:.71rem;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  border-bottom:1px solid transparent;padding-bottom:3px;transition:border-color .3s,gap .3s}
+.link:hover{border-color:var(--accent);gap:15px}
+.link svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* Asset slots — every image position is a labelled spec until the real
+   photography is dropped in. No stock imagery anywhere. */
+/* ------------------------------------------------- asset slots (no stock) */
+.slot{position:relative;display:grid;place-items:center;text-align:center;
+  background:
+    linear-gradient(135deg,rgba(200,163,74,.07),transparent 55%),
+    repeating-linear-gradient(135deg,rgba(191,195,199,.035) 0 1px,transparent 1px 9px),
+    var(--charcoal-2);
+  border:1px solid rgba(191,195,199,.14);overflow:hidden;color:var(--platinum)}
+.slot--warm{background:
+    linear-gradient(135deg,rgba(200,163,74,.13),transparent 60%),
+    repeating-linear-gradient(135deg,rgba(200,163,74,.05) 0 1px,transparent 1px 9px),
+    #14231D;border-color:rgba(200,163,74,.24)}
+.slot--em{background:
+    linear-gradient(140deg,rgba(13,91,63,.5),rgba(6,26,19,.9)),
+    repeating-linear-gradient(135deg,rgba(200,163,74,.05) 0 1px,transparent 1px 10px),
+    var(--emerald-ink);border-color:rgba(200,163,74,.22)}
+.slot-txt{padding:clamp(16px,3vw,30px);max-width:34ch}
+.slot-txt b{display:block;font-family:var(--sans);font-size:.6rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:9px}
+.slot-txt span{display:block;font-size:.72rem;font-weight:300;line-height:1.6;
+  color:var(--platinum);opacity:.72;word-break:break-word}
+.slot::after{content:"";position:absolute;inset:9px;border:1px solid rgba(200,163,74,.14);pointer-events:none}
+/* thumbnails are too small for a spec label */
+.slot--thumb .slot-txt{padding:2px;max-width:none}
+.slot--thumb .slot-txt b{font-size:.46rem;letter-spacing:.08em;margin:0}
+.slot--thumb::after{inset:4px}
+.r-2x3{aspect-ratio:2/3}
+.r-3x4{aspect-ratio:3/4}
+.r-1x1{aspect-ratio:1}
+.r-4x5{aspect-ratio:4/5}
+.r-4x3{aspect-ratio:4/3}
+.r-16x9{aspect-ratio:16/9}
+.r-21x9{aspect-ratio:21/9}
+.s-light .slot,.s-light-2 .slot{background:
+    linear-gradient(135deg,rgba(138,110,40,.1),transparent 55%),
+    repeating-linear-gradient(135deg,rgba(11,11,12,.045) 0 1px,transparent 1px 9px),
+    #DDE1E3;border-color:rgba(11,11,12,.16);color:var(--obsidian)}
+.s-light .slot-txt b,.s-light-2 .slot-txt b{color:var(--gold-deep)}
+.s-light .slot-txt span,.s-light-2 .slot-txt span{color:#4C5257;opacity:.9}
+.s-light .slot::after,.s-light-2 .slot::after{border-color:rgba(11,11,12,.1)}
+
+/* video frame */
+.vframe{position:relative}
+.vframe .slot{place-items:end center}
+.vframe .slot-txt{padding-bottom:clamp(14px,2vw,24px)}
+.vframe .play{position:absolute;inset:0;display:grid;place-items:center;gap:12px;
+  align-content:center;color:#fff}
+.play-ring{width:clamp(64px,7vw,92px);height:clamp(64px,7vw,92px);border-radius:50%;
+  border:1px solid var(--gold);display:grid;place-items:center;
+  background:rgba(7,7,8,.42);backdrop-filter:blur(3px);transition:background .35s var(--ease),transform .35s var(--ease)}
+.play-ring svg{width:26px;height:26px;fill:var(--gold);stroke:none;margin-left:3px}
+.vframe .play:hover .play-ring{background:var(--gold);transform:scale(1.06)}
+.vframe .play:hover .play-ring svg{fill:var(--obsidian)}
+.play-label{font-size:.62rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase}
+
+/* Apparel cards and engagement controls */
+/* --------------------------------------------------------- apparel cards */
+.pcard{position:relative;display:flex;flex-direction:column}
+.pcard-fig{position:relative;overflow:hidden}
+.pcard-fig .slot{transition:transform .7s var(--ease)}
+.pcard:hover .pcard-fig .slot{transform:scale(1.03)}
+.pcard-badge{position:absolute;top:12px;left:12px;z-index:3;background:rgba(7,7,8,.78);
+  border:1px solid rgba(200,163,74,.4);color:var(--gold);
+  font-size:.55rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:5px 9px}
+.pcard-body{padding:16px 0 0}
+.pcard-title{font-family:var(--serif);font-size:1.14rem;font-weight:500;line-height:1.2;margin:0 0 5px}
+.pcard-meaning{font-size:.775rem;font-weight:300;line-height:1.6;color:var(--fg-quiet);margin:0 0 12px}
+.pcard-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+
+/* engagement controls — the only interaction model in showcase mode */
+.eng{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;
+  border:1px solid var(--rule);font-size:.6rem;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--fg-quiet);transition:all .3s var(--ease)}
+.eng svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.eng:hover{border-color:var(--accent);color:var(--accent)}
+.eng.is-on{border-color:var(--accent);color:var(--accent);background:rgba(200,163,74,.1)}
+.eng.is-on svg{fill:var(--accent);stroke:var(--accent)}
+.eng-count{font-variant-numeric:tabular-nums;opacity:.85}
+
+/* vote meter */
+.meter{display:grid;gap:14px;margin:26px 0 0}
+.meter-row{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:center}
+.meter-name{font-size:.74rem;font-weight:500;letter-spacing:.06em}
+.meter-val{font-size:.68rem;font-weight:600;letter-spacing:.1em;color:var(--accent);font-variant-numeric:tabular-nums}
+.meter-track{grid-column:1/-1;height:4px;background:rgba(191,195,199,.14);position:relative;overflow:hidden}
+.meter-fill{position:absolute;inset:0 auto 0 0;background:var(--brass);
+  transform-origin:left;transform:scaleX(0);transition:transform 1.1s var(--ease)}
+
+/* Photoshoot look rail */
+/* ------------------------------------------------------------- look rail */
+.rail{display:flex;gap:8px;overflow-x:auto;padding:0 0 14px;margin:0 0 clamp(24px,3vw,40px);
+  scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.rail::-webkit-scrollbar{height:3px}
+.rail::-webkit-scrollbar-thumb{background:var(--gold)}
+.rail-btn{flex:0 0 auto;display:flex;flex-direction:column;gap:5px;align-items:flex-start;
+  padding:13px 18px;border:1px solid var(--rule);min-width:132px;
+  transition:all .35s var(--ease);text-align:left}
+.rail-btn small{font-family:var(--serif);font-size:1.02rem;color:var(--accent);line-height:1}
+.rail-btn span{font-size:.63rem;font-weight:500;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--fg-quiet);line-height:1.35}
+.rail-btn.is-on{border-color:var(--accent);background:rgba(200,163,74,.1)}
+.rail-btn.is-on span{color:var(--fg)}
+.rail-btn:hover{border-color:var(--accent)}
+.look{display:grid;grid-template-columns:.92fr 1.08fr;gap:clamp(24px,3.6vw,58px);align-items:start}
+.look-pieces{display:grid;gap:2px;grid-template-columns:repeat(3,1fr);margin:22px 0 0}
+.piece{display:flex;flex-direction:column;gap:9px}
+.piece .slot{aspect-ratio:1}
+.piece b{font-size:.66rem;font-weight:600;letter-spacing:.1em;line-height:1.35}
+.piece span{font-size:.66rem;color:var(--fg-quiet);font-weight:300}
+
+/* Docuseries / podcast episode cards */
+/* --------------------------------------------------------------- episodes */
+.epcard{display:grid;gap:16px;align-content:start}
+.epcard .slot{transition:transform .7s var(--ease)}
+.epcard:hover .slot{transform:scale(1.02)}
+.epmeta{display:flex;gap:10px;align-items:center;font-size:.6rem;font-weight:600;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--accent)}
+.epmeta i{width:14px;height:1px;background:currentColor;display:block;opacity:.6}
+.lessons{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:11px;counter-reset:l}
+.lessons li{counter-increment:l;display:grid;grid-template-columns:auto 1fr;gap:14px;
+  font-size:.84rem;font-weight:300;line-height:1.6}
+.lessons li::before{content:counter(l,decimal-leading-zero);font-family:var(--serif);
+  font-size:1rem;color:var(--accent);line-height:1.4}
+
+/* Podcast clip rail */
+/* -------------------------------------------------------------- clip rail */
+.clips{display:flex;gap:14px;overflow-x:auto;padding-bottom:16px;margin:0 calc(var(--gut)*-1);
+  padding-left:var(--gut);padding-right:var(--gut);scrollbar-width:thin}
+.clips::-webkit-scrollbar{height:3px}
+.clips::-webkit-scrollbar-thumb{background:var(--gold)}
+.clip{flex:0 0 clamp(190px,22vw,250px)}
+.clip .slot{aspect-ratio:9/16}
+.clip p{font-size:.76rem;font-weight:400;line-height:1.5;margin:12px 0 0}
+.clip span{font-size:.6rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-quiet)}
+
+/* Ecosystem cards — three brands, visually distinct */
+/* ---------------------------------------------------------------- ecosystem */
+.eco{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin-top:clamp(28px,3.6vw,48px)}
+.eco-card{background:var(--surface);padding:clamp(24px,3vw,40px);display:flex;
+  flex-direction:column;gap:14px;position:relative;transition:background .4s var(--ease)}
+.eco-card:hover{background:rgba(200,163,74,.05)}
+.eco-crest{height:72px;width:auto;object-fit:contain;align-self:flex-start}
+.eco-crest--type{height:34px}
+.eco-role{font-size:.58rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
+.eco-card h3{font-family:var(--serif);font-weight:500;font-size:1.28rem;margin:0;line-height:1.2}
+.eco-card p{font-size:.82rem;font-weight:300;line-height:1.7;color:var(--fg-quiet);margin:0}
+.eco-card ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.eco-card li{font-size:.74rem;font-weight:300;color:var(--fg-quiet);
+  padding-left:15px;position:relative}
+.eco-card li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:1px;background:var(--accent)}
+.eco-tag{margin-top:auto;font-size:.58rem;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);border-top:1px solid var(--rule);padding-top:14px}
+
+/* Community stories */
+/* ---------------------------------------------------------------- stories */
+.story{display:flex;flex-direction:column;gap:15px;background:transparent}
+.story-q{font-family:var(--serif);font-style:italic;font-weight:300;font-size:1.16rem;
+  line-height:1.44;margin:0}
+.story-who{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:6px}
+.story-who .slot{width:46px;height:46px;border-radius:50%;flex:0 0 auto}
+.story-who .slot::after{inset:4px;border-radius:50%}
+.story-who b{display:block;font-size:.78rem;font-weight:600;letter-spacing:.05em}
+.story-who span{display:block;font-size:.66rem;color:var(--fg-quiet);font-weight:300}
+.story-arc{display:flex;align-items:center;gap:9px;font-size:.58rem;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--accent)}
+.story-arc i{width:16px;height:1px;background:currentColor;display:block}
+
+/* Forms and subscriber benefits */
+/* ----------------------------------------------------------------- forms */
+.form{display:grid;gap:16px}
+.field{display:grid;gap:8px}
+.field>label{font-size:.62rem;font-weight:600;letter-spacing:.17em;text-transform:uppercase;color:var(--fg-quiet)}
+.field input,.field select,.field textarea{
+  width:100%;padding:14px 16px;background:rgba(191,195,199,.06);
+  border:1px solid var(--rule);color:var(--fg);font-size:.9rem;font-weight:300;
+  font-family:var(--sans);transition:border-color .3s,background .3s}
+.s-light .field input,.s-light .field select,.s-light .field textarea,
+.s-light-2 .field input,.s-light-2 .field select,.s-light-2 .field textarea{background:rgba(11,11,12,.04)}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--accent);background:rgba(200,163,74,.07)}
+.field textarea{min-height:130px;resize:vertical;line-height:1.7}
+.field-hint{font-size:.68rem;color:var(--fg-quiet);font-weight:300}
+.g2f{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+.check{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;
+  font-size:.775rem;font-weight:300;line-height:1.6;color:var(--fg-quiet);cursor:pointer}
+.check input{width:17px;height:17px;margin-top:2px;accent-color:var(--gold);flex:0 0 auto}
+.said{padding:16px 18px;border:1px solid var(--accent);background:rgba(200,163,74,.1);
+  font-size:.82rem;font-weight:400;display:none}
+.said.is-on{display:block}
+
+/* benefits list */
+.bens{list-style:none;margin:0;padding:0;display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.bens li{background:var(--surface);padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:14px;
+  font-size:.8rem;font-weight:300;line-height:1.55}
+.bens li b{display:block;font-weight:600;font-size:.74rem;letter-spacing:.05em;margin-bottom:3px}
+.bens svg{width:17px;height:17px;fill:none;stroke:var(--accent);stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round;margin-top:3px}
+
+/* Social grid */
+/* --------------------------------------------------------------- social */
+.socials{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.social{background:var(--surface);padding:clamp(20px,2.6vw,34px) 18px;display:grid;gap:12px;
+  place-items:center;text-align:center;transition:background .4s var(--ease)}
+.social:hover{background:rgba(200,163,74,.07)}
+.social svg{width:24px;height:24px;fill:none;stroke:var(--fg);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.social:hover svg{stroke:var(--accent)}
+.social b{font-size:.66rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase}
+.social span{font-size:.64rem;color:var(--fg-quiet);font-weight:300}
+
+/* Tabs */
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 clamp(26px,3vw,40px)}
+.tab{padding:11px 18px;border:1px solid var(--rule);font-size:.63rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--fg-quiet);transition:all .3s var(--ease)}
+.tab:hover{border-color:var(--accent);color:var(--accent)}
+.tab.is-on{background:var(--accent);border-color:var(--accent);color:var(--obsidian)}
+
+/* Accordion */
+/* accordion */
+.acc{border-top:1px solid var(--rule)}
+.acc-item{border-bottom:1px solid var(--rule)}
+.acc-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:19px 0;text-align:left;font-family:var(--serif);font-size:1.06rem;font-weight:500}
+.acc-q svg{width:16px;height:16px;fill:none;stroke:var(--accent);stroke-width:1.6;
+  flex:0 0 auto;transition:transform .35s var(--ease)}
+.acc-item.is-open .acc-q svg{transform:rotate(45deg)}
+.acc-a{display:none;padding:0 0 20px;font-size:.85rem;font-weight:300;line-height:1.8;
+  color:var(--fg-quiet);max-width:70ch}
+.acc-item.is-open .acc-a{display:block}
+
+/* Stats */
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin-top:clamp(26px,3vw,42px)}
+.stat{background:var(--surface);padding:clamp(20px,2.6vw,32px);display:grid;gap:6px}
+.stat b{font-family:var(--serif);font-weight:300;font-size:clamp(1.9rem,3.4vw,2.9rem);
+  line-height:1;color:var(--accent)}
+.stat span{font-size:.63rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--fg-quiet)}
+
+/* Note / callout */
+/* note / callout */
+.note{border:1px solid var(--rule);border-left:2px solid var(--accent);
+  padding:20px 22px;display:grid;gap:8px;background:rgba(200,163,74,.05)}
+.note b{font-size:.63rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.note p{font-size:.82rem;font-weight:300;line-height:1.75;margin:0;color:var(--fg-quiet)}
+
+/* Symbolism term lists — the handcuffs/cufflinks enumerations. Each item is
+   marked with the surface's accent so the list reads as brand vocabulary
+   rather than generic bullets. */
+.term-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.term-list li{position:relative;padding-left:16px;font-size:.82rem;font-weight:300;
+  line-height:1.9;color:var(--fg-quiet)}
+.term-list li::before{content:"";position:absolute;left:0;top:.92em;width:6px;height:1px;
+  background:var(--accent)}

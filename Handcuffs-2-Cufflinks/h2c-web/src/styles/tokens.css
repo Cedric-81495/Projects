@@ -1,0 +1,61 @@
+/* ==========================================================================
+   HANDCUFFS 2 CUFFLINKS — Design Tokens
+   Palette and typography are taken verbatim from the approved brand kit.
+   Do not introduce colours outside the six brand values and their tints.
+
+     Obsidian #0B0B0C · Charcoal #24272A · Graphite #555A60
+     Platinum #BFC3C7 · Prestige Gold #C8A34A · Emerald #0D5B3F
+
+   Cormorant Garamond (display / story) · Montserrat (UI / labels)
+   ========================================================================== */
+
+:root {
+  /* --- Brand kit, exact ------------------------------------------------ */
+  --obsidian: #0b0b0c;
+  --charcoal: #24272a;
+  --graphite: #555a60;
+  --platinum: #bfc3c7;
+  --gold: #c8a34a;
+  --emerald: #0d5b3f;
+
+  /* --- Derived, minimal — tints of the six above ----------------------- */
+  --pitch: #070708;
+  --obsidian-2: #101113;
+  --charcoal-2: #191b1e;
+  --gold-lit: #e7ce8c;
+  --gold-deep: #8a6e28;
+  --emerald-ink: #061a13;
+  --emerald-mid: #0a3b29;
+  --platinum-hi: #eaecee;
+  --platinum-2: #d8dcde;
+
+  --chrome: linear-gradient(178deg, #ffffff 0%, #e3e7ea 34%, #8f959b 56%, #f1f4f6 78%, #b9bfc4 100%);
+  --brass: linear-gradient(178deg, var(--gold-lit) 0%, var(--gold) 46%, var(--gold-deep) 100%);
+
+  /* --- Per-section theme, re-declared by the .s-* surface classes ------
+     Components read --fg / --fg-quiet / --rule / --accent rather than
+     brand values directly, so any component works on any surface.
+     -------------------------------------------------------------------- */
+  --surface: var(--obsidian);
+  --fg: var(--platinum-hi);
+  --fg-quiet: var(--graphite);
+  --rule: rgb(191 195 199 / 0.16);
+  --accent: var(--gold);
+
+  /* --- Brand accents: three brands, one ecosystem, distinct marks ------ */
+  --brand-h2c: var(--gold);
+  --brand-gwop: var(--emerald);
+  --brand-kmm: var(--platinum);
+
+  /* --- Type ------------------------------------------------------------ */
+  --serif: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+  --sans: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* --- Layout ---------------------------------------------------------- */
+  --gut: clamp(20px, 5.2vw, 80px);
+  --stack: clamp(72px, 9vw, 148px);
+  --maxw: 1400px;
+  --ease: cubic-bezier(0.22, 0.68, 0.16, 1);
+  --hdr-h: 74px;
+  --top-h: 112px; /* measured at runtime: announcement + header */
+}

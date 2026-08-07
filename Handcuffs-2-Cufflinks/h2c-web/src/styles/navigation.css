@@ -1,0 +1,113 @@
+/* Ported verbatim from the approved reference build. Values here are the
+   design contract — change them only with client approval. */
+
+/* Header, navigation, and mobile drawer nav */
+/* ------------------------------------------------------------------ header */
+.topstack{position:fixed;inset:0 0 auto;z-index:120}
+.hdr{position:relative;height:var(--hdr-h);
+  display:flex;align-items:center;gap:clamp(14px,2.4vw,38px);
+  padding:0 var(--gut);background:rgba(7,7,8,0);
+  border-bottom:1px solid transparent;transition:background .4s var(--ease),border-color .4s var(--ease),height .4s var(--ease)}
+.hdr.is-stuck{background:rgba(7,7,8,.9);backdrop-filter:blur(16px) saturate(1.2);
+  border-bottom-color:rgba(200,163,74,.2);height:66px}
+.hdr-logo{flex:0 0 auto;display:block}
+.hdr-logo img{height:clamp(22px,2.7vw,30px);width:auto}
+.nav{display:flex;align-items:center;gap:clamp(10px,1.5vw,22px);margin-left:auto;flex-wrap:nowrap}
+.nav a{font-size:.645rem;font-weight:500;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--platinum);padding:8px 0;position:relative;white-space:nowrap;transition:color .3s}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:1px;
+  background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.nav a:hover{color:#fff}
+.nav a:hover::after,.nav a.is-on::after{transform:scaleX(1)}
+.nav a.is-on{color:#fff}
+.nav .nav-join{color:var(--gold)}
+.hdr-tools{display:flex;align-items:center;gap:6px;margin-left:auto}
+.nav+.hdr-tools{margin-left:clamp(10px,2vw,26px)}
+.iconbtn{width:40px;height:40px;display:grid;place-items:center;position:relative;
+  color:var(--platinum);transition:color .3s}
+.iconbtn:hover{color:var(--gold)}
+.iconbtn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.pip{position:absolute;top:4px;right:2px;min-width:16px;height:16px;padding:0 4px;
+  background:var(--gold);color:var(--obsidian);border-radius:9px;font-size:.58rem;
+  font-weight:700;display:grid;place-items:center;letter-spacing:0}
+.burger{display:none}
+
+/* mobile nav */
+.mnav{position:fixed;inset:0;z-index:130;background:var(--pitch);
+  padding:calc(var(--top-h) + 22px) var(--gut) 40px;overflow-y:auto;
+  transform:translateY(-100%);transition:transform .55s var(--ease);visibility:hidden}
+.mnav.is-open{transform:none;visibility:visible}
+.mnav-logo{width:min(240px,60vw);margin-bottom:34px}
+.mnav a{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  padding:15px 0;border-bottom:1px solid rgba(191,195,199,.12);
+  font-family:var(--serif);font-size:1.5rem;font-weight:300;color:var(--platinum-hi)}
+.mnav a span{font-family:var(--sans);font-size:.6rem;font-weight:600;letter-spacing:.2em;color:var(--gold);opacity:.75}
+.mnav-social{display:flex;gap:8px;margin-top:30px}
+
+/* Saved-items drawer and scrim */
+/* ---------------------------------------------------------------- drawer */
+.scrim{position:fixed;inset:0;z-index:140;background:rgba(7,7,8,.72);
+  backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .4s var(--ease),visibility .4s}
+.scrim.is-on{opacity:1;visibility:visible}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:150;width:min(430px,100%);
+  background:var(--obsidian-2);border-left:1px solid rgba(200,163,74,.24);
+  display:flex;flex-direction:column;transform:translateX(101%);
+  transition:transform .5s var(--ease);visibility:hidden}
+.drawer.is-on{transform:none;visibility:visible}
+.drawer-hd{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:22px 24px;border-bottom:1px solid rgba(191,195,199,.14)}
+.drawer-hd h2{font-family:var(--serif);font-weight:400;font-size:1.28rem;margin:0}
+.drawer-bd{flex:1;overflow-y:auto;padding:22px 24px}
+.drawer-ft{padding:20px 24px;border-top:1px solid rgba(191,195,199,.14);display:grid;gap:12px}
+.saved{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;
+  padding:14px 0;border-bottom:1px solid rgba(191,195,199,.1)}
+.saved .slot{aspect-ratio:3/4}
+.saved b{display:block;font-family:var(--serif);font-size:.98rem;font-weight:500}
+.saved span{display:block;font-size:.68rem;color:var(--graphite)}
+.empty{text-align:center;padding:40px 10px;color:var(--graphite)}
+.empty p{font-size:.84rem;font-weight:300;line-height:1.7;margin:0 0 20px}
+.empty .h-sm{color:var(--platinum-hi)}
+
+/* Toast */
+/* toast */
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,140%);z-index:200;
+  background:var(--gold);color:var(--obsidian);padding:13px 22px;font-size:.7rem;
+  font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  transition:transform .45s var(--ease);max-width:calc(100vw - 32px);text-align:center}
+.toast.is-on{transform:translate(-50%,0)}
+
+/* Announcement bar and cookie notice */
+/* announce + cookie */
+.anno{background:var(--emerald);color:var(--platinum-hi);padding:9px calc(var(--gut) + 26px) 9px var(--gut);
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  font-size:.63rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;position:relative}
+.anno a{border-bottom:1px solid rgba(234,236,238,.5);padding-bottom:1px}
+.anno button{position:absolute;right:14px;color:inherit;opacity:.7;line-height:0}
+.anno svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7}
+.cookie{position:fixed;right:16px;bottom:16px;z-index:160;max-width:390px;
+  background:var(--obsidian-2);border:1px solid rgba(200,163,74,.26);padding:20px;display:grid;gap:14px}
+.cookie .btn{flex:1;white-space:nowrap}
+.cookie p{font-size:.75rem;font-weight:300;line-height:1.6;margin:0;color:var(--platinum)}
+.cookie a{color:var(--gold);border-bottom:1px solid currentColor}
+.cookie.is-off{display:none}
+
+/* Footer */
+/* ---------------------------------------------------------------- footer */
+.ftr{background:var(--obsidian);border-top:1px solid rgba(200,163,74,.2);
+  padding:clamp(52px,6vw,86px) var(--gut) 30px;color:var(--platinum)}
+.ftr-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:clamp(26px,3.4vw,54px);
+  max-width:var(--maxw);margin:0 auto}
+.ftr-logo{width:min(250px,70%);margin-bottom:20px}
+.ftr-grid h4{font-size:.62rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold);margin:0 0 18px}
+.ftr-grid ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.ftr-grid li a{font-size:.79rem;font-weight:300;color:var(--platinum);opacity:.78;transition:opacity .3s,color .3s}
+.ftr-grid li a:hover{opacity:1;color:var(--gold)}
+.ftr-note{font-size:.78rem;font-weight:300;line-height:1.75;color:var(--graphite);max-width:36ch;margin:0 0 22px}
+.ftr-base{max-width:var(--maxw);margin:clamp(38px,4.6vw,62px) auto 0;padding-top:24px;
+  border-top:1px solid rgba(191,195,199,.12);display:flex;flex-wrap:wrap;gap:14px 26px;
+  align-items:center;justify-content:space-between;font-size:.66rem;color:var(--graphite);font-weight:300}
+.ftr-base nav{display:flex;flex-wrap:wrap;gap:8px 20px}
+.ftr-base a:hover{color:var(--gold)}
+.ftr-crests{display:flex;gap:18px;align-items:center;margin-top:24px}
+.ftr-crests img{height:46px;width:auto;opacity:.85}

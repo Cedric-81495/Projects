@@ -1,0 +1,20 @@
+/* Ported verbatim from the approved reference build. Values here are the
+   design contract — change them only with client approval. */
+
+/* Scroll reveal. Reduced motion is honoured globally, not per component. */
+/* ------------------------------------------------------------ reveal anim */
+.rise{opacity:0;transform:translateY(22px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rise.is-in{opacity:1;transform:none}
+.d1{transition-delay:.09s}.d2{transition-delay:.18s}.d3{transition-delay:.27s}.d4{transition-delay:.36s}
+.draw{position:relative}
+.draw::before{content:"";position:absolute;left:0;top:-16px;width:100%;height:1px;
+  background:var(--accent);transform:scaleX(0);transform-origin:left;
+  transition:transform 1.1s var(--ease)}
+.draw.is-in::before{transform:scaleX(1)}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+  .rise{opacity:1;transform:none}
+  .draw::before{transform:scaleX(1)}
+}

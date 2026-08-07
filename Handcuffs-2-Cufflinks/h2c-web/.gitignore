@@ -1,0 +1,12 @@
+node_modules
+dist
+dist-server
+dist-ssr
+*.local
+.env
+.env.*
+!.env.example
+.DS_Store
+.vercel
+*.log
+coverage

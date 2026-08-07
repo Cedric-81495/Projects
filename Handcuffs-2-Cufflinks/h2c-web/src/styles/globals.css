@@ -1,0 +1,73 @@
+/* ==========================================================================
+   HANDCUFFS 2 CUFFLINKS — stylesheet entry point
+
+   Load order matters. Tokens first, then base, then layout, then components.
+   Tailwind is imported so utilities are available for one-off spacing inside
+   feature work, but the approved semantic classes (.sec, .h-lg, .btn, .cuff,
+   .slot ...) are the primary styling layer. Prefer them over utility soup:
+   they carry the brand contract and they theme themselves from the current
+   surface via --fg / --accent / --rule.
+   ========================================================================== */
+
+@import 'tailwindcss';
+
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './typography.css';
+@import './hero.css';
+@import './components.css';
+@import './navigation.css';
+@import './motion.css';
+@import './responsive.css';
+
+/* Expose the brand kit to Tailwind so utilities such as text-gold or
+   bg-emerald resolve to the approved values instead of Tailwind defaults. */
+@theme {
+  --color-obsidian: #0b0b0c;
+  --color-charcoal: #24272a;
+  --color-graphite: #555a60;
+  --color-platinum: #bfc3c7;
+  --color-gold: #c8a34a;
+  --color-emerald: #0d5b3f;
+  --color-pitch: #070708;
+  --color-gold-lit: #e7ce8c;
+  --color-gold-deep: #8a6e28;
+  --color-emerald-ink: #061a13;
+  --color-platinum-hi: #eaecee;
+
+  --font-serif: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+  --font-sans: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Tailwind's preflight resets margins that the ported design relies on, so a
+   handful of brand rules are restated at a later layer. */
+body {
+  margin: 0;
+  background: var(--obsidian);
+  color: var(--platinum-hi);
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+/* ---------------------------------------------------------------------------
+   Corrections to the ported reference build
+   Kept here rather than edited into the ported partials so the provenance of
+   those files stays intact and reviewable against the original.
+   --------------------------------------------------------------------------- */
+
+/**
+ * The reference set overflow-x:hidden on <body> only, which leaves <html> free
+ * to expand: the decorative arcs (.arc--tr / .arc--bl), the clip rail's
+ * negative margins, and the off-canvas drawer pushed the document to 1670px in
+ * a 1440px viewport, giving the whole site a sideways scroll into empty space.
+ *
+ * `clip` rather than `hidden` on <html> — hidden would turn the root into a
+ * scroll container and break scroll anchoring, whereas clip simply refuses to
+ * scroll. All three offenders are meant to be clipped by design.
+ */
+html {
+  overflow-x: clip;
+}

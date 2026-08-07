@@ -1,0 +1,59 @@
+/* Ported verbatim from the approved reference build. Values here are the
+   design contract — change them only with client approval. */
+
+/* Section shells, surface themes, and the transition bands that carry the
+   page from steel through emerald to platinum and back. */
+/* ---------------------------------------------------------------- surfaces */
+.sec{position:relative;background:var(--surface);color:var(--fg);padding:var(--stack) var(--gut)}
+.sec--tight{padding-top:clamp(44px,5vw,72px)}
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;position:relative;z-index:2}
+.wrap--narrow{max-width:820px}
+
+.s-pitch{--surface:var(--pitch)}
+.s-obsidian{--surface:var(--obsidian)}
+.s-obsidian2{--surface:var(--obsidian-2)}
+.s-charcoal{--surface:var(--charcoal-2)}
+.s-charcoal-hi{--surface:var(--charcoal)}
+.s-drift{--surface:linear-gradient(180deg,var(--charcoal) 0%,#1A2321 62%,#12241F 100%)}
+.s-forest{--surface:#102520}
+.s-emerald-ink{--surface:var(--emerald-ink)}
+.s-emerald{--surface:linear-gradient(170deg,var(--emerald-ink) 0%,var(--emerald-mid) 58%,#0C4630 100%)}
+.s-light{
+  --surface:var(--platinum-hi);--fg:var(--obsidian);--fg-quiet:#5E656B;
+  --rule:rgba(11,11,12,.16);--accent:var(--gold-deep);
+}
+.s-light-2{
+  --surface:var(--platinum-2);--fg:var(--obsidian);--fg-quiet:#5E656B;
+  --rule:rgba(11,11,12,.18);--accent:var(--gold-deep);
+}
+
+/* Transition bands — the arc from steel to emerald, then to platinum */
+.band{height:clamp(90px,12vw,170px);position:relative}
+.band--to-forest{background:linear-gradient(180deg,var(--charcoal) 0%,#1B2321 44%,#102520 100%)}
+.band--to-emerald{background:linear-gradient(180deg,#102520 0%,#0A2419 46%,var(--emerald-ink) 100%)}
+.band--to-light{background:linear-gradient(180deg,var(--emerald-ink) 0%,#28362F 26%,#6E7671 54%,#A8AEB1 76%,var(--platinum-hi) 100%)}
+.band--to-dark{background:linear-gradient(180deg,var(--platinum-2) 0%,#9AA1A4 20%,#4C544F 44%,#123527 70%,var(--emerald-ink) 100%)}
+.band--to-black{background:linear-gradient(180deg,#0C4630 0%,#0A2E20 34%,#0A1512 66%,var(--obsidian) 100%)}
+
+/* Grids */
+/* ------------------------------------------------------------------ grids */
+.g2{display:grid;gap:clamp(24px,3.4vw,60px);grid-template-columns:repeat(2,1fr)}
+.g3{display:grid;gap:clamp(20px,2.4vw,34px);grid-template-columns:repeat(3,1fr)}
+.g4{display:grid;gap:clamp(16px,1.9vw,26px);grid-template-columns:repeat(4,1fr)}
+.split{display:grid;gap:clamp(30px,5vw,84px);grid-template-columns:1.05fr .95fr;align-items:center}
+.split--rev>*:first-child{order:2}
+.split--top{align-items:start}
+
+/* Breadcrumb */
+/* ------------------------------------------------------------- breadcrumb */
+.crumb{padding:calc(var(--top-h) + 18px) var(--gut) 0;background:var(--surface)}
+.crumb ol{list-style:none;display:flex;flex-wrap:wrap;gap:9px;margin:0;padding:0;
+  max-width:var(--maxw);margin-inline:auto;font-size:.62rem;font-weight:500;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--fg-quiet)}
+.crumb a:hover{color:var(--accent)}
+.crumb li+li::before{content:"/";margin-right:9px;opacity:.45}
+
+/* Page hero */
+/* page hero */
+.phero{padding:clamp(26px,3.2vw,44px) var(--gut) clamp(46px,5.4vw,80px);
+  background:var(--surface);color:var(--fg);position:relative;overflow:hidden}

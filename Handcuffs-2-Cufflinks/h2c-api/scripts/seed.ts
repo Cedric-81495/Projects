@@ -11,6 +11,7 @@
  */
 import mongoose from 'mongoose';
 import { env } from '../src/config/env';
+import { connectForScript } from '../src/db/connect';
 import {
   ApparelCollection,
   ApparelItem,
@@ -103,7 +104,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  await mongoose.connect(env.MONGODB_URI);
+  await connectForScript();
   console.log(`\nSeeding ${mongoose.connection.name}\n`);
 
   const published = { status: 'published' as const, publishedAt: new Date() };

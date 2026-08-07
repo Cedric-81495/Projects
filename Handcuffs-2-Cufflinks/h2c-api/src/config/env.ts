@@ -27,6 +27,17 @@ const schema = z.object({
 
   SITE_URL: z.string().url().default('http://localhost:5173'),
 
+  /**
+   * Optional DNS override, e.g. "8.8.8.8,1.1.1.1".
+   *
+   * mongodb+srv:// requires an SRV record lookup, and some ISP routers,
+   * corporate resolvers, and VPNs refuse SRV queries while handling ordinary
+   * records fine — which surfaces as `querySrv ECONNREFUSED` and looks like an
+   * Atlas problem when it is not. Setting this points Node's resolver at a
+   * public one for the process only, without touching system settings.
+   */
+  DNS_SERVERS: z.string().optional(),
+
   VERCEL_DEPLOY_HOOK_URL: z.string().url().optional().or(z.literal('')),
   DEPLOY_HOOK_DEBOUNCE_MS: z.coerce.number().int().nonnegative().default(180_000),
 });
@@ -50,6 +61,7 @@ export const env = {
   corsOrigins: raw.CORS_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean),
   googleOAuthEnabled: Boolean(raw.GOOGLE_CLIENT_ID && raw.GOOGLE_CLIENT_SECRET && raw.GOOGLE_CALLBACK_URL),
   deployHookUrl: raw.VERCEL_DEPLOY_HOOK_URL || undefined,
+  dnsServers: raw.DNS_SERVERS?.split(',').map((s) => s.trim()).filter(Boolean) ?? [],
 } as const;
 
 /**

@@ -10,7 +10,7 @@
  */
 import crypto from 'node:crypto';
 import mongoose from 'mongoose';
-import { env } from '../src/config/env';
+import { connectForScript } from '../src/db/connect';
 import { hashPassword } from '../src/lib/password';
 import { User } from '../src/models/User';
 
@@ -36,7 +36,17 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  await mongoose.connect(env.MONGODB_URI);
+  /**
+   * Checked before connecting. A typo here creates an administrator whose
+   * address cannot receive a password reset or verification mail — and it is
+   * the one account that has to work.
+   */
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    console.error(`\n"${email}" is not a valid email address. It needs an @ and a domain.\n`);
+    process.exit(1);
+  }
+
+  await connectForScript();
 
   if (await User.exists({ email })) {
     console.error(`\nAn account already uses ${email}.\n`);

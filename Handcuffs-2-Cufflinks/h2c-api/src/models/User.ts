@@ -35,6 +35,9 @@ const userSchema = new Schema<UserDoc>(
       lowercase: true,
       trim: true,
       index: true,
+      // Enforced at the schema level as well as in the request validators, so
+      // no path — including scripts and seeds — can create an unreachable account.
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Enter a valid email address.'],
     },
     // select:false so a stray `User.find()` cannot leak hashes into a response.
     passwordHash: { type: String, select: false },

@@ -10,6 +10,7 @@
  */
 import mongoose from 'mongoose';
 import { env } from '../src/config/env';
+import { connectForScript } from '../src/db/connect';
 import { AuditLog } from '../src/models/AuditLog';
 import { CommunityStory } from '../src/models/community';
 import { ApparelCollection, ApparelItem } from '../src/models/content';
@@ -36,7 +37,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  await mongoose.connect(env.MONGODB_URI);
+  await connectForScript();
   console.log(`\nVerifying against ${mongoose.connection.name}\n`);
 
   const tag = `verify-${Date.now()}`;

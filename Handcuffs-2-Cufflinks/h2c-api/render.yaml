@@ -4,7 +4,10 @@ services:
     name: h2c-api
     runtime: node
     plan: starter
-    buildCommand: npm ci && npm run build
+    # --include=dev is required: Render sets NODE_ENV=production, which makes
+    # npm skip devDependencies — and typescript, tsup, and @types/node all live
+    # there. Without it the build has no compiler and no type definitions.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/v1/health
     envVars:

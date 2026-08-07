@@ -19,7 +19,8 @@
     "sourceMap": true,
     "declaration": false,
     "types": ["node"],
-    "baseUrl": ".",
+    // No baseUrl: it is deprecated in TypeScript 5 and removed in 7. Paths
+    // resolve relative to this file, which works on both.
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src", "scripts"]

@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Announcement } from './Announcement';
 import { MobileNav } from './MobileNav';
 import { Icon } from '@/components/ui/Icon';
+import { Wordmark } from '@/components/ui/Wordmark';
 import { useStickyHeader } from '@/hooks/useStickyHeader';
 import { useEngagement } from '@/providers/context/engagement';
 import { NAV_ITEMS, BRAND, PRIMARY_CTA } from '@/config/site';
@@ -32,7 +33,7 @@ export function Header() {
         <Announcement />
         <header className={cn('hdr', isStuck && 'is-stuck')} id="hdr">
           <Link to="/" className="hdr-logo" aria-label={`${BRAND.name} — home`}>
-            <img src="/media/logo-wordmark.webp" alt={BRAND.name} />
+            <Wordmark size="sm" />
           </Link>
 
           <nav className="nav" aria-label="Main">

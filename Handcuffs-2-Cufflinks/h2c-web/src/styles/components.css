@@ -286,3 +286,45 @@
   line-height:1.9;color:var(--fg-quiet)}
 .term-list li::before{content:"";position:absolute;left:0;top:.92em;width:6px;height:1px;
   background:var(--accent)}
+
+/* ---------------------------------------------------------------------------
+   Wordmark — the name set in type rather than as an image.
+   Platinum letterforms with a gold "2", mirroring the brand lockup. Kept in
+   Montserrat so it sits in the same family as the navigation without being
+   mistaken for a nav item: heavier weight, wider tracking, larger size.
+   --------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   Typographic wordmark
+   Replaces the raster logo in the header, mobile nav, footer, and CMS. Two
+   chrome words with a gold "2" between them — the logo lockup restated in type.
+   --------------------------------------------------------------------------- */
+.wordmark{display:inline-flex;align-items:baseline;gap:.24em;font-family:var(--sans);
+  font-weight:700;text-transform:uppercase;letter-spacing:.02em;line-height:1;white-space:nowrap}
+
+/* The 2 sits slightly larger and tighter, as it does in the lockup. */
+.wordmark-2{font-size:1.18em;letter-spacing:0}
+
+/* Wrapping links, so the whole wordmark is one target. */
+.hdr-logo,.mnav-brand,.ftr-brand{display:inline-block;text-decoration:none}
+
+/* Sizes.
+   Each is scoped to its container rather than declared on .wordmark--* alone.
+   The mobile nav styles its own descendants (.mnav a span sets a 0.6rem
+   number badge) at specificity 0,1,2, which outranks a bare 0,1,0 modifier
+   class and silently shrank the wordmark to badge size. Container-scoped
+   selectors sit at 0,2,0 and win. */
+.hdr-logo .wordmark--sm{font-size:clamp(.78rem,1.5vw,.95rem)}
+.ftr-brand .wordmark--md,
+.wordmark--md{font-size:clamp(1rem,2.4vw,1.35rem)}
+.mnav-brand .wordmark--lg,
+.wordmark--lg{font-size:clamp(1.4rem,5.5vw,2rem);letter-spacing:.02em}
+.wordmark--sm{font-size:clamp(.78rem,1.5vw,.95rem)}
+
+/* Both metal treatments clip a gradient to the glyphs, leaving the text itself
+   transparent. Forced-colours mode drops the gradient, so the fill is restored
+   to a system colour there or the wordmark would vanish entirely. */
+@media (forced-colors: active){
+  .wordmark .chrome-t,
+  .wordmark .gold{background:none;color:CanvasText;-webkit-text-fill-color:CanvasText}
+}

@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '@/providers/context/auth';
 import { Button } from '@/components/ui/Button';
+import { Wordmark } from '@/components/ui/Wordmark';
 import { ROUTES } from '@/router/routes';
 import type { Permission } from '@/types/auth';
 
@@ -40,7 +41,7 @@ export function AdminLayout() {
         }}
       >
         <Link to={ROUTES.home}>
-          <img src="/media/logo-wordmark.webp" alt="Handcuffs 2 Cufflinks" style={{ width: '100%' }} />
+          <Wordmark size="sm" />
         </Link>
 
         <nav aria-label="CMS sections" style={{ display: 'grid', gap: 2 }}>

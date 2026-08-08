@@ -7,10 +7,14 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Note } from '@/components/ui/Note';
 import { ApparelCard } from './components/ApparelCard';
 import { VoteMeter } from './components/VoteMeter';
-import { APPAREL } from '@/data/apparel';
-import { COLLECTIONS } from '@/data/collections';
+import { APPAREL as APPAREL_SEED } from '@/data/apparel';
+import { COLLECTIONS as COLLECTIONS_SEED } from '@/data/collections';
 import { ROUTES } from '@/router/routes';
 import { cn } from '@/lib/utils/cn';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toApparel, toCollection } from '@/lib/content/adapters';
+import type { ApiApparelItem, ApiCollection } from '@/lib/content/adapters';
 
 /**
  * Collections — showcase only.
@@ -20,6 +24,32 @@ import { cn } from '@/lib/utils/cn';
  * plainly so a visitor never hunts for a buy button that does not exist.
  */
 export function CollectionsPage() {
+  const { items: COLLECTIONS } = useContent<ApiCollection, (typeof COLLECTIONS_SEED)[number]>(
+    '/collections',
+    toCollection,
+    COLLECTIONS_SEED
+  );
+
+  /**
+   * Apparel carries a collection id, not a slug, so the filter buttons need the
+   * collections in hand before the mapping means anything. Building the lookup
+   * from whatever has arrived keeps the grid usable during the moment when
+   * apparel has loaded and collections have not.
+   */
+  const slugById = Object.fromEntries(
+    COLLECTIONS.map((collection) => {
+      const withId = collection as { id?: string; slug: string };
+      return [withId.id ?? withId.slug, withId.slug];
+    })
+  );
+
+  const { items: APPAREL, loading } = useContent<ApiApparelItem, (typeof APPAREL_SEED)[number]>(
+    '/apparel',
+    (item) => toApparel(item, 0, slugById),
+    APPAREL_SEED,
+    { params: { pageSize: 100 } }
+  );
+
   const [filter, setFilter] = useState<string>('all');
 
   const items = filter === 'all' ? APPAREL : APPAREL.filter((a) => a.coll === filter);
@@ -74,7 +104,7 @@ export function CollectionsPage() {
           </p>
 
           <div className="g4" style={{ marginTop: 'clamp(22px,2.6vw,34px)' }}>
-            {items.map((item) => (
+            {loading ? <SectionLoad label="Loading the collection" rows={5} /> : items.map((item) => (
               <ApparelCard key={item.id} item={item} />
             ))}
           </div>

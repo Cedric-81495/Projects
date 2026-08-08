@@ -2,8 +2,12 @@ import { Section, Wrap } from '@/components/ui/Section';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ButtonLink, Row } from '@/components/ui/Button';
-import { STORIES } from '@/data/stories';
+import { STORIES as STORIES_SEED } from '@/data/stories';
 import { ROUTES } from '@/router/routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toStory } from '@/lib/content/adapters';
+import type { ApiCommunityStory } from '@/lib/content/adapters';
 
 /**
  * Homepage section 10 — community stories.
@@ -13,6 +17,15 @@ import { ROUTES } from '@/router/routes';
  * Everything shown here has publication consent on record.
  */
 export function CommunityStories() {
+  // Featured stories only on the homepage: the moderator's pick is the point of
+  // the flag, and three chosen stories carry more than the three most recent.
+  const { items: STORIES, loading } = useContent<ApiCommunityStory, (typeof STORIES_SEED)[number]>(
+    '/community/stories',
+    toStory,
+    STORIES_SEED,
+    { params: { featured: 'true', pageSize: 3 } }
+  );
+
   return (
     <Section surface="light">
       <Wrap>
@@ -24,7 +37,7 @@ export function CommunityStories() {
         </h2>
 
         <div className="g3 rise d2" style={{ marginTop: 'clamp(30px,3.6vw,52px)' }}>
-          {STORIES.map((story) => (
+          {loading ? <SectionLoad label="Loading stories" /> : STORIES.map((story) => (
             <article className="story" key={story.name}>
               <div className="story-arc">
                 <i />

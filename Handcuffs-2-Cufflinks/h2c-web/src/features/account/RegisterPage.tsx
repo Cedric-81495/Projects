@@ -5,6 +5,7 @@ import { Seo } from '@/lib/seo/Seo';
 import { PageHero } from '@/components/layout/PageHero';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { Section, Wrap } from '@/components/ui/Section';
+import { PasswordField } from '@/components/ui/PasswordField';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { useMember } from '@/providers/context/member';
@@ -122,7 +123,7 @@ export function RegisterPage() {
 
               <div className="field">
                 <label htmlFor="r-password">Password</label>
-                <input id="r-password" type="password" autoComplete="new-password"
+                <PasswordField id="r-password" autoComplete="new-password"
                   {...register('password', {
                     required: 'Choose a password.',
                     minLength: { value: 12, message: 'Use at least 12 characters — a short phrase works well.' },

@@ -5,10 +5,20 @@ import { Section, Wrap } from '@/components/ui/Section';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ButtonLink, Row } from '@/components/ui/Button';
-import { STORIES } from '@/data/stories';
+import { STORIES as STORIES_SEED } from '@/data/stories';
 import { ROUTES } from '@/router/routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toStory } from '@/lib/content/adapters';
+import type { ApiCommunityStory } from '@/lib/content/adapters';
 
 export function CommunityPage() {
+  const { items: STORIES, loading } = useContent<ApiCommunityStory, (typeof STORIES_SEED)[number]>(
+    '/community/stories',
+    toStory,
+    STORIES_SEED
+  );
+
   return (
     <>
       <Seo
@@ -34,7 +44,7 @@ export function CommunityPage() {
         <Wrap>
           <Eyebrow>Featured stories</Eyebrow>
           <div className="g3 rise d1" style={{ marginTop: 'clamp(24px,3vw,40px)' }}>
-            {STORIES.map((story) => (
+            {loading ? <SectionLoad label="Loading stories" /> : STORIES.map((story) => (
               <article className="story" key={story.name}>
                 <div className="story-arc">
                   <i />

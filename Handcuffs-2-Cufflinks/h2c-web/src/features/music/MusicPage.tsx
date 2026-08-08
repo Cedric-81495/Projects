@@ -6,10 +6,14 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ButtonAnchor, Row } from '@/components/ui/Button';
 import { Note } from '@/components/ui/Note';
-import { MUSIC } from '@/data/music';
-import { ARTISTS } from '@/data/artists';
+import { MUSIC as MUSIC_SEED } from '@/data/music';
+import { ARTISTS as ARTISTS_SEED } from '@/data/artists';
 import { ECOSYSTEM } from '@/config/site';
 import { ROUTES } from '@/router/routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toArtist, toRelease } from '@/lib/content/adapters';
+import type { ApiArtist, ApiRelease } from '@/lib/content/adapters';
 
 /**
  * Music sits under Kitchen Muzik Management. The label is credited in the page
@@ -17,6 +21,17 @@ import { ROUTES } from '@/router/routes';
  * never blur into the parent.
  */
 export function MusicPage() {
+  const { items: MUSIC, loading: loadingMusic } = useContent<ApiRelease, (typeof MUSIC_SEED)[number]>(
+    '/kmm/releases',
+    toRelease,
+    MUSIC_SEED
+  );
+  const { items: ARTISTS, loading: loadingArtists } = useContent<ApiArtist, (typeof ARTISTS_SEED)[number]>(
+    '/kmm/artists',
+    toArtist,
+    ARTISTS_SEED
+  );
+
   return (
     <>
       <Seo
@@ -44,7 +59,7 @@ export function MusicPage() {
           <h2 className="h-lg rise d1">Out now</h2>
 
           <div className="g3 rise d2" style={{ marginTop: 'clamp(26px,3vw,44px)' }}>
-            {MUSIC.map((release, i) => (
+            {loadingMusic ? <SectionLoad label="Loading releases" /> : MUSIC.map((release, i) => (
               <article key={release.title}>
                 <AssetSlot
                   ratio="1x1"
@@ -78,7 +93,7 @@ export function MusicPage() {
           <h2 className="h-lg rise d1">Artists</h2>
 
           <div className="g3 rise d2" style={{ marginTop: 'clamp(26px,3vw,44px)' }}>
-            {ARTISTS.map((artist, i) => (
+            {loadingArtists ? <SectionLoad label="Loading the roster" /> : ARTISTS.map((artist, i) => (
               <article key={artist.name}>
                 <AssetSlot
                   ratio="4x5"

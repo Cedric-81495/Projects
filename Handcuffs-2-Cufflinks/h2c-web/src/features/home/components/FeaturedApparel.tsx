@@ -2,8 +2,12 @@ import { Section, Wrap } from '@/components/ui/Section';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { ApparelCard } from '@/features/collections/components/ApparelCard';
 import { ArrowLink } from '@/components/ui/Button';
-import { APPAREL } from '@/data/apparel';
+import { APPAREL as APPAREL_SEED } from '@/data/apparel';
 import { ROUTES } from '@/router/routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toApparel } from '@/lib/content/adapters';
+import type { ApiApparelItem } from '@/lib/content/adapters';
 
 /**
  * Homepage section 3 — featured apparel.
@@ -13,6 +17,13 @@ import { ROUTES } from '@/router/routes';
  * engagement controls read as participation rather than a broken checkout.
  */
 export function FeaturedApparel() {
+  const { items: APPAREL, loading } = useContent<ApiApparelItem, (typeof APPAREL_SEED)[number]>(
+    '/apparel',
+    toApparel,
+    APPAREL_SEED,
+    { params: { featured: 'true', pageSize: 4 } }
+  );
+
   const featured = APPAREL.slice(0, 4);
 
   return (
@@ -28,7 +39,7 @@ export function FeaturedApparel() {
         </p>
 
         <div className="g4 rise d3" style={{ marginTop: 'clamp(30px,3.4vw,52px)' }}>
-          {featured.map((item) => (
+          {loading ? <SectionLoad label="Loading apparel" rows={4} /> : featured.map((item) => (
             <ApparelCard key={item.id} item={item} compact />
           ))}
         </div>

@@ -516,3 +516,122 @@ main:focus-visible {
     transform: none;
   }
 }
+
+/* ================================================================= loading */
+/**
+ * A brass ring, not a generic grey one: a loading state is still the brand
+ * being seen, and it appears on the darkest surfaces the site has.
+ *
+ * Under reduced motion the ring stops turning and holds as a static arc rather
+ * than disappearing — something has to remain to say "still working".
+ */
+.spin {
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  border: 2px solid rgb(200 163 74 / 0.22);
+  border-top-color: var(--accent, #c8a34a);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+  flex: 0 0 auto;
+}
+
+.spin--sm {
+  width: 15px;
+  height: 15px;
+  border-width: 1.5px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* A section that is still waiting. Reserves height so the page does not jolt
+   when the content lands — layout shift is the thing a spinner is supposed to
+   prevent, not cause. */
+.secload {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  padding: clamp(28px, 4vw, 52px) 0;
+  text-align: center;
+}
+
+.secload p {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-quiet);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------- password field */
+/**
+ * A password input with a reveal control.
+ *
+ * Worth having rather than trusting people to type carefully: this site asks
+ * for twelve characters minimum and encourages passphrases, and a long phrase
+ * typed blind on a phone keyboard is exactly where sign-in failures come from.
+ *
+ * The button sits inside the field's border so the control reads as part of the
+ * input rather than as a separate thing next to it.
+ */
+.pwfield {
+  position: relative;
+  display: block;
+}
+
+.pwfield input {
+  width: 100%;
+  padding-right: 54px;
+}
+
+.pwfield button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 48px;
+  display: grid;
+  place-items: center;
+  color: var(--fg-quiet);
+  background: transparent;
+  border: 0;
+  transition: color 0.3s var(--ease);
+}
+
+.pwfield button:hover,
+.pwfield button:focus-visible {
+  color: var(--accent);
+}
+
+.pwfield button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* A loader standing in for a grid or a rail spans the whole row, or it lands in
+   the first column and the section looks off-centre while it waits. */
+.g2 > .secload,
+.g3 > .secload,
+.g4 > .secload,
+.carousel-track > .secload {
+  grid-column: 1 / -1;
+  width: 100%;
+  flex: 1 1 100%;
+}

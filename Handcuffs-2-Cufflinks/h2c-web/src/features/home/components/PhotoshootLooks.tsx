@@ -3,9 +3,12 @@ import { Section, Wrap } from '@/components/ui/Section';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ArrowLink } from '@/components/ui/Button';
-import { LOOKS } from '@/data/looks';
+import { LOOKS as LOOKS_SEED } from '@/data/looks';
 import { ROUTES } from '@/router/routes';
 import { cn } from '@/lib/utils/cn';
+import { useContent } from '@/lib/api/useContent';
+import { toLook } from '@/lib/content/adapters';
+import type { ApiLook } from '@/lib/content/adapters';
 
 /**
  * Homepage section 5 — the eight photoshoot looks.
@@ -15,6 +18,12 @@ import { cn } from '@/lib/utils/cn';
  * tablist because moving between looks should not reload anything.
  */
 export function PhotoshootLooks() {
+  const { items: LOOKS } = useContent<ApiLook, (typeof LOOKS_SEED)[number]>(
+    '/looks',
+    toLook,
+    LOOKS_SEED
+  );
+
   const [active, setActive] = useState(0);
   const look = LOOKS[active];
 

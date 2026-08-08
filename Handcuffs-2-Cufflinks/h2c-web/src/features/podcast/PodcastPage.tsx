@@ -8,10 +8,46 @@ import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ButtonAnchor, Row } from '@/components/ui/Button';
 import { Carousel } from '@/components/ui/Carousel';
 import { GuestNominationForm } from './GuestNominationForm';
-import { CLIPS } from '@/data/podcast';
+import { CLIPS as CLIPS_SEED } from '@/data/podcast';
 import { ROUTES } from '@/router/routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent, useFeatured } from '@/lib/api/useContent';
+import { toClip, toPodcastEpisode } from '@/lib/content/adapters';
+import type { ApiPodcastClip, ApiPodcastEpisode, PodcastEpisodeView } from '@/lib/content/adapters';
+
+
+/** The copy this page shipped with, used when the API cannot answer. */
+const SEED_EPISODE: PodcastEpisodeView = {
+  n: '31',
+  title: 'The first ninety days',
+  guest: '',
+  len: '68 min',
+  line: 'A reentry counsellor, a former client, and the founder on what actually works in the first ninety days after release.',
+  slug: '',
+  youtubeVideoId: '',
+  poster: '',
+  takeaways: [
+    'Housing before hustle. Nothing holds without an address.',
+    'One consistent adult changes the odds more than any programme.',
+    'The paperwork is the barrier. Someone has to sit with you and do it.',
+  ],
+};
 
 export function PodcastPage() {
+  const { item: episode } = useFeatured<ApiPodcastEpisode, PodcastEpisodeView>(
+    '/podcast/episodes',
+    toPodcastEpisode,
+    SEED_EPISODE,
+    { featured: 'true' }
+  );
+
+  const { items: CLIPS, loading: loadingClips } = useContent<ApiPodcastClip, (typeof CLIPS_SEED)[number]>(
+    '/podcast/clips',
+    toClip,
+    CLIPS_SEED,
+    { params: { pageSize: 24 } }
+  );
+
   return (
     <>
       <Seo
@@ -37,33 +73,42 @@ export function PodcastPage() {
           <Eyebrow>Featured episode</Eyebrow>
           <div className="split split--top rise d1">
             <VideoFrame
-              title="Episode 31 — The first ninety days"
+              title={`Episode ${episode.n} — ${episode.title}`}
               ratio="16x9"
               tone="warm"
-              spec="H2C_Pod_Ep31_Poster_16x9.jpg"
-              playLabel="Play episode 31"
+              spec={`H2C_Pod_Ep${episode.n}_Poster_16x9.jpg`}
+              posterSrc={episode.poster || undefined}
+              youtubeVideoId={episode.youtubeVideoId || undefined}
+              playLabel={`Play episode ${episode.n}`}
             />
             <div>
               <div className="epmeta">
-                <span>Episode 31</span>
-                <i />
-                <span>68 min</span>
+                <span>Episode {episode.n}</span>
+                {episode.len && (
+                  <>
+                    <i />
+                    <span>{episode.len}</span>
+                  </>
+                )}
+                {episode.guest && (
+                  <>
+                    <i />
+                    <span>{episode.guest}</span>
+                  </>
+                )}
               </div>
               <h2 className="h-md" style={{ marginTop: '14px' }}>
-                The first ninety days
+                {episode.title}
               </h2>
-              <p className="body">
-                A reentry counsellor, a former client, and the founder on what actually works in the
-                first ninety days after release.
-              </p>
+              <p className="body">{episode.line}</p>
 
               <p className="h-xs" style={{ marginTop: '1.4em' }}>
                 Key takeaways
               </p>
               <ol className="lessons">
-                <li>Housing before hustle. Nothing holds without an address.</li>
-                <li>One consistent adult changes the odds more than any programme.</li>
-                <li>The paperwork is the barrier. Someone has to sit with you and do it.</li>
+                {episode.takeaways.map((takeaway) => (
+                  <li key={takeaway}>{takeaway}</li>
+                ))}
               </ol>
 
               <p className="h-xs" style={{ marginTop: '1.6em' }}>
@@ -90,15 +135,19 @@ export function PodcastPage() {
           <Eyebrow>Clips</Eyebrow>
           <h2 className="h-lg rise d1">The lines people repeat</h2>
           <Carousel className="carousel--spaced rise d2" label="Podcast clips">
-            {CLIPS.map((clip) => (
+            {loadingClips ? (
+              <SectionLoad label="Loading clips" rows={5} />
+            ) : (
+              CLIPS.map((clip) => (
               <figure className="clip" key={clip.q}>
                 <AssetSlot ratio="1x1" label="CLIP" spec="9:16 vertical cut" />
                 <figcaption>
                   <p>{clip.q}</p>
                   <span>{clip.who}</span>
                 </figcaption>
-              </figure>
-            ))}
+                </figure>
+              ))
+            )}
           </Carousel>
         </Wrap>
       </Section>

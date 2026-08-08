@@ -8,8 +8,8 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Button, ButtonLink, Row } from '@/components/ui/Button';
 import { ApparelCard } from '@/features/collections/components/ApparelCard';
 import { useMember } from '@/providers/context/member';
+import { useEngagement } from '@/providers/context/engagement';
 import { fetchMemberEngagement } from '@/providers/memberEngagement';
-import { apparelById } from '@/data/apparel';
 import { ROUTES } from '@/router/routes';
 
 /**
@@ -21,6 +21,7 @@ import { ROUTES } from '@/router/routes';
  */
 export function AccountPage() {
   const { member, status, signOut } = useMember();
+  const { itemById } = useEngagement();
   const [engagement, setEngagement] = useState<Record<string, string[]> | null>(null);
 
   useEffect(() => {
@@ -38,8 +39,8 @@ export function AccountPage() {
 
   if (status === 'anonymous') return <Navigate to={ROUTES.signInMember} replace />;
 
-  const saved = (engagement?.favorite ?? []).map(apparelById).filter(Boolean);
-  const voted = (engagement?.vote ?? []).map(apparelById).filter(Boolean);
+  const saved = (engagement?.favorite ?? []).map(itemById).filter(Boolean);
+  const voted = (engagement?.vote ?? []).map(itemById).filter(Boolean);
 
   return (
     <>

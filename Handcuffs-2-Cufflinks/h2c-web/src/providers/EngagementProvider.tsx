@@ -5,10 +5,13 @@ import { useMember } from './context/member';
 import { fetchMemberEngagement } from './memberEngagement';
 import { EngagementContext } from './context/engagement';
 import type { EngagementContextValue, EngagementKind } from './context/engagement';
-import { APPAREL, apparelById } from '@/data/apparel';
-import { COLLECTIONS } from '@/data/collections';
+import { APPAREL as APPAREL_SEED } from '@/data/apparel';
+import { COLLECTIONS as COLLECTIONS_SEED } from '@/data/collections';
 import { apiPost } from '@/lib/api/client';
 import { API } from '@/lib/api/endpoints';
+import { useContent } from '@/lib/api/useContent';
+import { toApparel, toCollection } from '@/lib/content/adapters';
+import type { ApiApparelItem, ApiCollection } from '@/lib/content/adapters';
 
 /**
  * Apparel engagement — the entire interaction model in showcase mode.
@@ -55,6 +58,30 @@ function union(a: string[], b: string[] | undefined): string[] {
 }
 
 export function EngagementProvider({ children }: { children: React.ReactNode }) {
+  /**
+   * The provider holds the catalogue because three separate places need to turn
+   * an id into a garment — the toggle messages, the like and vote counts, and
+   * the saved drawer — and fetching it three times to answer the same question
+   * would be three requests for one answer.
+   */
+  const { items: collections } = useContent<ApiCollection, (typeof COLLECTIONS_SEED)[number]>(
+    '/collections',
+    toCollection,
+    COLLECTIONS_SEED
+  );
+
+  const { items: catalogue } = useContent<ApiApparelItem, (typeof APPAREL_SEED)[number]>(
+    '/apparel',
+    toApparel,
+    APPAREL_SEED,
+    { params: { pageSize: 100 } }
+  );
+
+  const itemById = useCallback(
+    (id: string) => catalogue.find((item) => item.id === id),
+    [catalogue]
+  );
+
   const [state, setState] = useLocalStorage<EngagementState>('h2c.engagement', EMPTY);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const { notify } = useToast();
@@ -97,7 +124,7 @@ export function EngagementProvider({ children }: { children: React.ReactNode }) 
 
   const toggle = useCallback(
     (kind: EngagementKind, id: string) => {
-      const item = apparelById(id);
+      const item = itemById(id);
       if (!item) return;
 
       const field = FIELD[kind];
@@ -123,17 +150,17 @@ export function EngagementProvider({ children }: { children: React.ReactNode }) 
       // failure here costs a count, not the interaction.
       void apiPost(API.apparel.engage(id, currentlyOn ? `${kind}/undo` : kind)).catch(() => {});
     },
-    [state, setState, notify]
+    [state, setState, notify, itemById]
   );
 
   const count = useCallback(
     (kind: 'like' | 'vote', id: string) => {
-      const item = apparelById(id);
+      const item = itemById(id);
       if (!item) return 0;
       const base = kind === 'like' ? item.likes : item.votes;
       return base + (isOn(kind, id) ? 1 : 0);
     },
-    [isOn]
+    [isOn, itemById]
   );
 
   /**
@@ -142,8 +169,8 @@ export function EngagementProvider({ children }: { children: React.ReactNode }) 
    * immediately — the meter has to feel answerable.
    */
   const voteTotals = useMemo(() => {
-    const totals = COLLECTIONS.map((collection) => {
-      const items = APPAREL.filter((a) => a.coll === collection.slug);
+    const totals = collections.map((collection) => {
+      const items = catalogue.filter((a) => a.coll === collection.slug);
       const base = items.reduce((sum, a) => sum + a.votes, 0);
       const mine = items.reduce(
         (sum, a) => sum + (state.votes.includes(a.id) ? OWN_VOTE_WEIGHT : 0),
@@ -154,13 +181,14 @@ export function EngagementProvider({ children }: { children: React.ReactNode }) 
 
     const max = totals[0]?.value || 1;
     return totals.map((t) => ({ ...t, percent: Math.round((t.value / max) * 100) }));
-  }, [state.votes]);
+  }, [state.votes, collections, catalogue]);
 
   const value = useMemo<EngagementContextValue>(
     () => ({
       isOn,
       toggle,
       count,
+      itemById,
       savedIds: state.saves,
       savedCount: state.saves.length,
       clearSaved: () => setState({ ...state, saves: [] }),
@@ -169,7 +197,7 @@ export function EngagementProvider({ children }: { children: React.ReactNode }) 
       openDrawer: () => setDrawerOpen(true),
       closeDrawer: () => setDrawerOpen(false),
     }),
-    [isOn, toggle, count, state, setState, voteTotals, isDrawerOpen]
+    [isOn, toggle, count, itemById, state, setState, voteTotals, isDrawerOpen]
   );
 
   return <EngagementContext.Provider value={value}>{children}</EngagementContext.Provider>;

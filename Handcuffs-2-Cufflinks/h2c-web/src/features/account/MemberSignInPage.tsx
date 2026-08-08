@@ -5,6 +5,7 @@ import { Seo } from '@/lib/seo/Seo';
 import { PageHero } from '@/components/layout/PageHero';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { Section, Wrap } from '@/components/ui/Section';
+import { PasswordField } from '@/components/ui/PasswordField';
 import { Button } from '@/components/ui/Button';
 import { useMember } from '@/providers/context/member';
 import { ROUTES } from '@/router/routes';
@@ -50,7 +51,7 @@ export function MemberSignInPage() {
 
             <div className="field">
               <label htmlFor="mi-password">Password</label>
-              <input id="mi-password" type="password" autoComplete="current-password"
+              <PasswordField id="mi-password" autoComplete="current-password"
                 {...register('password', { required: 'Enter your password.' })} />
               {errors.password && <span className="field-hint">{errors.password.message}</span>}
             </div>

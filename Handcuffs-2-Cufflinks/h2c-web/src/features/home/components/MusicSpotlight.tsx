@@ -2,9 +2,13 @@ import { Section, Wrap } from '@/components/ui/Section';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ArrowLink } from '@/components/ui/Button';
-import { MUSIC } from '@/data/music';
+import { MUSIC as MUSIC_SEED } from '@/data/music';
 import { ECOSYSTEM } from '@/config/site';
 import { ROUTES } from '@/router/routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toRelease } from '@/lib/content/adapters';
+import type { ApiRelease } from '@/lib/content/adapters';
 
 /**
  * Homepage section 8 — music spotlight.
@@ -14,6 +18,13 @@ import { ROUTES } from '@/router/routes';
  * rather than being folded into the parent brand's voice.
  */
 export function MusicSpotlight() {
+  const { items: MUSIC, loading } = useContent<ApiRelease, (typeof MUSIC_SEED)[number]>(
+    '/kmm/releases',
+    toRelease,
+    MUSIC_SEED,
+    { params: { pageSize: 3 } }
+  );
+
   return (
     <Section surface="emerald">
       <Wrap>
@@ -29,7 +40,7 @@ export function MusicSpotlight() {
         </p>
 
         <div className="g3 rise d3" style={{ marginTop: 'clamp(28px,3.2vw,46px)' }}>
-          {MUSIC.map((release, i) => (
+          {loading ? <SectionLoad label="Loading releases" /> : MUSIC.map((release, i) => (
             <article key={release.title}>
               <AssetSlot
                 ratio="1x1"

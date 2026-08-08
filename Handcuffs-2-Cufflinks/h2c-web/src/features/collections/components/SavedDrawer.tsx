@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useEngagement } from '@/providers/context/engagement';
 import { useScrollLock } from '@/hooks/useScrollLock';
-import { apparelById } from '@/data/apparel';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { Button, ButtonLink } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
@@ -14,7 +13,7 @@ import { cn } from '@/lib/utils/cn';
  * movement, because that is the conversion being measured.
  */
 export function SavedDrawer() {
-  const { isDrawerOpen, closeDrawer, savedIds, clearSaved, toggle } = useEngagement();
+  const { isDrawerOpen, closeDrawer, savedIds, clearSaved, toggle, itemById } = useEngagement();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -32,7 +31,7 @@ export function SavedDrawer() {
     return () => document.removeEventListener('keydown', onKey);
   }, [isDrawerOpen, closeDrawer]);
 
-  const items = savedIds.map(apparelById).filter((x): x is NonNullable<typeof x> => Boolean(x));
+  const items = savedIds.map(itemById).filter((x): x is NonNullable<typeof x> => Boolean(x));
 
   return (
     <>

@@ -3,14 +3,24 @@ import { PageHero } from '@/components/layout/PageHero';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { Section, Wrap } from '@/components/ui/Section';
 import { AssetSlot } from '@/components/ui/AssetSlot';
-import { LOOKS } from '@/data/looks';
+import { LOOKS as LOOKS_SEED } from '@/data/looks';
 import { ROUTES } from '@/router/routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toLook } from '@/lib/content/adapters';
+import type { ApiLook } from '@/lib/content/adapters';
 
 /**
  * All eight looks in sequence. The numbering is the narrative, so this page
  * reads top to bottom rather than as a grid.
  */
 export function LooksPage() {
+  const { items: LOOKS, loading } = useContent<ApiLook, (typeof LOOKS_SEED)[number]>(
+    '/looks',
+    toLook,
+    LOOKS_SEED
+  );
+
   return (
     <>
       <Seo
@@ -37,7 +47,7 @@ export function LooksPage() {
         lede="Look 01 is where it started. Look 08 is where it went. Read it in order."
       />
 
-      {LOOKS.map((look, i) => (
+      {loading ? <SectionLoad label="Loading the looks" rows={6} /> : LOOKS.map((look, i) => (
         <Section
           key={look.n}
           surface={i % 2 === 0 ? 'charcoal' : 'charcoal-hi'}

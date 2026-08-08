@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Seo } from '@/lib/seo/Seo';
 import { Section, Wrap } from '@/components/ui/Section';
+import { PasswordField } from '@/components/ui/PasswordField';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/providers/context/auth';
@@ -58,9 +59,8 @@ export function SignInPage() {
 
             <div className="field">
               <label htmlFor="auth-password">Password</label>
-              <input
+              <PasswordField
                 id="auth-password"
-                type="password"
                 autoComplete="current-password"
                 {...register('password', { required: 'Enter your password.' })}
               />

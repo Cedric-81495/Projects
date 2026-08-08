@@ -5,9 +5,13 @@ import { Section, Wrap, Band } from '@/components/ui/Section';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { ButtonLink, Row } from '@/components/ui/Button';
 import { Note } from '@/components/ui/Note';
-import { PROGRAMMES } from '@/data/gwop';
+import { PROGRAMMES as PROGRAMMES_SEED } from '@/data/gwop';
 import { ECOSYSTEM } from '@/config/site';
 import { ROUTES } from '@/router/routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toProgramme } from '@/lib/content/adapters';
+import type { ApiProgramme } from '@/lib/content/adapters';
 
 /**
  * GWOP is the education and empowerment arm. It gets its own crest, its own
@@ -15,6 +19,12 @@ import { ROUTES } from '@/router/routes';
  * the parent brand's storytelling voice.
  */
 export function GwopPage() {
+  const { items: PROGRAMMES, loading } = useContent<ApiProgramme, (typeof PROGRAMMES_SEED)[number]>(
+    '/gwop/programmes',
+    toProgramme,
+    PROGRAMMES_SEED
+  );
+
   return (
     <>
       <Seo
@@ -64,7 +74,7 @@ export function GwopPage() {
           <h2 className="h-lg rise d1">What is running now</h2>
 
           <div className="g3 rise d2" style={{ marginTop: 'clamp(26px,3vw,44px)' }}>
-            {PROGRAMMES.map((programme) => (
+            {loading ? <SectionLoad label="Loading programmes" /> : PROGRAMMES.map((programme) => (
               <article key={programme.name} className="eco-card" style={{ border: '1px solid var(--rule)' }}>
                 <p className="eco-role">
                   {programme.kind} · {programme.len}

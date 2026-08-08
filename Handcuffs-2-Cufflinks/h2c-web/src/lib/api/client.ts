@@ -169,8 +169,16 @@ async function request<T>(path: string, options: RequestOptions): Promise<T> {
   return payload.data;
 }
 
-export const apiGet = <T>(path: string, params?: Record<string, unknown>): Promise<T> =>
-  request<T>(path, { method: 'GET', params });
+/**
+ * `signal` is accepted so a component that unmounts mid-flight can abort the
+ * request rather than resolving into a dead component — the public content
+ * reads happen on every page and this is the common case, not an edge one.
+ */
+export const apiGet = <T>(
+  path: string,
+  params?: Record<string, unknown>,
+  signal?: AbortSignal
+): Promise<T> => request<T>(path, { method: 'GET', params, signal });
 
 export const apiPost = <T>(path: string, body?: unknown): Promise<T> =>
   request<T>(path, { method: 'POST', body });

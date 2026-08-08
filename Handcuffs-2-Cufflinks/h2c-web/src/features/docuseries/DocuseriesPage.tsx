@@ -6,11 +6,26 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { VideoFrame } from '@/components/media/VideoFrame';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ArrowLink } from '@/components/ui/Button';
-import { EPISODES } from '@/data/docuseries';
+import { EPISODES as EPISODES_SEED } from '@/data/docuseries';
 import { ROUTES } from '@/router/routes';
 import { videoGraph } from '@/lib/seo/jsonLd';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { useContent } from '@/lib/api/useContent';
+import { toEpisode } from '@/lib/content/adapters';
+import type { ApiDocuseriesEpisode, EpisodeView } from '@/lib/content/adapters';
 
 export function DocuseriesPage() {
+  const { items: EPISODES, loading } = useContent<ApiDocuseriesEpisode, EpisodeView>(
+    '/docuseries/episodes',
+    toEpisode,
+    EPISODES_SEED as readonly EpisodeView[]
+  );
+
+  /**
+   * The seed guarantees a first episode, so `featured` is never undefined even
+   * on a cold start — which is why the hero below can render unconditionally
+   * while only the grid shows a loading state.
+   */
   const [featured, ...rest] = EPISODES;
 
   return (
@@ -68,7 +83,7 @@ export function DocuseriesPage() {
           <h2 className="h-lg rise d1">Every story in the season</h2>
 
           <div className="g3 rise d2" style={{ marginTop: 'clamp(28px,3.2vw,46px)' }}>
-            {rest.map((episode, i) => (
+            {loading ? <SectionLoad label="Loading episodes" rows={4} /> : rest.map((episode, i) => (
               <article className="epcard" key={episode.n}>
                 <AssetSlot
                   ratio="16x9"

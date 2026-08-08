@@ -3,6 +3,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { VideoFrame } from '@/components/media/VideoFrame';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ArrowLink } from '@/components/ui/Button';
+import { Carousel } from '@/components/ui/Carousel';
 import { CLIPS } from '@/data/podcast';
 import { ROUTES } from '@/router/routes';
 
@@ -49,10 +50,11 @@ export function PodcastHighlights() {
           </div>
         </div>
 
-        <p className="h-xs rise" style={{ marginTop: 'clamp(36px,4vw,58px)' }}>
-          Clips
-        </p>
-        <div className="clips rise">
+        <Carousel
+          className="carousel--spaced rise"
+          label="Podcast clips"
+          heading={<p className="h-xs">Clips</p>}
+        >
           {CLIPS.map((clip) => (
             <figure className="clip" key={clip.q}>
               <AssetSlot ratio="1x1" tone="" label="CLIP" spec="9:16 vertical cut" />
@@ -62,7 +64,7 @@ export function PodcastHighlights() {
               </figcaption>
             </figure>
           ))}
-        </div>
+        </Carousel>
       </Wrap>
     </Section>
   );

@@ -201,3 +201,318 @@ main:focus-visible {
 .hero-art {
   width: 100%;
 }
+
+/* ================================================================ carousel */
+/**
+ * Premium horizontal rail — used for podcast clips, and available to any other
+ * section that outgrows a grid.
+ *
+ * Native scroll does the work (see Carousel.tsx for why). Everything here is
+ * the affordance layer: arrows, a progress line, and a fade at whichever edge
+ * still has content behind it. All three appear only when the rail actually
+ * overflows, so a short list looks like a deliberate row rather than a broken
+ * slider.
+ */
+.carousel {
+  position: relative;
+}
+
+/* Sits below a block of body copy rather than directly under a heading. */
+.carousel--spaced {
+  margin-top: clamp(30px, 4vw, 58px);
+}
+
+/* Heading and arrows share one baseline at every width, which is why the
+   heading is passed into the component rather than placed above it. */
+.carousel-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: clamp(16px, 1.8vw, 24px);
+}
+
+.carousel-title {
+  min-width: 0;
+}
+
+.carousel-title > * {
+  margin: 0;
+}
+
+.carousel-nav {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* Square, 44px: the brand set uses hard corners throughout, and 44px is the
+   minimum comfortable target even though these are pointer-only controls. */
+.carousel-btn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule);
+  color: var(--fg);
+  background: transparent;
+  transition:
+    color 0.35s var(--ease),
+    border-color 0.35s var(--ease),
+    background 0.35s var(--ease),
+    opacity 0.35s var(--ease);
+}
+
+.carousel-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.4s var(--ease);
+}
+
+.carousel-btn--prev svg {
+  transform: rotate(180deg);
+}
+
+.carousel-btn:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgb(200 163 74 / 0.08);
+}
+
+/* The arrow leans the way it travels — a small piece of feedback that costs
+   nothing and makes the control feel considered. */
+.carousel-btn:hover:not(:disabled) svg {
+  transform: translateX(2px);
+}
+
+.carousel-btn--prev:hover:not(:disabled) svg {
+  transform: rotate(180deg) translateX(2px);
+}
+
+/* Dimmed rather than hidden: a control that disappears at the end of the rail
+   makes the row jump and leaves the visitor wondering what they did. */
+.carousel-btn:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+/* ------------------------------------------------------------------ track */
+.carousel-track {
+  display: flex;
+  gap: clamp(12px, 1.4vw, 20px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+
+  /* Runs to the edge of the screen and stops at the gutter, so the rail reads
+     as cinematic rather than as a boxed widget. */
+  margin-inline: calc(var(--gut) * -1);
+  padding-inline: var(--gut);
+  scroll-padding-inline: var(--gut);
+  padding-block: 2px 4px;
+
+  /* The progress line replaces the scrollbar, so the native one is removed
+     rather than styled — two indicators of the same thing is one too many. */
+  scrollbar-width: none;
+
+  /* Content dissolves into the gutter at whichever edge still has more behind
+     it. The two custom properties are switched by the data attributes below. */
+  --fade-start: 0px;
+  --fade-end: clamp(28px, 5vw, 72px);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 var(--fade-start),
+    #000 calc(100% - var(--fade-end)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 var(--fade-start),
+    #000 calc(100% - var(--fade-end)),
+    transparent 100%
+  );
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-track[data-at-start='false'] {
+  --fade-start: clamp(28px, 5vw, 72px);
+}
+
+.carousel-track[data-at-end='true'] {
+  --fade-end: 0px;
+}
+
+.carousel-track {
+  /* Cards hang from a common top edge. Without this they stretch to the tallest
+     caption in the rail and the frames stop lining up. */
+  align-items: flex-start;
+}
+
+/* Grow and shrink are pinned, but the basis is left to each slide type — the
+   ported `.clip` rule owns its own width, and overriding the basis here would
+   size every card by the length of its quote instead. */
+.carousel-track > * {
+  flex-grow: 0;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* The rail is focusable so it can be scrolled from the keyboard. The ring is
+   drawn inside, because an outset ring on a bled-out container is clipped by
+   the viewport on the right-hand side. */
+.carousel-track:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+/* --------------------------------------------------------------- progress */
+.carousel-progress {
+  position: relative;
+  height: 2px;
+  margin-top: clamp(14px, 1.6vw, 20px);
+  background: rgb(191 195 199 / 0.12);
+  overflow: hidden;
+}
+
+/* Width is the visible fraction of the rail and the offset is how far along it
+   sits, so the line reports length as well as position — a rail of six clips
+   looks different from a rail of twenty before you touch it. */
+.carousel-progress span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  background: var(--brass);
+  transition: transform 0.45s var(--ease);
+  will-change: transform;
+}
+
+/* ---------------------------------------------------------- clips in rail */
+/**
+ * Clip cards are defined in components.css (ported). These refinements are
+ * scoped to the carousel so the ported rules stay untouched: the card lifts,
+ * the frame takes a gold edge, and a play mark confirms the still is a video.
+ *
+ * The gold edge is an inset shadow rather than a border, and the play mark uses
+ * ::before — `.slot` already owns its border and its ::after hairline, and
+ * overwriting either would strip the frame the whole site is built on.
+ */
+.carousel-track .clip {
+  position: relative;
+  transition: transform 0.55s var(--ease);
+}
+
+.carousel-track .clip .slot {
+  transition: box-shadow 0.45s var(--ease);
+}
+
+.carousel-track .clip:hover,
+.carousel-track .clip:focus-within {
+  transform: translateY(-4px);
+}
+
+.carousel-track .clip:hover .slot,
+.carousel-track .clip:focus-within .slot {
+  box-shadow: inset 0 0 0 1px rgb(200 163 74 / 0.5);
+}
+
+/* Play mark. Sits on the frame rather than in the caption because it describes
+   the still. Decorative — the caption already carries the meaning. */
+.carousel-track .clip .slot::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  left: 14px;
+  bottom: 14px;
+  width: 34px;
+  height: 34px;
+  background-color: rgb(11 11 12 / 0.55);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c8a34a'%3E%3Cpath d='M8 5v14l11-7L8 5Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 55% center;
+  background-size: 13px 13px;
+  border: 1px solid rgb(200 163 74 / 0.5);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.4s var(--ease),
+    transform 0.4s var(--ease);
+  pointer-events: none;
+}
+
+.carousel-track .clip:hover .slot::before,
+.carousel-track .clip:focus-within .slot::before {
+  opacity: 1;
+  transform: none;
+}
+
+/* The quote is the content, so it takes the display face — the same treatment
+   community pull-quotes get, at a size that suits a narrow card. */
+.carousel-track .clip figcaption p {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.94rem, 1.15vw, 1.06rem);
+  line-height: 1.42;
+  color: var(--fg);
+  margin-top: 14px;
+}
+
+.carousel-track .clip figcaption span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 9px;
+  color: var(--accent);
+}
+
+.carousel-track .clip figcaption span::before {
+  content: '';
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  flex: 0 0 auto;
+  opacity: 0.7;
+}
+
+/* --------------------------------------------------------------- widths */
+/* One card and a clear peek on a phone, so it is obvious the rail scrolls. */
+@media (max-width: 620px) {
+  .carousel-track .clip {
+    flex-basis: min(68vw, 260px);
+  }
+
+  .carousel-head {
+    align-items: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-track {
+    scroll-behavior: auto;
+  }
+
+  .carousel-track .clip,
+  .carousel-track .clip .slot,
+  .carousel-track .clip .slot::before,
+  .carousel-progress span,
+  .carousel-btn,
+  .carousel-btn svg {
+    transition: none;
+  }
+
+  .carousel-track .clip:hover,
+  .carousel-track .clip:focus-within {
+    transform: none;
+  }
+}

@@ -1,3 +1,4 @@
+import { cloudinarySrcSet, cloudinaryUrl } from '@/lib/media/cloudinary';
 import { cn } from '@/lib/utils/cn';
 
 export type Ratio = '2x3' | '3x4' | '1x1' | '4x5' | '4x3' | '16x9' | '21x9';
@@ -36,9 +37,26 @@ export function AssetSlot({
   const isThumb = label === 'IMG';
 
   if (src) {
+    /**
+     * Cloudinary assets are resized and re-encoded on delivery, and offered to
+     * the browser at several widths so it can pick one. Anything hosted
+     * elsewhere renders exactly as before — `srcSet` comes back empty and React
+     * omits the attribute.
+     *
+     * `sizes` is deliberately coarse: slots are full-width on a phone and about
+     * half the viewport on a desktop, and a rough hint that is right most of the
+     * time beats a precise one that is wrong when a layout changes.
+     */
     return (
       <div className={cn('slot', `r-${ratio}`, tone && `slot--${tone}`, className)}>
-        <img src={src} alt={alt ?? ''} loading="lazy" decoding="async" />
+        <img
+          src={cloudinaryUrl(src, { width: 1440 })}
+          srcSet={cloudinarySrcSet(src) || undefined}
+          sizes="(max-width: 900px) 100vw, 50vw"
+          alt={alt ?? ''}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     );
   }

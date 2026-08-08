@@ -28,3 +28,10 @@ services:
         sync: false
       - key: VERCEL_DEPLOY_HOOK_URL
         sync: false
+      # Media storage. The secret signs browser uploads and must stay here.
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

@@ -62,6 +62,21 @@ const schema = z.object({
    */
   DNS_SERVERS: z.string().optional(),
 
+  // --- Media storage (Cloudinary) -------------------------------------------
+  /**
+   * Optional. With all three set, the CMS can upload images, video and audio
+   * straight from the browser to Cloudinary; without them the media library
+   * still works by registering addresses of files hosted elsewhere.
+   *
+   * The secret signs upload requests and must never reach the frontend — only
+   * the cloud name is public.
+   */
+  CLOUDINARY_CLOUD_NAME: z.string().optional(),
+  CLOUDINARY_API_KEY: z.string().optional(),
+  CLOUDINARY_API_SECRET: z.string().optional(),
+  /** Everything this platform uploads lands under one folder, by brand. */
+  CLOUDINARY_FOLDER: z.string().default('handcuffs-2-cufflinks'),
+
   VERCEL_DEPLOY_HOOK_URL: z.string().url().optional().or(z.literal('')),
   DEPLOY_HOOK_DEBOUNCE_MS: z.coerce.number().int().nonnegative().default(180_000),
 });
@@ -84,6 +99,9 @@ export const env = {
   isDevelopment: raw.NODE_ENV === 'development',
   corsOrigins: raw.CORS_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean),
   googleOAuthEnabled: Boolean(raw.GOOGLE_CLIENT_ID && raw.GOOGLE_CLIENT_SECRET && raw.GOOGLE_CALLBACK_URL),
+  cloudinaryEnabled: Boolean(
+    raw.CLOUDINARY_CLOUD_NAME && raw.CLOUDINARY_API_KEY && raw.CLOUDINARY_API_SECRET
+  ),
   deployHookUrl: raw.VERCEL_DEPLOY_HOOK_URL || undefined,
   dnsServers: raw.DNS_SERVERS?.split(',').map((s) => s.trim()).filter(Boolean) ?? [],
 } as const;

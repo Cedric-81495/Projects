@@ -5,6 +5,7 @@ import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import type { Paginated } from '@/types/common';
 import { AdminHeader, Alert, Card, EmptyState, Pager } from './components/Chrome';
+import { MediaUpload } from './components/MediaUpload';
 import { RecordForm } from './components/RecordForm';
 import type { Field } from './lib/fields';
 import { messageFor, useAsyncData } from './lib/useAsyncData';
@@ -96,7 +97,8 @@ export function AdminMediaPage() {
   const [kind, setKind] = useState('');
   const [includeArchived, setIncludeArchived] = useState(false);
   const [page, setPage] = useState(1);
-  const [adding, setAdding] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -141,21 +143,53 @@ export function AdminMediaPage() {
         intro="One library for all three brands. Alt text is written once here and travels with the asset wherever it is used."
         actions={
           mayUpload ? (
-            <button type="button" className="adm-btn adm-btn--sm adm-btn--primary" onClick={() => setAdding(!adding)}>
-              {adding ? 'Close' : 'Add an asset'}
-            </button>
+            <>
+              <button
+                type="button"
+                className="adm-btn adm-btn--sm"
+                onClick={() => {
+                  setShowUpload(false);
+                  setShowRegister(!showRegister);
+                }}
+              >
+                {showRegister ? 'Close' : 'Add by address'}
+              </button>
+              <button
+                type="button"
+                className="adm-btn adm-btn--sm adm-btn--primary"
+                onClick={() => {
+                  setShowRegister(false);
+                  setShowUpload(!showUpload);
+                }}
+              >
+                {showUpload ? 'Close' : 'Upload a file'}
+              </button>
+            </>
           ) : null
         }
       />
 
-      <Alert title="Registration, not upload">
-        Assets are catalogued by address while the storage backend is being decided. Point this at wherever
-        the file already lives — the photographer’s delivery, a CDN, YouTube — and the record will not change
-        shape when uploads land.
+      <Alert title="Two ways in">
+        <b>Upload a file</b> sends it straight to Cloudinary from your browser and adds it here — large video
+        is fine, it never passes through this site. <b>Add by address</b> catalogues something already hosted
+        elsewhere, such as the photographer’s delivery or a YouTube link. Either way the record is the same,
+        and alt text written here travels with the asset wherever it is used.
       </Alert>
 
-      {adding && mayUpload && (
-        <Card title="Add an asset">
+      {showUpload && mayUpload && (
+        <Card title="Upload a file">
+          <MediaUpload
+            onUploaded={() => {
+              notify('Uploaded and added to the library.');
+              setShowUpload(false);
+              state.reload();
+            }}
+          />
+        </Card>
+      )}
+
+      {showRegister && mayUpload && (
+        <Card title="Add an asset by address">
           <RecordForm
             fields={REGISTER_FIELDS}
             record={{ brand: 'h2c' }}
@@ -163,7 +197,7 @@ export function AdminMediaPage() {
             onSubmit={async (payload) => {
               await apiPost('/media', payload);
               notify('Added to the library.');
-              setAdding(false);
+              setShowUpload(false);
               state.reload();
             }}
           />

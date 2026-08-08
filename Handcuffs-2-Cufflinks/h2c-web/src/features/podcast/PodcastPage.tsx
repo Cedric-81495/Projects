@@ -6,6 +6,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { VideoFrame } from '@/components/media/VideoFrame';
 import { AssetSlot } from '@/components/ui/AssetSlot';
 import { ButtonAnchor, Row } from '@/components/ui/Button';
+import { Carousel } from '@/components/ui/Carousel';
 import { GuestNominationForm } from './GuestNominationForm';
 import { CLIPS } from '@/data/podcast';
 import { ROUTES } from '@/router/routes';
@@ -88,7 +89,7 @@ export function PodcastPage() {
         <Wrap>
           <Eyebrow>Clips</Eyebrow>
           <h2 className="h-lg rise d1">The lines people repeat</h2>
-          <div className="clips rise d2">
+          <Carousel className="carousel--spaced rise d2" label="Podcast clips">
             {CLIPS.map((clip) => (
               <figure className="clip" key={clip.q}>
                 <AssetSlot ratio="1x1" label="CLIP" spec="9:16 vertical cut" />
@@ -98,7 +99,7 @@ export function PodcastPage() {
                 </figcaption>
               </figure>
             ))}
-          </div>
+          </Carousel>
         </Wrap>
       </Section>
 

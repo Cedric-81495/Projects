@@ -1076,3 +1076,63 @@
   .adm-who-text { display: none; }
   .adm-grid--4 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 }
+
+/* ------------------------------------------------------------ media upload */
+/* A file input and a progress line, in the same visual language as the rest of
+   the CMS forms. The bar is a scaled span rather than <progress>, which cannot
+   be styled consistently across browsers without fighting three vendor
+   pseudo-elements. */
+.adm-field small {
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.adm-field input[type='file'] {
+  padding: 9px 10px;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.adm-field input[type='file']::file-selector-button {
+  margin-right: 12px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.adm-hint--bad {
+  color: var(--danger);
+}
+
+.adm-progress {
+  position: relative;
+  display: grid;
+  gap: 8px;
+}
+
+.adm-progress::before {
+  content: '';
+  height: 3px;
+  background: var(--line);
+}
+
+.adm-progress span {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--accent, #c8a34a);
+  transform-origin: left;
+  transition: transform 0.25s ease-out;
+}
+
+.adm-progress b {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ink-quiet, var(--ink));
+  font-variant-numeric: tabular-nums;
+}

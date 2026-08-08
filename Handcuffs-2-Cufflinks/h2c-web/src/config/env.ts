@@ -51,6 +51,12 @@ export const env = {
     import.meta.env.VITE_SITE_URL ??
     (typeof window === 'undefined' ? 'https://handcuffs2cufflinks.com' : window.location.origin),
   googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '',
+  /**
+   * Cloudinary cloud name. Public by design — it appears in every delivery URL.
+   * Only needed for assets stored as a bare public id; full addresses coming
+   * out of the media library carry the cloud name themselves.
+   */
+  cloudinaryCloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ?? '',
   youtubeChannelId: import.meta.env.VITE_YOUTUBE_CHANNEL_ID ?? '',
   isProduction: import.meta.env.PROD,
 

@@ -1,8 +1,15 @@
 import crypto from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
+import { env } from '@/config/env';
 import { ApiError } from '@/lib/ApiError';
 import { asyncHandler } from '@/lib/asyncHandler';
+import {
+  isOwnCloudinaryUrl,
+  publicIdFromUrl,
+  resourceTypeFor,
+  signUploadParams,
+} from '@/lib/cloudinary';
 import { created, ok, page } from '@/lib/envelope';
 import { audit } from '@/middleware/audit';
 import { requireAuth, requirePermission } from '@/middleware/auth';
@@ -186,6 +193,53 @@ mediaRouter.get(
  * use, and letting a client choose it now is how a caller ends up able to name
  * — and later address — someone else's object.
  */
+/**
+ * Signs one direct-to-Cloudinary upload.
+ *
+ * The browser sends the file to Cloudinary itself and comes back here with the
+ * resulting address to register (below). Nothing is written by this route — a
+ * signature that is never used costs nothing — so it is safe for the CMS to ask
+ * for one per file picked.
+ *
+ * The folder and the resource type are decided here, not by the caller: they
+ * are part of the signed payload, so a signature handed to the browser cannot
+ * be replayed to write outside this platform's folder.
+ */
+mediaRouter.post(
+  '/upload-signature',
+  requirePermission('media:upload'),
+  validateBody(
+    z
+      .object({
+        kind: z.enum(['image', 'video', 'audio', 'document']),
+        brand: z.enum(['h2c', 'gwop', 'kitchen']).default('h2c'),
+      })
+      .strict()
+  ),
+  asyncHandler(async (req, res) => {
+    if (!env.cloudinaryEnabled) {
+      throw ApiError.badRequest(
+        'Uploads are not switched on for this environment. Add the asset by address instead.'
+      );
+    }
+
+    const body = req.body as { kind: string; brand: string };
+    const timestamp = Math.floor(Date.now() / 1000);
+    const folder = `${env.CLOUDINARY_FOLDER}/${body.brand}`;
+
+    const signature = signUploadParams({ folder, timestamp });
+
+    ok(res, {
+      cloudName: env.CLOUDINARY_CLOUD_NAME,
+      apiKey: env.CLOUDINARY_API_KEY,
+      resourceType: resourceTypeFor(body.kind),
+      folder,
+      timestamp,
+      signature,
+    });
+  })
+);
+
 mediaRouter.post(
   '/',
   requirePermission('media:upload'),
@@ -200,11 +254,19 @@ mediaRouter.post(
       throw ApiError.conflict('That asset is already in the library.');
     }
 
+    /**
+     * An address on this platform's own Cloudinary account is an object we
+     * control, so it is recorded as an upload with its public id as the storage
+     * key. Anything else stays an external reference. The distinction is what
+     * lets a future clean-up job tell the two apart without guessing at URLs.
+     */
+    const publicId = isOwnCloudinaryUrl(body.url) ? publicIdFromUrl(body.url) : null;
+
     const asset = await MediaAsset.create({
       kind: body.kind ?? KIND_BY_EXTENSION[extension],
       url: body.url,
-      source: 'external',
-      storageKey: `ext_${crypto.randomUUID()}`,
+      source: publicId ? 'upload' : 'external',
+      storageKey: publicId ?? `ext_${crypto.randomUUID()}`,
       originalName: body.originalName || fileNameOf(body.url),
       mimeType: body.mimeType || MIME_BY_EXTENSION[extension] || 'application/octet-stream',
       sizeBytes: body.sizeBytes ?? 0,

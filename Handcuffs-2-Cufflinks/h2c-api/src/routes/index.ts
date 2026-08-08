@@ -8,6 +8,7 @@ import { communityRouter } from '@/modules/community';
 import { contentRouter } from '@/modules/content';
 import { memberRouter } from '@/modules/members/member.controller';
 import { engagementRouter } from '@/modules/engagement';
+import { mediaRouter } from '@/modules/media';
 import { mediaEngagementRouter } from '@/modules/media-engagement';
 import { siteRouter } from '@/modules/site';
 import { subscriberRouter } from '@/modules/subscribers';
@@ -54,6 +55,10 @@ apiRouter.use('/site', siteRouter);
 // Music, docuseries, and podcast interactions. Same anonymous visitor cookie
 // as apparel, so a play can be deduplicated without an account.
 apiRouter.use('/media-engagement', attachVisitor, mediaEngagementRouter);
+
+// Digital asset library. Authenticated in full — an asset list is an inventory
+// of unreleased material, not public reference data.
+apiRouter.use('/media', mediaRouter);
 
 apiRouter.use(contentRouter);
 apiRouter.use('/community', communityRouter);

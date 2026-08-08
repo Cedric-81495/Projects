@@ -21,6 +21,7 @@
 @import './motion.css';
 @import './responsive.css';
 @import './extensions.css';
+@import './admin.css';
 
 /* Expose the brand kit to Tailwind so utilities such as text-gold or
    bg-emerald resolve to the approved values instead of Tailwind defaults. */

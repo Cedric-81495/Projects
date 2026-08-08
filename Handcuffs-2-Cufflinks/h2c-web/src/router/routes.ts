@@ -41,6 +41,21 @@ export const ROUTES = {
   adminMedia: '/admin/media',
   adminSubscribers: '/admin/subscribers',
   adminUsers: '/admin/users',
+
+  /* Site structure. Split from the record modules because these change the
+     shape of every page at once and carry a different permission. */
+  adminHomepage: '/admin/homepage',
+  adminNavigation: '/admin/navigation',
+  adminSeo: '/admin/search-metadata',
+  adminFounder: '/admin/founder',
+  adminSettings: '/admin/settings',
+
+  /* One generic surface for every record type in the registry, rather than a
+     route per content type — thirteen near-identical routes is thirteen places
+     to forget a permission check. */
+  adminRecords: '/admin/records/:resource',
+  adminRecordNew: '/admin/records/:resource/new',
+  adminRecordEdit: '/admin/records/:resource/:id',
 } as const;
 
 /** Build a concrete path from a parameterised route. */

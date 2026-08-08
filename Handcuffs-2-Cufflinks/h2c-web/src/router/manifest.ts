@@ -72,6 +72,13 @@ export const CLIENT_ONLY_ROUTES: string[] = [
   ROUTES.adminMedia,
   ROUTES.adminSubscribers,
   ROUTES.adminUsers,
+  ROUTES.adminHomepage,
+  ROUTES.adminNavigation,
+  ROUTES.adminSeo,
+  ROUTES.adminFounder,
+  ROUTES.adminSettings,
+  // The record screens are parameterised and cannot be enumerated, so they rely
+  // on the host's SPA rewrite like any other detail route.
 ];
 
 /**

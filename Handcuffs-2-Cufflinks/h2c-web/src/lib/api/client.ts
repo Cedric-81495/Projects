@@ -178,5 +178,57 @@ export const apiPost = <T>(path: string, body?: unknown): Promise<T> =>
 export const apiPatch = <T>(path: string, body?: unknown): Promise<T> =>
   request<T>(path, { method: 'PATCH', body });
 
+/**
+ * Replace rather than merge. Used where the API models a resource as a whole —
+ * a navigation menu is a sequence, and merging a partial items array into an
+ * existing one has no meaning.
+ */
+export const apiPut = <T>(path: string, body?: unknown): Promise<T> =>
+  request<T>(path, { method: 'PUT', body });
+
 export const apiDelete = <T>(path: string): Promise<T> =>
   request<T>(path, { method: 'DELETE' });
+
+/**
+ * Fetches a file endpoint and hands it to the browser as a download.
+ *
+ * A plain <a href> cannot be used for these. The access token lives in memory
+ * and travels in an Authorization header, which a navigation request does not
+ * send — the link would arrive unauthenticated and the operator would be told
+ * they need to sign in while looking at a screen that proves they are.
+ */
+export async function apiDownload(path: string, filename: string): Promise<void> {
+  const send = async (): Promise<Response> => {
+    const headers: Record<string, string> = {};
+    const token = tokenForPath(path);
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return fetch(buildUrl(path), { method: 'GET', credentials: 'include', headers });
+  };
+
+  let response: Response;
+  try {
+    response = await send();
+    if (response.status === 401) {
+      await refreshSession();
+      response = await send();
+    }
+  } catch {
+    throw new ApiError('Could not reach the server.', 0);
+  }
+
+  if (!response.ok) {
+    throw new ApiError('That export could not be produced.', response.status);
+  }
+
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = objectUrl;
+  anchor.download = filename;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  // Revoked on the next tick: revoking synchronously can cancel the download
+  // in browsers that have not finished reading the blob yet.
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+}

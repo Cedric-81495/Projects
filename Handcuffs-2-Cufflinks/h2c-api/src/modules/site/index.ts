@@ -370,6 +370,24 @@ function visibleItems(menu: MenuJson) {
   };
 }
 
+/**
+ * Every menu, unfiltered.
+ *
+ * The public reads above drop hidden entries, which is right for a visitor and
+ * wrong for an editor: a CMS that cannot see a hidden item cannot unhide it,
+ * and saving the menu would silently delete every entry the editor never knew
+ * was there. Declared before `/navigation/:location` so "admin" is not matched
+ * as a location.
+ */
+siteRouter.get(
+  '/navigation/admin/all',
+  requireAuth,
+  requirePermission('content:read'),
+  asyncHandler(async (_req, res) => {
+    ok(res, await NavigationMenu.find().sort({ location: 1 }));
+  })
+);
+
 siteRouter.get(
   '/navigation/:location',
   asyncHandler(async (req, res) => {

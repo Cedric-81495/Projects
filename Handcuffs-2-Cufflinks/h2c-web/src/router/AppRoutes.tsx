@@ -39,10 +39,17 @@ const DashboardPage = lazy(() => import('@/features/admin/DashboardPage').then((
 const AdminH2C = lazy(() => import('@/features/admin/modules').then((m) => ({ default: m.AdminH2CPage })));
 const AdminKitchen = lazy(() => import('@/features/admin/modules').then((m) => ({ default: m.AdminKitchenPage })));
 const AdminGwop = lazy(() => import('@/features/admin/modules').then((m) => ({ default: m.AdminGwopPage })));
-const AdminCommunity = lazy(() => import('@/features/admin/modules').then((m) => ({ default: m.AdminCommunityPage })));
-const AdminMedia = lazy(() => import('@/features/admin/modules').then((m) => ({ default: m.AdminMediaPage })));
-const AdminSubscribers = lazy(() => import('@/features/admin/modules').then((m) => ({ default: m.AdminSubscribersPage })));
-const AdminUsers = lazy(() => import('@/features/admin/modules').then((m) => ({ default: m.AdminUsersPage })));
+const AdminCommunity = lazy(() => import('@/features/admin/CommunityPage').then((m) => ({ default: m.AdminCommunityPage })));
+const AdminMedia = lazy(() => import('@/features/admin/MediaPage').then((m) => ({ default: m.AdminMediaPage })));
+const AdminSubscribers = lazy(() => import('@/features/admin/SubscribersPage').then((m) => ({ default: m.AdminSubscribersPage })));
+const AdminUsers = lazy(() => import('@/features/admin/UsersPage').then((m) => ({ default: m.AdminUsersPage })));
+const AdminHomepage = lazy(() => import('@/features/admin/HomepagePage').then((m) => ({ default: m.AdminHomepagePage })));
+const AdminNavigation = lazy(() => import('@/features/admin/NavigationPage').then((m) => ({ default: m.AdminNavigationPage })));
+const AdminSeo = lazy(() => import('@/features/admin/SeoPage').then((m) => ({ default: m.AdminSeoPage })));
+const AdminFounder = lazy(() => import('@/features/admin/FounderPage').then((m) => ({ default: m.AdminFounderPage })));
+const AdminSettings = lazy(() => import('@/features/admin/SettingsPage').then((m) => ({ default: m.AdminSettingsPage })));
+const ResourceList = lazy(() => import('@/features/admin/ResourceListPage').then((m) => ({ default: m.ResourceListPage })));
+const ResourceEdit = lazy(() => import('@/features/admin/ResourceEditPage').then((m) => ({ default: m.ResourceEditPage })));
 
 /** Deliberately quiet: a spinner on every navigation is worse than a beat of nothing. */
 function RouteFallback() {
@@ -91,6 +98,17 @@ export function AppRoutes() {
             <Route path={ROUTES.adminMedia} element={<AdminMedia />} />
             <Route path={ROUTES.adminSubscribers} element={<AdminSubscribers />} />
             <Route path={ROUTES.adminUsers} element={<AdminUsers />} />
+
+            <Route path={ROUTES.adminHomepage} element={<AdminHomepage />} />
+            <Route path={ROUTES.adminNavigation} element={<AdminNavigation />} />
+            <Route path={ROUTES.adminSeo} element={<AdminSeo />} />
+            <Route path={ROUTES.adminFounder} element={<AdminFounder />} />
+            <Route path={ROUTES.adminSettings} element={<AdminSettings />} />
+
+            {/* Declared before the :id route so "new" is not read as an id. */}
+            <Route path={ROUTES.adminRecords} element={<ResourceList />} />
+            <Route path={ROUTES.adminRecordNew} element={<ResourceEdit />} />
+            <Route path={ROUTES.adminRecordEdit} element={<ResourceEdit />} />
           </Route>
         </Route>
       </Routes>

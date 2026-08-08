@@ -177,6 +177,7 @@ Base `/site`. Copy is `content:write` / `content:publish`; structure is
 | GET | `/site/hero-banners/placement/:placement` | public | Published, ordered |
 | GET | `/site/navigation` | public | All menus, keyed by location |
 | GET | `/site/navigation/:location` | public | Hidden items stripped, sorted |
+| GET | `/site/navigation/admin/all` | `content:read` | Unfiltered. The CMS must see hidden items to unhide them |
 | PUT | `/site/navigation/:location` | `settings:manage` | Replaces the menu wholesale |
 | GET | `/site/seo?path=/collections` | public | Resolved: route override → site defaults → brand |
 | GET | `/site/seo/admin/all` | `content:read` | |
@@ -191,6 +192,34 @@ HTML — CMS-authored HTML rendered on the site is stored XSS. Navigation links
 must be a relative path or an `http(s)` URL; `javascript:` and `data:` are
 rejected at the schema. Pages flagged `isSystemPage` (privacy, terms, cookies)
 refuse to archive.
+
+## Media library
+
+Base `/media`. Authenticated in full — an asset list is an inventory of
+unreleased material, including drop imagery that has not been announced.
+
+| Method | Path | Auth | Notes |
+| --- | --- | --- | --- |
+| GET | `/media` | `media:upload` | `?page&pageSize&kind&brand&tag&search&includeArchived` |
+| GET | `/media/:id` | `media:upload` | |
+| POST | `/media` | `media:upload` | Registers an already-hosted asset by URL |
+| PATCH | `/media/:id` | `media:upload` | Metadata only — a different file is a different asset |
+| DELETE | `/media/:id` | `media:delete` | Soft: sets `archivedAt` |
+| POST | `/media/:id/restore` | `media:delete` | |
+
+Assets carry a `source` of `external` (hosted elsewhere, catalogued here) or
+`upload` (bytes this platform stored). Only `external` can be created today: the
+storage decision is outstanding, and picking a vendor inside a route handler is
+how a platform ends up married to one by accident. Everything the guide asks the
+library to do — one place, organised by brand, alt text written once, reused
+across records — works against already-hosted assets, and the records do not
+change shape when the upload path lands.
+
+`kind` is inferred from the file extension when the URL has one, and `alt` is
+required for images. `storageKey` is generated server-side even now, because it
+is the handle the future adapter will delete and re-sign objects with. Deletes
+are soft for the same reason content is archived: an asset dropped from the
+library may still be referenced by a published record.
 
 ## Media engagement
 

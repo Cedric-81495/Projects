@@ -9,6 +9,7 @@ import { Menu } from './components/Menu';
 import { AdminChromeProvider } from './theme/AdminChromeProvider';
 import { useAdminChrome } from './theme/theme';
 import { RESOURCES, findResource } from './lib/resources';
+import { Spinner } from '@/components/ui/Spinner';
 
 /**
  * The CMS shell.
@@ -220,6 +221,7 @@ function RailLink({ entry }: { entry: NavEntry }) {
 
 function Topbar() {
   const { user, signOut } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
   const { theme, toggle, railTight, toggleRail, setDrawerOpen } = useAdminChrome();
   const navigate = useNavigate();
   const [term, setTerm] = useState('');
@@ -330,13 +332,20 @@ function Topbar() {
             <button
               type="button"
               className="adm-menu-item adm-menu-item--warn"
+              disabled={signingOut}
               onClick={() => {
-                close();
-                void signOut();
+                setSigningOut(true);
+                // The menu stays open until it finishes: closing first would
+                // hide the only sign anything is happening, and signing out
+                // waits on the server revoking the refresh token.
+                void signOut().finally(() => {
+                  setSigningOut(false);
+                  close();
+                });
               }}
             >
-              <Glyph name="logout" />
-              Sign out
+              {signingOut ? <Spinner size="sm" label="" /> : <Glyph name="logout" />}
+              {signingOut ? 'Signing out' : 'Sign out'}
             </button>
           </>
         )}

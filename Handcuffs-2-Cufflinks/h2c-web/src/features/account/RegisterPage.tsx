@@ -11,6 +11,7 @@ import { Icon } from '@/components/ui/Icon';
 import { useMember } from '@/providers/context/member';
 import { ApiError } from '@/lib/api/client';
 import { ROUTES } from '@/router/routes';
+import { Spinner } from '@/components/ui/Spinner';
 
 interface Fields {
   firstName: string;
@@ -163,7 +164,15 @@ export function RegisterPage() {
                 </div>
               )}
 
-              <Button type="submit" variant="gold" wide icon="arrow" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                variant="gold"
+                wide
+                icon={isSubmitting ? undefined : 'arrow'}
+                disabled={isSubmitting}
+                className="btn--busy"
+              >
+                {isSubmitting && <Spinner size="sm" label="" />}
                 {isSubmitting ? 'Creating your account' : 'Create my account'}
               </Button>
             </form>

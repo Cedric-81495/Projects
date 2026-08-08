@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '@/components/ui/Icon';
 import { useScrollLock } from '@/hooks/useScrollLock';
+import { useAuth } from '@/providers/context/auth';
+import { ROUTES } from '@/router/routes';
 import { NAV_ITEMS, BRAND, PRIMARY_CTA, SOCIAL_LINKS } from '@/config/site';
 import { cn } from '@/lib/utils/cn';
 import type { IconName } from '@/components/ui/Icon';
@@ -19,6 +21,13 @@ interface MobileNavProps {
  */
 export function MobileNav({ open, onClose, currentPath }: MobileNavProps) {
   useScrollLock(open);
+  /**
+   * The desktop header carries a CMS link for signed-in staff, and below
+   * 1280px that whole nav is replaced by this drawer. Without the same link
+   * here, an administrator checking the site on a phone has no way back to
+   * their work except typing the address.
+   */
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!open) return;
@@ -52,6 +61,30 @@ export function MobileNav({ open, onClose, currentPath }: MobileNavProps) {
           <span>{String(i + 1).padStart(2, '0')}</span>
         </Link>
       ))}
+
+      {user && (
+        <Link
+          to={ROUTES.adminDashboard}
+          onClick={onClose}
+          tabIndex={open ? 0 : -1}
+          className="mnav-cms"
+        >
+          Back to the CMS
+          <span>Signed in as staff</span>
+        </Link>
+      )}
+
+      {user && (
+        <Link
+          to={ROUTES.adminDashboard}
+          onClick={onClose}
+          tabIndex={open ? 0 : -1}
+          className="mnav-cms"
+        >
+          Back to the CMS
+          <span>Staff</span>
+        </Link>
+      )}
 
       <div className="mnav-social">
         {SOCIAL_LINKS.map((social) => (

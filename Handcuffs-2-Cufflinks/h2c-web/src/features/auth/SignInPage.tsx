@@ -10,6 +10,7 @@ import { useAuth } from '@/providers/context/auth';
 import { env } from '@/config/env';
 import { ROUTES } from '@/router/routes';
 import type { SignInPayload } from '@/types/auth';
+import { Spinner } from '@/components/ui/Spinner';
 
 export function SignInPage() {
   const { signIn } = useAuth();
@@ -74,7 +75,8 @@ export function SignInPage() {
               </div>
             )}
 
-            <Button type="submit" variant="gold" wide disabled={isSubmitting}>
+            <Button type="submit" variant="gold" wide disabled={isSubmitting} className="btn--busy">
+              {isSubmitting && <Spinner size="sm" label="" />}
               {isSubmitting ? 'Signing in' : 'Sign in'}
             </Button>
 

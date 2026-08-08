@@ -11,6 +11,7 @@ import { useMember } from '@/providers/context/member';
 import { useEngagement } from '@/providers/context/engagement';
 import { fetchMemberEngagement } from '@/providers/memberEngagement';
 import { ROUTES } from '@/router/routes';
+import { Spinner } from '@/components/ui/Spinner';
 
 /**
  * The member's own page.
@@ -22,6 +23,11 @@ import { ROUTES } from '@/router/routes';
 export function AccountPage() {
   const { member, status, signOut } = useMember();
   const { itemById } = useEngagement();
+  /**
+   * Not reset on success: signing out unmounts this page, and clearing the flag
+   * first would flash the idle label back before the redirect.
+   */
+  const [signingOut, setSigningOut] = useState(false);
   const [engagement, setEngagement] = useState<Record<string, string[]> | null>(null);
 
   useEffect(() => {
@@ -91,7 +97,19 @@ export function AccountPage() {
             <Link to={ROUTES.join} style={{ borderBottom: '1px solid currentColor' }}>Manage that here</Link>.
           </p>
           <Row>
-            <Button variant="ghost" size="sm" onClick={() => void signOut()}>Sign out</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="btn--busy"
+              disabled={signingOut}
+              onClick={() => {
+                setSigningOut(true);
+                void signOut();
+              }}
+            >
+              {signingOut && <Spinner size="sm" label="" />}
+              {signingOut ? 'Signing out' : 'Sign out'}
+            </Button>
           </Row>
         </Wrap>
       </Section>

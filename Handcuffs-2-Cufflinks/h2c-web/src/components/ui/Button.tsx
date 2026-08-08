@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils/cn';
 import { Icon } from './Icon';
@@ -32,9 +33,19 @@ function classes({ variant = 'gold', size = 'default', wide, className }: Common
 
 type ButtonProps = CommonProps & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function Button({ variant, size, wide, icon, children, className, ...rest }: ButtonProps) {
+/**
+ * `forwardRef` so a dialog can move focus onto its safe action. Without it the
+ * session prompt would open with focus left behind on the page underneath,
+ * which for a keyboard user means the countdown runs while they hunt for the
+ * button.
+ */
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { variant, size, wide, icon, children, className, ...rest },
+  ref
+) {
   return (
     <button
+      ref={ref}
       type={rest.type ?? 'button'}
       className={classes({ variant, size, wide, className, children })}
       {...rest}
@@ -43,7 +54,7 @@ export function Button({ variant, size, wide, icon, children, className, ...rest
       {icon && <Icon name={icon} />}
     </button>
   );
-}
+});
 
 type ButtonLinkProps = CommonProps & {
   to: string;

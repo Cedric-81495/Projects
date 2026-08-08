@@ -9,6 +9,7 @@ import { PasswordField } from '@/components/ui/PasswordField';
 import { Button } from '@/components/ui/Button';
 import { useMember } from '@/providers/context/member';
 import { ROUTES } from '@/router/routes';
+import { Spinner } from '@/components/ui/Spinner';
 
 export function MemberSignInPage() {
   const { signIn } = useMember();
@@ -63,7 +64,8 @@ export function MemberSignInPage() {
               </div>
             )}
 
-            <Button type="submit" variant="gold" wide disabled={isSubmitting}>
+            <Button type="submit" variant="gold" wide disabled={isSubmitting} className="btn--busy">
+              {isSubmitting && <Spinner size="sm" label="" />}
               {isSubmitting ? 'Signing in' : 'Sign in'}
             </Button>
 

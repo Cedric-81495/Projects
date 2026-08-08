@@ -674,3 +674,104 @@ main:focus-visible {
 .routefail .body {
   max-width: 42ch;
 }
+
+/* ------------------------------------------------------------ session prompt */
+/**
+ * Idle warning. Deliberately heavier than a toast: it is asking a question with
+ * a consequence, and a notification that slides past the corner of the screen
+ * is exactly the wrong weight for "you are about to be signed out".
+ */
+.sessionscrim {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: var(--gut);
+  background: rgb(7 7 8 / 0.78);
+  backdrop-filter: blur(3px);
+  animation: sessionin 0.25s var(--ease);
+}
+
+.sessiondlg {
+  width: min(440px, 100%);
+  background: var(--obsidian-2);
+  border: 1px solid rgb(200 163 74 / 0.32);
+  padding: clamp(24px, 3vw, 36px);
+  display: grid;
+  gap: 14px;
+  color: var(--platinum-hi);
+  /* The dialog carries its own surface tokens: it can appear over a light
+     section, and inheriting that surface would render gold text on white. */
+  --fg: var(--platinum-hi);
+  --fg-quiet: var(--platinum);
+  --accent: var(--gold);
+  --rule: rgb(191 195 199 / 0.16);
+}
+
+.sessioncount {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin: 2px 0 4px;
+}
+
+.sessioncount b {
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.sessioncount span {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--platinum);
+}
+
+/* The spinner sits inside the button, so it needs the button's own gap. */
+.sessiondlg .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+@keyframes sessionin {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sessionscrim {
+    animation: none;
+  }
+}
+
+/* A button that is working: spinner and label sit on one baseline. */
+.btn--busy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Inside the CMS the spinner replaces the glyph, so it takes the glyph's box. */
+.adm-menu-item .spin {
+  width: 15px;
+  height: 15px;
+  border-width: 1.5px;
+}
+
+/* Staff-only return link at the foot of the mobile drawer. Gold-edged so it
+   reads as a different kind of destination from the site's own pages. */
+.mnav-cms {
+  border-top: 1px solid rgb(200 163 74 / 0.4) !important;
+  border-bottom-color: rgb(200 163 74 / 0.4) !important;
+  color: var(--gold-lit) !important;
+  margin-top: 12px;
+}

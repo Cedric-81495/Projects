@@ -2,7 +2,8 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { CookieNotice } from './CookieNotice';
-import { ScrollToTop } from './ScrollToTop';
+import { RouteScrollReset } from './RouteScrollReset';
+import { BackToTop } from './BackToTop';
 import { SavedDrawer } from '@/features/collections/components/SavedDrawer';
 import { useReveal } from '@/hooks/useReveal';
 
@@ -16,13 +17,17 @@ export function RootLayout() {
 
   return (
     <>
-      <ScrollToTop />
+      <RouteScrollReset />
       <Header />
-      <main id="main">
+      {/* tabIndex -1 makes <main> a valid focus target. Both the skip link and
+          the back-to-top button move focus here; without it the browser scrolls
+          but leaves focus behind on the control. */}
+      <main id="main" tabIndex={-1}>
         <Outlet />
       </main>
       <Footer />
       <SavedDrawer />
+      <BackToTop />
       <CookieNotice />
     </>
   );

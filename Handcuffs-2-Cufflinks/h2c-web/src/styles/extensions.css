@@ -1,0 +1,93 @@
+/* ==========================================================================
+   Net-new component styles authored for this build.
+
+   The other partials are ported verbatim from the approved reference build and
+   carry a "change only with client approval" contract, so anything added after
+   the port lands here instead. That keeps the provenance of the ported files
+   reviewable against the original while still letting the design system grow.
+
+   Everything here reads the same tokens the ported layer does — no new colour
+   values, no new easing curves.
+   ========================================================================== */
+
+/* ------------------------------------------------------------- back to top */
+/* Square, not a pill: the brand set uses hard corners throughout (.btn, .iconbtn,
+   .slot), and a rounded floating action button would read as a generic app
+   affordance on a site that is meant to feel cinematic and editorial. */
+.totop {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 110;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  background: rgba(7, 7, 8, 0.82);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(200, 163, 74, 0.34);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition:
+    opacity 0.4s var(--ease),
+    transform 0.4s var(--ease),
+    visibility 0.4s,
+    background 0.3s var(--ease),
+    color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+
+.totop.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.totop:hover {
+  background: var(--gold);
+  color: var(--obsidian);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+/* The icon set ships one arrow, pointing right. Rotating it keeps the stroke
+   weight and cap style identical to every other arrow on the site. */
+.totop svg {
+  width: 18px;
+  height: 18px;
+  transform: rotate(-90deg);
+}
+
+/* The cookie notice docks in the same corner. Stepping the button above it
+   keeps both usable; `:has()` means neither component has to know about the
+   other. The offsets are clearance estimates for the notice at its tallest —
+   and because .totop sits below .cookie in the stack (110 vs 160), the worst
+   case in a browser without :has() is that the button tucks behind the notice
+   rather than covering it. */
+body:has(.cookie:not(.is-off)) .totop {
+  bottom: 200px;
+}
+
+@media (max-width: 620px) {
+  body:has(.cookie:not(.is-off)) .totop {
+    bottom: 240px;
+  }
+}
+
+@media print {
+  .totop {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------- programmatic focus target */
+/* <main> takes tabIndex -1 so the skip link and the back-to-top button can hand
+   focus back to the top of the document. It is a non-interactive container, so
+   the global gold focus ring would draw a border around the entire page for no
+   useful signal — the next Tab lands on the header, which is visibly focused. */
+main:focus,
+main:focus-visible {
+  outline: none;
+}

@@ -635,3 +635,42 @@ main:focus-visible {
   width: 100%;
   flex: 1 1 100%;
 }
+
+/* --------------------------------------------------------------- CMS chip */
+/* Shown in the public header only when a staff session exists. Deliberately
+   quiet — it is a way back to work, not a promotion of the CMS to visitors,
+   who never see it at all. */
+.nav-cms {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid var(--rule);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-quiet);
+  transition:
+    color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+
+.nav-cms:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ------------------------------------------------------- route load failure */
+.routefail {
+  min-height: 60vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: var(--gut);
+}
+
+.routefail .body {
+  max-width: 42ch;
+}

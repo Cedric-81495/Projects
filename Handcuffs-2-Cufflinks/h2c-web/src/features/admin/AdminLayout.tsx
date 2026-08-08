@@ -309,10 +309,24 @@ function Topbar() {
               <b>{user?.fullName}</b>
               <span>{user?.email}</span>
             </div>
-            <Link className="adm-menu-item" to={ROUTES.home} onClick={close}>
+            {/*
+              A real link, not a client-side one. The CMS and the public site
+              are two applications sharing a bundle: hopping between them in the
+              same tab is how someone ends up on the public site holding the
+              CMS's chunk map, which breaks the next navigation after a deploy.
+              A new tab also keeps the work they were doing open behind them —
+              which is what "view the site" means when you are mid-edit.
+            */}
+            <a
+              className="adm-menu-item"
+              href={ROUTES.home}
+              target="_blank"
+              rel="noreferrer"
+              onClick={close}
+            >
               <Glyph name="external" />
               View the public site
-            </Link>
+            </a>
             <button
               type="button"
               className="adm-menu-item adm-menu-item--warn"

@@ -5,6 +5,8 @@ import { HomePage } from '@/features/home/HomePage';
 import { NotFoundPage } from '@/features/NotFoundPage';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { ROUTES } from './routes';
+import { SectionLoad } from '@/components/ui/Spinner';
+import { RouteBoundary } from './RouteBoundary';
 
 /**
  * The route tree, shared by the browser and the prerender build.
@@ -52,13 +54,25 @@ const ResourceList = lazy(() => import('@/features/admin/ResourceListPage').then
 const ResourceEdit = lazy(() => import('@/features/admin/ResourceEditPage').then((m) => ({ default: m.ResourceEditPage })));
 
 /** Deliberately quiet: a spinner on every navigation is worse than a beat of nothing. */
+/**
+ * Shown while a route's chunk is downloading.
+ *
+ * It used to be an empty box, which meant a slow or failed chunk looked exactly
+ * like a blank page — indistinguishable from a broken site. A visible, labelled
+ * spinner says the difference out loud.
+ */
 function RouteFallback() {
-  return <div style={{ minHeight: '60vh' }} aria-busy="true" />;
+  return (
+    <div style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+      <SectionLoad label="Loading" rows={2} />
+    </div>
+  );
 }
 
 export function AppRoutes() {
   return (
-    <Suspense fallback={<RouteFallback />}>
+    <RouteBoundary>
+      <Suspense fallback={<RouteFallback />}>
       <Routes>
         <Route element={<RootLayout />}>
           <Route path={ROUTES.home} element={<HomePage />} />
@@ -111,7 +125,8 @@ export function AppRoutes() {
             <Route path={ROUTES.adminRecordEdit} element={<ResourceEdit />} />
           </Route>
         </Route>
-      </Routes>
-    </Suspense>
+        </Routes>
+      </Suspense>
+    </RouteBoundary>
   );
 }

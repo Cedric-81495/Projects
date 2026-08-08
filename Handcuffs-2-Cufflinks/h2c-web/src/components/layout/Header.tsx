@@ -7,6 +7,7 @@ import { Wordmark } from '@/components/ui/Wordmark';
 import { useStickyHeader } from '@/hooks/useStickyHeader';
 import { useEngagement } from '@/providers/context/engagement';
 import { useMember } from '@/providers/context/member';
+import { useAuth } from '@/providers/context/auth';
 import { NAV_ITEMS, BRAND, PRIMARY_CTA } from '@/config/site';
 import { ROUTES } from '@/router/routes';
 import { cn } from '@/lib/utils/cn';
@@ -24,6 +25,14 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { savedCount, openDrawer } = useEngagement();
   const { member } = useMember();
+  /**
+   * Staff and members are separate accounts, so a signed-in administrator is
+   * genuinely not signed in *here* — the header would otherwise be lying about
+   * whose session it is showing. It is still worth acknowledging: without this,
+   * someone who just came from the CMS reads "Sign in" as being logged out of
+   * everything, which is the one thing it does not mean.
+   */
+  const { user } = useAuth();
   const location = useLocation();
 
   return (
@@ -63,6 +72,11 @@ export function Header() {
             >
               {member ? member.firstName : 'Sign in'}
             </NavLink>
+            {user && (
+              <Link to={ROUTES.adminDashboard} className="nav-cms">
+                CMS
+              </Link>
+            )}
           </nav>
 
           <div className="hdr-tools">

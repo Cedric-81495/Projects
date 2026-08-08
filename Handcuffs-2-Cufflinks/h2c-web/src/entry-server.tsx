@@ -59,4 +59,4 @@ export async function render(url: string): Promise<RenderResult> {
 }
 
 /** Re-exported so the prerender script has a single entry point to import. */
-export { PRERENDER_ROUTES, DYNAMIC_ROUTE_SOURCES } from '@/router/manifest';
+export { PRERENDER_ROUTES, DYNAMIC_ROUTE_SOURCES, CLIENT_ONLY_ROUTES } from '@/router/manifest';

@@ -149,7 +149,7 @@ function robots() {
 
 async function main() {
   const template = await readFile(join(dist, 'index.html'), 'utf8');
-  const { render, PRERENDER_ROUTES, DYNAMIC_ROUTE_SOURCES } = await import(
+  const { render, PRERENDER_ROUTES, DYNAMIC_ROUTE_SOURCES, CLIENT_ONLY_ROUTES } = await import(
     join(root, 'dist-server', 'entry-server.js')
   );
 
@@ -194,8 +194,28 @@ async function main() {
     '<title>Handcuffs 2 Cufflinks — From Struggle to Success</title>',
     '<meta name="robots" content="noindex,follow" />',
   ].join('\n    ');
-  await writeFile(join(dist, 'app.html'), injectHead(template, shellHead));
+  const shell = injectHead(template, shellHead);
+  await writeFile(join(dist, 'app.html'), shell);
   console.log('  ✓ app.html (fallback shell)');
+
+  /**
+   * The same shell, written as a real file at every client-only route.
+   *
+   * These are not prerendered — there is nothing to render for a signed-out
+   * visitor, and the CMS markup should not sit in the build output. But a route
+   * with no file depends entirely on the host's SPA fallback rewrite, and when
+   * that rewrite is not in effect the visitor gets the platform's own 404 with
+   * nothing in the build log to explain it. A file on disk cannot 404.
+   *
+   * Written as `<route>/index.html` so it resolves with `cleanUrls` and
+   * `trailingSlash: false` the same way the prerendered pages do.
+   */
+  for (const route of CLIENT_ONLY_ROUTES) {
+    const outPath = join(dist, route, 'index.html');
+    await mkdir(dirname(outPath), { recursive: true });
+    await writeFile(outPath, shell);
+  }
+  console.log(`  ✓ ${CLIENT_ONLY_ROUTES.length} client-only route shells (CMS, account)`);
 
   await writeFile(join(dist, 'sitemap.xml'), sitemap(routes));
   await writeFile(join(dist, 'robots.txt'), robots());

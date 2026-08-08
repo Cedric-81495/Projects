@@ -1,146 +1,163 @@
-# Deployment and publishing
+# Deploying, and getting admin sign-in working
 
-## How a VA's edit reaches the site
+Two separate things have to be true before you can sign in to the CMS on a
+deployed build:
 
-Two independent paths. Understanding which is which prevents most confusion.
+1. `https://<site>/admin/sign-in` has to **load** (this was the 404).
+2. The sign-in **request** has to reach the API, be allowed by CORS, and be
+   able to set a cross-site cookie.
 
-**Path 1 — content freshness (no build).** Pages fetch content from the Express
-API at runtime. A moderator publishes, and the change appears on the next page
-load. No rebuild, no waiting, nothing to trigger. This is how VAs experience the
-site day to day.
+They fail independently and look similar from the browser, so check them in
+order.
 
-**Path 2 — social previews (needs a build).** Facebook, WhatsApp, iMessage,
-LinkedIn, and X do not run JavaScript. They read the raw HTML and stop. So each
-route is prerendered to a static file carrying real titles, descriptions, and OG
-images.
+---
 
-The consequence: an edit to an **existing** page is visible to visitors
-immediately, and its unfurl metadata refreshes at the next build. A **brand-new**
-page works for visitors immediately too, but until the next build its social
-preview falls back to the site defaults.
+## 1. Why `/admin/sign-in` returned 404
 
-That is an acceptable gap — nobody shares a URL in the first three minutes of it
-existing — and it means the VA never waits on a build.
+The CMS is deliberately not prerendered — there is nothing to render for a
+signed-out visitor, and the admin markup should not sit in the build output. So
+no file was written at `dist/admin/sign-in/`, and the URL depended entirely on
+the SPA fallback rewrite in `vercel.json`:
 
-## Build pipeline
-
-```
-npm run build
-  ├─ tsc -b                 typecheck
-  ├─ vite build             client bundle → dist/
-  ├─ vite build --ssr       server bundle → dist-server/
-  └─ node scripts/prerender.mjs
-       ├─ renders each route → dist/<path>/index.html
-       ├─ writes sitemap.xml
-       └─ writes robots.txt
+```json
+"rewrites": [{ "source": "/((?!api/|assets/|media/|sitemap.xml|robots.txt).*)",
+              "destination": "/app.html" }]
 ```
 
-The prerender also emits `dist/app.html`: an **empty** shell used as the SPA
-fallback for URLs with no prerendered file — client-side redirects (`/shop`),
-the CMS, and genuine 404s.
+If that rewrite is not in effect, every non-prerendered URL falls through to
+Vercel's own 404. The homepage and `/collections` keep working because they are
+real files on disk, which is exactly the pattern you saw.
 
-`vercel.json` must rewrite unmatched paths to `/app.html`, **not** `/index.html`.
-Pointing it at `index.html` serves prerendered homepage markup for those URLs,
-and React then throws a hydration mismatch on every one of them. This was a real
-bug caught in testing; the rewrite target is load-bearing.
+**Fixed** by writing the same empty shell as a real file at every client-only
+route (`scripts/prerender.mjs` + `CLIENT_ONLY_ROUTES` in `src/router/manifest.ts`).
+The build now emits:
 
-`npm run build:spa` skips prerendering. Useful for a quick check; do not deploy
-it, because social previews will be wrong.
+```
+dist/admin/index.html          dist/admin/media/index.html
+dist/admin/sign-in/index.html  dist/admin/subscribers/index.html
+dist/admin/dashboard/index.html  dist/admin/users/index.html
+dist/admin/handcuffs-2-cufflinks/index.html
+dist/admin/kitchen-muzik/index.html
+dist/admin/gwop/index.html
+dist/admin/community/index.html
+dist/account/index.html
+```
 
-## Required environment variables
+Each is `noindex`, has an empty `<div id="root">` (nothing to hydrate against),
+and is absent from `sitemap.xml`. A file on disk cannot 404, so these no longer
+depend on the rewrite at all. The rewrite stays as the safety net for
+parameterised detail routes, which cannot be enumerated ahead of time.
 
-| Variable | Production | Staging / preview |
+### Still worth checking
+
+Visit any nonsense URL, e.g. `https://<site>/zzz-does-not-exist`:
+
+* **The site's own styled 404 page** → the rewrite works. Detail pages
+  (`/docuseries/<slug>`) are fine.
+* **Vercel's plain black `404: NOT_FOUND` page** → the rewrite is not being
+  applied. Almost always because the Vercel project's **Root Directory** is not
+  set to `h2c-web`; `vercel.json` is only read from the root of the deployment.
+  Fix it in Project Settings → General → Root Directory, then redeploy.
+
+---
+
+## 2. Vercel — frontend environment
+
+Project Settings → Environment Variables, scoped to **Production**. Vite inlines
+`VITE_*` values **at build time**, so adding or changing any of these requires a
+redeploy — saving them alone changes nothing.
+
+| Variable | Value | Why it matters |
 | --- | --- | --- |
-| `VITE_API_BASE_URL` | Render API URL | Render **staging** API URL |
-| `VITE_SITE_URL` | `https://<production-domain>` | `https://<staging-domain>` |
-| `SEO_NOINDEX` | **unset** | `true` |
+| `VITE_API_BASE_URL` | `https://<your-api>.onrender.com/api/v1` | **The most common cause of a broken sign-in.** If unset it defaults to `/api/v1`, so the CMS posts to `https://<site>/api/v1/auth/sign-in` — same origin, no such file, 404. It must be absolute and include `/api/v1`. |
+| `VITE_SITE_URL` | `https://<your-site>` | Canonical URLs and OG images. Wrong value = every share link unfurls with the wrong host. |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth **client ID** | Public. The secret stays on the API. |
+| `SEO_NOINDEX` | `true` on staging/preview, **unset on production** | Currently `true` on this deployment — `robots.txt` is serving `Disallow: /`. Correct for staging; delists the site if left on for production. |
 
-### The two mistakes that cause real damage
+Also confirm: **Root Directory = `h2c-web`**, Build Command `npm run build`,
+Output Directory `dist` (these come from `vercel.json` once the root directory
+is right).
 
-1. **`SEO_NOINDEX` unset on staging** → Google indexes staging, it competes
-   with production in search, and unpublished stories can leak.
-2. **`SEO_NOINDEX=true` on production** → the live site is silently delisted.
+---
 
-Both are one variable. Verify on the live URL before announcing anything:
+## 3. Render — API environment
+
+| Variable | Value | Notes |
+| --- | --- | --- |
+| `NODE_ENV` | `production` | **Do not skip this.** It is what switches the refresh cookie to `Secure; SameSite=None`. Without it the cookie is `SameSite=Lax`, and because the CMS (Vercel) and API (Render) are different sites, the browser silently drops it — you sign in successfully, then get signed out on the next page load or refresh. |
+| `MONGODB_URI` | Atlas connection string | Use a different database from local. |
+| `JWT_ACCESS_SECRET` | `openssl rand -base64 48` | |
+| `JWT_REFRESH_SECRET` | `openssl rand -base64 48` | Must **differ** from the access secret — the server refuses to start otherwise. |
+| `CORS_ORIGINS` | `https://<your-site>` | Exact scheme + host, **no trailing slash**, comma-separated for several. No wildcards: the API uses cookies, and browsers reject `*` with credentials. Preview deployments get a new URL each time, so they will not be allowed unless you add them. |
+| `SITE_URL` | `https://<your-site>` | |
+| `ADMIN_URL` | `https://<your-site>/admin` | Password reset and email confirmation links are built from this. |
+| `RESEND_API_KEY` | Resend key | Optional, but **without it password reset does not send** — the mailer logs the link to the Render console instead. |
+| `MAIL_FROM` | `Handcuffs 2 Cufflinks <no-reply@yourdomain>` | Domain must be verified with the provider. |
+| `REQUIRE_SUPER_ADMIN_MFA` | `false` | Leave false until every super admin has enrolled, or you lock everyone out at once. |
+
+Google sign-in (optional — password sign-in works without it):
+
+| Variable | Value |
+| --- | --- |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | From Google Cloud Console → Credentials → OAuth client ID (Web application) |
+| `GOOGLE_CALLBACK_URL` | `https://<your-api>.onrender.com/api/v1/auth/google/callback` |
+| `OAUTH_SUCCESS_REDIRECT` | `https://<your-site>/admin/dashboard` |
+| `OAUTH_MEMBER_REDIRECT` | `https://<your-site>/community` |
+| `OAUTH_FAILURE_REDIRECT` | `https://<your-site>/admin/sign-in` |
+
+`GOOGLE_CALLBACK_URL` must be added verbatim to the OAuth client's **Authorised
+redirect URIs** — Google matches character for character, and a trailing slash
+is a different URI. One callback serves both the CMS and member flows.
+
+---
+
+## 4. MongoDB Atlas
+
+* **Network Access → 0.0.0.0/0.** Render's free and starter tiers have no
+  static outbound IP, so an allowlist of specific addresses will fail
+  intermittently and look like a database outage.
+* Database user with read/write on the app database.
+* If startup fails with `querySrv ECONNREFUSED`, the host's DNS is refusing the
+  SRV lookup that `mongodb+srv://` needs — set `DNS_SERVERS=8.8.8.8,1.1.1.1`.
+
+---
+
+## 5. Create the first administrator
+
+There is no self-registration into the CMS — by design. Google sign-in also
+never creates a staff account; it only matches an existing one. So the first
+account has to be made against the production database:
 
 ```bash
-curl -s https://<production-domain>/robots.txt                # expect: Allow: /
-curl -s https://<production-domain>/ | grep 'name="robots"'   # expect: index,follow
+cd h2c-api
+MONGODB_URI="<your production Atlas URI>" npm run create-admin -- \
+  --email you@example.com --name "Your Name"
 ```
 
-A wrong `VITE_SITE_URL` is the third trap: the build inlines it, so a production
-build run with a local `.env` present would ship `og:image` pointing at
-localhost. The prerender script re-bases image origins onto `VITE_SITE_URL` to
-defend against this, but the variable still has to be right.
+The password is generated and printed **once**. It is never logged or written
+to a file — copy it before closing the terminal, then change it after first
+sign-in.
 
-## Rebuild trigger (for the backend developer)
+You can run this from your own machine (your IP needs Atlas access) or from a
+Render shell.
 
-Prerendered metadata only refreshes on a build, so the API should ping Vercel
-when content is published.
+---
 
-1. In Vercel: **Settings → Git → Deploy Hooks**, create a hook, copy the URL.
-2. Store it in the backend as `VERCEL_DEPLOY_HOOK_URL`.
-3. On successful publish or unpublish, fire it:
+## 6. Verify, in order
 
-```ts
-// Fire-and-forget. A failed hook must never fail the publish — the content is
-// already live for visitors via the client fetch. Only metadata waits.
-async function requestSiteRebuild(): Promise<void> {
-  const url = process.env.VERCEL_DEPLOY_HOOK_URL;
-  if (!url) return;
-  try {
-    await fetch(url, { method: 'POST' });
-  } catch (error) {
-    logger.warn({ error }, 'Site rebuild hook failed; metadata refreshes next build');
-  }
-}
-```
+1. `https://<your-api>.onrender.com/api/v1/health` → `{"success":true,...,"database":"connected"}`.
+   A 503 here means the API is up but cannot reach Mongo — fix that first.
+2. `https://<your-site>/admin/sign-in` → the sign-in form renders.
+3. Submit the form with DevTools → Network open:
+   * **404 on the request** → `VITE_API_BASE_URL` is wrong or unset (§2).
+   * **CORS error** → `CORS_ORIGINS` does not exactly match the site origin (§3).
+   * **200, then signed out on refresh** → `NODE_ENV` is not `production`, so
+     the refresh cookie is being dropped (§3).
+   * **401 "email and password combination did not work"** → credentials; the
+     API is reachable and configured correctly.
+4. In DevTools → Application → Cookies, confirm `h2c_rt` is present with
+   `Secure` and `SameSite=None`.
 
-**Debounce it.** A VA publishing six episodes in a row should cause one build,
-not six. A 2–5 minute trailing debounce is enough. Vercel also queues and
-cancels superseded builds, but debouncing keeps the log readable.
-
-If adding the hook is not possible, schedule a Vercel cron rebuild instead
-(hourly is fine). The VA experience is identical either way, because freshness
-comes from the client fetch rather than the build.
-
-## Adding detail pages to the prerender
-
-`src/router/manifest.ts` holds the route list. `DYNAMIC_ROUTE_SOURCES` describes
-detail routes whose slugs come from the CMS; the prerender script fetches them at
-build time and generates a file per slug.
-
-That fetch is deliberately non-fatal. If an endpoint is unreachable the build
-logs a skip and continues — those URLs still work as client-rendered pages, and
-only their unfurl metadata waits for the API.
-
-## Writing SSR-safe code
-
-The prerender runs the app in Node, where there is no `window`, `document`, or
-`localStorage`. Two rules keep it building:
-
-1. **Never touch a browser API during render or at module scope.** Guard with
-   `typeof window === 'undefined'`, or move it into `useEffect`, which does not
-   run on the server.
-2. **Never render differently on the first client pass than the server did.**
-   Anything read from `localStorage` must come from `useEffect`. `useLocalStorage`
-   already does this and returns a `hydrated` flag for components that would
-   otherwise flash.
-
-Hydration mismatches surface as console errors, so the Playwright check catches
-them. Run it before merging anything that touches providers or layout.
-
-## Pre-launch checks
-
-- [ ] `robots.txt` and the `robots` meta tag are correct on **production**
-- [ ] `sitemap.xml` submitted in Google Search Console
-- [ ] Every route in the sitemap returns a prerendered file (`curl` and look for
-      real content, not an empty `<div id="root">`)
-- [ ] Paste live URLs into the Facebook Sharing Debugger, X Card Validator,
-      LinkedIn Post Inspector, and a real WhatsApp thread
-- [ ] Google Rich Results Test against the homepage and a docuseries page
-- [ ] Deep-link straight to an interior page in a fresh tab
-- [ ] Visit an unknown URL and `/shop` — both should render cleanly with no
-      console errors (this verifies the `/app.html` rewrite)
-- [ ] Deploy hook fires on publish, and the resulting build succeeds
-- [ ] Lighthouse run against staging, not localhost
+Note that Render's free tier sleeps after inactivity, so the first request after
+a quiet period can take 30–60 seconds and may time out. That is not a
+misconfiguration — retry once before debugging.

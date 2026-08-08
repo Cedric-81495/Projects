@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useToast } from './context/toast';
+import { useMember } from './context/member';
+import { fetchMemberEngagement } from './memberEngagement';
 import { EngagementContext } from './context/engagement';
 import type { EngagementContextValue, EngagementKind } from './context/engagement';
 import { APPAREL, apparelById } from '@/data/apparel';
@@ -47,10 +49,46 @@ const FIELD: Record<EngagementKind, keyof EngagementState> = {
 /** A visitor's own vote is weighted so the meter visibly responds to them. */
 const OWN_VOTE_WEIGHT = 120;
 
+/** Merges two id lists without duplicates. */
+function union(a: string[], b: string[] | undefined): string[] {
+  return Array.from(new Set([...a, ...(b ?? [])]));
+}
+
 export function EngagementProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useLocalStorage<EngagementState>('h2c.engagement', EMPTY);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const { notify } = useToast();
+  const { status: memberStatus } = useMember();
+
+  /**
+   * When a member signs in, their reactions are pulled from the server and
+   * merged into local state.
+   *
+   * This is the point of having an account: a like registered on a phone shows
+   * up on a laptop. Merged rather than replaced, so anything reacted to
+   * anonymously in this browser before signing in is not silently dropped —
+   * the server claims those rows at sign-in, and this keeps the UI in step.
+   */
+  useEffect(() => {
+    if (memberStatus !== 'signed-in') return;
+    let cancelled = false;
+
+    void fetchMemberEngagement().then((remote) => {
+      if (!remote || cancelled) return;
+      setState((current) => ({
+        likes: union(current.likes, remote.like),
+        saves: union(current.saves, remote.favorite),
+        votes: union(current.votes, remote.vote),
+        notifies: union(current.notifies, remote.notify),
+      }));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+    // setState is stable; re-running on state changes would loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [memberStatus]);
 
   const isOn = useCallback(
     (kind: EngagementKind, id: string) => state[FIELD[kind]].includes(id),

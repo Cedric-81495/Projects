@@ -4,6 +4,7 @@ import { ApiError } from '@/lib/ApiError';
 import { asyncHandler } from '@/lib/asyncHandler';
 import { ok } from '@/lib/envelope';
 import { requireAuth, requirePermission } from '@/middleware/auth';
+import { optionalMember } from '@/middleware/memberAuth';
 import { engagementLimiter } from '@/middleware/rateLimit';
 import { validateBody } from '@/middleware/validate';
 import { ApparelItem } from '@/models/content';
@@ -47,6 +48,7 @@ const bodySchema = z.object({
 engagementRouter.post(
   '/:id/:action',
   engagementLimiter,
+  optionalMember,
   validateBody(bodySchema),
   asyncHandler(async (req, res) => {
     const parsed = paramsSchema.safeParse(req.params);
@@ -69,7 +71,13 @@ engagementRouter.post(
         visitorId,
         itemId: id,
         action,
-        email: action === 'notify' ? (req.body as { email?: string }).email : undefined,
+        // Attributed to the member when signed in, so it follows them between
+        // devices. Anonymous visitors still count exactly as before.
+        memberId: req.member?.id ?? null,
+        email:
+          action === 'notify'
+            ? ((req.body as { email?: string }).email ?? req.member?.email)
+            : undefined,
       });
     } catch (error) {
       // Duplicate key: already registered. Idempotent by design — the visitor's

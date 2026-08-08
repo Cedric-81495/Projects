@@ -29,6 +29,9 @@ const StorySubmissionPage = lazy(() => import('@/features/community/StorySubmiss
 const FounderPage = lazy(() => import('@/features/founder/FounderPage').then((m) => ({ default: m.FounderPage })));
 const JoinPage = lazy(() => import('@/features/join/JoinPage').then((m) => ({ default: m.JoinPage })));
 const LegalPage = lazy(() => import('@/features/legal/LegalPage').then((m) => ({ default: m.LegalPage })));
+const RegisterPage = lazy(() => import('@/features/account/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const MemberSignInPage = lazy(() => import('@/features/account/MemberSignInPage').then((m) => ({ default: m.MemberSignInPage })));
+const AccountPage = lazy(() => import('@/features/account/AccountPage').then((m) => ({ default: m.AccountPage })));
 
 const SignInPage = lazy(() => import('@/features/auth/SignInPage').then((m) => ({ default: m.SignInPage })));
 const AdminLayout = lazy(() => import('@/features/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })));
@@ -63,6 +66,9 @@ export function AppRoutes() {
           <Route path={ROUTES.submitStory} element={<StorySubmissionPage />} />
           <Route path={ROUTES.founder} element={<FounderPage />} />
           <Route path={ROUTES.join} element={<JoinPage />} />
+          <Route path={ROUTES.register} element={<RegisterPage />} />
+          <Route path={ROUTES.signInMember} element={<MemberSignInPage />} />
+          <Route path={ROUTES.account} element={<AccountPage />} />
           <Route path={ROUTES.legal} element={<LegalPage />} />
           <Route path={ROUTES.legalDoc} element={<LegalPage />} />
 

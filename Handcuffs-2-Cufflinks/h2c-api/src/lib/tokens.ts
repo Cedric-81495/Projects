@@ -17,6 +17,20 @@ import type { Role } from '@/types/auth';
 export const ACCESS_TTL_SECONDS = 15 * 60;
 export const REFRESH_TTL_DAYS = 30;
 export const REFRESH_COOKIE = 'h2c_rt';
+/** Members get their own cookie so a member and an admin can be signed in at once. */
+export const MEMBER_REFRESH_COOKIE = 'h2c_mrt';
+
+/**
+ * Token audiences.
+ *
+ * Staff and members are separate audiences on purpose. A member's access token
+ * therefore fails signature verification on any admin route before permissions
+ * are even consulted — so a missing requirePermission() on some future CMS
+ * route cannot quietly expose it to the public. Roles alone would not give that
+ * guarantee.
+ */
+export const CMS_AUDIENCE = 'h2c-cms';
+export const MEMBER_AUDIENCE = 'h2c-members';
 
 export interface AccessPayload {
   sub: string;
@@ -29,15 +43,35 @@ export function signAccessToken(payload: AccessPayload): string {
   return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
     expiresIn: ACCESS_TTL_SECONDS,
     issuer: 'h2c-api',
-    audience: 'h2c-cms',
+    audience: CMS_AUDIENCE,
   });
 }
 
 export function verifyAccessToken(token: string): AccessPayload {
   return jwt.verify(token, env.JWT_ACCESS_SECRET, {
     issuer: 'h2c-api',
-    audience: 'h2c-cms',
+    audience: CMS_AUDIENCE,
   }) as AccessPayload;
+}
+
+export interface MemberPayload {
+  sub: string;
+  v: number;
+}
+
+export function signMemberToken(payload: MemberPayload): string {
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
+    expiresIn: ACCESS_TTL_SECONDS,
+    issuer: 'h2c-api',
+    audience: MEMBER_AUDIENCE,
+  });
+}
+
+export function verifyMemberToken(token: string): MemberPayload {
+  return jwt.verify(token, env.JWT_ACCESS_SECRET, {
+    issuer: 'h2c-api',
+    audience: MEMBER_AUDIENCE,
+  }) as MemberPayload;
 }
 
 /** Opaque refresh token. Returned once; only the hash is persisted. */

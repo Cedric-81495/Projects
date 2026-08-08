@@ -2,6 +2,7 @@ import { prerender } from 'react-dom/static';
 import { StaticRouter } from 'react-router';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
+import { MemberProvider } from '@/providers/MemberProvider';
 import { EngagementProvider } from '@/providers/EngagementProvider';
 import { AppRoutes } from '@/router/AppRoutes';
 import { HeadCollectorContext } from '@/lib/seo/head';
@@ -42,11 +43,13 @@ export async function render(url: string): Promise<RenderResult> {
     <HeadCollectorContext.Provider value={collector}>
       <AuthProvider>
         <ToastProvider>
-          <EngagementProvider>
-            <StaticRouter location={url}>
-              <AppRoutes />
-            </StaticRouter>
-          </EngagementProvider>
+          <MemberProvider>
+            <EngagementProvider>
+              <StaticRouter location={url}>
+                <AppRoutes />
+              </StaticRouter>
+            </EngagementProvider>
+          </MemberProvider>
         </ToastProvider>
       </AuthProvider>
     </HeadCollectorContext.Provider>

@@ -6,7 +6,9 @@ import { Icon } from '@/components/ui/Icon';
 import { Wordmark } from '@/components/ui/Wordmark';
 import { useStickyHeader } from '@/hooks/useStickyHeader';
 import { useEngagement } from '@/providers/context/engagement';
+import { useMember } from '@/providers/context/member';
 import { NAV_ITEMS, BRAND, PRIMARY_CTA } from '@/config/site';
+import { ROUTES } from '@/router/routes';
 import { cn } from '@/lib/utils/cn';
 
 /**
@@ -21,6 +23,7 @@ export function Header() {
   const isStuck = useStickyHeader(stackRef);
   const [menuOpen, setMenuOpen] = useState(false);
   const { savedCount, openDrawer } = useEngagement();
+  const { member } = useMember();
   const location = useLocation();
 
   return (
@@ -52,6 +55,13 @@ export function Header() {
               className={({ isActive }) => cn('nav-join', isActive && 'is-on')}
             >
               {PRIMARY_CTA.label}
+            </NavLink>
+            {/* Secondary to Join the Movement, which stays the North Star. */}
+            <NavLink
+              to={member ? ROUTES.account : ROUTES.signInMember}
+              className={({ isActive }) => (isActive ? 'is-on' : undefined)}
+            >
+              {member ? member.firstName : 'Sign in'}
             </NavLink>
           </nav>
 

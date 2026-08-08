@@ -25,7 +25,12 @@ const engagementSchema = new Schema(
     },
     /** Only for notify-me, where the visitor asks to be told about a release. */
     email: { type: String, lowercase: true, trim: true },
-    userId: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+    /**
+     * Set once a member signs in, which is what lets their reactions follow
+     * them between devices. Null for anonymous visitors, who are still counted.
+     * References Member, not User: staff do not react to apparel.
+     */
+    memberId: { type: Schema.Types.ObjectId, ref: 'Member', default: null, index: true },
   },
   { timestamps: true }
 );

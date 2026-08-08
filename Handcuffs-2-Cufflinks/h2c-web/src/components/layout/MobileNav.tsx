@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from '@/components/ui/Icon';
-import { Wordmark } from '@/components/ui/Wordmark';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { NAV_ITEMS, BRAND, PRIMARY_CTA, SOCIAL_LINKS } from '@/config/site';
 import { cn } from '@/lib/utils/cn';
@@ -44,7 +43,7 @@ export function MobileNav({ open, onClose, currentPath }: MobileNavProps) {
       aria-hidden={!open}
     >
       <Link to="/" onClick={onClose} className="mnav-brand" aria-label={`${BRAND.name} — home`}>
-        <Wordmark size="lg" />
+        <img className="mnav-logo" src="/media/logo-wordmark.webp" alt="" />
       </Link>
 
       {[...NAV_ITEMS, { label: PRIMARY_CTA.label, to: PRIMARY_CTA.to }].map((item, i) => (

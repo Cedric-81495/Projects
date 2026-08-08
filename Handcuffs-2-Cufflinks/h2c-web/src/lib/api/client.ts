@@ -16,6 +16,7 @@ import type { ApiEnvelope, ApiErrorShape } from '@/types/common';
  */
 
 let accessToken: string | null = null;
+let memberAccessToken: string | null = null;
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;
@@ -23,6 +24,26 @@ export function setAccessToken(token: string | null): void {
 
 export function getAccessToken(): string | null {
   return accessToken;
+}
+
+/**
+ * Community member token, kept in a separate slot from the staff token.
+ *
+ * Two tokens exist because staff and members are different audiences on the
+ * server. Holding them in one variable is how a member token ends up on an
+ * admin request — so which one is sent is decided by the request path, never by
+ * whichever happened to be set last.
+ */
+export function setMemberAccessToken(token: string | null): void {
+  memberAccessToken = token;
+}
+
+export function getMemberAccessToken(): string | null {
+  return memberAccessToken;
+}
+
+function tokenForPath(path: string): string | null {
+  return path.startsWith('/members') ? memberAccessToken : accessToken;
 }
 
 /** Thrown for any non-2xx response. Carries field errors for form display. */
@@ -93,7 +114,8 @@ async function refreshSession(): Promise<void> {
 async function request<T>(path: string, options: RequestOptions): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
-  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  const token = tokenForPath(path);
+  if (token) headers.Authorization = `Bearer ${token}`;
 
   let response: Response;
   try {
@@ -114,7 +136,8 @@ async function request<T>(path: string, options: RequestOptions): Promise<T> {
   if (
     response.status === 401 &&
     !options.retried &&
-    !path.startsWith('/auth/')
+    !path.startsWith('/auth/') &&
+    !path.startsWith('/members')
   ) {
     try {
       await refreshSession();

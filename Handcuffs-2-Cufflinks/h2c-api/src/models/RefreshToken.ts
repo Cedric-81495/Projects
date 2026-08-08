@@ -4,6 +4,7 @@ import { applyJsonTransform } from './plugins';
 
 export interface RefreshTokenDoc extends Document {
   userId: Types.ObjectId;
+  subjectType: 'user' | 'member';
   /** SHA-256 of the token. The token itself is never stored. */
   tokenHash: string;
   expiresAt: Date;
@@ -17,7 +18,13 @@ export interface RefreshTokenDoc extends Document {
 
 const refreshTokenSchema = new Schema<RefreshTokenDoc>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    userId: { type: Schema.Types.ObjectId, required: true, index: true },
+    /**
+     * Which collection userId points at. Without this a member's refresh token
+     * and a staff refresh token are indistinguishable rows, and the refresh
+     * endpoint could hand a member a CMS session.
+     */
+    subjectType: { type: String, enum: ['user', 'member'], default: 'user', index: true },
     tokenHash: { type: String, required: true, unique: true, index: true },
     expiresAt: { type: Date, required: true },
     revokedAt: { type: Date, default: null },

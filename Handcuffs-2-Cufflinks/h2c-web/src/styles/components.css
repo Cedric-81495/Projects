@@ -309,17 +309,16 @@
 .hdr-logo,.mnav-brand,.ftr-brand{display:inline-block;text-decoration:none}
 
 /* Sizes.
-   Each is scoped to its container rather than declared on .wordmark--* alone.
-   The mobile nav styles its own descendants (.mnav a span sets a 0.6rem
-   number badge) at specificity 0,1,2, which outranks a bare 0,1,0 modifier
-   class and silently shrank the wordmark to badge size. Container-scoped
-   selectors sit at 0,2,0 and win. */
-.hdr-logo .wordmark--sm{font-size:clamp(.78rem,1.5vw,.95rem)}
-.ftr-brand .wordmark--md,
-.wordmark--md{font-size:clamp(1rem,2.4vw,1.35rem)}
-.mnav-brand .wordmark--lg,
-.wordmark--lg{font-size:clamp(1.4rem,5.5vw,2rem);letter-spacing:.02em}
+   The header rule is container-scoped deliberately. Any container that styles
+   its own descendants can outrank a bare modifier class — the mobile nav's
+   ".mnav a span" number-badge rule sits at specificity 0,1,2 and once shrank a
+   wordmark placed there to badge size. If the wordmark is ever used inside such
+   a container again, scope its size the same way (0,2,0) rather than raising
+   the base rule. */
+.hdr-logo .wordmark--sm,
 .wordmark--sm{font-size:clamp(.78rem,1.5vw,.95rem)}
+.wordmark--md{font-size:clamp(1rem,2.4vw,1.35rem)}
+.wordmark--lg{font-size:clamp(1.4rem,5.5vw,2rem)}
 
 /* Both metal treatments clip a gradient to the glyphs, leaving the text itself
    transparent. Forced-colours mode drops the gradient, so the fill is restored

@@ -30,6 +30,10 @@ export const PRERENDER_ROUTES: RouteEntry[] = [
   { path: ROUTES.submitStory, priority: 0.7, changefreq: 'monthly' },
   { path: ROUTES.founder, priority: 0.8, changefreq: 'monthly' },
   { path: ROUTES.join, priority: 0.9, changefreq: 'monthly' },
+  { path: ROUTES.register, priority: 0.6, changefreq: 'monthly' },
+  { path: ROUTES.signInMember, priority: 0.4, changefreq: 'yearly' },
+  // ROUTES.account is deliberately absent: it is a private page, marked
+  // noIndex, and there is nothing to prerender for a signed-out visitor.
   { path: ROUTES.legal, priority: 0.3, changefreq: 'yearly' },
   { path: `${ROUTES.legal}/privacy`, priority: 0.3, changefreq: 'yearly' },
   { path: `${ROUTES.legal}/terms`, priority: 0.3, changefreq: 'yearly' },

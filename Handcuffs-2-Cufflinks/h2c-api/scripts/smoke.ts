@@ -142,6 +142,58 @@ async function main(): Promise<void> {
   check('public collection listing does not require auth', publicList.status !== 401, publicList.status);
 
   /* ---------------------------------------------------------------- */
+  console.log('\nMember accounts (public)');
+
+  const badRegister = await fetch(`${BASE}/members/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ firstName: 'A', email: 'nope', password: 'short', acceptTerms: false }),
+  });
+  const regBody = await json(badRegister);
+  check('registration validates the body', badRegister.status === 400, badRegister.status);
+  check('password length is enforced',
+    /12 characters/i.test(JSON.stringify(regBody.errors ?? {})), regBody.errors);
+  check('terms must be accepted',
+    /terms of use/i.test(JSON.stringify(regBody.errors ?? {})), regBody.errors);
+
+  for (const path of ['/members/me', '/members/me/engagement']) {
+    const res = await fetch(`${BASE}${path}`);
+    check(`${path} requires a member session`, res.status === 401, res.status);
+  }
+
+  const noMemberSession = await fetch(`${BASE}/members/refresh`, { method: 'POST' });
+  check('member refresh without a cookie returns 401', noMemberSession.status === 401, noMemberSession.status);
+
+  // The boundary that matters: a member token must be useless on staff routes.
+  const { signMemberToken } = await import('../src/lib/tokens');
+  const memberToken = signMemberToken({ sub: '507f1f77bcf86cd799439011', v: 0 });
+
+  const staffWithMemberToken = await fetch(`${BASE}/auth/me`, {
+    headers: { Authorization: `Bearer ${memberToken}` },
+  });
+  check('a member token is rejected by the CMS', staffWithMemberToken.status === 401, staffWithMemberToken.status);
+
+  const usersWithMemberToken = await fetch(`${BASE}/users`, {
+    headers: { Authorization: `Bearer ${memberToken}` },
+  });
+  check('a member token cannot reach user administration', usersWithMemberToken.status === 401, usersWithMemberToken.status);
+
+  const { signAccessToken } = await import('../src/lib/tokens');
+  const staffToken = signAccessToken({ sub: '507f1f77bcf86cd799439011', role: 'super-admin', v: 0 });
+  const memberWithStaffToken = await fetch(`${BASE}/members/me`, {
+    headers: { Authorization: `Bearer ${staffToken}` },
+  });
+  check('a staff token is rejected by member routes', memberWithStaffToken.status === 401, memberWithStaffToken.status);
+
+  // Engagement must keep working with no account at all.
+  const anonEngage = await fetch(`${BASE}/apparel/507f1f77bcf86cd799439011/like`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}',
+  });
+  check('engagement is not gated behind registration', anonEngage.status !== 401, anonEngage.status);
+
+  /* ---------------------------------------------------------------- */
   console.log('\nCORS');
 
   const allowed = await fetch(`${BASE}/`, { headers: { Origin: 'http://localhost:5173' } });

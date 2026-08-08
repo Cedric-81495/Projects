@@ -6,6 +6,7 @@ import { analyticsRouter } from '@/modules/analytics';
 import { authRouter } from '@/modules/auth/auth.controller';
 import { communityRouter } from '@/modules/community';
 import { contentRouter } from '@/modules/content';
+import { memberRouter } from '@/modules/members/member.controller';
 import { engagementRouter } from '@/modules/engagement';
 import { subscriberRouter } from '@/modules/subscribers';
 import { userRouter } from '@/modules/users';
@@ -34,7 +35,12 @@ apiRouter.get('/health', (_req, res) => {
   });
 });
 
+// Staff CMS authentication.
 apiRouter.use('/auth', authRouter);
+
+// Public community accounts. Entirely separate from /auth — different
+// collection, different token audience, no permissions.
+apiRouter.use('/members', memberRouter);
 
 // Engagement needs the anonymous visitor cookie for deduplication.
 apiRouter.use('/apparel', attachVisitor, engagementRouter);

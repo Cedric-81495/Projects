@@ -38,6 +38,7 @@ async function issueSession(user: UserDoc, req: Request) {
   const { token, hash } = generateRefreshToken();
   await RefreshToken.create({
     userId: user._id,
+    subjectType: 'user',
     tokenHash: hash,
     expiresAt: expiryDate(),
     userAgent: req.get('user-agent'),
@@ -107,7 +108,12 @@ export async function signIn(email: string, password: string, req: Request) {
  * session is a small cost against letting a stolen token keep working.
  */
 export async function refresh(rawToken: string, req: Request) {
-  const stored = await RefreshToken.findOne({ tokenHash: hashToken(rawToken) });
+  // subjectType is part of the lookup: a member's refresh token must never
+  // resolve here, or refreshing it would mint a CMS session.
+  const stored = await RefreshToken.findOne({
+    tokenHash: hashToken(rawToken),
+    subjectType: 'user',
+  });
   if (!stored) throw ApiError.unauthorized('Your session has expired. Sign in again.');
 
   if (stored.revokedAt) {
@@ -134,6 +140,7 @@ export async function refresh(rawToken: string, req: Request) {
 
   await RefreshToken.create({
     userId: user._id,
+    subjectType: 'user',
     tokenHash: next.hash,
     expiresAt: expiryDate(),
     userAgent: req.get('user-agent'),

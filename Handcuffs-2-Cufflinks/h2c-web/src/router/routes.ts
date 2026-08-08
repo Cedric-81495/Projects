@@ -23,6 +23,11 @@ export const ROUTES = {
   join: '/join-the-movement',
   legal: '/legal',
   legalDoc: '/legal/:docSlug',
+  /* Public community accounts. Distinct from the staff CMS sign-in below. */
+  register: '/join/create-account',
+  signInMember: '/join/sign-in',
+  account: '/account',
+
   notFound: '*',
 
   /* Admin — CMS behind authentication and RBAC */

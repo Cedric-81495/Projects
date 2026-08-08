@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Wordmark } from '@/components/ui/Wordmark';
 import { BRAND, NAV_ITEMS, SOCIAL_LINKS, ECOSYSTEM } from '@/config/site';
 import { ROUTES } from '@/router/routes';
 
@@ -11,7 +10,7 @@ export function Footer() {
       <div className="ftr-grid">
         <div>
           <Link to="/" className="ftr-brand" aria-label={`${BRAND.name} — home`}>
-            <Wordmark size="md" />
+            <img className="ftr-logo" src="/media/logo-wordmark.webp" alt="" />
           </Link>
           <p className="ftr-note">
             {BRAND.valueProposition}

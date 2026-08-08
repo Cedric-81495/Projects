@@ -4,16 +4,19 @@ import { apiGet } from '@/lib/api/client';
 import { useAuth } from '@/providers/context/auth';
 import { ROUTES, buildPath } from '@/router/routes';
 import type { Paginated } from '@/types/common';
-import { AdminHeader, Alert } from './components/Chrome';
+import { AdminHeader, Note, Skeleton } from './components/Chrome';
+import { Glyph } from './components/Glyph';
+import type { GlyphName } from './components/Glyph';
 import { resourcesInGroup } from './lib/resources';
 import type { ResourceDef, ResourceGroup } from './lib/resources';
 import { useAsyncData } from './lib/useAsyncData';
 
-/** A card that is not a record list — settings, moderation, and so on. */
+/** A tile that is not a record list — settings, moderation, and so on. */
 export interface ModuleLink {
   to: string;
   label: string;
   blurb: string;
+  glyph: GlyphName;
 }
 
 export interface ModuleSection {
@@ -22,12 +25,28 @@ export interface ModuleSection {
   links?: ModuleLink[];
 }
 
+const RESOURCE_GLYPH: Record<string, GlyphName> = {
+  collections: 'shirt',
+  apparel: 'shirt',
+  looks: 'image',
+  docuseries: 'film',
+  'podcast-episodes': 'mic',
+  'podcast-clips': 'mic',
+  announcements: 'sparkle',
+  'hero-banners': 'layout',
+  pages: 'panel',
+  artists: 'user',
+  releases: 'note',
+  programmes: 'graduation',
+  events: 'inbox',
+};
+
 /**
  * A module's front door.
  *
- * Cards carry a live count because the first question anyone opening a module
+ * Tiles carry a live count because the first question anyone opening a module
  * asks is "how much is in here" — and a count of zero on a module that should
- * have twelve records is the fastest way to notice the API is not connected.
+ * hold twelve records is the fastest way to notice the API is not connected.
  */
 export function ModuleIndexPage({
   eyebrow,
@@ -42,24 +61,25 @@ export function ModuleIndexPage({
 }) {
   const { hasPermission } = useAuth();
 
-  const resources = sections
-    .flatMap((section) => (section.groups ?? []).flatMap(resourcesInGroup))
-    .filter((resource) => hasPermission(resource.writePermission) || hasPermission('content:read'));
+  const visibleIn = (group: ResourceGroup) =>
+    resourcesInGroup(group).filter(
+      (resource) => hasPermission(resource.writePermission) || hasPermission('content:read')
+    );
+
+  const all = sections.flatMap((section) => (section.groups ?? []).flatMap(visibleIn));
 
   const counts = useAsyncData<Record<string, number | null>>(async () => {
     const results = await Promise.allSettled(
-      resources.map((resource) =>
-        apiGet<Paginated<unknown>>(`${resource.basePath}/admin/all`, { pageSize: 1 })
-      )
+      all.map((resource) => apiGet<Paginated<unknown>>(`${resource.basePath}/admin/all`, { pageSize: 1 }))
     );
     return Object.fromEntries(
-      resources.map((resource, index) => {
+      all.map((resource, index) => {
         const result = results[index];
         return [resource.key, result.status === 'fulfilled' ? result.value.total : null];
       })
     );
     // Keyed on the resource set, which is stable for a given module and role.
-  }, [resources.map((resource) => resource.key).join(',')]);
+  }, [all.map((resource) => resource.key).join(',')]);
 
   return (
     <>
@@ -67,32 +87,39 @@ export function ModuleIndexPage({
       <AdminHeader eyebrow={eyebrow} title={title} intro={intro} />
 
       {counts.offline && (
-        <Alert title="API unreachable">
-          Record counts and every screen below need the backend running. Everything else here is
-          reachable, but nothing will load.
-        </Alert>
+        <Note title="API unreachable" tone="bad">
+          Record counts and every screen below need the backend running.
+        </Note>
       )}
 
       {sections.map((section) => {
-        const sectionResources = (section.groups ?? []).flatMap(resourcesInGroup);
-        const visible = sectionResources.filter(
-          (resource) => hasPermission(resource.writePermission) || hasPermission('content:read')
-        );
-        if (visible.length === 0 && !section.links?.length) return null;
+        const resources = (section.groups ?? []).flatMap(visibleIn);
+        if (resources.length === 0 && !section.links?.length) return null;
 
         return (
-          <section key={section.name} style={{ marginBottom: 'clamp(26px,3vw,42px)' }}>
-            <h2 className="h-xs" style={{ marginBottom: 14 }}>
+          <section key={section.name} style={{ display: 'grid', gap: 12 }}>
+            <h2 className="adm-eyebrow" style={{ margin: 0 }}>
               {section.name}
             </h2>
 
-            <div className="adm-cards">
-              {visible.map((resource) => (
-                <RecordCard key={resource.key} resource={resource} count={counts.data?.[resource.key] ?? null} />
+            <div className="adm-grid adm-grid--3">
+              {resources.map((resource) => (
+                <RecordTile
+                  key={resource.key}
+                  resource={resource}
+                  count={counts.data?.[resource.key] ?? null}
+                  loading={counts.loading}
+                />
               ))}
 
               {section.links?.map((link) => (
-                <Link key={link.to} to={link.to} className="adm-card">
+                <Link key={link.to} to={link.to} className="adm-tile">
+                  <div className="adm-tile-top">
+                    <span className="adm-metric-icon">
+                      <Glyph name={link.glyph} />
+                    </span>
+                    <Glyph name="arrow-right" size={16} />
+                  </div>
                   <h3>{link.label}</h3>
                   <p>{link.blurb}</p>
                 </Link>
@@ -105,10 +132,27 @@ export function ModuleIndexPage({
   );
 }
 
-function RecordCard({ resource, count }: { resource: ResourceDef; count: number | null }) {
+function RecordTile({
+  resource,
+  count,
+  loading,
+}: {
+  resource: ResourceDef;
+  count: number | null;
+  loading: boolean;
+}) {
   return (
-    <Link to={buildPath(ROUTES.adminRecords, { resource: resource.key })} className="adm-card">
-      <span className="adm-card-count">{count === null ? '—' : count.toLocaleString()}</span>
+    <Link to={buildPath(ROUTES.adminRecords, { resource: resource.key })} className="adm-tile">
+      <div className="adm-tile-top">
+        <span className="adm-metric-icon">
+          <Glyph name={RESOURCE_GLYPH[resource.key] ?? 'panel'} />
+        </span>
+        {loading ? (
+          <Skeleton height={22} width={40} />
+        ) : (
+          <span className="adm-tile-count">{count === null ? '—' : count.toLocaleString()}</span>
+        )}
+      </div>
       <h3>{resource.label}</h3>
       <p>{resource.blurb}</p>
     </Link>

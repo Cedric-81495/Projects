@@ -70,11 +70,21 @@
 
 /* Toast */
 /* toast */
+/**
+ * The resting position is a percentage of the toast's *own* height, so an empty
+ * toast — as tall as its padding and nothing else — does not travel far enough
+ * to clear the viewport, and a sliver of gold sits at the bottom of every page
+ * until the first message arrives. Visibility is what actually hides it; the
+ * transform still carries the animation, and delaying the visibility change by
+ * the duration of the slide lets the exit finish before it disappears.
+ */
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,140%);z-index:200;
   background:var(--gold);color:var(--obsidian);padding:13px 22px;font-size:.7rem;
-  font-weight:600;letter-spacing:.13em;text-transform:uppercase;
-  transition:transform .45s var(--ease);max-width:calc(100vw - 32px);text-align:center}
-.toast.is-on{transform:translate(-50%,0)}
+  font-weight:600;letter-spacing:.13em;text-transform:uppercase;visibility:hidden;
+  transition:transform .45s var(--ease),visibility 0s linear .45s;
+  max-width:calc(100vw - 32px);text-align:center}
+.toast.is-on{transform:translate(-50%,0);visibility:visible;
+  transition:transform .45s var(--ease),visibility 0s}
 
 /* Announcement bar and cookie notice */
 /* announce + cookie */

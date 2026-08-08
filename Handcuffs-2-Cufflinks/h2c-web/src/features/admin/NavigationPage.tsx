@@ -4,7 +4,7 @@ import { apiGet, apiPut } from '@/lib/api/client';
 import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import { ROUTES } from '@/router/routes';
-import { AdminHeader, Alert } from './components/Chrome';
+import { AdminHeader, Alert, Card, Skeleton } from './components/Chrome';
 import { RecordForm } from './components/RecordForm';
 import type { Field } from './lib/fields';
 import { useAsyncData } from './lib/useAsyncData';
@@ -122,12 +122,17 @@ export function AdminNavigationPage() {
         </Alert>
       )}
 
+      <Card style={{ maxWidth: 940 }}>
       {state.loading ? (
-        <p className="body body--quiet">Loading…</p>
+        <div style={{ display: 'grid', gap: 18 }}>
+          {[0, 1, 2].map((row) => (
+            <Skeleton key={row} height={44} />
+          ))}
+        </div>
       ) : (
         <>
           {!menu && (
-            <p className="field-hint" style={{ marginBottom: 14 }}>
+            <p className="adm-hint" style={{ marginBottom: 14 }}>
               This menu has not been set up yet. Saving creates it.
             </p>
           )}
@@ -145,6 +150,7 @@ export function AdminNavigationPage() {
           />
         </>
       )}
+      </Card>
     </>
   );
 }

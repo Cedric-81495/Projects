@@ -5,7 +5,8 @@ import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import type { Paginated } from '@/types/common';
 import type { AdminUser, Role } from '@/types/auth';
-import { AdminHeader, Alert, EmptyState, Pager } from './components/Chrome';
+import { AdminHeader, Alert, Card, EmptyState, Pager, SkeletonRows } from './components/Chrome';
+import { Glyph } from './components/Glyph';
 import { RecordForm } from './components/RecordForm';
 import type { Field } from './lib/fields';
 import { messageFor, useAsyncData } from './lib/useAsyncData';
@@ -131,18 +132,20 @@ function Users() {
 
   return (
     <>
-      <div className="adm-bar">
-        <button type="button" className="adm-mini adm-mini--go" onClick={() => setAdding(!adding)}>
-          {adding ? 'Close' : 'Add a user'}
-        </button>
-        <span className="adm-bar-count">{users.length} accounts</span>
-      </div>
-
       {actionError && <Alert title="That did not go through">{actionError}</Alert>}
       {state.error && <Alert title={state.offline ? 'API unreachable' : 'Could not load'}>{state.error}</Alert>}
 
+      <Card flush>
+      <div className="adm-toolbar">
+        <button type="button" className="adm-btn adm-btn--sm adm-btn--primary" onClick={() => setAdding(!adding)}>
+          <Glyph name={adding ? 'x' : 'plus'} />
+          {adding ? 'Close' : 'Add a user'}
+        </button>
+        <span className="adm-count">{users.length} accounts</span>
+      </div>
+
       {adding && (
-        <div className="adm-repitem" style={{ marginBottom: 22 }}>
+        <div className="adm-repitem" style={{ margin: 18 }}>
           <div className="adm-rephead">
             <span className="adm-repnum">New user</span>
           </div>
@@ -160,7 +163,12 @@ function Users() {
         </div>
       )}
 
-      {!state.loading && users.length === 0 && !state.error && <EmptyState>No accounts.</EmptyState>}
+      {state.loading && users.length === 0 && <SkeletonRows columns={5} />}
+      {!state.loading && users.length === 0 && !state.error && (
+        <EmptyState title="No accounts" glyph="shield">
+          Add the first Super Administrator from the button above.
+        </EmptyState>
+      )}
 
       {users.length > 0 && (
         <div className="adm-tablewrap">
@@ -183,9 +191,9 @@ function Users() {
 
                 return (
                   <tr key={user.id}>
-                    <td className="adm-cell-strong">
+                    <td className="adm-strong">
                       {user.fullName}
-                      {isSelf && <span className="adm-metaline"> · you</span>}
+                      {isSelf && <span className="adm-meta"> · you</span>}
                     </td>
                     <td>{user.email}</td>
                     <td>
@@ -200,14 +208,8 @@ function Users() {
                             'Role changed. Their existing sessions were ended.'
                           )
                         }
-                        style={{
-                          padding: '6px 8px',
-                          background: 'transparent',
-                          border: '1px solid var(--rule)',
-                          color: 'var(--fg)',
-                          fontSize: '0.72rem',
-                          fontFamily: 'var(--sans)',
-                        }}
+                        className="adm-inp"
+                        style={{ padding: '5px 8px', fontSize: '0.72rem', minWidth: 150 }}
                       >
                         <option value="admin">Admin</option>
                         <option value="super-admin">Super Administrator</option>
@@ -223,7 +225,7 @@ function Users() {
                         {!isSelf && (
                           <button
                             type="button"
-                            className={active ? 'adm-mini adm-mini--warn' : 'adm-mini'}
+                            className={active ? 'adm-btn adm-btn--sm adm-btn--danger' : 'adm-btn adm-btn--sm'}
                             disabled={busyId === user.id}
                             onClick={() =>
                               void run(
@@ -238,7 +240,7 @@ function Users() {
                             {active ? 'Deactivate' : 'Reactivate'}
                           </button>
                         )}
-                        {isSelf && <span className="adm-metaline">Manage your own account elsewhere</span>}
+                        {isSelf && <span className="adm-meta">Manage your own account elsewhere</span>}
                       </div>
                     </td>
                   </tr>
@@ -248,6 +250,7 @@ function Users() {
           </table>
         </div>
       )}
+      </Card>
     </>
   );
 }
@@ -270,8 +273,12 @@ function AuditLog() {
 
   return (
     <>
-      <div className="adm-bar">
+      {state.error && <Alert title={state.offline ? 'API unreachable' : 'Could not load'}>{state.error}</Alert>}
+      <Card flush>
+      <div className="adm-toolbar">
         <input
+          className="adm-inp"
+          style={{ width: 'auto', minWidth: 240 }}
           type="text"
           aria-label="Filter by resource"
           placeholder="Filter by resource, e.g. collection"
@@ -281,11 +288,15 @@ function AuditLog() {
             setPage(1);
           }}
         />
-        <span className="adm-bar-count">{state.data ? `${state.data.total} entries` : ''}</span>
+        <span className="adm-count">{state.data ? `${state.data.total} entries` : ''}</span>
       </div>
 
-      {state.error && <Alert title={state.offline ? 'API unreachable' : 'Could not load'}>{state.error}</Alert>}
-      {!state.loading && entries.length === 0 && !state.error && <EmptyState>Nothing recorded yet.</EmptyState>}
+      {state.loading && entries.length === 0 && <SkeletonRows columns={5} />}
+      {!state.loading && entries.length === 0 && !state.error && (
+        <EmptyState title="Nothing recorded yet" glyph="shield">
+          Sign-ins, publishes, deletions and role changes appear here as they happen.
+        </EmptyState>
+      )}
 
       {entries.length > 0 && (
         <div className="adm-tablewrap">
@@ -303,10 +314,10 @@ function AuditLog() {
               {entries.map((entry) => (
                 <tr key={entry.id}>
                   <td>{new Date(entry.createdAt).toLocaleString()}</td>
-                  <td className="adm-cell-strong">{entry.actorEmail ?? '—'}</td>
+                  <td className="adm-strong">{entry.actorEmail ?? '—'}</td>
                   <td>{entry.action}</td>
                   <td className="adm-secondary">
-                    <span className="adm-cell-clip">
+                    <span className="adm-clip">
                       {entry.resource}
                       {entry.resourceId ? ` · ${entry.resourceId}` : ''}
                     </span>
@@ -327,6 +338,7 @@ function AuditLog() {
           onChange={setPage}
         />
       )}
+      </Card>
     </>
   );
 }

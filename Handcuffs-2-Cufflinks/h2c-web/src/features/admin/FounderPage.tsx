@@ -3,7 +3,7 @@ import { apiGet, apiPatch } from '@/lib/api/client';
 import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import { ROUTES } from '@/router/routes';
-import { AdminHeader, Alert } from './components/Chrome';
+import { AdminHeader, Alert, Card, Skeleton } from './components/Chrome';
 import { RecordForm } from './components/RecordForm';
 import type { Field } from './lib/fields';
 import { useAsyncData } from './lib/useAsyncData';
@@ -84,8 +84,16 @@ export function AdminFounderPage() {
 
       {state.error && <Alert title={state.offline ? 'API unreachable' : 'Could not load'}>{state.error}</Alert>}
 
+      <Card style={{ maxWidth: 940 }}>
       {state.loading ? (
-        <p className="body body--quiet">Loading…</p>
+        <div style={{ display: 'grid', gap: 18 }}>
+          {[0, 1, 2, 3].map((row) => (
+            <div key={row} style={{ display: 'grid', gap: 6 }}>
+              <Skeleton height={11} width={110} />
+              <Skeleton height={36} />
+            </div>
+          ))}
+        </div>
       ) : (
         <RecordForm
           fields={FIELDS}
@@ -99,6 +107,7 @@ export function AdminFounderPage() {
           }}
         />
       )}
+      </Card>
     </>
   );
 }

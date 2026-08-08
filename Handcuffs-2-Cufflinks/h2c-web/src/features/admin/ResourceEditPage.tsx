@@ -6,16 +6,18 @@ import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import { ROUTES, buildPath } from '@/router/routes';
 import type { PublishStatus } from '@/types/common';
-import { AdminHeader, Alert, StatusPill } from './components/Chrome';
+import { AdminHeader, Card, Note, Skeleton, StatusPill } from './components/Chrome';
+import { Glyph } from './components/Glyph';
 import { RecordForm } from './components/RecordForm';
 import { GROUP_LABEL, findResource } from './lib/resources';
 import type { ResourceDef } from './lib/resources';
 import { messageFor, useAsyncData } from './lib/useAsyncData';
 
-interface Record_ {
+interface RecordShape {
   id: string;
   status?: PublishStatus;
   publishedAt?: string | null;
+  updatedAt?: string;
   [key: string]: unknown;
 }
 
@@ -31,7 +33,7 @@ export function ResourceEditPage() {
   const resource = findResource(key);
 
   if (!resource) return <Navigate to={ROUTES.adminDashboard} replace />;
-  return <Editor resource={resource} id={id === 'new' ? null : (id ?? null)} />;
+  return <Editor key={`${resource.key}:${id}`} resource={resource} id={id === 'new' ? null : (id ?? null)} />;
 }
 
 function Editor({ resource, id }: { resource: ResourceDef; id: string | null }) {
@@ -46,8 +48,8 @@ function Editor({ resource, id }: { resource: ResourceDef; id: string | null }) 
   const mayPublish = hasPermission('content:publish');
   const mayDelete = hasPermission('content:delete');
 
-  const state = useAsyncData<Record_ | null>(
-    () => (id ? apiGet<Record_>(`${resource.basePath}/admin/${id}`) : Promise.resolve(null)),
+  const state = useAsyncData<RecordShape | null>(
+    () => (id ? apiGet<RecordShape>(`${resource.basePath}/admin/${id}`) : Promise.resolve(null)),
     [resource.basePath, id]
   );
 
@@ -62,7 +64,7 @@ function Editor({ resource, id }: { resource: ResourceDef; id: string | null }) 
       return;
     }
 
-    const createdRecord = await apiPost<Record_>(resource.basePath, payload);
+    const createdRecord = await apiPost<RecordShape>(resource.basePath, payload);
     notify('Created as a draft. Publish it when it is ready.');
     navigate(buildPath(ROUTES.adminRecordEdit, { resource: resource.key, id: createdRecord.id }), {
       replace: true,
@@ -104,7 +106,7 @@ function Editor({ resource, id }: { resource: ResourceDef; id: string | null }) 
               {mayPublish && record.status !== 'published' && record.status !== 'archived' && (
                 <button
                   type="button"
-                  className="adm-mini adm-mini--go"
+                  className="adm-btn adm-btn--sm adm-btn--primary"
                   disabled={busy}
                   onClick={() =>
                     void act(
@@ -113,25 +115,25 @@ function Editor({ resource, id }: { resource: ResourceDef; id: string | null }) 
                     )
                   }
                 >
+                  <Glyph name="eye" />
                   Publish
                 </button>
               )}
               {mayPublish && record.status === 'published' && (
                 <button
                   type="button"
-                  className="adm-mini"
+                  className="adm-btn adm-btn--sm"
                   disabled={busy}
-                  onClick={() =>
-                    void act(() => apiPost(`${resource.basePath}/${id}/unpublish`), 'Back to draft.')
-                  }
+                  onClick={() => void act(() => apiPost(`${resource.basePath}/${id}/unpublish`), 'Back to draft.')}
                 >
+                  <Glyph name="eye-off" />
                   Unpublish
                 </button>
               )}
               {mayDelete && record.status !== 'archived' && (
                 <button
                   type="button"
-                  className="adm-mini adm-mini--warn"
+                  className="adm-btn adm-btn--sm adm-btn--danger"
                   disabled={busy}
                   onClick={() =>
                     void act(
@@ -141,6 +143,7 @@ function Editor({ resource, id }: { resource: ResourceDef; id: string | null }) 
                     )
                   }
                 >
+                  <Glyph name="trash" />
                   Archive
                 </button>
               )}
@@ -149,26 +152,38 @@ function Editor({ resource, id }: { resource: ResourceDef; id: string | null }) 
         }
       />
 
-      {actionError && <Alert title="That did not go through">{actionError}</Alert>}
-      {state.error && <Alert title={state.offline ? 'API unreachable' : 'Could not load'}>{state.error}</Alert>}
-
-      {!mayWrite && (
-        <Alert title="Read only">
-          Your role can view these records but not change them.
-        </Alert>
+      {actionError && (
+        <Note title="That did not go through" tone="bad">
+          {actionError}
+        </Note>
       )}
-
-      {state.loading && id ? (
-        <p className="body body--quiet">Loading…</p>
-      ) : (
-        <RecordForm
-          fields={resource.fields}
-          record={record}
-          submitLabel={id ? 'Save changes' : `Create ${resource.singular}`}
-          disabled={!mayWrite}
-          onSubmit={save}
-        />
+      {state.error && (
+        <Note title={state.offline ? 'API unreachable' : 'Could not load'} tone="bad">
+          {state.error}
+        </Note>
       )}
+      {!mayWrite && <Note title="Read only">Your role can view these records but not change them.</Note>}
+
+      <Card style={{ maxWidth: 940 }}>
+        {state.loading && id ? (
+          <div style={{ display: 'grid', gap: 18 }}>
+            {[0, 1, 2, 3, 4].map((row) => (
+              <div key={row} style={{ display: 'grid', gap: 6 }}>
+                <Skeleton height={11} width={110} />
+                <Skeleton height={36} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <RecordForm
+            fields={resource.fields}
+            record={record}
+            submitLabel={id ? 'Save changes' : `Create ${resource.singular}`}
+            disabled={!mayWrite}
+            onSubmit={save}
+          />
+        )}
+      </Card>
     </>
   );
 }

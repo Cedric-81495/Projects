@@ -4,7 +4,7 @@ import { apiGet, apiPost } from '@/lib/api/client';
 import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import type { Paginated } from '@/types/common';
-import { AdminHeader, Alert, EmptyState, Pager, StatusPill } from './components/Chrome';
+import { AdminHeader, Alert, Card, EmptyState, Pager, SkeletonRows, StatusPill } from './components/Chrome';
 import { messageFor, useAsyncData } from './lib/useAsyncData';
 
 /**
@@ -153,8 +153,11 @@ function Stories() {
 
   return (
     <>
-      <div className="adm-bar">
+      <Card flush>
+      <div className="adm-toolbar">
         <select
+          className="adm-inp"
+          style={{ width: 'auto', minWidth: 190 }}
           aria-label="Filter by moderation state"
           value={stateFilter}
           onChange={(event) => {
@@ -168,17 +171,20 @@ function Stories() {
           <option value="needs-changes">Needs changes</option>
           <option value="rejected">Rejected</option>
         </select>
-        <span className="adm-bar-count">{data.data ? `${data.data.total} stories` : ''}</span>
+        <span className="adm-count">{data.data ? `${data.data.total} stories` : ''}</span>
       </div>
 
       {actionError && <Alert title="That did not go through">{actionError}</Alert>}
       {data.error && <Alert title={data.offline ? 'API unreachable' : 'Could not load'}>{data.error}</Alert>}
 
+      {data.loading && stories.length === 0 && <SkeletonRows columns={3} />}
       {!data.loading && stories.length === 0 && !data.error && (
-        <EmptyState>Nothing in this queue.</EmptyState>
+        <EmptyState title="Nothing in this queue" glyph="people">
+          Submissions from the public site land here for review before anything is published.
+        </EmptyState>
       )}
 
-      <div className="adm-rep">
+      <div className="adm-rep" style={{ padding: stories.length ? 18 : 0 }}>
         {stories.map((story) => {
           const consented = story.consent?.publishStory === true;
           const open = openId === story.id;
@@ -195,11 +201,11 @@ function Stories() {
                     <StatusPill status={story.moderation?.state ?? 'pending'} />
                     <StatusPill status={story.status} />
                     {!consented && (
-                      <span className="adm-pill adm-pill--rejected">No permission to publish</span>
+                      <span className="adm-pill adm-pill--bad">No permission to publish</span>
                     )}
                   </div>
                 </div>
-                <button type="button" className="adm-mini" onClick={() => setOpenId(open ? null : story.id)}>
+                <button type="button" className="adm-btn adm-btn--sm" onClick={() => setOpenId(open ? null : story.id)}>
                   {open ? 'Close' : 'Read'}
                 </button>
               </div>
@@ -270,6 +276,7 @@ function Stories() {
           onChange={setPage}
         />
       )}
+      </Card>
     </>
   );
 }
@@ -294,7 +301,7 @@ function ModerationActions({
   return (
     <div style={{ display: 'grid', gap: 14 }}>
       <div className="adm-row">
-        <div className="field">
+        <div className="adm-field">
           <label htmlFor={`quote-${story.id}`}>Pull quote</label>
           <input
             id={`quote-${story.id}`}
@@ -303,9 +310,9 @@ function ModerationActions({
             maxLength={500}
             onChange={(event) => setQuote(event.target.value)}
           />
-          <span className="field-hint">Shown on the community page. Use their words, not a summary.</span>
+          <span className="adm-hint">Shown on the community page. Use their words, not a summary.</span>
         </div>
-        <div className="field">
+        <div className="adm-field">
           <label htmlFor={`notes-${story.id}`}>Moderator notes</label>
           <input
             id={`notes-${story.id}`}
@@ -314,11 +321,11 @@ function ModerationActions({
             maxLength={2000}
             onChange={(event) => setNotes(event.target.value)}
           />
-          <span className="field-hint">Internal. Never shown to the author or the public.</span>
+          <span className="adm-hint">Internal. Never shown to the author or the public.</span>
         </div>
       </div>
 
-      <label className="check">
+      <label className="adm-check">
         <input type="checkbox" checked={featured} onChange={(event) => setFeatured(event.target.checked)} />
         <span>Feature this story</span>
       </label>
@@ -333,7 +340,7 @@ function ModerationActions({
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <button
           type="button"
-          className="adm-mini adm-mini--go"
+          className="adm-btn adm-btn--sm adm-btn--primary"
           disabled={busy || !consented}
           title={consented ? undefined : 'The author has not given permission to publish.'}
           onClick={() =>
@@ -348,7 +355,7 @@ function ModerationActions({
         </button>
         <button
           type="button"
-          className="adm-mini"
+          className="adm-btn adm-btn--sm"
           disabled={busy}
           onClick={() =>
             void onModerate(story, { ...base, state: 'approved', publish: false }, 'Approved, still a draft.')
@@ -358,7 +365,7 @@ function ModerationActions({
         </button>
         <button
           type="button"
-          className="adm-mini"
+          className="adm-btn adm-btn--sm"
           disabled={busy}
           onClick={() =>
             void onModerate(story, { ...base, state: 'needs-changes', publish: false }, 'Marked as needing changes.')
@@ -368,7 +375,7 @@ function ModerationActions({
         </button>
         <button
           type="button"
-          className="adm-mini adm-mini--warn"
+          className="adm-btn adm-btn--sm adm-btn--danger"
           disabled={busy}
           onClick={() => void onModerate(story, { ...base, state: 'rejected', publish: false }, 'Rejected.')}
         >
@@ -377,7 +384,7 @@ function ModerationActions({
         {story.status === 'published' && (
           <button
             type="button"
-            className="adm-mini"
+            className="adm-btn adm-btn--sm"
             disabled={busy}
             onClick={() =>
               void onModerate(story, { ...base, state: 'approved', publish: false }, 'Taken off the site.')
@@ -400,17 +407,21 @@ function Nominations() {
   return (
     <>
       {data.error && <Alert title={data.offline ? 'API unreachable' : 'Could not load'}>{data.error}</Alert>}
-      {!data.loading && items.length === 0 && !data.error && <EmptyState>No nominations yet.</EmptyState>}
+      {!data.loading && items.length === 0 && !data.error && (
+        <EmptyState title="No nominations yet" glyph="inbox">
+          The guest nomination form on the podcast page feeds this list.
+        </EmptyState>
+      )}
 
       <div className="adm-rep">
         {items.map((item) => (
           <div className="adm-repitem" key={item.id}>
             <div className="adm-rephead">
               <span className="adm-repnum">{item.nomineeName}</span>
-              <span className="adm-metaline">{new Date(item.createdAt).toLocaleDateString()}</span>
+              <span className="adm-meta">{new Date(item.createdAt).toLocaleDateString()}</span>
             </div>
             <p style={{ margin: 0, fontSize: '0.85rem', whiteSpace: 'pre-wrap' }}>{item.nomineeStory}</p>
-            <span className="adm-metaline">
+            <span className="adm-meta">
               Nominated by {item.nominatorName} · {item.nominatorEmail}
               {item.relationship ? ` · ${item.relationship}` : ''}
             </span>
@@ -428,9 +439,14 @@ function Applications() {
   return (
     <>
       {data.error && <Alert title={data.offline ? 'API unreachable' : 'Could not load'}>{data.error}</Alert>}
-      {!data.loading && items.length === 0 && !data.error && <EmptyState>No applications yet.</EmptyState>}
+      {!data.loading && items.length === 0 && !data.error && (
+        <EmptyState title="No applications yet" glyph="inbox">
+          Volunteer and mentorship forms on the community page feed this list.
+        </EmptyState>
+      )}
 
       {items.length > 0 && (
+        <Card flush>
         <div className="adm-tablewrap">
           <table className="adm-table">
             <thead>
@@ -445,14 +461,14 @@ function Applications() {
             <tbody>
               {items.map((item) => (
                 <tr key={item.id}>
-                  <td className="adm-cell-strong">{item.name}</td>
+                  <td className="adm-strong">{item.name}</td>
                   <td>{item.kind === 'volunteer' ? 'Volunteer' : 'Mentorship'}</td>
                   <td className="adm-secondary">
                     {item.email}
                     {item.phone ? ` · ${item.phone}` : ''}
                   </td>
                   <td className="adm-secondary">
-                    <span className="adm-cell-clip">{(item.interests ?? []).join(', ') || '—'}</span>
+                    <span className="adm-clip">{(item.interests ?? []).join(', ') || '—'}</span>
                   </td>
                   <td className="adm-secondary">{new Date(item.createdAt).toLocaleDateString()}</td>
                 </tr>
@@ -460,6 +476,7 @@ function Applications() {
             </tbody>
           </table>
         </div>
+        </Card>
       )}
     </>
   );

@@ -1,5 +1,6 @@
 import { blankValues } from '../lib/fields';
 import type { Field, Path, Values } from '../lib/fields';
+import { Glyph } from './Glyph';
 
 /**
  * Renders one field descriptor.
@@ -32,7 +33,7 @@ export function FieldControl({ field, path, values, errors, onChange, disabled }
     return (
       <fieldset className={`adm-group ${field.half ? '' : 'adm-full'}`}>
         <legend>{field.label}</legend>
-        {field.hint && <span className="field-hint">{field.hint}</span>}
+        {field.hint && <span className="adm-hint">{field.hint}</span>}
         <FieldSet
           fields={field.fields}
           path={here}
@@ -50,13 +51,15 @@ export function FieldControl({ field, path, values, errors, onChange, disabled }
     const atMax = field.max !== undefined && rows.length >= field.max;
 
     return (
-      <div className="adm-full">
-        <span className="adm-grouptitle" style={{ padding: 0, display: 'block', marginBottom: 6 }}>
-          {field.label}
-        </span>
-        {field.hint && <span className="field-hint">{field.hint}</span>}
+      <div className="adm-full" style={{ display: 'grid', gap: 10 }}>
+        <div>
+          <span className="adm-grouptitle" style={{ padding: 0, display: 'block' }}>
+            {field.label}
+          </span>
+          {field.hint && <span className="adm-hint">{field.hint}</span>}
+        </div>
 
-        <div className="adm-rep" style={{ marginTop: 10 }}>
+        <div className="adm-rep">
           {rows.map((row, index) => (
             <div className="adm-repitem" key={index}>
               <div className="adm-rephead">
@@ -65,10 +68,11 @@ export function FieldControl({ field, path, values, errors, onChange, disabled }
                 </span>
                 <button
                   type="button"
-                  className="adm-mini adm-mini--warn"
+                  className="adm-btn adm-btn--sm adm-btn--danger"
                   disabled={disabled}
-                  onClick={() => onChange(here, rows.filter((_, i) => i !== index))}
+                  onClick={() => onChange(here, rows.filter((_unused, position) => position !== index))}
                 >
+                  <Glyph name="trash" />
                   Remove
                 </button>
               </div>
@@ -84,21 +88,22 @@ export function FieldControl({ field, path, values, errors, onChange, disabled }
           ))}
 
           {rows.length === 0 && (
-            <p className="field-hint" style={{ margin: 0 }}>
+            <p className="adm-hint" style={{ margin: 0 }}>
               None yet.
             </p>
           )}
 
-          <div>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <button
               type="button"
-              className="adm-mini"
+              className="adm-btn adm-btn--sm"
               disabled={disabled || atMax}
               onClick={() => onChange(here, [...rows, blankValues(field.fields)])}
             >
+              <Glyph name="plus" />
               Add {field.itemNoun}
             </button>
-            {atMax && <span className="field-hint"> Maximum of {field.max}.</span>}
+            {atMax && <span className="adm-hint">Maximum of {field.max}.</span>}
           </div>
         </div>
 
@@ -107,24 +112,20 @@ export function FieldControl({ field, path, values, errors, onChange, disabled }
     );
   }
 
-  const wrapperClass = [
-    'field',
-    field.half ? '' : 'adm-full',
-    problems.length > 0 ? 'adm-field-invalid' : '',
-  ]
+  const wrapper = ['adm-field', field.half ? '' : 'adm-full', problems.length > 0 ? 'adm-field-bad' : '']
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div className={wrapperClass}>
+    <div className={wrapper}>
       <label htmlFor={id}>
         {field.label}
-        {'required' in field && field.required ? ' *' : ''}
+        {'required' in field && field.required ? <span className="adm-req"> *</span> : null}
       </label>
 
       {renderControl(field, id, value, (next) => onChange(here, next), disabled)}
 
-      {field.hint && <span className="field-hint">{field.hint}</span>}
+      {field.hint && field.kind !== 'boolean' && <span className="adm-hint">{field.hint}</span>}
       {problems.length > 0 && <span className="adm-err">{problems.join(' ')}</span>}
     </div>
   );
@@ -166,7 +167,7 @@ function renderControl(
 
     case 'boolean':
       return (
-        <label className="check" style={{ marginTop: 2 }}>
+        <label className="adm-check">
           <input
             id={id}
             type="checkbox"

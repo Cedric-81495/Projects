@@ -4,7 +4,8 @@ import { apiDownload, apiGet } from '@/lib/api/client';
 import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import type { Paginated } from '@/types/common';
-import { AdminHeader, Alert, EmptyState, Pager, StatusPill } from './components/Chrome';
+import { AdminHeader, Alert, Card, EmptyState, Pager, SkeletonRows, StatusPill } from './components/Chrome';
+import { Glyph } from './components/Glyph';
 import { messageFor, useAsyncData } from './lib/useAsyncData';
 
 /**
@@ -66,7 +67,7 @@ export function AdminSubscribersPage() {
           mayExport ? (
             <button
               type="button"
-              className="adm-mini adm-mini--go"
+              className="adm-btn adm-btn--sm adm-btn--primary"
               disabled={exporting}
               onClick={() => {
                 setExporting(true);
@@ -77,6 +78,7 @@ export function AdminSubscribersPage() {
                   .finally(() => setExporting(false));
               }}
             >
+              <Glyph name="download" />
               {exporting ? 'Preparing' : 'Export CSV'}
             </button>
           ) : null
@@ -87,9 +89,11 @@ export function AdminSubscribersPage() {
       {!mayRead && <Alert title="No access">Your role cannot view the subscriber list.</Alert>}
 
       {mayRead && (
-        <>
-          <div className="adm-bar">
+        <Card flush>
+          <div className="adm-toolbar">
             <select
+              className="adm-inp"
+              style={{ width: 'auto', minWidth: 160 }}
               aria-label="Filter by status"
               value={status}
               onChange={(event) => {
@@ -102,7 +106,7 @@ export function AdminSubscribersPage() {
               <option value="unsubscribed">Unsubscribed</option>
               <option value="bounced">Bounced</option>
             </select>
-            <span className="adm-bar-count">{state.data ? `${state.data.total} people` : ''}</span>
+            <span className="adm-count">{state.data ? `${state.data.total} people` : ''}</span>
           </div>
 
           {state.error && (
@@ -110,8 +114,11 @@ export function AdminSubscribersPage() {
           )}
 
           {!state.loading && rows.length === 0 && !state.error && (
-            <EmptyState>Nobody on this list yet.</EmptyState>
+            <EmptyState title="Nobody yet" glyph="mail">
+              The Join the Movement form on the public site feeds this list.
+            </EmptyState>
           )}
+          {state.loading && rows.length === 0 && <SkeletonRows columns={5} />}
 
           {rows.length > 0 && (
             <div className="adm-tablewrap">
@@ -130,11 +137,11 @@ export function AdminSubscribersPage() {
                 <tbody>
                   {rows.map((row) => (
                     <tr key={row.id}>
-                      <td className="adm-cell-strong">{row.firstName}</td>
+                      <td className="adm-strong">{row.firstName}</td>
                       <td>{row.email}</td>
                       <td className="adm-secondary">{row.mobile || '—'}</td>
                       <td className="adm-secondary">
-                        <span className="adm-cell-clip">{(row.interests ?? []).join(', ') || '—'}</span>
+                        <span className="adm-clip">{(row.interests ?? []).join(', ') || '—'}</span>
                       </td>
                       <td className="adm-secondary">
                         {[row.consentEmail && 'email', row.consentSms && 'SMS'].filter(Boolean).join(' + ') ||
@@ -159,10 +166,10 @@ export function AdminSubscribersPage() {
               onChange={setPage}
             />
           )}
-        </>
+        </Card>
       )}
 
-      <p className="field-hint" style={{ marginTop: 20, maxWidth: '62ch' }}>
+      <p className="adm-hint" style={{ margin: 0, maxWidth: '62ch' }}>
         Newsletter campaigns are not built yet — the API has no campaign endpoints. Until they exist, export
         the list and send from the email provider.
       </p>

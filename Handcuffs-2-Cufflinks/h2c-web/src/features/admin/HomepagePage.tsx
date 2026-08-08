@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Seo } from '@/lib/seo/Seo';
-import { Button } from '@/components/ui/Button';
 import { apiGet, apiPatch, apiPost } from '@/lib/api/client';
 import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import { ROUTES } from '@/router/routes';
-import { AdminHeader, Alert } from './components/Chrome';
+import { AdminHeader, Alert, Skeleton } from './components/Chrome';
 import { RecordForm } from './components/RecordForm';
 import type { Field } from './lib/fields';
 import { messageFor, useAsyncData } from './lib/useAsyncData';
@@ -170,8 +169,8 @@ export function AdminHomepagePage() {
       {state.error && <Alert title={state.offline ? 'API unreachable' : 'Could not load'}>{state.error}</Alert>}
 
       {missing.length > 0 && mayEditStructure && (
-        <div className="adm-bar" style={{ display: 'block' }}>
-          <p className="field-hint" style={{ marginBottom: 10 }}>
+        <div className="adm-note adm-note--info" style={{ display: 'block' }}>
+          <p className="adm-hint" style={{ marginBottom: 10 }}>
             {missing.length} section{missing.length === 1 ? '' : 's'} from the guide {missing.length === 1 ? 'has' : 'have'} no
             record yet. Create them to make their copy editable.
           </p>
@@ -180,7 +179,7 @@ export function AdminHomepagePage() {
               <button
                 key={key}
                 type="button"
-                className="adm-mini"
+                className="adm-btn adm-btn--sm"
                 disabled={busy}
                 onClick={() =>
                   void run(
@@ -196,7 +195,13 @@ export function AdminHomepagePage() {
         </div>
       )}
 
-      {state.loading && <p className="body body--quiet">Loading…</p>}
+      {state.loading && (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {[0, 1, 2, 3].map((row) => (
+            <Skeleton key={row} height={72} />
+          ))}
+        </div>
+      )}
 
       <div className="adm-rep">
         {sections.map((section, index) => (
@@ -205,7 +210,7 @@ export function AdminHomepagePage() {
               <div>
                 <span className="adm-repnum">{SECTION_LABEL[section.key] ?? section.key}</span>
                 {!section.isEnabled && (
-                  <span className="adm-pill adm-pill--archived" style={{ marginLeft: 10 }}>
+                  <span className="adm-pill adm-pill--mute" style={{ marginLeft: 10 }}>
                     Hidden
                   </span>
                 )}
@@ -219,7 +224,7 @@ export function AdminHomepagePage() {
                   <>
                     <button
                       type="button"
-                      className="adm-mini"
+                      className="adm-btn adm-btn--sm"
                       disabled={busy || index === 0}
                       onClick={() => move(index, -1)}
                       aria-label={`Move ${section.key} earlier`}
@@ -228,7 +233,7 @@ export function AdminHomepagePage() {
                     </button>
                     <button
                       type="button"
-                      className="adm-mini"
+                      className="adm-btn adm-btn--sm"
                       disabled={busy || index === sections.length - 1}
                       onClick={() => move(index, 1)}
                       aria-label={`Move ${section.key} later`}
@@ -239,7 +244,7 @@ export function AdminHomepagePage() {
                 )}
                 <button
                   type="button"
-                  className="adm-mini"
+                  className="adm-btn adm-btn--sm"
                   onClick={() => setOpenId(openId === section.id ? null : section.id)}
                 >
                   {openId === section.id ? 'Close' : 'Edit copy'}
@@ -272,16 +277,14 @@ export function AdminHomepagePage() {
       )}
 
       {sections.length > 0 && !mayEditStructure && (
-        <p className="field-hint" style={{ marginTop: 14 }}>
+        <p className="adm-hint" style={{ marginTop: 14 }}>
           Reordering the homepage changes every visitor’s first impression, so it is restricted to Super
           Administrators. You can still edit each section’s copy.
         </p>
       )}
 
       <div style={{ marginTop: 24 }}>
-        <Button variant="ghost" size="sm" onClick={() => state.reload()} disabled={busy}>
-          Refresh
-        </Button>
+        <button type="button" className="adm-btn adm-btn--sm" onClick={() => state.reload()} disabled={busy}>Refresh</button>
       </div>
     </>
   );

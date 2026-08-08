@@ -25,26 +25,31 @@ export function AdminH2CPage() {
             {
               to: ROUTES.adminHomepage,
               label: 'Homepage sections',
+              glyph: 'layout',
               blurb: 'The thirteen blocks the guide specifies, in the order visitors meet them.',
             },
             {
               to: ROUTES.adminNavigation,
               label: 'Navigation',
+              glyph: 'compass',
               blurb: 'Header, footer, drawer, and legal menus.',
             },
             {
               to: ROUTES.adminSeo,
               label: 'Search metadata',
+              glyph: 'search',
               blurb: 'Per-route titles, descriptions, and share images.',
             },
             {
               to: ROUTES.adminFounder,
               label: 'Founder',
+              glyph: 'user',
               blurb: 'The story, the message, and the speaking topics.',
             },
             {
               to: ROUTES.adminSettings,
               label: 'Site settings',
+              glyph: 'settings',
               blurb: 'Brand copy, contact addresses, socials, and maintenance mode.',
             },
           ],

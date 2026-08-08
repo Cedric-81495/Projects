@@ -4,7 +4,7 @@ import { apiGet, apiPut } from '@/lib/api/client';
 import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import { ROUTES } from '@/router/routes';
-import { AdminHeader, Alert, EmptyState } from './components/Chrome';
+import { AdminHeader, Alert, Card, EmptyState, SkeletonRows } from './components/Chrome';
 import { RecordForm } from './components/RecordForm';
 import type { Field } from './lib/fields';
 import { useAsyncData } from './lib/useAsyncData';
@@ -76,7 +76,7 @@ export function AdminSeoPage() {
           mayEdit && !open ? (
             <button
               type="button"
-              className="adm-mini adm-mini--go"
+              className="adm-btn adm-btn--sm adm-btn--primary"
               onClick={() => {
                 setCreating(true);
                 setEditing(null);
@@ -92,20 +92,7 @@ export function AdminSeoPage() {
       {!mayEdit && <Alert title="Read only">Route metadata is restricted to Super Administrators.</Alert>}
 
       {open && (
-        <div className="adm-repitem" style={{ marginBottom: 22 }}>
-          <div className="adm-rephead">
-            <span className="adm-repnum">{creating ? 'New route' : open.path}</span>
-            <button
-              type="button"
-              className="adm-mini"
-              onClick={() => {
-                setCreating(false);
-                setEditing(null);
-              }}
-            >
-              Close
-            </button>
-          </div>
+        <Card title={creating ? 'New route override' : open.path}>
           <RecordForm
             key={creating ? 'new' : open.path}
             fields={FIELDS}
@@ -120,13 +107,16 @@ export function AdminSeoPage() {
               state.reload();
             }}
           />
-        </div>
+        </Card>
       )}
 
-      {state.loading && <p className="body body--quiet">Loading…</p>}
+      <Card flush>
+      {state.loading && <SkeletonRows columns={4} />}
 
       {!state.loading && records.length === 0 && !state.error && (
-        <EmptyState>No route overrides. Every page is using the site defaults.</EmptyState>
+        <EmptyState title="No overrides" glyph="search">
+          Every route is inheriting the site defaults, which is a perfectly good place to be.
+        </EmptyState>
       )}
 
       {records.length > 0 && (
@@ -144,19 +134,19 @@ export function AdminSeoPage() {
             <tbody>
               {records.map((record) => (
                 <tr key={record.id}>
-                  <td className="adm-cell-strong">{record.path}</td>
+                  <td className="adm-strong">{record.path}</td>
                   <td>
-                    <span className="adm-cell-clip">{record.seo?.title || '—'}</span>
+                    <span className="adm-clip">{record.seo?.title || '—'}</span>
                   </td>
                   <td className="adm-secondary">
-                    <span className="adm-cell-clip">{record.seo?.description || '—'}</span>
+                    <span className="adm-clip">{record.seo?.description || '—'}</span>
                   </td>
                   <td className="adm-secondary">{record.seo?.noIndex ? 'No' : 'Yes'}</td>
                   <td>
                     <div className="adm-rowacts">
                       <button
                         type="button"
-                        className="adm-mini"
+                        className="adm-btn adm-btn--sm"
                         onClick={() => {
                           setEditing(record);
                           setCreating(false);
@@ -172,6 +162,7 @@ export function AdminSeoPage() {
           </table>
         </div>
       )}
+      </Card>
     </>
   );
 }

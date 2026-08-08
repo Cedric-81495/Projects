@@ -4,7 +4,7 @@ import { apiDelete, apiGet, apiPatch, apiPost } from '@/lib/api/client';
 import { useAuth } from '@/providers/context/auth';
 import { useToast } from '@/providers/context/toast';
 import type { Paginated } from '@/types/common';
-import { AdminHeader, Alert, EmptyState, Pager } from './components/Chrome';
+import { AdminHeader, Alert, Card, EmptyState, Pager } from './components/Chrome';
 import { RecordForm } from './components/RecordForm';
 import type { Field } from './lib/fields';
 import { messageFor, useAsyncData } from './lib/useAsyncData';
@@ -141,7 +141,7 @@ export function AdminMediaPage() {
         intro="One library for all three brands. Alt text is written once here and travels with the asset wherever it is used."
         actions={
           mayUpload ? (
-            <button type="button" className="adm-mini adm-mini--go" onClick={() => setAdding(!adding)}>
+            <button type="button" className="adm-btn adm-btn--sm adm-btn--primary" onClick={() => setAdding(!adding)}>
               {adding ? 'Close' : 'Add an asset'}
             </button>
           ) : null
@@ -155,10 +155,7 @@ export function AdminMediaPage() {
       </Alert>
 
       {adding && mayUpload && (
-        <div className="adm-repitem" style={{ margin: '20px 0' }}>
-          <div className="adm-rephead">
-            <span className="adm-repnum">New asset</span>
-          </div>
+        <Card title="Add an asset">
           <RecordForm
             fields={REGISTER_FIELDS}
             record={{ brand: 'h2c' }}
@@ -170,10 +167,11 @@ export function AdminMediaPage() {
               state.reload();
             }}
           />
-        </div>
+        </Card>
       )}
 
-      <div className="adm-bar" style={{ marginTop: 18 }}>
+      <Card flush>
+      <div className="adm-toolbar">
         <input
           type="search"
           aria-label="Search the library"
@@ -213,7 +211,7 @@ export function AdminMediaPage() {
           <option value="audio">Audio</option>
           <option value="document">Documents</option>
         </select>
-        <label className="check" style={{ fontSize: '0.7rem' }}>
+        <label className="adm-check" style={{ fontSize: '0.7rem' }}>
           <input
             type="checkbox"
             checked={includeArchived}
@@ -224,17 +222,17 @@ export function AdminMediaPage() {
           />
           <span>Show removed</span>
         </label>
-        <span className="adm-bar-count">{state.data ? `${state.data.total} assets` : ''}</span>
+        <span className="adm-count">{state.data ? `${state.data.total} assets` : ''}</span>
       </div>
 
       {actionError && <Alert title="That did not go through">{actionError}</Alert>}
       {state.error && <Alert title={state.offline ? 'API unreachable' : 'Could not load'}>{state.error}</Alert>}
 
       {editing && (
-        <div className="adm-repitem" style={{ margin: '20px 0' }}>
+        <div className="adm-repitem" style={{ margin: 18 }}>
           <div className="adm-rephead">
             <span className="adm-repnum">{editing.originalName}</span>
-            <button type="button" className="adm-mini" onClick={() => setEditingId(null)}>
+            <button type="button" className="adm-btn adm-btn--sm" onClick={() => setEditingId(null)}>
               Close
             </button>
           </div>
@@ -255,16 +253,21 @@ export function AdminMediaPage() {
       )}
 
       {!state.loading && assets.length === 0 && !state.error && (
-        <EmptyState>
-          {search || brand || kind ? 'Nothing matches that filter.' : 'The library is empty.'}
+        <EmptyState
+          title={search || brand || kind ? 'Nothing matches' : 'The library is empty'}
+          glyph="image"
+        >
+          {search || brand || kind
+            ? 'Try a different search, or clear the brand and type filters.'
+            : 'Add the first asset by pointing at wherever the file already lives.'}
         </EmptyState>
       )}
 
       {assets.length > 0 && (
-        <div className="adm-media">
+        <div className="adm-media" style={{ padding: 18 }}>
           {assets.map((asset) => (
             <div className="adm-mediaitem" key={asset.id}>
-              <div className="adm-mediathumb">
+              <div className="adm-thumb">
                 {asset.kind === 'image' ? (
                   <img src={asset.url} alt={asset.alt} loading="lazy" />
                 ) : (
@@ -275,7 +278,7 @@ export function AdminMediaPage() {
               <span className="adm-medianame" title={asset.originalName}>
                 {asset.originalName}
               </span>
-              <span className="adm-metaline">
+              <span className="adm-meta">
                 {BRAND_LABEL[asset.brand]}
                 {asset.archivedAt ? ' · removed' : ''}
               </span>
@@ -284,13 +287,13 @@ export function AdminMediaPage() {
               )}
 
               <div className="adm-rowacts" style={{ justifyContent: 'flex-start' }}>
-                <button type="button" className="adm-mini" onClick={() => setEditingId(asset.id)}>
+                <button type="button" className="adm-btn adm-btn--sm" onClick={() => setEditingId(asset.id)}>
                   {mayUpload ? 'Edit' : 'View'}
                 </button>
                 {mayDelete && !asset.archivedAt && (
                   <button
                     type="button"
-                    className="adm-mini adm-mini--warn"
+                    className="adm-btn adm-btn--sm adm-btn--danger"
                     disabled={busy}
                     onClick={() =>
                       void run(
@@ -305,7 +308,7 @@ export function AdminMediaPage() {
                 {mayDelete && asset.archivedAt && (
                   <button
                     type="button"
-                    className="adm-mini"
+                    className="adm-btn adm-btn--sm"
                     disabled={busy}
                     onClick={() => void run(() => apiPost(`/media/${asset.id}/restore`), 'Back in the library.')}
                   >
@@ -326,6 +329,7 @@ export function AdminMediaPage() {
           onChange={setPage}
         />
       )}
+      </Card>
     </>
   );
 }

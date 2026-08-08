@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/Button';
 import { toPayload, valuesFrom, writeAt } from '../lib/fields';
 import type { Field, Path, Values } from '../lib/fields';
 import { fieldErrorsFor, messageFor } from '../lib/useAsyncData';
-import { Alert } from './Chrome';
+import { Note } from './Chrome';
 import { FieldSet } from './FieldControl';
+import { Glyph } from './Glyph';
 
 /**
  * The form every record is edited through.
@@ -74,15 +74,15 @@ export function RecordForm({
     }
   }
 
-  const generalProblems = errors._ ?? [];
+  const general = errors._ ?? [];
 
   return (
     <form className="adm-form" onSubmit={(event) => void submit(event)} noValidate>
       {failure && (
-        <Alert title="Not saved">
+        <Note title="Not saved" tone="bad">
           {failure}
-          {generalProblems.length > 0 && ` ${generalProblems.join(' ')}`}
-        </Alert>
+          {general.length > 0 && ` ${general.join(' ')}`}
+        </Note>
       )}
 
       <FieldSet
@@ -95,12 +95,13 @@ export function RecordForm({
       />
 
       <div className="adm-save">
-        <Button type="submit" variant="gold" disabled={disabled || saving}>
+        <button type="submit" className="adm-btn adm-btn--primary" disabled={disabled || saving}>
+          <Glyph name="check" />
           {saving ? 'Saving' : submitLabel}
-        </Button>
+        </button>
         {extraActions}
         {dirty && !saving && (
-          <span className="field-hint" role="status">
+          <span className="adm-hint" role="status">
             Unsaved changes.
           </span>
         )}

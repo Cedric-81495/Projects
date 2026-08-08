@@ -8,6 +8,8 @@ import { communityRouter } from '@/modules/community';
 import { contentRouter } from '@/modules/content';
 import { memberRouter } from '@/modules/members/member.controller';
 import { engagementRouter } from '@/modules/engagement';
+import { mediaEngagementRouter } from '@/modules/media-engagement';
+import { siteRouter } from '@/modules/site';
 import { subscriberRouter } from '@/modules/subscribers';
 import { userRouter } from '@/modules/users';
 
@@ -44,6 +46,14 @@ apiRouter.use('/members', memberRouter);
 
 // Engagement needs the anonymous visitor cookie for deduplication.
 apiRouter.use('/apparel', attachVisitor, engagementRouter);
+
+// Site chrome, structure, and metadata: announcements, hero banners, the
+// homepage layout, navigation, standing pages, and SEO.
+apiRouter.use('/site', siteRouter);
+
+// Music, docuseries, and podcast interactions. Same anonymous visitor cookie
+// as apparel, so a play can be deduplicated without an account.
+apiRouter.use('/media-engagement', attachVisitor, mediaEngagementRouter);
 
 apiRouter.use(contentRouter);
 apiRouter.use('/community', communityRouter);

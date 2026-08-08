@@ -6,3 +6,5 @@ export * from './engagement';
 export * from './community';
 export * from './Subscriber';
 export * from './MediaAsset';
+export * from './site';
+export * from './mediaEngagement';

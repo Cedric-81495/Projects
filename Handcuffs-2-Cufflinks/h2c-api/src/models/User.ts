@@ -12,7 +12,20 @@ export interface UserDoc extends Document {
   passwordHash?: string;
   role: Role;
   emailVerified: boolean;
+  /** SHA-256 of the emailed token. The raw value only ever exists in the link. */
+  verificationToken?: string;
+  verificationExpires?: Date | null;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date | null;
   mfaEnabled: boolean;
+  /** Base32 TOTP secret. Written at enrolment, before mfaEnabled flips true. */
+  mfaSecret?: string;
+  mfaEnrolledAt?: Date | null;
+  /** SHA-256 of the live sign-in ticket's id. Cleared when the ticket is spent. */
+  mfaTicketHash?: string;
+  mfaTicketExpires?: Date | null;
+  /** SHA-256 of each unused recovery code. Entries are removed as spent. */
+  mfaRecoveryCodes?: string[];
   isActive: boolean;
   googleId?: string;
   avatarUrl?: string;
@@ -43,9 +56,32 @@ const userSchema = new Schema<UserDoc>(
     passwordHash: { type: String, select: false },
     role: { type: String, enum: ROLES, required: true, default: 'admin', index: true },
     emailVerified: { type: Boolean, default: false },
+
+    /**
+     * Every credential-adjacent field is select:false. These are bearer secrets
+     * in their own right — a valid reset token is a password, and a TOTP secret
+     * generates every future code — so the default projection must not carry
+     * them, and no route may serialise them by accident.
+     */
+    verificationToken: { type: String, select: false },
+    verificationExpires: { type: Date, select: false, default: null },
+    passwordResetToken: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false, default: null },
+
     mfaEnabled: { type: Boolean, default: false },
+    mfaSecret: { type: String, select: false },
+    mfaEnrolledAt: { type: Date, default: null },
+    mfaRecoveryCodes: { type: [String], select: false, default: [] },
+    mfaTicketHash: { type: String, select: false },
+    mfaTicketExpires: { type: Date, select: false, default: null },
+
     isActive: { type: Boolean, default: true, index: true },
-    googleId: { type: String, sparse: true, index: true },
+    /**
+     * unique as well as sparse. sparse alone constrains nothing, which would
+     * let one Google identity be linked to several staff records — and since
+     * the callback links on first sign-in, that is a state the code can reach.
+     */
+    googleId: { type: String, unique: true, sparse: true, index: true },
     avatarUrl: { type: String },
     lastLoginAt: { type: Date, default: null },
     tokenVersion: { type: Number, default: 0 },

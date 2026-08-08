@@ -24,8 +24,32 @@ const schema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CALLBACK_URL: z.string().url().optional(),
   OAUTH_SUCCESS_REDIRECT: z.string().url().default('http://localhost:5173/admin/dashboard'),
+  /** Where members land after Google sign-in. Separate from the CMS redirect. */
+  OAUTH_MEMBER_REDIRECT: z.string().url().default('http://localhost:5173/community'),
+  /** Where either flow lands when Google sign-in is refused. */
+  OAUTH_FAILURE_REDIRECT: z.string().url().default('http://localhost:5173/sign-in'),
 
   SITE_URL: z.string().url().default('http://localhost:5173'),
+  /** Where the CMS lives. Password reset and verification links point here. */
+  ADMIN_URL: z.string().url().default('http://localhost:5173/admin'),
+
+  // --- Mail -----------------------------------------------------------------
+  // Optional. Without a key the mailer logs messages in full rather than
+  // sending them, so local development needs no vendor account.
+  RESEND_API_KEY: z.string().optional(),
+  MAIL_FROM: z.string().default('Handcuffs 2 Cufflinks <no-reply@handcuffs2cufflinks.com>'),
+
+  // --- Multi-factor authentication ------------------------------------------
+  /**
+   * When on, a super administrator who has not finished TOTP enrolment is
+   * refused at sign-in. Off by default: switching it on before the team has
+   * authenticator apps set up would lock everyone out of the CMS at once, so it
+   * is a deliberate decision rather than a default.
+   */
+  REQUIRE_SUPER_ADMIN_MFA: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
 
   /**
    * Optional DNS override, e.g. "8.8.8.8,1.1.1.1".

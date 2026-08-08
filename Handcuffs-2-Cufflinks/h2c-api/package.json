@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Handcuffs 2 Cufflinks \u2014 REST API, CMS, and record management.",
+  "description": "Handcuffs 2 Cufflinks — REST API, CMS, and record management.",
   "engines": {
     "node": "22.x"
   },

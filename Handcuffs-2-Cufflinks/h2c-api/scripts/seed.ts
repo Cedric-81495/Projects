@@ -23,6 +23,7 @@ import {
   PodcastClip,
   PodcastEpisode,
 } from '../src/models/content';
+import { seedSite } from './seed-site';
 
 const COLLECTIONS = [
   { slug: 'signature', name: 'Signature Collection', premise: 'The pieces the movement started with.', displayOrder: 1 },
@@ -207,6 +208,10 @@ async function main(): Promise<void> {
     await GwopProgramme.findOneAndUpdate({ slug: p.slug }, { ...p, ...published }, upsert);
   }
   console.log(`  ✓ ${PROGRAMMES.length} GWOP programmes`);
+
+  // Structure last: it does not depend on the content above, and seeding it
+  // after means a failure here leaves the content seed already committed.
+  await seedSite();
 
   await mongoose.disconnect();
   console.log('\nSeed complete.\n');

@@ -28,8 +28,24 @@ const memberSchema = new Schema(
       index: true,
       match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Enter a valid email address.'],
     },
-    // select:false so a stray find() cannot leak hashes into a response.
-    passwordHash: { type: String, required: true, select: false },
+    /**
+     * select:false so a stray find() cannot leak hashes into a response.
+     *
+     * Required only for accounts that sign in with a password. A member who
+     * joined through Google has none, and minting a random one on their behalf
+     * would be a credential nobody chose, nobody knows, and nobody can rotate.
+     */
+    passwordHash: {
+      type: String,
+      select: false,
+      required: function requiredWithoutGoogle(this: { googleId?: string }) {
+        return !this.googleId;
+      },
+    },
+
+    /** Set when the account is linked to a Google identity. */
+    googleId: { type: String, unique: true, sparse: true, index: true },
+    avatarUrl: { type: String },
 
     location: { type: String, trim: true, maxlength: 160 },
 

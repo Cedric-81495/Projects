@@ -17,6 +17,7 @@ import {
   registerSchema,
   updateProfileSchema,
 } from './member.schemas';
+import * as google from '../auth/google.service';
 import * as service from './member.service';
 
 export const memberRouter = Router();
@@ -175,3 +176,26 @@ memberRouter.delete(
     ok(res, { deleted: true }, 'Your account has been removed.');
   })
 );
+
+/* ================================================================== */
+/* Google sign-in                                                      */
+/* ================================================================== */
+
+/**
+ * Starts Google sign-in for the public.
+ *
+ * The callback is the CMS one — Google matches redirect URIs against an exact
+ * allowlist, so the deployment registers a single URI and the `flow` field in
+ * the signed state cookie decides which side handles the return. Set here,
+ * before the browser leaves, so it cannot be changed from the query string.
+ */
+memberRouter.get(
+  '/auth/google',
+  authLimiter,
+  asyncHandler(async (_req, res) => {
+    const { url, state } = google.buildAuthorizationUrl('member');
+    res.cookie(google.OAUTH_STATE_COOKIE, google.encodeState(state), google.stateCookieOptions());
+    res.redirect(url);
+  })
+);
+

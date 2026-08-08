@@ -151,6 +151,17 @@ const docuseriesSchema = new Schema(
     },
     runtimeLabel: String,
     relatedApparelIds: [{ type: Schema.Types.ObjectId, ref: 'ApparelItem' }],
+    /**
+     * Denormalised counters, same arrangement as apparel: MediaEngagement is
+     * the source of truth and can rebuild these, but listing a season should
+     * not cost an aggregation per episode.
+     */
+    engagement: {
+      views: { type: Number, default: 0, min: 0 },
+      plays: { type: Number, default: 0, min: 0 },
+      completions: { type: Number, default: 0, min: 0 },
+      shares: { type: Number, default: 0, min: 0 },
+    },
     isFeatured: { type: Boolean, default: false, index: true },
     ...publishableFields,
   },
@@ -176,6 +187,12 @@ const podcastSchema = new Schema(
       default: [],
       _id: false,
     },
+    engagement: {
+      views: { type: Number, default: 0, min: 0 },
+      plays: { type: Number, default: 0, min: 0 },
+      completions: { type: Number, default: 0, min: 0 },
+      shares: { type: Number, default: 0, min: 0 },
+    },
     isFeatured: { type: Boolean, default: false, index: true },
     ...publishableFields,
   },
@@ -198,6 +215,16 @@ const clipSchema = new Schema(
       type: [String],
       enum: ['home', 'podcast', 'movement', 'community'],
       default: ['podcast'],
+    },
+    /**
+     * Clips carry no completion count: a fifteen-second quote has no meaningful
+     * "finished it", and a metric that is always equal to plays is noise on the
+     * dashboard rather than information.
+     */
+    engagement: {
+      views: { type: Number, default: 0, min: 0 },
+      plays: { type: Number, default: 0, min: 0 },
+      shares: { type: Number, default: 0, min: 0 },
     },
     ...publishableFields,
   },
@@ -251,9 +278,11 @@ const releaseSchema = new Schema(
       copyrightNotice: String,
     },
     engagement: {
-      plays: { type: Number, default: 0 },
-      views: { type: Number, default: 0 },
-      downloads: { type: Number, default: 0 },
+      plays: { type: Number, default: 0, min: 0 },
+      views: { type: Number, default: 0, min: 0 },
+      downloads: { type: Number, default: 0, min: 0 },
+      completions: { type: Number, default: 0, min: 0 },
+      shares: { type: Number, default: 0, min: 0 },
     },
     isFeatured: { type: Boolean, default: false, index: true },
     ...publishableFields,

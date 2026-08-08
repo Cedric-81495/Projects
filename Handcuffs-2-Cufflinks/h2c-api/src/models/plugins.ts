@@ -15,9 +15,16 @@ export function applyJsonTransform(schema: Schema): void {
       ret.id = String(ret._id);
       delete ret._id;
       // Defence in depth: these must never be serialised even if a query
-      // forgets to exclude them.
+      // forgets to exclude them. select:false on the schema is the first line;
+      // the case this catches is a legitimate `.select('+mfaSecret')` whose
+      // document then gets handed to a response further down the call.
       delete ret.passwordHash;
       delete ret.tokenHash;
+      delete ret.mfaSecret;
+      delete ret.mfaRecoveryCodes;
+      delete ret.mfaTicketHash;
+      delete ret.verificationToken;
+      delete ret.passwordResetToken;
       return ret;
     },
   });

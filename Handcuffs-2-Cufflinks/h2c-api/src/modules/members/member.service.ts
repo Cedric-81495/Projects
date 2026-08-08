@@ -221,3 +221,57 @@ export async function signOut(rawToken: string | undefined): Promise<void> {
     { revokedAt: new Date() }
   );
 }
+
+/**
+ * Google sign-in for the public.
+ *
+ * The opposite policy to the CMS: here an unknown address creates an account.
+ * Membership is open by design — the guide's north star is people joining the
+ * movement — and members hold no permissions, so a new record grants nothing
+ * beyond a place to keep someone's saved pieces and submissions.
+ *
+ * Matching is by verified email, which is why google.service refuses an
+ * unverified one: without that check this would be a takeover of any member
+ * account whose address someone could claim at Google.
+ */
+export async function signInWithGoogle(
+  identity: { googleId: string; email: string; name: string; picture?: string },
+  req: Request
+) {
+  const email = identity.email.toLowerCase();
+  const existing = await Member.findOne({ email });
+
+  if (existing) {
+    if (!existing.isActive) {
+      throw ApiError.forbidden('That account is no longer active.');
+    }
+
+    // First Google sign-in on a password account links the two rather than
+    // creating a second record for the same person.
+    if (!existing.googleId) existing.googleId = identity.googleId;
+    if (!existing.avatarUrl && identity.picture) existing.avatarUrl = identity.picture;
+    existing.emailVerified = true;
+    existing.lastLoginAt = new Date();
+    await existing.save();
+
+    return issueSession(existing, req);
+  }
+
+  const [firstName, ...rest] = identity.name.split(' ');
+  const member = await Member.create({
+    firstName: firstName || email.split('@')[0],
+    lastName: rest.join(' ') || undefined,
+    email,
+    googleId: identity.googleId,
+    avatarUrl: identity.picture,
+    // Google has already confirmed the address; asking them to confirm it again
+    // is friction for a guarantee already held.
+    emailVerified: true,
+    // Not subscribed. Signing in is not consent to be emailed, and the guide
+    // treats joining the mailing list as its own deliberate act.
+    subscribedToMovement: false,
+    lastLoginAt: new Date(),
+  });
+
+  return issueSession(member, req);
+}

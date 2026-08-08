@@ -11,6 +11,7 @@ import {
 import { RefreshToken } from '@/models/RefreshToken';
 import { User } from '@/models/User';
 import type { UserDoc } from '@/models/User';
+import { assertEnrolmentPolicy, issueMfaTicket } from './mfa.service';
 
 const MAX_FAILED_ATTEMPTS = 8;
 const LOCK_MINUTES = 15;
@@ -93,9 +94,39 @@ export async function signIn(email: string, password: string, req: Request) {
 
   user.failedLoginAttempts = 0;
   user.lockedUntil = null;
+  await user.save();
+
+  // Shared with the Google callback, so the two first factors cannot drift
+  // apart on whether the policy applies.
+  assertEnrolmentPolicy(user);
+
+  if (user.mfaEnabled) {
+    // No session yet, and lastLoginAt stays where it was: the password is
+    // proven, the second factor is not, and this is not a sign-in until it is.
+    return { mfaRequired: true as const, mfaToken: await issueMfaTicket(String(user._id)) };
+  }
+
   user.lastLoginAt = new Date();
   await user.save();
 
+  return { mfaRequired: false as const, ...(await issueSession(user, req)) };
+}
+
+/**
+ * Mints a session for a user whose identity is already established — the second
+ * half of an MFA sign-in, and the Google callback.
+ *
+ * Re-reads the record and re-checks isActive rather than trusting the caller's
+ * copy. An account can be disabled in the seconds between a correct password
+ * and a submitted code, and that narrow window is exactly the one someone
+ * revoking access in a hurry is trying to close.
+ */
+export async function issueSessionForUserId(userId: string, req: Request) {
+  const user = await User.findById(userId);
+  if (!user?.isActive) throw ApiError.unauthorized('This account is no longer active.');
+
+  user.lastLoginAt = new Date();
+  await user.save();
   return issueSession(user, req);
 }
 

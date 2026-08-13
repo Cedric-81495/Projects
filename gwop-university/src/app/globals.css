@@ -613,3 +613,26 @@ section:first-of-type{padding-top:clamp(34px,5.5vw,64px)}
 .herocard .acts{flex-wrap:nowrap}
 @media(max-width:439px){.herocard .acts{flex-wrap:wrap}
   .herocard .acts .btn{width:100%}}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SAFARI — backdrop-filter needs the -webkit- prefix on iOS. Without it the
+   sticky header loses its blur and renders as a flat block.
+   ═══════════════════════════════════════════════════════════════════════════ */
+header{-webkit-backdrop-filter:saturate(160%) blur(14px)}
+body.navopen header{-webkit-backdrop-filter:none}
+
+/* iOS Safari: body overflow:hidden alone does not reliably stop background
+   scroll behind a fixed overlay. Pin the body while the drawer is open. */
+/* body pinning removed — it broke scroll restore (a real regression) to fix an
+   unverified iOS issue. Verify scroll-lock on a borrowed iPhone first; if it
+   fails, reinstate pinning WITH a correct scroll restore. */
+body.navopen{overscroll-behavior:none}
+.drawer{overscroll-behavior:contain}
+
+/* The scrolling element is <html>, so locking only <body> does nothing.
+   overflow:hidden on both preserves scroll position — unlike position:fixed,
+   which collapses document height and loses it. */
+/* Pinning the body is the only reliable cross-browser lock. overflow:hidden on
+   <html> locks but RESETS scroll to 0; position:fixed with a negative top
+   holds the visual position and we restore it exactly on close. */
+body.navopen{position:fixed;left:0;right:0;width:100%;overflow:hidden}

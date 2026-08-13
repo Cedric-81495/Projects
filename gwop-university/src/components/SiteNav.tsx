@@ -20,12 +20,21 @@ export function SiteNav() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    document.body.classList.toggle('navopen', open)
+    if (!open) return
+    const y = window.scrollY
+    document.body.classList.add('navopen')
+    document.body.style.top = `-${y}px`
+
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
     window.addEventListener('keydown', onKey)
+
     return () => {
       window.removeEventListener('keydown', onKey)
       document.body.classList.remove('navopen')
+      document.body.style.top = ''
+      /* `html { scroll-behavior: smooth }` would animate this restore, so the
+         page drifts instead of snapping back. Force it instant. */
+      document.documentElement.scrollTop = y   // direct assignment ignores scroll-behavior
     }
   }, [open])
 

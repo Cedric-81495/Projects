@@ -171,3 +171,89 @@ not the primary logo. Files are named accordingly:
 **Still needed from Maui:** the primary logo as a transparent PNG or vector. The brand sheet
 assigns it to hero graphics and course covers, but the only copy available is on an ivory
 plate, which cannot sit on the forest hero card. The secondary crest is used there instead.
+
+---
+
+## Security — dependency posture (Aug 14)
+
+**Patched:** `next` was on **15.5.4**, which is vulnerable to **CVE-2025-66478** — a
+CVSS 10.0 remote-code-execution flaw in the React Server Components protocol, actively
+exploited in the wild. Now on **15.5.23** (latest 15.5 backport). Verified cleared.
+
+**Remaining, accepted for Aug 30:** three high advisories in `postcss` and `sharp`, both
+transitive dependencies bundled by Next. `npm audit` only offers a fix by upgrading to
+Next **16.3.0**, which is a semver-major jump.
+
+Decision: **stay on 15.5.23 until after the event.**
+
+- `sharp` — libvips image-parsing flaws. Only reachable when processing untrusted images;
+  every image here is a static file we control, and image optimisation runs on Vercel's
+  infrastructure.
+- `postcss` — build-time only, requires an attacker-controlled `sourceMappingURL` in CSS.
+  All CSS in this repo is ours.
+
+Neither is reachable by a visitor to a static marketing site. A major-version framework
+upgrade seven days before an unrepeatable event is the larger risk.
+
+**After Aug 30:** upgrade to the current Next 16.x, re-run `npm audit`, and re-run the
+responsive audit before redeploying.
+
+---
+
+## Data handling — what applies here
+
+This site **stores nothing**. Jake's GoHighLevel form is the system of record, so there is
+no database, no session, no logging, and exactly one API route (`/go/[code]`, `GET` only,
+a redirect). That removes most of the usual risk — but two things still matter.
+
+### 1 · The `?s=` parameter is user-controllable
+
+The QR redirect puts a source value in the URL, and that value is passed into Jake's form
+URL. Anything a visitor can edit is untrusted input.
+
+**Rule: validate against an allow-list, never reflect it.** See `readSource()` in
+`src/app/830/InterestForm.tsx` — it accepts only values present in `QR_CODES`, and falls
+back to `direct`. It is never rendered into the DOM, only appended to a URL after being
+matched against a known set.
+
+```ts
+const known = Object.values(QR_CODES) as readonly string[]
+return s && known.includes(s) ? s : 'direct'
+```
+
+Apply the same pattern to any future param. Never interpolate a raw param into markup,
+a URL, or an attribute.
+
+### 2 · We embed a third-party iframe
+
+Jake's form runs code we don't control inside our page. The CSP in `next.config.ts`
+constrains it: **`frame-src` is derived from `GHL_FORM_URL`**, so only that exact origin
+can be framed. With the variable unset it resolves to `'none'` — meaning it is impossible
+to accidentally allow arbitrary framing.
+
+### Headers set (verified in production build)
+
+| Header | Why |
+|---|---|
+| `Content-Security-Policy` | No third-party script origins; only Jake's origin may be framed |
+| `frame-ancestors 'none'` | Our pages can't be embedded elsewhere (clickjacking) |
+| `Strict-Transport-Security` | HTTPS only, 2 years |
+| `X-Content-Type-Options: nosniff` | No MIME sniffing |
+| `Referrer-Policy: strict-origin-when-cross-origin` | The `?s=` value isn't leaked to Jake's domain via referrer |
+| `Permissions-Policy` | Camera, mic, geolocation, payment, USB all denied — we need none |
+
+### Standing rules
+
+1. **No endpoint that accepts data.** `CLAUDE.md` invariant 1. If a task seems to need
+   one, the answer is a question, not an API route.
+2. **No PII in this codebase, ever** — no name, email, phone, SSN, date of birth, address,
+   credit report data or card details. Not in code, not in content files, not in logs.
+3. **Never display lead data.** If a live signup view is ever added it shows **counts, not
+   people**. Names and numbers stay in GHL where the access controls are.
+4. **`/admin` is publicly reachable by URL.** It's `noindex` and unlinked, and it holds
+   only module titles and status — no personal data. **That is a requirement, not a
+   coincidence.** Before it ever displays anything sensitive it must be put behind auth.
+5. **No analytics, chat widget or third-party script on `/830` before Aug 27.** Nothing
+   goes in front of the form.
+6. Course content is **view-only** — signed, expiring links, no download affordance,
+   never a public bucket URL (Phase 2).

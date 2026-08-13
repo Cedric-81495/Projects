@@ -1,10 +1,15 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { site } from '@/content/site'
+import { DRAFT } from '@/config/integrations'
 
 export const metadata: Metadata = {
   title: 'GWOP University — Knowledge Pays',
   description: site.hero.sub,
+  /* While DRAFT is on, keep the whole site out of search engines — it carries
+     placeholder pricing and unapproved legal copy. Public URL, un-findable.
+     Flip DRAFT to false in src/config/integrations.ts to allow indexing. */
+  robots: DRAFT ? { index: false, follow: false } : undefined,
 }
 
 export const viewport: Viewport = { themeColor: '#0F1210' }

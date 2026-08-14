@@ -10,12 +10,14 @@ export function Tbc({ children }: { children: React.ReactNode }) {
   return <span {...(DRAFT ? { 'data-tbc': '' } : {})}>{children}</span>
 }
 
-/** Secondary logo — brand sheet: profile icons, favicons, small applications. */
+/** The MARK — clean shield. Brand sheet: nav, footer, favicons, small use.
+ *  Deliberately not the ornate Blueprint artwork: at 34px that reads as a
+ *  green smudge, while this shield stays legible. */
 export function Crest({ size = 38 }: { size?: number }) {
   return (
     <Image
       className="crest"
-      src="/crest.png"
+      src="/mark-128.png"
       alt=""
       width={size}
       height={size}
@@ -49,6 +51,18 @@ export function Footer() {
           <div>
             <Logo />
             <p className="blurb">{site.tagline}</p>
+
+            {/* Felicia §12 — official accounts. Empty URLs render a plain
+                label, so the slot is visibly reserved without a dead link. */}
+            <ul className="socials">
+              {site.social.map(s => (
+                <li key={s.name}>
+                  {s.url
+                    ? <a href={s.url} rel="me noopener" target="_blank">{s.name}</a>
+                    : <span data-tbc>{s.name}</span>}
+                </li>
+              ))}
+            </ul>
           </div>
           <div>
             <h4>Pathway</h4>
@@ -67,9 +81,12 @@ export function Footer() {
           </div>
           <div>
             <h4>Legal</h4>
+            {/* Felicia §13 — all four required routes, linked. */}
             <ul>
-              <li><Link href="/privacy">Privacy</Link></li>
-              <li><Link href="/terms">Terms</Link></li>
+              <li><Link href="/privacy">Privacy Policy</Link></li>
+              <li><Link href="/terms">Terms &amp; Conditions</Link></li>
+              <li><Link href="/sms-terms">SMS Terms &amp; Consent</Link></li>
+              <li><Link href="/refunds">Refund &amp; Cancellation</Link></li>
               <li><Link href="/disclosures">Disclosures</Link></li>
             </ul>
           </div>

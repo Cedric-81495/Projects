@@ -6,6 +6,20 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 export type ModuleStatus = 'ready' | 'pending' | 'missing'
 
+/* ── ASSET SLOTS ───────────────────────────────────────────────────────────
+   Maui's tracker task is "upload modules, organize by level" — but until now
+   there was nowhere to put a file. These four fields are that place.
+
+   Each is a URL. Two forms work:
+     · `/notes/L1-01-credit-foundations-note.pdf`  → served from public/
+     · `https://drive.google.com/...`              → Drive link, nothing to deploy
+
+   Naming follows the file spec: L{level}-{order}-{slug}-{kind}.{ext}
+
+   ⚠️ ACCESS: anything under public/ is downloadable by anyone with the URL.
+   That is fine for `free: true` modules. Paid modules must use a Drive link
+   with restricted sharing, or wait for the real upload platform after Aug 30.
+   ────────────────────────────────────────────────────────────────────────── */
 export type Module = {
   slug: string
   level: 'freshman' | 'sophomore' | 'junior' | 'senior'
@@ -14,10 +28,26 @@ export type Module = {
   minutes: number
   status: ModuleStatus
   free?: boolean
+  /** Student-ready course note PDF — Visual Build Package p.2 standard */
+  note?: string
+  /** Printable workbook / worksheet pages, if separate from the note */
+  workbook?: string
+  /** Lesson video */
+  video?: string
+  /** Card thumbnail */
+  thumb?: string
 }
 
+/** Which assets a module is still missing. Drives /admin so Maui can see gaps. */
+export const missingAssets = (m: Module) =>
+  (['note', 'video', 'thumb'] as const).filter(k => !m[k])
+
 export const MODULES: Module[] = [
-  { slug: 'credit-foundations',   level: 'freshman',  order: 1, title: 'Credit Foundations',        minutes: 14, status: 'ready',   free: true },
+  /* First real student material received — Shin/Maui, Aug 14. Course Note 01,
+     8 pages, built to the p.2 standard (cover, brief, teach, worked example,
+     framework worksheet, apply, act). Still owed for this module: video + thumb. */
+  { slug: 'credit-foundations',   level: 'freshman',  order: 1, title: 'Credit Foundations',        minutes: 14, status: 'ready',   free: true,
+    note: '/notes/L1-01-credit-foundations-note.pdf' },
   { slug: 'reading-your-report',  level: 'freshman',  order: 2, title: 'Reading Your Report',       minutes: 18, status: 'ready' },
   { slug: 'cash-flow-basics',     level: 'freshman',  order: 3, title: 'Cash Flow Basics',          minutes: 16, status: 'pending' },
   { slug: 'banking-and-debt',     level: 'freshman',  order: 4, title: 'Banking &amp; Debt',            minutes: 21, status: 'missing' },

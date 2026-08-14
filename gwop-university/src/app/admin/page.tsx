@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PATHWAY } from '@/content/pathway'
-import { MODULES, byLevel, STATUS_LABEL } from '@/content/modules'
+import { MODULES, byLevel, STATUS_LABEL, missingAssets } from '@/content/modules'
 import { Crest } from '@/components/Chrome'
 import { DRAFT } from '@/config/integrations'
 
@@ -63,7 +63,15 @@ export default function Admin() {
                       <span className="mn">{String(m.order).padStart(2, '0')}</span>
                       <span>
                         <h3>{m.title}</h3>
-                        <span className="meta">{m.minutes} min · {m.slug}</span>
+                        <span className="meta">
+                          {m.minutes} min · {m.slug}
+                          {/* Maui's tracker task is "report missing items" —
+                              this names them instead of leaving her to guess. */}
+                          {missingAssets(m).length > 0 && (
+                            <> · needs {missingAssets(m).join(', ')}</>
+                          )}
+                          {m.note && <> · note ✓</>}
+                        </span>
                       </span>
                       <span className={`chip ${
                         m.status === 'ready' ? 'ok' : m.status === 'pending' ? 'wait' : 'miss'

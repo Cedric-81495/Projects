@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { event } from '@/content/event'
 import { site } from '@/content/site'
+import { BOOKING_URL } from '@/config/integrations'
 import { Crest, DraftBar, Tbc } from '@/components/Chrome'
 
 export const metadata: Metadata = {
@@ -18,11 +20,23 @@ export default function Thanks() {
         <b>{site.brand}<small>{site.motto}</small></b>
       </div>
 
+      {/* Hierarchy prescribed by Felicia §11: YOU'RE IN → Blueprint starts here
+          → confirm delivery → next CTA. Do not reorder. */}
       <div className="evhero">
         <div className="evcard">
           <span className="evtag">Signup complete</span>
           <h1>{event.thanks.h1}</h1>
-          <p className="evkw" style={{ fontWeight: 400 }}>{event.thanks.lede}</p>
+          <p className="evkw">{event.thanks.h2}</p>
+          <p className="evsupport">{event.thanks.lede}</p>
+
+          <div className="evacts">
+            <Link className="btn btn-e" href={event.thanks.ctas.primary.href}>
+              {event.thanks.ctas.primary.label}
+            </Link>
+            <a className="btn btn-ol" href={event.thanks.ctas.secondary.href} data-tbc>
+              {event.thanks.ctas.secondary.label}
+            </a>
+          </div>
         </div>
       </div>
 
@@ -43,10 +57,25 @@ export default function Thanks() {
               </div>
             ))}
           </div>
+
+          {/* Beast's 1:1 Blueprint calendar — hidden until Jake supplies the
+              live GHL booking link. A visible-but-dead button at a booth is
+              worse than no button. */}
+          {BOOKING_URL && (
+            <div className="evcap" style={{ marginTop: 18 }}>
+              <p className="k">{event.thanks.booking.h}</p>
+              <p style={{ fontWeight: 400, fontSize: 15, marginBottom: 14 }}>
+                {event.thanks.booking.p}
+              </p>
+              <a className="btn btn-g" href={BOOKING_URL}>
+                {event.thanks.booking.label}
+              </a>
+            </div>
+          )}
         </section>
       </div>
 
-      <DraftBar pending="founding member wording (Surpaul), GHL redirect confirmation (Jake)" />
+      <DraftBar pending="founding member wording (Surpaul), GHL redirect confirmation (Jake), 1:1 booking link (Jake)" />
     </div>
   )
 }

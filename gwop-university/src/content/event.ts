@@ -3,14 +3,39 @@
    Source: Visual Build Package p.7 + Tracker "8-30 SIGNUP FUNNEL" tab
    ═══════════════════════════════════════════════════════════════════════════ */
 export const event = {
-  badge: { text: 'Everybody Gotta Eat · Aug 30', pending: true },
+  /* Felicia §3: "Exact event time/location details can be inserted once
+     confirmed." Editable placeholders so a late answer costs a one-line edit,
+     not a layout change. Anything still `pending` is highlighted in DRAFT and
+     is simply not rendered — a blank beats a wrong time on the signage page. */
+  details: {
+    name: 'Everybody Gotta Eat',
+    date: 'August 30, 2026',
+    time:     { text: '', pending: true },   // ← paste when Felicia confirms
+    location: { text: '', pending: true },   // ← paste when Felicia confirms
+  },
 
-  // Prescribed by Visual Build Package p.7
+  // Prescribed by Visual Build Package p.7 + Felicia §2 — DO NOT REWORD
   h1a: 'BUILD YOUR',
   h1b: 'GWOP BLUEPRINT',
   kicker: 'Credit. Funding. Business. Wealth.',
+
+  /* Felicia §2 "Supporting copy", verbatim. Note the fourth sentence — the
+     event page carries it; the homepage hero (p.5) deliberately does not. */
+  support:
+    'Build your financial foundation. Strengthen your credit. Prepare your ' +
+    'business for capital. Build toward long-term wealth.',
+
   cta: 'Start your blueprint',
-  fine: 'Free · Takes 2 minutes · Sent straight to your phone',
+
+  /* Felicia §2: "For QR/event signage, we can also use: SCAN TO START."
+     Single approved source for Maui's print run — signage and screen must not
+     drift apart. Maui pulls the wording from here, not from a chat message. */
+  signage: {
+    headline: 'BUILD YOUR GWOP BLUEPRINT',
+    kicker: 'Credit. Funding. Business. Wealth.',
+    qrCta: 'SCAN TO START',
+    brandLine: 'GWOP UNIVERSITY · Knowledge Pays.',
+  },
 
   // Offer — Surpaul approves (Tracker: due Aug 17)
   incentives: {
@@ -50,9 +75,29 @@ export const event = {
     note: 'Takes under a minute.',
   },
 
+  /* Felicia §11 prescribes this hierarchy: "YOU'RE IN." then "Your GWOP
+     Blueprint starts here." then confirm delivery, then the next CTA. */
   thanks: {
     h1: 'You’re in.',
-    lede: 'Check your phone — your GWOP Blueprint is on its way by text.',
+    h2: 'Your GWOP Blueprint starts here.',
+    lede: 'Check your phone — your GWOP Blueprint is on its way by text and email.',
+
+    /* Felicia §11 names both of these as the next CTA "based on the final
+       offer". Both render; the founding-member one is wording-pending. */
+    ctas: {
+      primary:   { label: 'Explore GWOP University', href: '/' },
+      secondary: { label: 'Become a Founding Member', href: '#founding', pending: true },
+    },
+
+    /* Shown only once Jake sends the live booking link (BOOKING_URL).
+       Jake, Aug 14: Beast's 1:1 GWOP Blueprint/Roadmap calendar, Mon–Fri 11–1. */
+    booking: {
+      h: 'Book your 1:1 Blueprint session',
+      p: 'Sit down with Beast and walk through your roadmap. Mon–Fri, 11 AM–1 PM.',
+      label: 'Pick a time',
+      pending: true,
+    },
+
     next: [
       { h: 'Watch for a text', p: 'Your starting point arrives in the next few minutes.' },
       { h: 'Talk to Surpaul', p: 'Come find him at the table — he’ll walk you through what your blueprint means.' },

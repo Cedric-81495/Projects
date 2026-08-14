@@ -27,6 +27,17 @@ export const site = {
     lede: 'Each level has a clear purpose and a clear outcome.',
   },
 
+  /* Felicia §12: leave space for the official social accounts.
+     Paste the real URLs in. Any entry left empty is not rendered — we never
+     ship a link to a handle that does not exist yet. */
+  social: [
+    { name: 'Instagram', url: '', pending: true },
+    { name: 'Facebook',  url: '', pending: true },
+    { name: 'TikTok',    url: '', pending: true },
+    { name: 'YouTube',   url: '', pending: true },
+    { name: 'LinkedIn',  url: '', pending: true },
+  ],
+
   cta: {
     h2: 'Start With Your Blueprint.',
     p:  'Begin with a free review — no cost, no credit check, no obligation.',

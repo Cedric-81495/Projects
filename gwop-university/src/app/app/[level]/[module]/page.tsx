@@ -59,6 +59,16 @@ export default async function ModulePage(
               <p className="ak">Action › Knowledge</p>
             </div>
           </div>
+
+          {/* Course note. Renders only when Maui has attached a file — a
+              download button that 404s is worse than no button. */}
+          {mod.note && (
+            <p style={{ marginTop: 22 }}>
+              <a className="btn btn-o btn-sm" href={mod.note} target="_blank" rel="noopener">
+                Download course note (PDF)
+              </a>
+            </p>
+          )}
         </div>
       </section>
       <Footer />

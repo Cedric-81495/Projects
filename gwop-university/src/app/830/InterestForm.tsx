@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { event } from '@/content/event'
 import {
-  GHL_FORM_URL, INTERESTS, INTEREST_FALLBACK, DRAFT, QR_CODES,
+  GHL_FORM_URL, INTERESTS, INTEREST_FALLBACK, QR_CODES, CAMPAIGN_PARAMS,
 } from '@/config/integrations'
 
 /* The only client component on /830.
@@ -20,17 +20,32 @@ function readSource(): string {
   return s && known.includes(s) ? s : s === 'unknown' ? 'unknown' : 'direct'
 }
 
+/* Felicia §3 + §7: one page, one QR destination, attribution on parameters.
+   Allow-listed only — an arbitrary ?field=value in a scanned link must never
+   reach Jake's form. Values are truncated; a pasted novel is not attribution. */
+function readCampaign(): Array<[string, string]> {
+  if (typeof window === 'undefined') return []
+  const q = new URLSearchParams(window.location.search)
+  return CAMPAIGN_PARAMS
+    .map(k => [k, (q.get(k) ?? '').slice(0, 120)] as [string, string])
+    .filter(([, v]) => v.length > 0)
+}
+
 export function InterestForm() {
   const [choice, setChoice] = useState<{ value: string; label: string } | null>(null)
   const [src, setSrc] = useState<string | null>(null)
 
-  function choose(value: string, label: string) {
+  function choose(value: string, label: string, tag: string) {
     setChoice({ value, label })
     if (!GHL_FORM_URL) return setSrc(null)
     try {
       const u = new URL(GHL_FORM_URL)
       u.searchParams.set('interest', value)
+      /* Jake's exact tag text travels with the lead, so his workflow can tag on
+         a match rather than a lookup table that has to be kept in sync twice. */
+      u.searchParams.set('interest_tag', tag)
       u.searchParams.set('s', readSource())
+      for (const [k, v] of readCampaign()) u.searchParams.set(k, v)
       setSrc(u.toString())
     } catch {
       setSrc(null) // malformed env value — show the placeholder instead of breaking
@@ -46,8 +61,7 @@ export function InterestForm() {
             type="button"
             className="evpick"
             aria-pressed={choice?.value === i.value}
-            {...(DRAFT && 'pending' in i ? { 'data-tbc': '' } : {})}
-            onClick={() => choose(i.value, i.label)}
+            onClick={() => choose(i.value, i.label, i.tag)}
           >
             <span className="dot" />
             {i.label}
@@ -60,7 +74,7 @@ export function InterestForm() {
       <button
         type="button"
         className="evskip"
-        onClick={() => choose(INTEREST_FALLBACK, 'general')}
+        onClick={() => choose(INTEREST_FALLBACK, 'general', 'Unspecified')}
       >
         {event.choose.skip}
       </button>

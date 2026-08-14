@@ -4,8 +4,9 @@ Project constitution. Read fully before writing code. Place at repo root — loa
 automatically every session. **These rules override default behaviour and general best
 practice. Follow them exactly.**
 
-**Version 3 — Aug 13.** Supersedes v1/v2. Rewritten after Felicia's Master Team Tracker
-and the approved GWOP Visual Build Package. **The stack changed — see §3.**
+**Version 4 — Aug 14.** Supersedes v3. Updated against Felicia's confirmed directions
+(Aug 14, 8:08 AM) and Jake's status update (Aug 14, 8:30 AM). **Three previously open
+questions are now closed — see §12.**
 
 ---
 
@@ -96,7 +97,7 @@ Do not build any of this before Aug 27, and do not add its dependencies to Phase
 /830               event landing page ← the QR destination
 /thanks            confirmation after Jake's form submits
 /go/[code]         redirect → /830?s=<role>   ← THE PRINTED QR POINTS HERE
-/privacy /terms /disclosures   legal (attorney copy only)
+/privacy /terms /sms-terms /refunds /disclosures   legal (attorney copy only)
 /app               student app — Phase 2, stub until then
 ```
 
@@ -117,7 +118,8 @@ person and used, it is not finished."* This table is how we satisfy it.
 | `src/content/site.ts` | Surpaul / Felicia, applied by Maui | All website copy |
 | `src/content/event.ts` | Surpaul (offer), Maui | Event page copy, incentives, thank-you |
 | `src/content/pathway.ts` | Maui | Freshman–Senior labels and details |
-| `src/config/integrations.ts` | **Jhon**, with input from Jake | Form URL, QR codes, interest list, draft flag |
+| `src/config/integrations.ts` | **Jhon**, with input from Jake | Form URL, QR codes, interest list, campaign params, booking link, draft flag |
+| `src/config/membership.ts` | **Felicia defines, Surpaul approves** | Level pricing, billing modes, promo codes, offers, refund policy |
 | `src/app/globals.css` | **Jhon only** | Design tokens + all styling |
 | `src/app/**/page.tsx` | **Jhon only** | Structure. **Never copy.** |
 
@@ -174,7 +176,9 @@ Violating any of these is a bug even if the feature works. If a request would br
     clickable thing that isn't the form is a lost signup.
 11. `/830` is `noindex`.
 12. The interest selector precedes the form (p.6: SCAN → **CHOOSE** → CAPTURE) and passes
-    `interest` and `s` through to Jake's form.
+    `interest`, `interest_tag`, `s` and allow-listed campaign params through to Jake's form.
+    **Only allow-listed params are forwarded** — a scanned URL must never be able to inject
+    an arbitrary field into his form.
 13. Interest values come from `INTERESTS` in the config. Jake builds one nurture branch per
     value — **adding or removing one silently breaks his automation.** Changes require
     Felicia's decision and a message to Jake.
@@ -230,19 +234,30 @@ gold is still used for rules, borders, numbers, and all gold on dark backgrounds
 
 ### Logos — `public/`
 
-| Asset | Use |
-|---|---|
-| `logo-primary.png` / `.webp` (1537×1600, transparent) | Hero graphics, course covers, presentations, premium campaigns |
-| `logo-primary-800` / `-400` | Responsive smaller renders |
-| `crest.png` / `.webp` (secondary compact crest) | Nav, favicons, avatars, stamps, small applications |
-| `src/app/icon.png`, `apple-icon.png` | Next.js auto-favicon |
+Two assets, two jobs. **Do not swap them.** Updated Aug 14 with Felicia's supplied files.
 
-**Serve WebP first** — the primary logo is 2.1MB as PNG and 207KB as WebP. On the event
-page's 1.5s LCP budget that difference matters.
+| Asset | Source | Use |
+|---|---|---|
+| `hero-crest-900/600/400.png` / `.webp` | `Primary-logo-w-bg.jpeg`, white background cut | The image beside the black card on `/` (p.5) and `/830` (p.7). Ornate, portrait 0.64 ratio |
+| `mark-512/256/128/64.png` / `.webp` | `Gwop_University_logo.png`, already transparent | Nav, footer, event bar, favicons, avatars, stamps |
+| `src/app/icon.png`, `apple-icon.png` | the mark | Next.js auto-favicon. Apple icon gets an ivory plate — iOS renders transparency as black |
 
-**Known asset gap:** the secondary crest was cropped from the brand identity sheet (a
-JPEG), so it may show faint compression artefacts at large sizes. Ask Maui for the
-secondary logo as its own transparent PNG or vector.
+**Why two.** The ornate Blueprint artwork is unreadable at 34px — it becomes a green
+smudge in the nav. The shield mark stays legible. Conversely the shield is too plain to
+carry the hero, where p.5 and p.7 both show the ornate piece.
+
+**Background removal method** (`make_assets.py`, kept for when the artwork is revised): the
+white was cut by flood-filling from the image border, so only white *connected to the edge*
+was removed. A global white threshold would have punched holes through the dome, columns
+and banner, which are all white marble. Verified: 100% centre opacity, no halo on forest.
+
+**Serve WebP first** — the 600px hero is 1.0MB as PNG and 217KB as WebP; the 400px event
+variant is 88KB. On the event page's 1.5s LCP budget that difference matters.
+
+**Remaining asset gap:** both files are raster. The mark is 2779px so it is fine for
+screen and most print, but the ornate hero piece came from a 1024px JPEG — usable on
+screen, marginal for a large table sign. **Ask Maui/Felicia for vector (SVG/AI/EPS) before
+Maui's Aug 24 print run**, or confirm the print size stays small enough for raster.
 
 ### Prescribed components (Visual Build Package p.4, p.5)
 
@@ -304,6 +319,7 @@ pnpm qr           # regenerate QR codes into qr-out/
 ```
 NEXT_PUBLIC_SITE_URL=          # live origin, used by the QR generator
 NEXT_PUBLIC_GHL_FORM_URL=      # Jake's form embed URL
+NEXT_PUBLIC_BOOKING_URL=       # Beast's 1:1 Blueprint calendar (GHL), optional
 ```
 
 That is the entire list for Phase 1. **If a task introduces a secret, question the task** —
@@ -332,33 +348,79 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
 ## 12. Status
 
 **Resolved**
-- [x] A2P 10DLC approved (Jake, Aug 13) — SMS live. **Test sends reach real phones.**
+- [x] A2P 10DLC approved (Jake, Aug 13) — SMS + calls live. **Test sends reach real phones.**
 - [x] Visual direction approved — Visual Build Package is the spec
 - [x] Pathway confirmed: Freshman → Sophomore → Junior → Senior + Capstone
 - [x] Form ownership settled: Jake builds it, we embed it
-- [x] Programme is fully paid; only the credit review is free
+- [x] **Interest list — CLOSED (Felicia, Aug 14).** Five options. Attendee-facing labels
+      and Jake's GHL tag text are both in `src/config/integrations.ts` and differ on
+      purpose: *Business Funding* → tag `Business Funding`, *Business / Entrepreneurship*
+      → tag `Entrepreneurship`, *Wealth Building* → tag `Wealth Building`, plus *Credit*
+      and *Wellness*. Jake needs six branches — five plus `Unspecified`.
+- [x] **No account creation in the event funnel (Felicia §10).** QR → landing → quick
+      signup → confirmation. Account creation belongs to membership, not lead capture.
+- [x] **Payment stays out of this repo (Felicia §10)** — "a separate but connected
+      component". The contract it must implement is written in `src/config/membership.ts`.
+- [x] **Pricing is configuration, not layout (Felicia §1)** — `src/config/membership.ts`,
+      gated by `PRICING_PUBLISHED`. No number can render while that is false.
+- [x] One landing URL, one QR destination; attribution on allow-listed campaign params
+- [x] **Brand assets received (Felicia, Aug 14).** Ornate Blueprint artwork → hero on `/`
+      and `/830`, white background cut. New shield mark → nav, footer, favicons. The old
+      derived crest files are deleted; nothing references them.
+- [x] **Homepage hero reduced to ONE button**, as p.5 specifies. The previous "See the
+      pathway" secondary CTA competed with "Start your blueprint".
+- [x] **Hero and event cards are now BLACK** (`--black: #0F1210`), not forest. Felicia §4
+      lists "Black for premium contrast" and package p.5 and p.7 both render the card in
+      near-black. Forest remains the secondary dark for bands and the footer.
+- [x] **All four §13 legal routes exist**: `/privacy`, `/terms`, `/sms-terms`, `/refunds`.
+      The last two were missing. `/refunds` renders a holding line only — Felicia §1: "Do
+      not publish a final policy until approved."
+- [x] **`/830` hero rebuilt to p.7.** The artwork is a SIBLING of the black card, not a
+      child — the grid belongs on `.evhero`. My first attempt made `.evcard` itself the
+      grid, which threw the kicker into the crest column and left a large dead gap.
+      Also removed, per review: the `Everybody Gotta Eat · Aug 30, 2026` badge and the
+      `Free · Takes 2 minutes` line. Neither appears in p.7 and both pushed the CTA
+      further down a phone screen. Time and location still render from
+      `event.details` once Felicia confirms them.
+- [x] **Module asset slots added** (`note`, `video`, `thumb`, `workbook` on `Module`).
+      Maui's task is "upload modules, organize by level" but there was previously
+      nowhere to put a file. Accepts a `/public` path or a Drive link.
+      ⚠️ `public/` is world-readable — fine for `free: true`, Drive-with-restricted-
+      sharing for paid modules until the real upload platform exists.
+- [x] **First real student material wired**: Course Note 01, Credit Foundations
+      (`/notes/L1-01-credit-foundations-note.pdf`). `/admin` now names the missing
+      assets per module, which is Maui's "report missing items" step.
+- [x] `TESTING.md` — the Workflow 1 chain as a printable seven-link runbook with all six
+      interest branches, so rehearsals do not depend on anyone remembering the chain.
 
-**🔴 Blocking, unowned in the tracker**
+**🔴 Blocking, still unowned in the tracker**
 - [ ] **Domain + DNS access** — Aug 23 QR lock and Maui's Aug 24 print both depend on it,
-      and no tracker row assigns it. Escalate to Felicia.
-- [ ] **Interest list mismatch** — tracker says 5 (incl. Wellness), package p.6 says 4.
-      Jake needs one branch per value. Felicia decides.
+      and no tracker row assigns it. Escalate to Felicia. **Oldest open item.**
 - [ ] **Thank-you redirect** — can Jake's GHL form redirect to our `/thanks`? If not, the
-      page is never seen and task 5 changes shape. Ask Jake.
+      page is never seen and task 5 changes shape. One answer from Jake settles it.
+- [ ] **Jake's form embed URL.** His draft funnel is a `vibepreview.com` preview host —
+      usable as a cold standby (`STANDBY_FUNNEL_URL`), never as the printed destination.
 
 **Waiting on others**
 - [ ] Offer + pricing approval (Surpaul, tracker due Aug 17)
-- [ ] Jake's form embed URL + parameter support
-- [ ] Founding member wording (Surpaul)
+- [ ] Founding member wording + scholarship rules (Surpaul) — §9
+- [ ] Refund / cancellation policy (Surpaul + attorney) — §1, must not be published early
+- [ ] Event time + location (Felicia) — §3, placeholders already in `src/content/event.ts`
+- [ ] Official social accounts (Felicia) — §12, slots reserved in `src/content/site.ts`
+- [ ] Beast's 1:1 booking link (Jake) — CTA on `/thanks` stays hidden until it arrives
 - [ ] Attorney legal copy for `legal` in `src/content/site.ts`
-- [ ] Vector crest (Maui)
+- [ ] **Vector logo files (Maui / Felicia)** — both supplied assets are raster. The hero
+      piece came from a 1024px JPEG, which is fine on screen but marginal for a large
+      table sign. Needed before Maui's Aug 24 print run.
 
 **Build**
 - [x] `/` website built to package p.5 spec
-- [x] `/830` event page built to package p.7 spec
-- [ ] Content + config extracted to `src/content` / `src/config`
-- [ ] `/go/[code]` redirect + QR generator
-- [ ] `/thanks` page
-- [ ] Vercel project under client ownership, preview URL to Jake
+- [x] `/830` event page built to package p.7 + Felicia §2 spec
+- [x] Content + config extracted to `src/content` / `src/config`
+- [x] `/go/[code]` redirect + QR generator
+- [x] `/thanks` page built to Felicia §11 hierarchy
+- [x] Campaign parameter passthrough into Jake's form
+- [x] Membership + pricing configuration layer
+- [ ] Vercel project under client ownership, preview URL to Jake ← **next action**
 - [ ] Device + cellular test matrix
 - [ ] Handoff folder contribution

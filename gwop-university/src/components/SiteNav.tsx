@@ -45,7 +45,7 @@ export function SiteNav() {
           <Link className="logo" href="/" onClick={() => setOpen(false)}>
             <Image
               className="crest"
-              src="/crest-200.png"
+              src="/mark-128.png"
               alt=""
               width={38}
               height={38}

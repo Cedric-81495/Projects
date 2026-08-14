@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { event } from '@/content/event'
 import { site, legal } from '@/content/site'
@@ -29,19 +30,49 @@ export default function EventPage() {
         </b>
       </div>
 
-      {/* ═══ HERO · Visual Build Package p.7 ═══ */}
+      {/* ═══ HERO · Visual Build Package p.7 ═══
+          p.7 puts the artwork BESIDE the black card, not inside it. So the grid
+          lives on .evhero and the card is one cell — my previous attempt made
+          .evcard itself the grid, which threw the kicker into the crest column.
+          Removed per Jhon's review: the event badge and the "Free · 2 minutes"
+          line. Neither is in p.7, and both push the CTA further down a phone. */}
       <div className="evhero">
         <div className="evcard">
-          <span className="evtag" data-tbc>{event.badge.text}</span>
           <h1>
             {event.h1a}
             <em>{event.h1b}</em>
           </h1>
           <p className="evkw">{event.kicker}</p>
+
+          {/* Felicia §2 supporting copy */}
+          <p className="evsupport">{event.support}</p>
+
           <a className="btn btn-e" href="#choose" style={{ marginTop: 26 }}>
             {event.cta}
           </a>
-          <p className="evfine">{event.fine}</p>
+
+          {/* Felicia §3 — renders only once she confirms time/location.
+              Empty values render nothing rather than an empty label. */}
+          {(event.details.time.text || event.details.location.text) && (
+            <p className="evmeta">
+              {[event.details.time.text, event.details.location.text]
+                .filter(Boolean).join(' · ')}
+            </p>
+          )}
+        </div>
+
+        {/* p.7: the artwork sits in its own panel to the right of the card */}
+        <div className="evcrest">
+          <picture>
+            <source srcSet="/hero-crest-400.webp" type="image/webp" />
+            <Image
+              src="/hero-crest-400.png"
+              alt="GWOP University — The GWOP Blueprint"
+              width={400}
+              height={621}
+              sizes="(max-width:719px) 42vw, 210px"
+            />
+          </picture>
         </div>
       </div>
 
@@ -113,11 +144,12 @@ export default function EventPage() {
         <p><Tbc>{legal.disclosure.text}</Tbc></p>
         <p>
           Msg &amp; data rates may apply. Reply STOP to opt out.{' '}
-          <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link>
+          <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link> ·{' '}
+          <Link href="/sms-terms">SMS Terms</Link>
         </p>
       </footer>
 
-      <DraftBar pending="founding member wording (Surpaul), Wellness interest (Felicia), legal copy (attorney), Jake's form URL" />
+      <DraftBar pending="founding member wording (Surpaul), legal copy (attorney), Jake's form URL, event time + location (Felicia)" />
     </div>
   )
 }

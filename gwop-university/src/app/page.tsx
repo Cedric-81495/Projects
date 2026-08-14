@@ -12,7 +12,9 @@ export default function Home() {
     <>
       <Nav />
 
-      {/* ═══ HERO · p.5 — copy prescribed, do not reword ═══ */}
+      {/* ═══ HERO · p.5 — copy AND layout prescribed, do not reword or add ═══
+          Package p.5 shows exactly one button. A second CTA next to the primary
+          splits the one action the page is meant to drive, so there is one. */}
       <div className="hero wrap">
         <div className="herocard">
           <div>
@@ -21,19 +23,19 @@ export default function Home() {
             <p className="sub">{site.hero.sub}</p>
             <div className="acts">
               <Link className="btn btn-e" href={EVENT_PATH}>{site.hero.primary}</Link>
-              <a className="btn btn-ol" href="#pathway">{site.hero.secondary}</a>
             </div>
           </div>
 
-          {/* Primary logo — brand sheet: hero graphics */}
+          {/* The ornate Blueprint artwork, on the right, as p.5 shows it.
+              Background cut so it sits on the dark card without a white plate. */}
           <div className="herologo">
             <picture>
-              <source srcSet="/crest-800.webp" type="image/webp" />
+              <source srcSet="/hero-crest-600.webp" type="image/webp" />
               <Image
-                src="/crest-800.png"
+                src="/hero-crest-600.png"
                 alt="GWOP University — The GWOP Blueprint"
-                width={769}
-                height={800}
+                width={600}
+                height={932}
                 priority
                 sizes="(max-width:820px) 58vw, 270px"
               />

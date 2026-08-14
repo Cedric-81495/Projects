@@ -8,8 +8,13 @@
   --emerald:#0D5B3F;      /* Growth & Ambition */
   --emerald-dk:#0A4A34;
   --emerald-lt:#E4EFE9;
-  --forest:#1E3E2F;       /* Stability & Authority — the dark. No true black. */
+  --forest:#1E3E2F;       /* Stability & Authority — secondary dark, bands + footer */
   --forest-dk:#152C21;
+  /* Felicia §4 lists "Black for premium contrast", and Visual Build Package p.5
+     and p.7 both render the hero card in near-black, not forest. This is that
+     black. Kept a touch off pure #000 so the gold rule and crest edges read as
+     depth rather than a hard cut. White on it is 18.4:1. */
+  --black:#0F1210;
   --gold:#C8A34A;         /* Wealth & Excellence */
   --gold-lt:#D9B45C;      /* gold on dark */
   --gold-ink:#8A6D1F;     /* gold that passes as small text on ivory */
@@ -122,7 +127,7 @@ header{position:sticky;top:0;z-index:80;background:rgba(247,243,233,.92);
 
 /* ── HERO · Visual Build Package p.5 ─────────────────────────────────────── */
 .hero{padding:clamp(22px,4vw,34px) 0 0}
-.herocard{background:var(--forest);border-radius:var(--r-xl);
+.herocard{background:var(--black);border-radius:var(--r-xl);
   padding:clamp(32px,6.5vw,64px) clamp(24px,5.5vw,56px);
   display:grid;gap:clamp(28px,5vw,48px);position:relative;overflow:hidden}
 .herocard::after{content:'';position:absolute;left:-130px;bottom:-160px;
@@ -133,7 +138,12 @@ header{position:sticky;top:0;z-index:80;background:rgba(247,243,233,.92);
 .herocard .sub{color:rgba(247,243,233,.82);font-size:clamp(16px,1.2vw + 14px,19.5px);
   margin-top:18px;max-width:32ch}
 .herocard .acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(24px,4vw,34px)}
-.herologo{width:min(58%,240px);margin-inline:auto;position:relative}
+/* The new artwork is portrait (0.64) where the old one was near-square, so it
+   is sized by HEIGHT. Sizing a 2:3 image by width alone makes the hero card
+   grow roughly 50% taller and pushes the CTA off a phone screen. */
+.herologo{width:min(46%,190px);margin-inline:auto;position:relative}
+.herologo img{display:block;width:100%;height:auto;max-height:46vh;
+  object-fit:contain;object-position:center}
 
 /* ── COURSE CARDS · p.5 ──────────────────────────────────────────────────── */
 .courses{display:grid;gap:14px;margin-top:clamp(18px,3vw,28px)}
@@ -192,6 +202,11 @@ footer .logo b{color:#fff}
 footer .logo b small{color:var(--gold-lt)}
 footer .blurb{margin-top:14px;max-width:30ch;font-family:var(--display);
   font-size:17px;color:rgba(247,243,233,.78)}
+/* Felicia §12 — reserved space for the official accounts */
+footer .socials{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:18px;
+  list-style:none;padding:0}
+footer .socials li{font-size:12.4px;font-weight:500}
+footer .socials span{color:rgba(247,243,233,.42)}
 footer h4{color:#fff;font-family:var(--body);font-size:10.5px;font-weight:600;
   letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
 footer ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
@@ -219,8 +234,9 @@ body:not(.draft) .draftbar{display:none}
   .fg{grid-template-columns:1fr 1fr}
 }
 @media(min-width:820px){
-  .herocard{grid-template-columns:1fr minmax(200px,270px);align-items:center}
+  .herocard{grid-template-columns:1fr minmax(180px,230px);align-items:center}
   .herologo{width:100%;margin:0}
+  .herologo img{max-height:none}
   .fg{grid-template-columns:1.6fr 1fr 1fr}
 }
 @media(min-width:1024px){
@@ -246,8 +262,9 @@ body:not(.draft) .draftbar{display:none}
   line-height:1.05}
 .evbar b small{display:block;font-family:var(--body);font-size:7px;font-weight:600;
   letter-spacing:.24em;color:var(--gold-lt);margin-top:2px}
-.evhero{padding:18px var(--pad) 0}
-.evcard{max-width:760px;margin-inline:auto;background:var(--forest);
+.evhero{padding:18px var(--pad) 0;display:grid;gap:22px;justify-items:center;
+  max-width:1000px;margin-inline:auto}
+.evcard{width:100%;max-width:760px;background:var(--black);
   border-radius:var(--r-xl);padding:clamp(30px,7vw,50px) clamp(24px,6vw,46px);
   position:relative;overflow:hidden}
 .evcard::after{content:'';position:absolute;right:-80px;top:-80px;width:260px;height:260px;
@@ -262,6 +279,17 @@ body:not(.draft) .draftbar{display:none}
   font-size:clamp(14.5px,3.6vw,18px);color:rgba(247,243,233,.9)}
 .evkw span{color:var(--gold-lt)}
 .evfine{margin-top:12px;font-size:12.5px;color:rgba(247,243,233,.55)}
+/* Felicia §2 supporting copy / §11 thank-you confirmation line */
+.evsupport{margin-top:13px;max-width:44ch;font-size:14.6px;line-height:1.62;
+  color:rgba(247,243,233,.78)}
+/* Felicia §3 event time + location, inserted once confirmed */
+.evmeta{margin-top:16px;padding-top:14px;border-top:1px solid rgba(200,163,74,.22);
+  font-size:12.8px;font-weight:500;letter-spacing:.02em;color:var(--gold-lt)}
+/* Felicia §11 next-step CTAs on /thanks */
+.evacts{display:flex;flex-wrap:wrap;gap:11px;margin-top:26px}
+@media(max-width:439px){.evacts .btn{width:100%}}
+.evcrest{display:flex;justify-content:center;align-items:center}
+.evcrest img{display:block;width:min(42%,168px);height:auto}
 .evsect{padding:clamp(34px,7vw,52px) 0 0}
 .evsect.pb{padding-bottom:clamp(34px,7vw,52px)}
 .evsect h2{font-family:var(--display);font-size:clamp(24px,6vw,32px)}
@@ -329,6 +357,12 @@ body:not(.draft) .draftbar{display:none}
   font-size:11px;line-height:1.62}
 .evfoot p{margin-bottom:6px}
 .evfoot a,.evfoot strong{color:rgba(247,243,233,.6)}
+@media(min-width:720px){
+  /* p.7: artwork in its own panel to the right of the card */
+  .evhero{grid-template-columns:minmax(0,1fr) 210px;gap:34px;align-items:center;
+    justify-items:stretch;padding-top:26px}
+  .evcrest img{width:100%;max-width:210px}
+}
 @media(min-width:640px){
   .evgifts{grid-template-columns:repeat(3,1fr)}
   .evgift{flex-direction:column}
@@ -602,7 +636,7 @@ section:first-of-type{padding-top:clamp(34px,5.5vw,64px)}
    ═══════════════════════════════════════════════════════════════════════════ */
 @media(min-width:820px) and (max-width:1009px){
   .herocard{grid-template-columns:1fr}
-  .herologo{width:min(46%,210px);margin-inline:auto}
+  .herologo{width:min(42%,220px);margin-inline:auto}
   .herocard h1{font-size:clamp(44px,6.4vw,62px)}
   .herocard .sub{max-width:46ch}
 }

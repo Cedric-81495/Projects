@@ -30,16 +30,21 @@ export const QR_CODES = {
 export type QrCode = keyof typeof QR_CODES
 
 /* ── TASK 4: INTEREST OPTIONS ───────────────────────────────────────────────
-   ⚠️ OPEN: Felicia to confirm. Tracker lists 5 (incl. Wellness); the Visual
-   Build Package p.6 lists 4. Jake needs one nurture branch per value here.
-   Removing one = delete the line. The page and the form both read this list.
+   ✅ RESOLVED — Felicia, Aug 14, 8:08 AM (directions §6 + §7).
+   FIVE options. The 5-vs-4 mismatch against Visual Build Package p.6 is closed:
+   p.6 was shorthand for the four financial tracks; Wellness is in.
+
+   `label` = what the attendee taps (Felicia §6 wording, verbatim).
+   `tag`   = the exact GHL tag Jake creates (Felicia §7 wording, verbatim).
+   They differ on purpose — do not "tidy" either one. Jake needs one nurture
+   branch per `tag`; a mismatch here means a lead gets no follow-up at all.
    ────────────────────────────────────────────────────────────────────────── */
 export const INTERESTS = [
-  { value: 'credit',   label: 'Credit' },
-  { value: 'funding',  label: 'Funding' },
-  { value: 'business', label: 'Business' },
-  { value: 'wealth',   label: 'Wealth' },
-  { value: 'wellness', label: 'Wellness', pending: true },
+  { value: 'credit',           label: 'Credit',                      tag: 'Credit' },
+  { value: 'funding',          label: 'Business Funding',            tag: 'Business Funding' },
+  { value: 'entrepreneurship', label: 'Business / Entrepreneurship', tag: 'Entrepreneurship' },
+  { value: 'wealth',           label: 'Wealth Building',             tag: 'Wealth Building' },
+  { value: 'wellness',         label: 'Wellness',                    tag: 'Wellness' },
 ] as const
 
 /** Sent when someone taps "not sure yet". Jake needs a default branch for it. */
@@ -47,6 +52,38 @@ export const INTEREST_FALLBACK = 'unspecified'
 
 /** GHL source/tag for this event. Must match Jake's tag exactly. */
 export const EVENT_TAG = 'EVENT - Everybody Gotta Eat - 08/30/26'
+
+/* ── CAMPAIGN ATTRIBUTION ───────────────────────────────────────────────────
+   Felicia §7: "We do not necessarily need separate signup pages for every staff
+   member... tracking attribution on the backend" and §3: "Tracking should happen
+   through source/campaign parameters or GHL."
+
+   So: ONE page, ONE QR destination. Attribution rides on query parameters that
+   we forward straight into Jake's form. Anything not on this list is dropped —
+   an allow-list, so a scanned URL can never inject arbitrary fields.
+   ────────────────────────────────────────────────────────────────────────── */
+export const CAMPAIGN_PARAMS = [
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+] as const
+
+/* ── BEAST'S 1:1 BLUEPRINT CALENDAR ────────────────────────────────────────
+   Jake's request, Aug 14, 8:30 AM. Availability Mon–Fri 11 AM–1 PM,
+   GHL tag `GWOP – Blueprint 1:1`, Beast notified on booking.
+   Paste the live GHL booking link here when Jake sends it. Empty = the CTA
+   is hidden rather than shown broken.
+   ────────────────────────────────────────────────────────────────────────── */
+export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL ?? ''
+export const BOOKING_TAG = 'GWOP – Blueprint 1:1'
+
+/* ── COLD STANDBY ──────────────────────────────────────────────────────────
+   Jake's draft funnel, Aug 14: preview-1786530807575155018.vibepreview.com
+   ⚠️ NEVER PRINT THIS URL and never make it the QR destination — it is a
+   preview host with a generated subdomain that can rotate or expire.
+   Its only job: if our deploy fails at 2pm on Aug 30, we re-point
+   /go/[code] here and the booth keeps capturing leads.
+   ────────────────────────────────────────────────────────────────────────── */
+export const STANDBY_FUNNEL_URL =
+  'https://preview-1786530807575155018.vibepreview.com/#credit-review'
 
 /** Draft mode: highlights unconfirmed copy and shows the status bar.
  *  Set to false only when every `pending` flag in src/content is cleared. */

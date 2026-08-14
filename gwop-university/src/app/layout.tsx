@@ -25,7 +25,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      {/* globals.css styles `body.draft [data-tbc]`, but nothing was adding the
+          class — so every placeholder highlight was silently inert and the
+          "nothing unapproved can ship by accident" safeguard did nothing. */}
+      <body className={DRAFT ? 'draft' : undefined}>{children}</body>
     </html>
   )
 }

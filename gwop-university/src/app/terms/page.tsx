@@ -1,10 +1,10 @@
-import { Nav, Footer } from '@/components/Chrome'
+import { BrandBar, Footer } from '@/components/Chrome'
 
 /* ⚠️ ATTORNEY-SUPPLIED COPY ONLY — CLAUDE.md invariant 6. Do not draft. */
 export default function Page() {
   return (
     <>
-      <Nav />
+      <BrandBar />
       <section>
         <div className="wrap">
           <div className="head">

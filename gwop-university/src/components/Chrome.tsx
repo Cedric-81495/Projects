@@ -2,12 +2,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { site, legal } from '@/content/site'
 import { PATHWAY } from '@/content/pathway'
-import { DRAFT, EVENT_PATH } from '@/config/integrations'
-import { SiteNav } from './SiteNav'
+import { EVENT_PATH } from '@/config/integrations'
 
-/** Wraps unconfirmed copy so DRAFT mode can highlight it. */
+/** Marks copy that is still awaiting approval. Renders plainly — the marker
+ *  exists so a search for `Tbc` finds every unapproved string in the source. */
 export function Tbc({ children }: { children: React.ReactNode }) {
-  return <span {...(DRAFT ? { 'data-tbc': '' } : {})}>{children}</span>
+  return <>{children}</>
 }
 
 /** The MARK — clean shield. Brand sheet: nav, footer, favicons, small use.
@@ -39,8 +39,34 @@ export function Logo() {
   )
 }
 
-export function Nav() {
-  return <SiteNav />
+/* ═══════════════════════════════════════════════════════════════════════════
+   BRAND BAR — the same header on every page.
+
+   Package p.1 team rule: "every screen, workbook, event piece and social asset
+   should feel like it belongs to the same university." `/830` already used this
+   bar; `/` and `/app` had a separate header with a nav menu and a mobile drawer.
+
+   That menu earned its removal on its own terms: it held two items, one of which
+   ("Students") duplicated the four course cards, and the other duplicated the
+   hero CTA. p.4 does not show a nav bar. Everywhere to go is already on the page
+   — the cards go into the levels, the footer holds the legal routes.
+
+   `linked` is false on `/830` only, where invariant 10 applies: nothing on the
+   event page may click away from the form.
+   ═══════════════════════════════════════════════════════════════════════════ */
+export function BrandBar({ linked = true }: { linked?: boolean }) {
+  const inner = (
+    <>
+      <Crest size={34} />
+      <b>
+        {site.brand}
+        <small>{site.motto}</small>
+      </b>
+    </>
+  )
+  return linked
+    ? <Link className="evbar" href="/">{inner}</Link>
+    : <div className="evbar">{inner}</div>
 }
 
 export function Footer() {
@@ -59,7 +85,7 @@ export function Footer() {
                 <li key={s.name}>
                   {s.url
                     ? <a href={s.url} rel="me noopener" target="_blank">{s.name}</a>
-                    : <span data-tbc>{s.name}</span>}
+                    : <span className="soon">{s.name}</span>}
                 </li>
               ))}
             </ul>
@@ -68,7 +94,7 @@ export function Footer() {
             <h4>Pathway</h4>
             <ul>
               {PATHWAY.map(l => (
-                <li key={l.slug}><a href="/#pathway">{l.label}</a></li>
+                <li key={l.slug}><Link href={`/app/${l.slug}`}>{l.label}</Link></li>
               ))}
             </ul>
           </div>
@@ -103,7 +129,3 @@ export function Footer() {
   )
 }
 
-export function DraftBar({ pending }: { pending: string }) {
-  if (!DRAFT) return null
-  return <div className="draftbar">⚠️ <b>DRAFT</b> — pending: {pending}</div>
-}

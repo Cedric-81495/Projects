@@ -14,19 +14,9 @@ export const site = {
     h1:        'Knowledge Pays.',
     sub:       'Build your financial foundation. Strengthen your credit. Prepare your business for capital.',
     primary:   'Start your blueprint',
-    secondary: 'See the pathway',
   },
 
   /* p.5 build note: "consistent course cards" */
-  courseNote: 'Four levels. One blueprint. Study in order.',
-
-  /* p.4 — "The university should visually show progression." */
-  pathway: {
-    tag:  '01 / Course Experience',
-    h2:   'The 4-Level Pathway',
-    lede: 'Each level has a clear purpose and a clear outcome.',
-  },
-
   /* Felicia §12: leave space for the official social accounts.
      Paste the real URLs in. Any entry left empty is not rendered — we never
      ship a link to a handle that does not exist yet. */
@@ -38,11 +28,6 @@ export const site = {
     { name: 'LinkedIn',  url: '', pending: true },
   ],
 
-  cta: {
-    h2: 'Start With Your Blueprint.',
-    p:  'Begin with a free review — no cost, no credit check, no obligation.',
-    button: 'Get started',
-  },
 } as const
 
 /* ── LEGAL — ⚠️ ATTORNEY-SUPPLIED ONLY. Never draft or reword. ───────────── */

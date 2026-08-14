@@ -28,6 +28,8 @@ plus one skip. **Rehearsals: Aug 25 and Aug 26.**
 | Check | Pass |
 |---|---|
 | Printed QR scans at arm's length, dim light, first try | ☐ |
+| The code on the table sign and the counter card are the SAME code | ☐ |
+| The airdrop graphic opens the page with no QR on it (p.6 piece 3) | ☐ |
 | Scans from ~1 metre (staff holding a card) | ☐ |
 | `/go/1` … `/go/5` each reach `/830` with the right `?s=` role | ☐ |
 | An unknown code (e.g. `/go/99`) still lands on `/830` — never a 404 | ☐ |
@@ -35,6 +37,43 @@ plus one skip. **Rehearsals: Aug 25 and Aug 26.**
 
 A dead QR at the booth is unrecoverable. That is why the printed code points at
 `/go/[code]` and never at `/830`.
+
+## 1b · SCREEN SIZES
+
+Breakpoint behaviour, verified statically. Column counts are what the CSS
+resolves to at each width:
+
+| Width | Course cards | Hero | Event hero | Devices |
+|---|---|---|---|---|
+| 280-339 | 1 | stacked | stacked | Fold cover screen, old Androids |
+| 340-519 | 1 | stacked | stacked | iPhone SE/13/15, most Androids |
+| 520-719 | 2 | stacked | stacked | Large phones, Fold open |
+| 720-819 | 2 | stacked | side by side | iPad mini portrait |
+| 820-1009 | 2 | stacked | side by side | iPad / iPad Air portrait |
+| 1010-1023 | 2 | side by side | side by side | Small laptop windows |
+| 1024+ | 4 | side by side | side by side | iPad landscape, desktop |
+
+Also handled: viewports under 520px tall (landscape phones) shrink the drawer
+so the whole menu fits; `viewport-fit=cover` plus safe-area insets keep the menu
+clear of the notch and home indicator.
+
+**Statically verified ≠ tested.** The table above says what the CSS resolves to.
+It does not tell you whether it *looks* right, whether tap targets feel right, or
+how it behaves on cellular. Those still need real hardware — the checks below.
+
+### Devices to actually test on
+
+| Device | Why this one |
+|---|---|
+| iPhone (any current) | Safari is the only engine that matters on iOS |
+| Android phone, Chrome | Different font rendering and viewport handling |
+| One small phone (≤375px) | Where the headline and CTA compete for space |
+| One phone in landscape | The drawer scroll fix above |
+| iPad or tablet | The 2-column band nobody looks at |
+
+Check on each: no horizontal scroll at any point, headline and CTA visible
+without scrolling, buttons comfortably tappable one-handed, images sharp, and
+the page readable in bright outdoor light.
 
 ## 2 · LANDING PAGE
 

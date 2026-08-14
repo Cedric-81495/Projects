@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { event } from '@/content/event'
 import { site } from '@/content/site'
 import { BOOKING_URL } from '@/config/integrations'
-import { Crest, DraftBar, Tbc } from '@/components/Chrome'
+import { BrandBar, Tbc } from '@/components/Chrome'
 
 export const metadata: Metadata = {
   title: "You're in — GWOP University",
@@ -15,10 +15,7 @@ export const metadata: Metadata = {
 export default function Thanks() {
   return (
     <div className="ev">
-      <div className="evbar">
-        <Crest size={34} />
-        <b>{site.brand}<small>{site.motto}</small></b>
-      </div>
+      <BrandBar />
 
       {/* Hierarchy prescribed by Felicia §11: YOU'RE IN → Blueprint starts here
           → confirm delivery → next CTA. Do not reorder. */}
@@ -74,8 +71,6 @@ export default function Thanks() {
           )}
         </section>
       </div>
-
-      <DraftBar pending="founding member wording (Surpaul), GHL redirect confirmation (Jake), 1:1 booking link (Jake)" />
     </div>
   )
 }

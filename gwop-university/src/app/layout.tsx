@@ -1,18 +1,22 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { site } from '@/content/site'
-import { DRAFT } from '@/config/integrations'
 
 export const metadata: Metadata = {
   title: 'GWOP University — Knowledge Pays',
   description: site.hero.sub,
-  /* While DRAFT is on, keep the whole site out of search engines — it carries
-     placeholder pricing and unapproved legal copy. Public URL, un-findable.
-     Flip DRAFT to false in src/config/integrations.ts to allow indexing. */
-  robots: DRAFT ? { index: false, follow: false } : undefined,
+  /* Keep the site out of search engines until pricing and the attorney's legal
+     copy are approved. Remove this line to allow indexing. */
+  robots: { index: false, follow: false },
 }
 
-export const viewport: Viewport = { themeColor: '#0F1210' }
+export const viewport: Viewport = {
+  themeColor: '#0F1210',
+  /* Required for the env(safe-area-inset-*) values the drawer relies on.
+     Without viewport-fit they resolve to 0 and the menu sits under the
+     notch and the home indicator on iPhone. */
+  viewportFit: 'cover',
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -25,10 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      {/* globals.css styles `body.draft [data-tbc]`, but nothing was adding the
-          class — so every placeholder highlight was silently inert and the
-          "nothing unapproved can ship by accident" safeguard did nothing. */}
-      <body className={DRAFT ? 'draft' : undefined}>{children}</body>
+      <body>{children}</body>
     </html>
   )
 }

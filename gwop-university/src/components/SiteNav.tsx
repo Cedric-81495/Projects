@@ -8,8 +8,7 @@ import { EVENT_PATH } from '@/config/integrations'
 import { PATHWAY } from '@/content/pathway'
 
 const LINKS = [
-  { href: '/#pathway', label: 'Pathway',  meta: 'Freshman–Senior' },
-  { href: '/app',      label: 'Students', meta: 'Your blueprint' },
+  { href: '/app', label: 'Students', meta: 'Freshman–Senior' },
 ] as const
 
 /* ⚠️ The drawer MUST be a sibling of <header>, not a child.
@@ -65,9 +64,13 @@ export function SiteNav() {
           </button>
 
           <div className="desk">
+            {/* Sourced from LINKS so desktop and the mobile drawer can never
+                drift apart — they were hardcoded separately, which is how the
+                dead /#pathway link survived in one and not the other. */}
             <div className="menu">
-              <a href="/#pathway">Pathway</a>
-              <Link href="/app">Students</Link>
+              {LINKS.map(l => (
+                <Link href={l.href} key={l.href}>{l.label}</Link>
+              ))}
             </div>
             <Link className="btn btn-e btn-sm" href={EVENT_PATH}>{site.hero.primary}</Link>
           </div>

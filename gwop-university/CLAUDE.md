@@ -118,6 +118,8 @@ person and used, it is not finished."* This table is how we satisfy it.
 | `src/content/site.ts` | Surpaul / Felicia, applied by Maui | All website copy |
 | `src/content/event.ts` | Surpaul (offer), Maui | Event page copy, incentives, thank-you |
 | `src/content/pathway.ts` | Maui | Freshman–Senior labels and details |
+| `src/components/Chrome.tsx` | **Jhon** | `BrandBar` — the one header used by every page. `linked={false}` on `/830` only |
+| `src/components/Pathway.tsx` | **Jhon** | `PathwayTarget` — the whole p.4 layout, shared by `/` and `/app`. Structure is fixed; only the four strings in `SURFACES` differ per surface. Surfaces are a closed union, so a new one inherits the layout and cannot invent its own |
 | `src/config/integrations.ts` | **Jhon**, with input from Jake | Form URL, QR codes, interest list, campaign params, booking link, draft flag |
 | `src/config/membership.ts` | **Felicia defines, Surpaul approves** | Level pricing, billing modes, promo codes, offers, refund policy |
 | `src/app/globals.css` | **Jhon only** | Design tokens + all styling |
@@ -238,7 +240,7 @@ Two assets, two jobs. **Do not swap them.** Updated Aug 14 with Felicia's suppli
 
 | Asset | Source | Use |
 |---|---|---|
-| `hero-crest-900/600/400.png` / `.webp` | `Primary-logo-w-bg.jpeg`, white background cut | The image beside the black card on `/` (p.5) and `/830` (p.7). Ornate, portrait 0.64 ratio |
+| `hero-crest-900/600/400.png` / `.webp` | `Primary-logo-w-bg.jpeg`, **white plate kept** | The image beside the black card on `/` (p.5) and `/830` (p.7). Ornate, portrait 0.64 ratio |
 | `mark-512/256/128/64.png` / `.webp` | `Gwop_University_logo.png`, already transparent | Nav, footer, event bar, favicons, avatars, stamps |
 | `src/app/icon.png`, `apple-icon.png` | the mark | Next.js auto-favicon. Apple icon gets an ivory plate — iOS renders transparency as black |
 
@@ -246,10 +248,11 @@ Two assets, two jobs. **Do not swap them.** Updated Aug 14 with Felicia's suppli
 smudge in the nav. The shield mark stays legible. Conversely the shield is too plain to
 carry the hero, where p.5 and p.7 both show the ornate piece.
 
-**Background removal method** (`make_assets.py`, kept for when the artwork is revised): the
-white was cut by flood-filling from the image border, so only white *connected to the edge*
-was removed. A global white threshold would have punched holes through the dome, columns
-and banner, which are all white marble. Verified: 100% centre opacity, no halo on forest.
+**The hero artwork keeps its white background** — p.4 and p.7 both show the crest on a
+white plate inside the black card, and that is the approved look. An earlier version cut
+the background out; reverted Aug 14 on client instruction. Processing is limited to
+trimming the outer margin and forcing the near-white JPEG border (253-254) to pure white,
+so the plate does not read grey. The mark, by contrast, is genuinely transparent.
 
 **Serve WebP first** — the 600px hero is 1.0MB as PNG and 217KB as WebP; the 400px event
 variant is 88KB. On the event page's 1.5s LCP budget that difference matters.
@@ -414,7 +417,90 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
       table sign. Needed before Maui's Aug 24 print run.
 
 **Build**
-- [x] `/` website built to package p.5 spec
+- [x] `/` website stripped to package p.4 exactly — hero card + four course cards.
+      **Removed as unauthorised additions (Aug 14):** the repeated 4-level pathway
+      section, the "Start With Your Blueprint" CTA band, and the on-page build note.
+      That build-note line on p.4 is an instruction to the builder, not website copy.
+- [x] **`/` and `/app` share ONE p.4 layout with surface-specific copy.** p.4
+      shows both uses at once: a marketing hero with START YOUR BLUEPRINT *and*
+      four cards with ENTER > into levels. It is one design language across two
+      surfaces — which is what "WEBSITE + APP" in the title means. So the
+      structure is shared and verified identical (black card, gold eyebrow, serif
+      headline, supporting line, emerald pill CTA, artwork right, four cards);
+      only four strings differ.
+
+      | | `/` | `/app` |
+      |---|---|---|
+      | Eyebrow | GWOP University | Student area |
+      | Headline | Knowledge Pays. | Your Blueprint |
+      | CTA | Start your blueprint → `/830` | Continue → first level |
+
+      An intermediate version made the two pages byte-identical. That sent a
+      paying student on `/app` back out to the event signup funnel, which is a
+      stranger's page shown to a customer. Reverted.
+      ⚠️ Confirm the reading with Felicia — she wrote the note.
+- [x] **One header on every page (`BrandBar`).** Package p.1 team rule: "every
+      screen... should feel like it belongs to the same university." `/830` used a
+      centred brand bar while `/` and `/app` had a different header with a nav menu
+      and a mobile drawer. All pages now use the brand bar. It links to `/`
+      everywhere except `/830`, where invariant 10 forbids anything that clicks
+      away from the form.
+      The old menu earned removal on its own terms: two items, one duplicating the
+      four course cards and the other duplicating the hero CTA, on a layout (p.4)
+      that shows no nav bar. Everywhere to go is already on the page.
+      **Deleted with it:** `SiteNav.tsx`, ~6KB of header/drawer/burger/menu CSS,
+      the `--nav-h` variable, the sticky-header scroll offset, and the landscape
+      drawer-scroll bug — which no longer has a component to affect.
+      `/admin` keeps its own distinct bar: it is an internal tool, and looking
+      different from the student-facing site is useful there.
+- [x] **Crest plate corners are square** — an added `border-radius: 8px` was
+      rounding the artwork's white plate. p.4 shows a plain rectangle.
+- [x] **Internal production status removed from student-facing pages.** Module
+      readiness counts and "In production" / "Missing assets" labels were showing
+      to students. Those belong on `/admin`, which still has them. A student sees
+      the runtime and whether a module is open — nothing about our pipeline.
+- [x] **QR output rebuilt to package p.6.** p.6 lists three pieces: the main table
+      sign carries THE primary QR, the counter card carries **the same code** at a
+      smaller size, and the phone/airdrop graphic carries **no code** — it is a
+      tappable link. So `pnpm qr` now emits ONE code at three sizes: one file for
+      Maui to print, one code to field-test. Per-staff codes still exist but are
+      off by default (`ROLE_CODES=1 pnpm qr`) — Felicia §7 says separate signup
+      pages per staff member are not required, and five printed variants means
+      five codes needing their own field test before Aug 23.
+- [x] **Fixed a print hazard in the generator.** It defaulted to
+      `https://gwopu.com` when `NEXT_PUBLIC_SITE_URL` was unset, silently
+      producing printable codes for a domain nobody has confirmed we own. It now
+      exits with an error, and also rejects non-https origins — a cert warning
+      after a scan loses the signup. **Open question for Felicia: is gwopu.com
+      actually ours?**
+- [x] **Verified by decoding, not by eye.** All three sizes decode to the right
+      URL, and the counter card still decodes at 150px, blurred, at 35% contrast,
+      and with a corner fully covered. That is error-correction level H working.
+- [x] **Hero eyebrow pill removed** — p.4 shows plain gold text, no bordered pill.
+- [x] **Space added below the four course cards** — `.hero` had no bottom padding,
+      so the card row ran straight into the footer.
+- [x] **Responsive hardening** — fluid images, buttons that wrap rather than
+      overflow, full-width CTAs below 380px, and overflow clipped on both dark
+      cards so the decorative gold ring cannot cause horizontal scroll.
+- [x] **Buttons now scale with the viewport, not just on mobile.** They were a
+      fixed `15.5px / 15px 30px` at every width — identical on a 320px phone and
+      a 1440px monitor. Now fluid: 14.5→17px text, 48→56px height, 22→36px side
+      padding. **The floors are accessibility limits, not taste** — 48px height
+      and 14.5px text minimum so the target stays thumb-sized. The ceilings stop
+      the CTA inflating into a slab on a large display.
+- [x] **DRAFT mode removed entirely** — banner, `body.draft` class, `data-tbc`
+      highlighting and their CSS are gone. `Tbc` remains as a source-level marker
+      only (renders plainly), so a search still finds every unapproved string.
+      `robots: noindex` is now unconditional until pricing and legal copy land.
+- [x] **Link audit, all 14 routes crawled.** Three dead links found and fixed:
+      (1) nav "Pathway" → `/#pathway`, an anchor deleted with the pathway section;
+      (2) all four footer level links pointed at that same dead anchor instead of
+      their own level; (3) the founding-member CTA on `/thanks` → `#founding`,
+      an id that never existed. **Root cause worth remembering:** the desktop nav
+      was hardcoded separately from the mobile drawer array, so fixing mobile left
+      desktop broken. Both now render from the same `LINKS` array.
+- [x] `/830` closing CTA band removed — not in p.7. The page now holds only what
+      Felicia §2 lists: intro, four levels, incentive, signup.
 - [x] `/830` event page built to package p.7 + Felicia §2 spec
 - [x] Content + config extracted to `src/content` / `src/config`
 - [x] `/go/[code]` redirect + QR generator

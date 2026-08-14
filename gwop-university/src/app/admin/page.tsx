@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { PATHWAY } from '@/content/pathway'
 import { MODULES, byLevel, STATUS_LABEL, missingAssets } from '@/content/modules'
 import { Crest } from '@/components/Chrome'
-import { DRAFT } from '@/config/integrations'
 
 export const metadata: Metadata = {
   title: 'Module Admin — GWOP University',
@@ -90,12 +89,6 @@ export default function Admin() {
           </p>
         </div>
       </section>
-
-      {DRAFT && (
-        <div className="draftbar">
-          ⚠️ <b>DRAFT</b> — placeholder module data · no auth yet, do not expose publicly
-        </div>
-      )}
     </>
   )
 }

@@ -5,7 +5,7 @@ import { event } from '@/content/event'
 import { site, legal } from '@/content/site'
 import { PATHWAY, CAPSTONE } from '@/content/pathway'
 
-import { Crest, DraftBar, Tbc } from '@/components/Chrome'
+import { BrandBar, Tbc } from '@/components/Chrome'
 import { InterestForm } from './InterestForm'
 
 /* Event page must never be indexed — CLAUDE.md invariant 11 */
@@ -22,13 +22,7 @@ export default function EventPage() {
   return (
     <div className="ev">
       {/* brand identity only — no nav, nothing to click away to (invariant 10) */}
-      <div className="evbar">
-        <Crest size={34} />
-        <b>
-          {site.brand}
-          <small>{site.motto}</small>
-        </b>
-      </div>
+      <BrandBar linked={false} />
 
       {/* ═══ HERO · Visual Build Package p.7 ═══
           p.7 puts the artwork BESIDE the black card, not inside it. So the grid
@@ -69,7 +63,7 @@ export default function EventPage() {
               src="/hero-crest-400.png"
               alt="GWOP University — The GWOP Blueprint"
               width={400}
-              height={621}
+              height={610}
               sizes="(max-width:719px) 42vw, 210px"
             />
           </picture>
@@ -77,8 +71,8 @@ export default function EventPage() {
       </div>
 
       <div className="wrap">
-        {/* ═══ INCENTIVE ═══ */}
-        <section className="evsect">
+        {/* ═══ INCENTIVE · Felicia §2 "explain the event incentive" ═══ */}
+        <section className="evsect" id="gifts">
           <p className="tag">What you get today</p>
           <h2>{event.incentives.h2}</h2>
           <p className="evlede">{event.incentives.lede}</p>
@@ -109,7 +103,7 @@ export default function EventPage() {
           <InterestForm />
         </section>
 
-        {/* ═══ PATHWAY · task 2 ═══ */}
+        {/* ═══ FOUR LEVELS · Felicia §2 "show the four levels" ═══ */}
         <section className="evsect pb">
           <p className="tag">The pathway</p>
           <h2>Four levels, in order.</h2>
@@ -132,13 +126,6 @@ export default function EventPage() {
         </section>
       </div>
 
-      {/* ═══ CLOSING ═══ */}
-      <div className="evclosing">
-        <h2>{site.hero.h1}</h2>
-        <p>Get your free blueprint before you leave the table.</p>
-        <a className="btn btn-g" href="#choose">{event.cta}</a>
-      </div>
-
       <footer className="evfoot">
         <p><strong><Tbc>{legal.entity.text}</Tbc></strong></p>
         <p><Tbc>{legal.disclosure.text}</Tbc></p>
@@ -148,8 +135,6 @@ export default function EventPage() {
           <Link href="/sms-terms">SMS Terms</Link>
         </p>
       </footer>
-
-      <DraftBar pending="founding member wording (Surpaul), legal copy (attorney), Jake's form URL, event time + location (Felicia)" />
     </div>
   )
 }

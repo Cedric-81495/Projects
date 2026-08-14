@@ -1,4 +1,4 @@
-import { Nav, Footer } from '@/components/Chrome'
+import { BrandBar, Footer } from '@/components/Chrome'
 import { legal } from '@/content/site'
 
 /* Felicia §13 — a required placeholder route: "SMS Terms / Consent language".
@@ -8,7 +8,7 @@ import { legal } from '@/content/site'
 export default function Page() {
   return (
     <>
-      <Nav />
+      <BrandBar />
       <section>
         <div className="wrap">
           <div className="head">

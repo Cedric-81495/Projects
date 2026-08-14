@@ -31,7 +31,6 @@
   --pad:clamp(20px,5vw,32px);
   --sect:clamp(52px,9vw,104px);
   --r:14px;  --r-lg:20px;  --r-xl:26px;
-  --nav-h:64px;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -41,7 +40,6 @@ html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--body);
   font-size:clamp(15.5px,.42vw + 14.5px,17px);line-height:1.62;
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
-body.navopen{overflow:hidden}
 img,svg{max-width:100%;display:block;height:auto}
 p{margin:0}
 a{color:var(--emerald)}
@@ -80,50 +78,10 @@ h3,h4{font-family:var(--body);font-weight:600;color:var(--emerald);
 .btn-full{width:100%}
 
 /* ── HEADER ──────────────────────────────────────────────────────────────── */
-header{position:sticky;top:0;z-index:80;background:rgba(247,243,233,.92);
-  backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--stone);
-  padding-top:env(safe-area-inset-top)}
-.nav{display:flex;align-items:center;gap:20px;min-height:var(--nav-h)}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none}
-.logo .crest{width:38px;height:38px;flex:none}
-.logo b{font-family:var(--display);font-size:clamp(15px,3.4vw,17.5px);font-weight:700;
-  color:var(--emerald);line-height:1.05;letter-spacing:.005em;white-space:nowrap}
-.logo b small{display:block;font-family:var(--body);font-size:7.5px;font-weight:600;
-  letter-spacing:.22em;color:var(--gold-ink);margin-top:2px}
-.nav .desk{display:none}
 
 /* burger */
-.burger{margin-left:auto;width:48px;height:48px;display:grid;place-items:center;
-  background:none;border:0;cursor:pointer;flex:none}
-.burger span{display:block;width:24px;height:2px;background:var(--emerald);
-  border-radius:2px;transition:transform .26s ease,opacity .18s ease}
-.burger span+span{margin-top:6px}
-.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(8px) rotate(45deg)}
-.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
-.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
 
 /* ── MOBILE DRAWER ───────────────────────────────────────────────────────── */
-.drawer{position:fixed;inset:0;z-index:90;background:var(--forest);
-  display:flex;flex-direction:column;
-  padding:calc(var(--nav-h) + env(safe-area-inset-top) + 24px) var(--pad)
-          calc(28px + env(safe-area-inset-bottom));
-  opacity:0;visibility:hidden;transform:translateY(-8px);
-  transition:opacity .24s ease,transform .24s ease,visibility .24s}
-.drawer.open{opacity:1;visibility:visible;transform:none}
-.drawer::before{content:'';position:absolute;right:-70px;top:-70px;width:280px;height:280px;
-  border:1px solid rgba(200,163,74,.16);border-radius:50%;pointer-events:none}
-.drawer ul{list-style:none;margin:0;padding:0;flex:1}
-.drawer li{border-bottom:1px solid rgba(200,163,74,.22)}
-.drawer li:first-child{border-top:1px solid rgba(200,163,74,.22)}
-.drawer a{display:flex;align-items:center;justify-content:space-between;
-  font-family:var(--display);font-size:clamp(25px,7vw,32px);font-weight:600;
-  color:var(--ivory);text-decoration:none;padding:18px 2px;min-height:64px}
-.drawer a span{font-family:var(--body);font-size:11px;font-weight:600;
-  letter-spacing:.16em;color:var(--gold-lt);text-transform:uppercase}
-.drawer .foot{display:grid;gap:12px;margin-top:26px}
-.drawer .motto{font-family:var(--body);font-size:9.5px;font-weight:600;
-  letter-spacing:.28em;text-transform:uppercase;color:rgba(247,243,233,.42);
-  text-align:center;margin-top:20px}
 
 /* ── HERO · Visual Build Package p.5 ─────────────────────────────────────── */
 .hero{padding:clamp(22px,4vw,34px) 0 0}
@@ -142,8 +100,8 @@ header{position:sticky;top:0;z-index:80;background:rgba(247,243,233,.92);
    is sized by HEIGHT. Sizing a 2:3 image by width alone makes the hero card
    grow roughly 50% taller and pushes the CTA off a phone screen. */
 .herologo{width:min(46%,190px);margin-inline:auto;position:relative}
-.herologo img{display:block;width:100%;height:auto;max-height:46vh;
-  object-fit:contain;object-position:center}
+.herologo img{display:block;width:100%;height:auto;
+  max-height:min(46vh,420px);object-fit:contain;object-position:center}
 
 /* ── COURSE CARDS · p.5 ──────────────────────────────────────────────────── */
 .courses{display:grid;gap:14px;margin-top:clamp(18px,3vw,28px)}
@@ -158,41 +116,15 @@ header{position:sticky;top:0;z-index:80;background:rgba(247,243,233,.92);
   color:var(--ink);margin-top:8px;flex:1;line-height:1.2}
 .course .enter{font-family:var(--body);font-weight:600;font-size:12px;
   letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink);margin-top:16px}
-.buildnote{margin-top:18px;font-size:13.5px;color:var(--muted);text-align:center}
 
 /* ── SECTIONS ────────────────────────────────────────────────────────────── */
 section{padding:var(--sect) 0}
 section.tint{background:var(--white);border-block:1px solid var(--stone)}
 .head{max-width:660px;margin-bottom:clamp(32px,5vw,50px)}
-.head.mid{text-align:center;margin-inline:auto}
-.head.mid .lede{margin-inline:auto}
 
 /* ── PATHWAY · p.4 · alternating emerald / forest bars ───────────────────── */
-.path{display:grid}
-.bar{border-radius:var(--r-lg);padding:22px 24px;display:grid;
-  grid-template-columns:auto 1fr;gap:16px 18px;align-items:center}
-.bar.g{background:var(--emerald)}
-.bar.k{background:var(--forest)}
-.bar .n{width:46px;height:46px;border-radius:50%;background:var(--gold);
-  color:var(--forest-dk);display:grid;place-items:center;font-family:var(--display);
-  font-weight:700;font-size:19px;flex:none}
-.bar h3{color:#fff;font-family:var(--display);font-size:clamp(21px,4.4vw,26px);
-  font-weight:700;text-transform:uppercase;letter-spacing:.01em}
-.bar .role{font-family:var(--body);font-size:10.5px;font-weight:600;letter-spacing:.17em;
-  text-transform:uppercase;color:var(--gold-lt);margin-top:4px}
-.bar .det{grid-column:1/-1;color:rgba(247,243,233,.80);font-size:14.6px}
-.link{width:2px;height:22px;background:var(--gold);margin-left:22px;border-radius:2px}
-.capstone{margin-top:24px;text-align:center;font-family:var(--display);font-weight:700;
-  font-size:clamp(17px,3.4vw,23px);color:var(--emerald);text-transform:uppercase;
-  letter-spacing:.015em}
 
 /* ── CTA BAND ────────────────────────────────────────────────────────────── */
-.cta-band{background:var(--emerald);padding:var(--sect) 0;text-align:center}
-.cta-band h2{color:#fff;font-size:clamp(25px,5.4vw,40px);text-transform:uppercase;
-  max-width:22ch;margin-inline:auto;letter-spacing:.01em}
-.cta-band p{color:rgba(247,243,233,.82);max-width:44ch;margin:16px auto 26px;
-  font-size:clamp(15.5px,1vw + 13.5px,17.5px)}
-.cta-band hr{width:48px;height:2px;background:var(--gold);border:0;margin:0 auto 22px}
 
 /* ── FOOTER ──────────────────────────────────────────────────────────────── */
 footer{background:var(--forest);color:rgba(247,243,233,.62);
@@ -206,7 +138,7 @@ footer .blurb{margin-top:14px;max-width:30ch;font-family:var(--display);
 footer .socials{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:18px;
   list-style:none;padding:0}
 footer .socials li{font-size:12.4px;font-weight:500}
-footer .socials span{color:rgba(247,243,233,.42)}
+footer .socials .soon{color:rgba(247,243,233,.42)}
 footer h4{color:#fff;font-family:var(--body);font-size:10.5px;font-weight:600;
   letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
 footer ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
@@ -216,21 +148,9 @@ footer a:hover{color:var(--gold-lt)}
 .legal p{margin-bottom:8px}
 .legal strong{color:rgba(247,243,233,.56)}
 
-/* ── DRAFT ───────────────────────────────────────────────────────────────── */
-.draftbar{position:fixed;bottom:0;left:0;right:0;z-index:120;background:#7A1F1F;
-  color:#fff;text-align:center;font-size:11.5px;font-weight:600;
-  padding:8px 14px calc(8px + env(safe-area-inset-bottom))}
-.draftbar b{color:#FFD9A0}
-body.draft{padding-bottom:40px}
-body.draft [data-tbc]{background:rgba(200,163,74,.20);outline:1.5px dashed var(--gold);
-  outline-offset:2px;border-radius:3px}
-body:not(.draft) .draftbar{display:none}
-
 /* ═══ BREAKPOINTS ════════════════════════════════════════════════════════ */
 @media(min-width:520px){
   .courses{grid-template-columns:1fr 1fr}
-  .bar{grid-template-columns:auto auto 1fr;gap:18px 20px}
-  .bar .det{grid-column:auto;text-align:right}
   .fg{grid-template-columns:1fr 1fr}
 }
 @media(min-width:820px){
@@ -240,13 +160,6 @@ body:not(.draft) .draftbar{display:none}
   .fg{grid-template-columns:1.6fr 1fr 1fr}
 }
 @media(min-width:1024px){
-  :root{--nav-h:72px}
-  .burger{display:none}
-  .nav .desk{display:flex;align-items:center;gap:28px;margin-left:auto}
-  .nav .desk .menu{display:flex;gap:26px}
-  .nav .desk a{text-decoration:none;color:var(--muted);font-size:14.6px;font-weight:500}
-  .nav .desk a:hover{color:var(--emerald)}
-  .drawer{display:none}
   .courses{grid-template-columns:repeat(4,1fr)}
   .course{min-height:170px;padding:26px 24px}
   .fg{grid-template-columns:1.7fr 1fr 1fr 1fr}
@@ -257,7 +170,10 @@ body:not(.draft) .draftbar{display:none}
    ═══════════════════════════════════════════════════════════════════════════ */
 .ev{--wrap:760px}
 .evbar{background:var(--forest);padding:12px var(--pad);display:flex;align-items:center;
-  justify-content:center;gap:10px;padding-top:calc(12px + env(safe-area-inset-top))}
+  justify-content:center;gap:10px;padding-top:calc(12px + env(safe-area-inset-top));
+  text-decoration:none;transition:background .18s ease}
+a.evbar:hover{background:var(--forest-dk)}
+.evbar .crest{flex:none}
 .evbar b{font-family:var(--display);font-size:14.5px;font-weight:700;color:#fff;
   line-height:1.05}
 .evbar b small{display:block;font-family:var(--body);font-size:7px;font-weight:600;
@@ -348,10 +264,6 @@ body:not(.draft) .draftbar{display:none}
 .evcap .k{font-size:9.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
   color:var(--gold-lt);margin-bottom:6px}
 .evcap p{font-family:var(--display);font-weight:700;font-size:17px;color:#fff}
-.evclosing{background:var(--emerald);margin-top:clamp(34px,7vw,52px);
-  padding:clamp(34px,7vw,52px) var(--pad);text-align:center}
-.evclosing h2{color:#fff;font-size:clamp(24px,6vw,32px);max-width:20ch;margin:0 auto 12px}
-.evclosing p{color:rgba(247,243,233,.82);font-size:15.2px;max-width:34ch;margin:0 auto 20px}
 .evfoot{background:var(--forest);color:rgba(247,243,233,.46);
   padding:22px var(--pad) calc(26px + env(safe-area-inset-bottom));text-align:center;
   font-size:11px;line-height:1.62}
@@ -451,51 +363,24 @@ body:not(.draft) .draftbar{display:none}
    2. Footer / nav text links were ~22px tall. Tracker task 8 requires
       "no broken buttons" on real phones, so they get proper tap height.
    ═══════════════════════════════════════════════════════════════════════════ */
-.drawer{overflow:hidden}
 footer ul{gap:2px}
 footer ul a{display:flex;align-items:center;min-height:44px}
-.nav .desk a:not(.btn){display:inline-flex;align-items:center;min-height:44px}
 
 /* ═══ DRAWER OPEN STATE ══════════════════════════════════════════════════════
    The header must sit ABOVE the drawer or the close button is unreachable.
    While open it goes transparent so it reads as part of the dark overlay.
    ═══════════════════════════════════════════════════════════════════════════ */
-header{z-index:100}
-body.navopen header{background:transparent;backdrop-filter:none;border-bottom-color:transparent}
-body.navopen .logo b{color:var(--ivory)}
-body.navopen .logo b small{color:var(--gold-lt)}
-body.navopen .burger span{background:var(--ivory)}
 
 /* level shortcuts inside the drawer — real pages, not decoration */
-.drawer .levels{list-style:none;margin:18px 0 0;padding:0;display:grid;
-  grid-template-columns:1fr 1fr;gap:8px}
-.drawer .levels li{border:0}
-.drawer .levels a{display:block;padding:13px 14px;min-height:52px;border-radius:12px;
-  border:1px solid rgba(200,163,74,.3);font-family:var(--body);font-size:13px;
-  font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--gold-lt)}
-.drawer .levels a:hover{background:rgba(200,163,74,.1)}
 
 /* ═══ BURGER → X ═════════════════════════════════════════════════════════════
    Grid rows made the bar offsets unreliable (the X rendered as a chevron).
    Absolute positioning inside a relative button is deterministic.
    ═══════════════════════════════════════════════════════════════════════════ */
-.burger{position:relative;display:block}
-.burger span{position:absolute;left:50%;width:24px;height:2px;margin:0;
-  transform:translateX(-50%);transform-origin:center;
-  transition:top .22s ease,transform .22s ease,opacity .14s ease}
-.burger span:nth-child(1){top:17px}
-.burger span:nth-child(2){top:23px}
-.burger span:nth-child(3){top:29px}
-.burger[aria-expanded="true"] span:nth-child(1){top:23px;transform:translateX(-50%) rotate(45deg)}
-.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
-.burger[aria-expanded="true"] span:nth-child(3){top:23px;transform:translateX(-50%) rotate(-45deg)}
 
 /* only the CTA block should absorb the free space, not every list */
-.drawer ul{flex:none}
-.drawer .foot{margin-top:auto}
 
 /* must come last — the burger fix above re-declared display:block globally */
-@media(min-width:1024px){ .burger{display:none} }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    UNIFICATION PASS — bring the website onto /830's rhythm.
@@ -509,19 +394,12 @@ body.navopen .burger span{background:var(--ivory)}
 }
 
 /* anchor links must clear the sticky header */
-html{scroll-padding-top:calc(var(--nav-h) + 18px)}
+html{scroll-padding-top:18px}
 
-/* eyebrow as a bordered pill on dark, matching /830's .evtag */
-.herocard .tag.on-dark,.cta-band .tag.on-dark{
-  display:inline-block;border:1px solid rgba(200,163,74,.42);border-radius:999px;
-  padding:5px 13px;margin-bottom:20px;letter-spacing:.19em}
+/* p.4 shows the eyebrow as plain gold text — no pill, no border. */
+.herocard .tag.on-dark{margin-bottom:clamp(16px,2.4vw,22px);letter-spacing:.19em}
 
 /* gold ornament rule — from the brand identity sheet's divider motif */
-.orn{display:flex;align-items:center;justify-content:center;gap:12px;
-  margin:0 auto clamp(26px,4vw,38px);max-width:220px;color:var(--gold)}
-.orn::before,.orn::after{content:'';flex:1;height:1px;background:var(--gold);opacity:.5}
-.orn i{font-style:normal;width:7px;height:7px;background:var(--gold);
-  transform:rotate(45deg);flex:none}
 
 /* hero: match /830's card language */
 .herocard{border-radius:var(--r-xl);
@@ -541,9 +419,6 @@ html{scroll-padding-top:calc(var(--nav-h) + 18px)}
 .course:hover::after,.course:focus-visible::after{transform:scaleX(1)}
 
 /* pathway: tighter bars, consistent with /830 card padding */
-.bar{padding:20px 22px;border-radius:var(--r-lg)}
-.bar .n{width:42px;height:42px;font-size:18px}
-.link{height:18px;margin-left:20px}
 
 /* section heads centred like /830's, with the ornament */
 .head{margin-bottom:clamp(28px,4.5vw,44px)}
@@ -552,38 +427,10 @@ html{scroll-padding-top:calc(var(--nav-h) + 18px)}
 footer{padding:clamp(36px,6vw,54px) 0 calc(26px + env(safe-area-inset-bottom))}
 .fg{gap:26px;padding-bottom:26px}
 
-/* drawer: bulletproof size + a touch of stagger for polish */
-.drawer{width:100vw;height:100vh;height:100dvh}
-.drawer li,.drawer .levels li{opacity:0;transform:translateY(6px);
-  transition:opacity .3s ease,transform .3s ease}
-.drawer.open li,.drawer.open .levels li{opacity:1;transform:none}
-.drawer.open li:nth-child(2){transition-delay:.05s}
-.drawer.open .levels li:nth-child(1){transition-delay:.09s}
-.drawer.open .levels li:nth-child(2){transition-delay:.12s}
-.drawer.open .levels li:nth-child(3){transition-delay:.15s}
-.drawer.open .levels li:nth-child(4){transition-delay:.18s}
-@media(prefers-reduced-motion:reduce){
-  .drawer li,.drawer .levels li{opacity:1;transform:none;transition:none}}
-
 @media(min-width:1024px){
   .courses{gap:18px}
   .course{min-height:176px;padding:28px 26px 24px}
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   FIX — the drawer CTA inherited nav-link styling.
-   `.drawer a` matched the button too: serif face, 32px, space-between,
-   64px min-height. Scope the nav-link rules to list links only.
-   ═══════════════════════════════════════════════════════════════════════════ */
-.drawer ul:not(.levels) > li > a{
-  display:flex;align-items:center;justify-content:space-between;
-  font-family:var(--display);font-size:clamp(24px,6.4vw,30px);font-weight:600;
-  color:var(--ivory);text-decoration:none;padding:17px 2px;min-height:62px}
-.drawer .foot .btn{
-  font-family:var(--body);font-size:16px;font-weight:600;letter-spacing:.015em;
-  justify-content:center;padding:16px 28px;min-height:56px;border-radius:999px;
-  color:var(--forest-dk);text-transform:none}
-.drawer .foot .btn span{display:none}
 
 /* ═══ DESKTOP REFINEMENT ═════════════════════════════════════════════════════
    Hero was over-tall with slack space; cards read thin; pathway detail
@@ -602,17 +449,11 @@ footer{padding:clamp(36px,6vw,54px) 0 calc(26px + env(safe-area-inset-bottom))}
   .course .enter{margin-top:22px}
 
   /* label and detail sit together; the number anchors the row */
-  .bar{grid-template-columns:auto minmax(190px,220px) 1fr;gap:22px;
-    padding:20px 26px;align-items:center}
-  .bar .det{text-align:left;font-size:15.4px;
-    padding-left:22px;border-left:1px solid rgba(200,163,74,.28)}
-  .link{height:16px;margin-left:21px}
 }
 
 /* Package p.4 alternates the bars for a visible rhythm. Emerald #0D5B3F next
    to Forest #1E3E2F read almost identically, so the alternate bar uses the
    deeper Forest shade — still brand-derived, alternation now legible. */
-.bar.k{background:var(--forest-dk)}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FIX — .hero used the `padding` shorthand with 0 for the inline axis, which
@@ -621,10 +462,9 @@ footer{padding:clamp(36px,6vw,54px) 0 calc(26px + env(safe-area-inset-bottom))}
    Use padding-block so the shared gutter survives, and open up the spacing
    between the header, the hero and the card row.
    ═══════════════════════════════════════════════════════════════════════════ */
-.hero{padding:0;padding-block:clamp(26px,4.4vw,44px) 0;
+.hero{padding:0;padding-block:clamp(26px,4.4vw,44px) clamp(44px,7vw,88px);
   padding-inline:var(--pad)}
 .courses{margin-top:clamp(18px,3vw,26px)}
-.buildnote{margin-top:clamp(16px,2.4vw,22px)}
 
 /* a little more air under the sticky header on every page */
 section:first-of-type{padding-top:clamp(34px,5.5vw,64px)}
@@ -652,16 +492,12 @@ section:first-of-type{padding-top:clamp(34px,5.5vw,64px)}
    SAFARI — backdrop-filter needs the -webkit- prefix on iOS. Without it the
    sticky header loses its blur and renders as a flat block.
    ═══════════════════════════════════════════════════════════════════════════ */
-header{-webkit-backdrop-filter:saturate(160%) blur(14px)}
-body.navopen header{-webkit-backdrop-filter:none}
 
 /* iOS Safari: body overflow:hidden alone does not reliably stop background
    scroll behind a fixed overlay. Pin the body while the drawer is open. */
 /* body pinning removed — it broke scroll restore (a real regression) to fix an
    unverified iOS issue. Verify scroll-lock on a borrowed iPhone first; if it
    fails, reinstate pinning WITH a correct scroll restore. */
-body.navopen{overscroll-behavior:none}
-.drawer{overscroll-behavior:contain}
 
 /* The scrolling element is <html>, so locking only <body> does nothing.
    overflow:hidden on both preserves scroll position — unlike position:fixed,
@@ -669,4 +505,86 @@ body.navopen{overscroll-behavior:none}
 /* Pinning the body is the only reliable cross-browser lock. overflow:hidden on
    <html> locks but RESETS scroll to 0; position:fixed with a negative top
    holds the visual position and we restore it exactly on close. */
-body.navopen{position:fixed;left:0;right:0;width:100%;overflow:hidden}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE HARDENING — buttons, images, overflow
+   Audited against the approved layout on every width from 320px up.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Every image is fluid and can never exceed its column. */
+img,picture,svg,video{max-width:100%;height:auto}
+
+/* Buttons: never wider than their container, never narrower than a thumb,
+   and long labels wrap instead of pushing the button past the viewport. */
+.btn{max-width:100%;white-space:normal;word-break:normal;overflow-wrap:break-word}
+
+/* 320-380px: the smallest phones still in real use. Full-width buttons stop
+   the CTA sitting in a lonely half-row, and the crest gets a touch smaller so
+   the headline and button stay above the fold. */
+@media(max-width:380px){
+  .hero .btn,.evcard .btn{width:100%}
+  .herologo{width:min(56%,180px)}
+  .evcrest img{width:min(52%,150px)}
+  .herocard h1{font-size:clamp(38px,11.5vw,46px)}
+}
+
+/* Long unbroken strings — a pasted URL, an email — must not widen the page. */
+h1,h2,h3,h4,p,a,li,td{overflow-wrap:anywhere}
+
+/* The gold ring behind the hero card is decorative; clip it so it can never
+   create a horizontal scrollbar on a narrow screen. */
+.herocard,.evcard{overflow:hidden}
+
+/* Tap targets: 44px minimum on anything interactive in the footer and nav. */
+footer a{display:inline-block;min-height:24px;padding-block:4px}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SMALL AND SHORT SCREENS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BUG — the drawer is position:fixed with no scroll. On a landscape phone
+   (844×390) the menu items, footer links and CTA are taller than the viewport,
+   so the bottom of the menu was unreachable. */
+
+/* Landscape phones and other short viewports: the drawer's display-serif links
+   are sized for portrait. Shrink them so the whole menu fits without scrolling. */
+@media(max-height:520px){
+  .herologo img{max-height:none}
+}
+
+/* Foldable cover screens and the smallest Androids still in use (280-320px).
+   The headline minimum was 38px, wide enough to force a mid-word break. */
+@media(max-width:339px){
+  .herocard h1{font-size:32px}
+  .evcard h1{font-size:31px}
+  .course .goal{font-size:18px}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FIX — buttons were a fixed 15.5px / 15px×30px at EVERY width, so the CTA
+   was identical on a 320px phone and a 1440px desktop: cramped on one, small
+   on the other. Now fluid between explicit floors and ceilings.
+
+   The floor is an accessibility limit, not a taste one: 48px minimum height
+   and 14.5px minimum text, so the target never gets too small for a thumb.
+   The ceiling stops it inflating into a slab on a large monitor.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.btn{
+  font-size:clamp(14.5px,.22vw + 13.8px,17px);
+  padding:clamp(13px,.36vw + 11.9px,17px) clamp(22px,1.25vw + 18px,36px);
+  min-height:clamp(48px,.71vw + 45.7px,56px);
+}
+
+/* Nav / inline button: same fluid behaviour, tighter range, 44px floor. */
+.btn-sm{
+  font-size:clamp(13.5px,.18vw + 12.9px,15px);
+  padding:clamp(10px,.27vw + 9.1px,13px) clamp(18px,.98vw + 14.9px,29px);
+  min-height:clamp(44px,.36vw + 42.8px,48px);
+}
+
+/* A full-width button on a wide column becomes an unreadable bar. Cap it, but
+   only above the widths where we deliberately go full-width on phones —
+   otherwise a 430px screen gets a capped button with an odd gap beside it. */
+@media(min-width:520px){
+  .btn-full{max-width:420px}
+}

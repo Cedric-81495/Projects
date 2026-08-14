@@ -1,4 +1,4 @@
-import { Nav, Footer } from '@/components/Chrome'
+import { BrandBar, Footer } from '@/components/Chrome'
 import { REFUND_POLICY } from '@/config/membership'
 
 /* Felicia §13 — a required placeholder route: "Refund / Cancellation Policy".
@@ -8,7 +8,7 @@ import { REFUND_POLICY } from '@/config/membership'
 export default function Page() {
   return (
     <>
-      <Nav />
+      <BrandBar />
       <section>
         <div className="wrap">
           <div className="head">

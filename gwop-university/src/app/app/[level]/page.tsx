@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PATHWAY } from '@/content/pathway'
-import { byLevel, STATUS_LABEL } from '@/content/modules'
-import { Nav, Footer, DraftBar } from '@/components/Chrome'
+import { byLevel } from '@/content/modules'
+import { BrandBar, Footer } from '@/components/Chrome'
 
 export function generateStaticParams() {
   return PATHWAY.map(l => ({ level: l.slug }))
@@ -19,7 +19,7 @@ export default async function LevelPage(
 
   return (
     <>
-      <Nav />
+      <BrandBar />
       <section>
         <div className="wrap">
           <p className="crumb"><Link href="/app">Student area</Link> › {meta.label}</p>
@@ -41,10 +41,10 @@ export default async function LevelPage(
                 <span className="mn">{String(m.order).padStart(2, '0')}</span>
                 <span>
                   <h3>{m.title}</h3>
-                  <span className="meta">
-                    {m.minutes} min
-                    {m.status !== 'ready' && ` · ${STATUS_LABEL[m.status]}`}
-                  </span>
+                  {/* Internal production status ("In production", "Missing
+                      assets") stays on /admin. A student sees the runtime and
+                      whether it is open yet — nothing about our pipeline. */}
+                  <span className="meta">{m.minutes} min</span>
                 </span>
                 <span className="go">{m.status === 'ready' ? 'Open ›' : 'Soon'}</span>
               </Link>
@@ -53,7 +53,6 @@ export default async function LevelPage(
         </div>
       </section>
       <Footer />
-      <DraftBar pending="module content (Maui + Sheena)" />
     </>
   )
 }

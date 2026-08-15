@@ -439,6 +439,22 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
       paying student on `/app` back out to the event signup funnel, which is a
       stranger's page shown to a customer. Reverted.
       ⚠️ Confirm the reading with Felicia — she wrote the note.
+- [x] **Consistent page height — with NO fixed or minimum heights.** The legal
+      pages hold one heading and one line, so the page ended partway down the
+      screen with the footer floating mid-viewport.
+      Fix: body is a flex column at least `100svh` tall, the content area takes
+      the slack with `flex:1 0 auto`, and the footer is pinned by `margin-top:auto`.
+      Single-section pages then use `display:grid; align-content:center` so the
+      leftover space is distributed above and below the text rather than dumped
+      in one block above the footer.
+      **A `min-height` floor was tried first and removed.** It was redundant with
+      the flex growth, and on a short viewport — landscape phone, small laptop —
+      a hard `56svh` forced the section taller than the space available and
+      created scroll on a page holding two lines of text. Nothing in the layout
+      now depends on a magic number.
+      `svh` not `vh`: `100vh` overshoots on iOS Safari and adds a phantom scroll.
+      `grid` not `flex` for the centring: a grid item stretches on the inline
+      axis, so `.wrap` keeps its max-width; `display:flex` would shrink-wrap it.
 - [x] **`/thanks` centred and made responsive.** It reuses `/830`'s `.evhero`,
       which becomes a two-column grid at 720px (card + Blueprint artwork). The
       confirmation page has no artwork, so the card sat in the 1fr column with a

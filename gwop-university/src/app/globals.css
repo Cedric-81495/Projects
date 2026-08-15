@@ -630,3 +630,58 @@ footer a{display:inline-block;min-height:24px;padding-block:4px}
   /* Three "what happens next" cards side by side, matching /830. */
   .ev-thanks .evgifts{grid-template-columns:repeat(3,1fr)}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAGE HEIGHT — consistent layout on short pages
+
+   The legal pages hold one heading and one line. Without this the page ended
+   partway down the screen with the footer floating mid-viewport and blank
+   ivory beneath it, so /privacy looked broken next to /830.
+
+   Two separate fixes, because they solve different halves:
+
+   1. Sticky footer. Body is a flex column at least one viewport tall, and the
+      footer takes the leftover space with margin-top:auto. The footer now sits
+      at the bottom on every page regardless of content.
+
+   2. Minimum content height. A footer pinned to the bottom of an almost-empty
+      page still reads as empty, so a page whose content is a single <section>
+      gets a floor. Pages with more than one section already have body.
+
+   `svh` is the small viewport height — it accounts for mobile browser chrome,
+   where `100vh` overshoots on iOS Safari and adds a phantom scroll.
+   ═══════════════════════════════════════════════════════════════════════════ */
+body{
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;      /* fallback for older browsers */
+  min-height:100svh;
+}
+
+/* The event pages wrap everything in .ev, so the growth has to happen there. */
+body>.ev{display:flex;flex-direction:column;flex:1 0 auto}
+
+/* Content grows, chrome does not. */
+body>section,body>.ev>.wrap{flex:1 0 auto}
+body>.evbar,body>footer,body>.abar{flex:none}
+
+/* Footer to the bottom on short pages, natural position on long ones. */
+footer{margin-top:auto}
+
+/* No fixed or minimum height anywhere. `flex:1 0 auto` above already makes the
+   content area absorb the leftover viewport, so a floor on top of it is both
+   redundant and harmful: on a short viewport (landscape phone, small laptop) a
+   hard `56svh` forces the section taller than the space available and creates
+   scroll on a page holding two lines of text.
+
+   What was actually wrong is where the slack went. The section grew, the text
+   stayed pinned to the top, and all the empty space collected in one block
+   above the footer — which reads as a rendering fault rather than layout.
+
+   So: distribute the slack instead of capping it. Content sits optically
+   centred in whatever space the viewport gives, and the page looks deliberate
+   at any height without a single fixed number.
+
+   `grid` not `flex` on purpose — a grid item stretches across the inline axis
+   by default, so `.wrap` keeps its width. `display:flex` would shrink-wrap it. */
+body>section:only-of-type{display:grid;align-content:center}

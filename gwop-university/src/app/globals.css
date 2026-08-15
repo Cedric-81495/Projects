@@ -588,3 +588,45 @@ footer a{display:inline-block;min-height:24px;padding-block:4px}
 @media(min-width:520px){
   .btn-full{max-width:420px}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   /thanks — CENTRED CONFIRMATION
+
+   BUG: this page reuses /830's `.evhero`, which becomes a two-column grid at
+   720px (card + Blueprint artwork). /thanks has no artwork, so the card sat in
+   the 1fr column with a 210px empty column beside it — visibly off-centre on
+   every screen wider than a phone.
+
+   A confirmation page is also a different job from a landing page: one message,
+   nothing to scan, no competing content. Centred suits it; /830 stays left.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ev-thanks .evhero{grid-template-columns:minmax(0,1fr);justify-items:center}
+.ev-thanks .evcard{max-width:620px;text-align:center}
+
+/* Copy blocks carry their own max-width, so they need centring individually
+   rather than inheriting a left margin from the card. */
+.ev-thanks .evcard .evsupport,
+.ev-thanks .evcard .evkw{margin-inline:auto}
+
+/* Buttons: centred, and capped so a two-button row does not stretch wide on
+   desktop. They stack full-width on phones (see the <440px rule below). */
+.ev-thanks .evacts{justify-content:center}
+
+/* "What happens next" — centre the section heading to match the card above,
+   but keep the numbered items left-aligned: centred body text in a list is
+   hard to scan, and each item is a sentence rather than a label. */
+.ev-thanks .evsect{text-align:center}
+.ev-thanks .evgift{text-align:left}
+.ev-thanks .evlede{margin-inline:auto;max-width:46ch}
+.ev-thanks .evgifts{max-width:660px;margin-inline:auto;width:100%}
+.ev-thanks .evcap{max-width:520px;margin-inline:auto}
+
+@media(max-width:439px){
+  /* One thumb, one column: both CTAs full width and stacked. */
+  .ev-thanks .evacts{flex-direction:column;align-items:stretch}
+  .ev-thanks .evacts .btn{width:100%}
+}
+@media(min-width:640px){
+  /* Three "what happens next" cards side by side, matching /830. */
+  .ev-thanks .evgifts{grid-template-columns:repeat(3,1fr)}
+}

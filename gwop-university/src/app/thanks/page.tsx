@@ -14,7 +14,7 @@ export const metadata: Metadata = {
    ⚠️ Depends on Jake's GHL form being able to redirect here — confirm with him. */
 export default function Thanks() {
   return (
-    <div className="ev">
+    <div className="ev ev-thanks">
       <BrandBar />
 
       {/* Hierarchy prescribed by Felicia §11: YOU'RE IN → Blueprint starts here
@@ -30,7 +30,7 @@ export default function Thanks() {
             <Link className="btn btn-e" href={event.thanks.ctas.primary.href}>
               {event.thanks.ctas.primary.label}
             </Link>
-            <a className="btn btn-ol" href={event.thanks.ctas.secondary.href} data-tbc>
+            <a className="btn btn-ol" href={event.thanks.ctas.secondary.href}>
               {event.thanks.ctas.secondary.label}
             </a>
           </div>

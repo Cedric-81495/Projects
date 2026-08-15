@@ -439,6 +439,14 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
       paying student on `/app` back out to the event signup funnel, which is a
       stranger's page shown to a customer. Reverted.
       ⚠️ Confirm the reading with Felicia — she wrote the note.
+- [x] **`/thanks` centred and made responsive.** It reuses `/830`'s `.evhero`,
+      which becomes a two-column grid at 720px (card + Blueprint artwork). The
+      confirmation page has no artwork, so the card sat in the 1fr column with a
+      210px empty column beside it — visibly off-centre on anything wider than a
+      phone. Scoped under `.ev-thanks`: single column, centred card capped at
+      620px, centred CTAs that stack full-width below 440px, and the three
+      "what happens next" items in a row from 640px. Their body text stays
+      left-aligned — centred text in a list is hard to scan. `/830` untouched.
 - [x] **One header on every page (`BrandBar`).** Package p.1 team rule: "every
       screen... should feel like it belongs to the same university." `/830` used a
       centred brand bar while `/` and `/app` had a different header with a nav menu

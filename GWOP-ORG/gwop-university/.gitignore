@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+qr-out
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+.vercel
+
+# Secrets. `.env*` catches every real env file; the two exceptions below are
+# templates containing no credentials and MUST be committed — without them a
+# new machine has nothing to copy from.
+.env*
+!.env.example
+!.env.local.example

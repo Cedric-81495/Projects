@@ -1,8 +1,8 @@
 {
   "crons": [
-    { "path": "/api/v1/cron/expire", "schedule": "0 7 * * *" }
-  ],
-  "functions": {
-    "src/app/api/webhooks/stripe/route.ts": { "maxDuration": 30 }
-  }
+    {
+      "path": "/api/v1/cron/expire",
+      "schedule": "0 7 * * *"
+    }
+  ]
 }

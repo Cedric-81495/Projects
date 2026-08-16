@@ -1,9 +1,0 @@
-node_modules
-.next
-out
-qr-out
-.env*
-!.env.example
-*.tsbuildinfo
-next-env.d.ts
-.DS_Store

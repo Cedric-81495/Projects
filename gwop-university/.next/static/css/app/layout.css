@@ -1,0 +1,594 @@
+/*!*****************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./src/app/globals.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************/
+/* ═══════════════════════════════════════════════════════════════════════════
+   GWOP UNIVERSITY — DESIGN SYSTEM
+   Palette + type: GWOP University Brand Identity sheet (authoritative)
+   Layout + components: GWOP_Visual_Build_Package.pdf p.2–p.7 (prescriptive)
+   Mobile-first. Nothing here that the package does not specify.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --emerald:#0D5B3F;      /* Growth & Ambition */
+  --emerald-dk:#0A4A34;
+  --emerald-lt:#E4EFE9;
+  --forest:#1E3E2F;       /* Stability & Authority — secondary dark, bands + footer */
+  --forest-dk:#152C21;
+  /* Felicia §4 lists "Black for premium contrast", and Visual Build Package p.5
+     and p.7 both render the hero card in near-black, not forest. This is that
+     black. Kept a touch off pure #000 so the gold rule and crest edges read as
+     depth rather than a hard cut. White on it is 18.4:1. */
+  --black:#0F1210;
+  --gold:#C8A34A;         /* Wealth & Excellence */
+  --gold-lt:#D9B45C;      /* gold on dark */
+  --gold-ink:#8A6D1F;     /* gold that passes as small text on ivory */
+  --ivory:#F7F3E9;        /* Clarity & Refinement */
+  --white:#FFFFFF;
+  --stone:#E7E4DD;        /* Balance & Structure */
+  --ink:#1A1D1B;
+  --muted:#5F6560;
+
+  --display:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --body:'Poppins',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+
+  --wrap:1120px;
+  --pad:clamp(20px,5vw,32px);
+  --sect:clamp(52px,9vw,104px);
+  --r:14px;  --r-lg:20px;  --r-xl:26px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+body{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--body);
+  font-size:clamp(15.5px,.42vw + 14.5px,17px);line-height:1.62;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{max-width:100%;display:block;height:auto}
+p{margin:0}
+a{color:var(--emerald)}
+:focus-visible{outline:2px solid var(--emerald);outline-offset:3px;border-radius:4px}
+
+.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:var(--pad)}
+
+/* ── TYPE ────────────────────────────────────────────────────────────────── */
+h1,h2{font-family:var(--display);font-weight:700;color:var(--emerald);
+  line-height:1.08;letter-spacing:-.005em;margin:0}
+h3,h4{font-family:var(--body);font-weight:600;color:var(--emerald);
+  line-height:1.25;letter-spacing:-.01em;margin:0}
+.h2{font-size:clamp(26px,5.4vw,42px);text-transform:uppercase;letter-spacing:.012em}
+.tag{font-family:var(--body);font-size:clamp(10px,2.4vw,11px);font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink);margin:0 0 14px}
+.tag.on-dark{color:var(--gold-lt)}
+.lede{color:var(--muted);font-size:clamp(15.5px,1.1vw + 13px,18px);margin-top:14px;
+  max-width:60ch}
+.rule{width:48px;height:2px;background:var(--gold);border:0;margin:0 0 22px}
+
+/* ── BUTTONS · min 48px tap target ───────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--body);font-weight:600;font-size:15.5px;letter-spacing:.015em;
+  text-decoration:none;padding:15px 30px;min-height:52px;border-radius:999px;
+  border:1.5px solid transparent;cursor:pointer;
+  transition:background .18s ease,color .18s ease,border-color .18s ease}
+.btn-e{background:var(--emerald);color:#fff}
+.btn-e:hover{background:var(--emerald-dk)}
+.btn-g{background:var(--gold);color:var(--forest-dk)}
+.btn-g:hover{background:var(--gold-lt)}
+.btn-o{border-color:var(--emerald);color:var(--emerald);background:transparent}
+.btn-o:hover{background:var(--emerald);color:#fff}
+.btn-ol{border-color:rgba(247,243,233,.34);color:#fff;background:transparent}
+.btn-ol:hover{border-color:var(--gold);color:var(--gold-lt)}
+.btn-sm{padding:11px 22px;min-height:44px;font-size:14.5px}
+.btn-full{width:100%}
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+
+/* burger */
+
+/* ── MOBILE DRAWER ───────────────────────────────────────────────────────── */
+
+/* ── HERO · Visual Build Package p.5 ─────────────────────────────────────── */
+.hero{padding:clamp(22px,4vw,34px) 0 0}
+.herocard{background:var(--black);border-radius:var(--r-xl);
+  padding:clamp(32px,6.5vw,64px) clamp(24px,5.5vw,56px);
+  display:grid;grid-gap:clamp(28px,5vw,48px);gap:clamp(28px,5vw,48px);position:relative;overflow:hidden}
+.herocard::after{content:'';position:absolute;left:-130px;bottom:-160px;
+  width:360px;height:360px;border:1px solid rgba(200,163,74,.13);border-radius:50%;
+  pointer-events:none}
+.herocard h1{font-size:clamp(42px,12vw,86px);color:#fff;letter-spacing:-.02em;
+  position:relative}
+.herocard .sub{color:rgba(247,243,233,.82);font-size:clamp(16px,1.2vw + 14px,19.5px);
+  margin-top:18px;max-width:32ch}
+.herocard .acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(24px,4vw,34px)}
+/* The new artwork is portrait (0.64) where the old one was near-square, so it
+   is sized by HEIGHT. Sizing a 2:3 image by width alone makes the hero card
+   grow roughly 50% taller and pushes the CTA off a phone screen. */
+.herologo{width:min(46%,190px);margin-inline:auto;position:relative}
+.herologo img{display:block;width:100%;height:auto;
+  max-height:min(46vh,420px);object-fit:contain;object-position:center}
+
+/* ── COURSE CARDS · p.5 ──────────────────────────────────────────────────── */
+.courses{display:grid;grid-gap:14px;gap:14px;margin-top:clamp(18px,3vw,28px)}
+.course{background:var(--white);border:1.5px solid var(--gold);border-radius:var(--r);
+  padding:22px 22px 20px;display:flex;flex-direction:column;text-decoration:none;
+  min-height:120px;transition:transform .18s ease,box-shadow .18s ease}
+.course:hover,.course:focus-visible{transform:translateY(-3px);
+  box-shadow:0 18px 34px -22px rgba(13,91,63,.42)}
+.course .nm{font-family:var(--body);font-weight:600;font-size:13.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--emerald)}
+.course .goal{font-family:var(--display);font-size:clamp(19px,2vw,22px);font-weight:600;
+  color:var(--ink);margin-top:8px;flex:1 1;line-height:1.2}
+.course .enter{font-family:var(--body);font-weight:600;font-size:12px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink);margin-top:16px}
+
+/* ── SECTIONS ────────────────────────────────────────────────────────────── */
+section{padding:var(--sect) 0}
+section.tint{background:var(--white);border-block:1px solid var(--stone)}
+.head{max-width:660px;margin-bottom:clamp(32px,5vw,50px)}
+
+/* ── PATHWAY · p.4 · alternating emerald / forest bars ───────────────────── */
+
+/* ── CTA BAND ────────────────────────────────────────────────────────────── */
+
+/* ── FOOTER ──────────────────────────────────────────────────────────────── */
+footer{background:var(--forest);color:rgba(247,243,233,.62);
+  padding:clamp(40px,7vw,60px) 0 calc(28px + env(safe-area-inset-bottom));font-size:14px}
+.fg{display:grid;grid-gap:30px;gap:30px;padding-bottom:30px;border-bottom:1px solid rgba(200,163,74,.2)}
+footer .logo b{color:#fff}
+footer .logo b small{color:var(--gold-lt)}
+footer .blurb{margin-top:14px;max-width:30ch;font-family:var(--display);
+  font-size:17px;color:rgba(247,243,233,.78)}
+/* Felicia §12 — reserved space for the official accounts */
+footer .socials{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:18px;
+  list-style:none;padding:0}
+footer .socials li{font-size:12.4px;font-weight:500}
+footer .socials .soon{color:rgba(247,243,233,.42)}
+footer h4{color:#fff;font-family:var(--body);font-size:10.5px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
+footer ul{list-style:none;margin:0;padding:0;display:grid;grid-gap:10px;gap:10px}
+footer a{color:rgba(247,243,233,.62);text-decoration:none}
+footer a:hover{color:var(--gold-lt)}
+.legal{padding-top:22px;font-size:11.5px;line-height:1.66;color:rgba(247,243,233,.40)}
+.legal p{margin-bottom:8px}
+.legal strong{color:rgba(247,243,233,.56)}
+
+/* ═══ BREAKPOINTS ════════════════════════════════════════════════════════ */
+@media(min-width:520px){
+  .courses{grid-template-columns:1fr 1fr}
+  .fg{grid-template-columns:1fr 1fr}
+}
+@media(min-width:820px){
+  .herocard{grid-template-columns:1fr minmax(180px,230px);align-items:center}
+  .herologo{width:100%;margin:0}
+  .herologo img{max-height:none}
+  .fg{grid-template-columns:1.6fr 1fr 1fr}
+}
+@media(min-width:1024px){
+  .courses{grid-template-columns:repeat(4,1fr)}
+  .course{min-height:170px;padding:26px 24px}
+  .fg{grid-template-columns:1.7fr 1fr 1fr 1fr}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8/30 EVENT PAGE · package p.7  —  scoped .ev* so it cannot collide
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ev{--wrap:760px}
+.evbar{background:var(--forest);padding:12px var(--pad);display:flex;align-items:center;
+  justify-content:center;gap:10px;padding-top:calc(12px + env(safe-area-inset-top));
+  text-decoration:none;transition:background .18s ease}
+a.evbar:hover{background:var(--forest-dk)}
+.evbar .crest{flex:none}
+.evbar b{font-family:var(--display);font-size:14.5px;font-weight:700;color:#fff;
+  line-height:1.05}
+.evbar b small{display:block;font-family:var(--body);font-size:7px;font-weight:600;
+  letter-spacing:.24em;color:var(--gold-lt);margin-top:2px}
+.evhero{padding:18px var(--pad) 0;display:grid;grid-gap:22px;gap:22px;justify-items:center;
+  max-width:1000px;margin-inline:auto}
+.evcard{width:100%;max-width:760px;background:var(--black);
+  border-radius:var(--r-xl);padding:clamp(30px,7vw,50px) clamp(24px,6vw,46px);
+  position:relative;overflow:hidden}
+.evcard::after{content:'';position:absolute;right:-80px;top:-80px;width:260px;height:260px;
+  border:1px solid rgba(200,163,74,.15);border-radius:50%}
+.evtag{display:inline-block;font-size:9.5px;font-weight:600;letter-spacing:.19em;
+  text-transform:uppercase;color:var(--gold-lt);border:1px solid rgba(200,163,74,.42);
+  border-radius:999px;padding:5px 12px;margin-bottom:18px}
+.evcard h1{font-size:clamp(36px,11vw,58px);color:#fff;letter-spacing:-.015em;
+  position:relative;line-height:1.02}
+.evcard h1 em{font-style:normal;color:var(--gold-lt);display:block}
+.evkw{margin-top:14px;font-family:var(--body);font-weight:500;
+  font-size:clamp(14.5px,3.6vw,18px);color:rgba(247,243,233,.9)}
+.evkw span{color:var(--gold-lt)}
+.evfine{margin-top:12px;font-size:12.5px;color:rgba(247,243,233,.55)}
+/* Felicia §2 supporting copy / §11 thank-you confirmation line */
+.evsupport{margin-top:13px;max-width:44ch;font-size:14.6px;line-height:1.62;
+  color:rgba(247,243,233,.78)}
+/* Felicia §3 event time + location, inserted once confirmed */
+.evmeta{margin-top:16px;padding-top:14px;border-top:1px solid rgba(200,163,74,.22);
+  font-size:12.8px;font-weight:500;letter-spacing:.02em;color:var(--gold-lt)}
+/* Felicia §11 next-step CTAs on /thanks */
+.evacts{display:flex;flex-wrap:wrap;gap:11px;margin-top:26px}
+@media(max-width:439px){.evacts .btn{width:100%}}
+.evcrest{display:flex;justify-content:center;align-items:center}
+.evcrest img{display:block;width:min(42%,168px);height:auto}
+.evsect{padding:clamp(34px,7vw,52px) 0 0}
+.evsect.pb{padding-bottom:clamp(34px,7vw,52px)}
+.evsect h2{font-family:var(--display);font-size:clamp(24px,6vw,32px)}
+.evlede{color:var(--muted);font-size:15.2px;margin:8px 0 22px}
+.evgifts{display:grid;grid-gap:11px;gap:11px}
+.evgift{background:var(--white);border:1px solid var(--stone);border-radius:var(--r);
+  padding:17px 19px;display:flex;gap:14px;align-items:flex-start}
+.evgift .num{flex:none;width:29px;height:29px;border-radius:50%;background:var(--gold);
+  color:var(--forest-dk);display:grid;place-items:center;font-family:var(--display);
+  font-weight:700;font-size:13.5px}
+.evgift h3{font-size:16px}
+.evgift p{font-size:13.8px;color:var(--muted);margin-top:2px}
+.evabout{background:var(--emerald);border-radius:var(--r-lg);padding:26px 24px;
+  color:#fff;margin-top:12px}
+.evabout h2{color:#fff;font-size:21px;margin-bottom:11px}
+.evabout p{color:rgba(247,243,233,.86);font-size:15px}
+.evabout p+p{margin-top:8px}
+.evpicks{display:grid;grid-template-columns:1fr 1fr;grid-gap:10px;gap:10px}
+.evpick{background:var(--white);border:2px solid var(--stone);border-radius:var(--r);
+  padding:16px 14px;text-align:left;cursor:pointer;font-family:var(--body);font-size:15px;
+  font-weight:600;color:var(--ink);min-height:60px;display:flex;align-items:center;gap:10px;
+  transition:border-color .15s,background .15s}
+.evpick .dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--stone);
+  transition:border-color .15s,background .15s}
+.evpick:hover{border-color:var(--emerald)}
+.evpick[aria-pressed="true"]{border-color:var(--emerald);background:var(--emerald-lt)}
+.evpick[aria-pressed="true"] .dot{border-color:var(--emerald);background:var(--emerald);
+  box-shadow:inset 0 0 0 3px var(--white)}
+.evskip{display:block;width:100%;margin-top:14px;padding:12px;font-size:13.5px;
+  color:var(--muted);background:none;border:0;cursor:pointer;text-decoration:underline;
+  font-family:var(--body);min-height:44px}
+.evform{margin-top:24px;background:var(--white);border:1px solid var(--stone);
+  border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:0 1px 2px rgba(13,91,63,.05),0 20px 44px -26px rgba(13,91,63,.3)}
+.evform .fh{background:var(--emerald-lt);padding:15px 20px;border-bottom:1px solid var(--stone)}
+.evform .fh h3{font-size:17px}
+.evform .fh p{font-size:12.8px;color:var(--muted);margin-top:2px}
+.evform .fh .chosen{font-weight:600;color:var(--emerald)}
+.evslot{padding:5px;min-height:520px}
+.evslot iframe{width:100%;border:0;display:block;min-height:520px}
+.evph{margin:13px;padding:28px 18px;text-align:center;border:2px dashed var(--emerald-lt);
+  border-radius:12px;background:var(--ivory)}
+.evph b{display:block;font-family:var(--body);font-weight:600;font-size:14px;
+  color:var(--emerald);margin-bottom:6px}
+.evph span{font-size:12.5px;color:var(--muted);line-height:1.6;display:block}
+.evph code{background:var(--emerald-lt);padding:1px 5px;border-radius:3px;font-size:11.5px}
+.evlevels{display:grid;grid-gap:11px;gap:11px}
+.evlvl{background:var(--white);border:1.5px solid var(--gold);border-radius:var(--r);
+  padding:18px 20px}
+.evlvl .nm{font-family:var(--body);font-weight:600;font-size:12.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold-ink);margin-bottom:5px}
+.evlvl .goal{font-family:var(--display);font-size:19px;font-weight:600;margin-bottom:3px}
+.evlvl .det{font-size:13.4px;color:var(--muted)}
+.evcap{margin-top:13px;background:var(--forest);border-radius:var(--r);padding:19px 20px;
+  text-align:center}
+.evcap .k{font-size:9.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold-lt);margin-bottom:6px}
+.evcap p{font-family:var(--display);font-weight:700;font-size:17px;color:#fff}
+.evfoot{background:var(--forest);color:rgba(247,243,233,.46);
+  padding:22px var(--pad) calc(26px + env(safe-area-inset-bottom));text-align:center;
+  font-size:11px;line-height:1.62}
+.evfoot p{margin-bottom:6px}
+.evfoot a,.evfoot strong{color:rgba(247,243,233,.6)}
+@media(min-width:720px){
+  /* p.7: artwork in its own panel to the right of the card */
+  .evhero{grid-template-columns:minmax(0,1fr) 210px;gap:34px;align-items:center;
+    justify-items:stretch;padding-top:26px}
+  .evcrest img{width:100%;max-width:210px}
+}
+@media(min-width:640px){
+  .evgifts{grid-template-columns:repeat(3,1fr)}
+  .evgift{flex-direction:column}
+  .evpicks{grid-template-columns:repeat(3,1fr)}
+  .evlevels{grid-template-columns:1fr 1fr}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STUDENT APP + ADMIN  —  same card system as the website (p.2 team rule)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.crumb{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.crumb a{color:var(--gold-ink);text-decoration:none}
+.crumb a:hover{text-decoration:underline}
+
+.mods{display:grid;grid-gap:11px;gap:11px}
+.mod{background:var(--white);border:1px solid var(--stone);border-radius:var(--r);
+  padding:16px 18px;display:grid;grid-template-columns:auto 1fr auto;grid-gap:14px;gap:14px;
+  align-items:center;text-decoration:none;
+  transition:border-color .16s ease,transform .16s ease}
+.mod:hover{border-color:var(--gold);transform:translateY(-2px)}
+.mod .mn{width:34px;height:34px;border-radius:50%;background:var(--emerald-lt);
+  color:var(--emerald);display:grid;place-items:center;font-family:var(--display);
+  font-weight:700;font-size:14px;flex:none}
+.mod h3{font-size:16px}
+.mod .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+.mod .go{font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold-ink);white-space:nowrap}
+.mod[data-locked="true"]{opacity:.55;pointer-events:none}
+
+.player{background:var(--forest);border-radius:var(--r-lg);aspect-ratio:16/9;
+  display:grid;place-items:center;color:rgba(247,243,233,.5);font-size:13px;
+  text-align:center;padding:20px;border:1px solid rgba(200,163,74,.2)}
+
+/* workbook · package p.3 */
+.wb{background:var(--white);border:1.5px solid var(--gold);border-radius:var(--r-lg);
+  overflow:hidden}
+.wb .wh{background:var(--emerald);padding:20px 22px}
+.wb .wh .lv{font-family:var(--body);font-size:10.5px;font-weight:600;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--gold-lt);margin-bottom:6px}
+.wb .wh h3{color:#fff;font-family:var(--display);font-size:22px;font-weight:700;
+  text-transform:uppercase}
+.wb .wbody{padding:22px}
+.wb h4{font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px}
+.frow{margin-bottom:15px}
+.frow b{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.frow .ln{height:1px;background:var(--stone)}
+.moves{margin-top:22px}
+.move{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+.move .mvn{width:28px;height:28px;border-radius:50%;background:var(--gold);
+  color:var(--forest-dk);display:grid;place-items:center;font-family:var(--display);
+  font-weight:700;font-size:12.5px;flex:none}
+.move .ln{flex:1 1;height:1px;background:var(--stone)}
+.ak{margin-top:20px;font-size:11.5px;font-weight:600;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--gold-ink)}
+
+/* admin */
+.abar{background:var(--forest);color:#fff;padding:14px var(--pad);display:flex;
+  align-items:center;gap:12px;padding-top:calc(14px + env(safe-area-inset-top))}
+.abar b{font-family:var(--display);font-size:17px;font-weight:700}
+.abar .who{margin-left:auto;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold-lt)}
+.stats{display:grid;grid-gap:11px;gap:11px;margin-bottom:26px}
+.stat{background:var(--white);border:1px solid var(--stone);border-radius:var(--r);
+  padding:18px 20px}
+.stat b{display:block;font-family:var(--display);font-size:30px;font-weight:700;
+  color:var(--emerald);line-height:1}
+.stat span{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-top:6px}
+.lvlblock{margin-bottom:26px}
+.lvlhead{display:flex;align-items:center;gap:12px;margin-bottom:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--stone)}
+.lvlhead h3{font-family:var(--display);font-size:20px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.01em}
+.lvlhead .cnt{margin-left:auto;font-size:11.5px;color:var(--muted)}
+.chip{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.chip.ok{background:var(--emerald-lt);color:var(--emerald)}
+.chip.wait{background:#FBF2DE;color:var(--gold-ink)}
+.chip.miss{background:#F7E4E4;color:#8A2222}
+@media(min-width:640px){.stats{grid-template-columns:repeat(3,1fr)}}
+
+/* ═══ RESPONSIVE FIXES — found by viewport audit ═════════════════════════════
+   1. .drawer::before (a decorative ring at right:-70px) escaped the fixed
+      drawer and added 70px of horizontal scroll on every page under 1024px.
+   2. Footer / nav text links were ~22px tall. Tracker task 8 requires
+      "no broken buttons" on real phones, so they get proper tap height.
+   ═══════════════════════════════════════════════════════════════════════════ */
+footer ul{gap:2px}
+footer ul a{display:flex;align-items:center;min-height:44px}
+
+/* ═══ DRAWER OPEN STATE ══════════════════════════════════════════════════════
+   The header must sit ABOVE the drawer or the close button is unreachable.
+   While open it goes transparent so it reads as part of the dark overlay.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* level shortcuts inside the drawer — real pages, not decoration */
+
+/* ═══ BURGER → X ═════════════════════════════════════════════════════════════
+   Grid rows made the bar offsets unreliable (the X rendered as a chevron).
+   Absolute positioning inside a relative button is deterministic.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* only the CTA block should absorb the free space, not every list */
+
+/* must come last — the burger fix above re-declared display:block globally */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UNIFICATION PASS — bring the website onto /830's rhythm.
+   /830 reads tighter and more premium: narrower column, closer vertical
+   spacing, pill eyebrow, gold ornament rules. Applied site-wide so every
+   screen belongs to the same university (package p.2 team rule).
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --wrap:1040px;                      /* was 1120 — tighter measure reads richer */
+  --sect:clamp(46px,7.5vw,84px);      /* closer to /830's rhythm */
+}
+
+/* anchor links must clear the sticky header */
+html{scroll-padding-top:18px}
+
+/* p.4 shows the eyebrow as plain gold text — no pill, no border. */
+.herocard .tag.on-dark{margin-bottom:clamp(16px,2.4vw,22px);letter-spacing:.19em}
+
+/* gold ornament rule — from the brand identity sheet's divider motif */
+
+/* hero: match /830's card language */
+.herocard{border-radius:var(--r-xl);
+  padding:clamp(30px,6vw,58px) clamp(24px,5vw,52px)}
+.herocard h1{font-size:clamp(40px,10.5vw,78px)}
+.herocard .sub{color:rgba(247,243,233,.84)}
+
+/* course cards: richer internal rhythm, gold fill on the ENTER row */
+.course{padding:24px 22px 20px;border-radius:var(--r);position:relative;
+  overflow:hidden;background:var(--white)}
+.course .goal{font-size:clamp(18px,1.7vw,21px);line-height:1.22}
+.course .enter{display:inline-flex;align-items:center;gap:6px;transition:gap .18s ease}
+.course:hover .enter{gap:11px}
+.course::after{content:'';position:absolute;inset:auto 0 0 0;height:2px;
+  background:var(--gold);transform:scaleX(0);transform-origin:left;
+  transition:transform .28s ease}
+.course:hover::after,.course:focus-visible::after{transform:scaleX(1)}
+
+/* pathway: tighter bars, consistent with /830 card padding */
+
+/* section heads centred like /830's, with the ornament */
+.head{margin-bottom:clamp(28px,4.5vw,44px)}
+
+/* footer: tighter, less corporate */
+footer{padding:clamp(36px,6vw,54px) 0 calc(26px + env(safe-area-inset-bottom))}
+.fg{gap:26px;padding-bottom:26px}
+
+@media(min-width:1024px){
+  .courses{gap:18px}
+  .course{min-height:176px;padding:28px 26px 24px}
+}
+
+/* ═══ DESKTOP REFINEMENT ═════════════════════════════════════════════════════
+   Hero was over-tall with slack space; cards read thin; pathway detail
+   floated away from its label. Tightened to the same density as /830.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media(min-width:1024px){
+  .herocard{grid-template-columns:1.15fr minmax(190px,240px);
+    padding:52px 48px;align-items:center;gap:44px}
+  .herocard h1{font-size:clamp(52px,5.2vw,68px);max-width:15ch}
+  .herocard .sub{font-size:18px;max-width:34ch;margin-top:16px}
+  .herocard .acts{margin-top:28px}
+
+  .courses{grid-template-columns:repeat(4,1fr);gap:16px}
+  .course{min-height:0;padding:24px 22px 20px}
+  .course .goal{margin-top:10px;flex:0 1 auto}
+  .course .enter{margin-top:22px}
+
+  /* label and detail sit together; the number anchors the row */
+}
+
+/* Package p.4 alternates the bars for a visible rhythm. Emerald #0D5B3F next
+   to Forest #1E3E2F read almost identically, so the alternate bar uses the
+   deeper Forest shade — still brand-derived, alternation now legible. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FIX — .hero used the `padding` shorthand with 0 for the inline axis, which
+   overrode .wrap's padding-inline. The hero card and the four course cards
+   sat flush to the viewport edges while the pathway (same .wrap) had margins.
+   Use padding-block so the shared gutter survives, and open up the spacing
+   between the header, the hero and the card row.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.hero{padding:0;padding-block:clamp(26px,4.4vw,44px) clamp(44px,7vw,88px);
+  padding-inline:var(--pad)}
+.courses{margin-top:clamp(18px,3vw,26px)}
+
+/* a little more air under the sticky header on every page */
+section:first-of-type{padding-top:clamp(34px,5.5vw,64px)}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FIX — the hero split into two columns at 820px, leaving the text column
+   ~300px wide: "Knowledge Pays." wrapped awkwardly and the buttons stacked.
+   Stay single-column until there's genuinely room for two.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media(min-width:820px) and (max-width:1009px){
+  .herocard{grid-template-columns:1fr}
+  .herologo{width:min(42%,220px);margin-inline:auto}
+  .herocard h1{font-size:clamp(44px,6.4vw,62px)}
+  .herocard .sub{max-width:46ch}
+}
+/* keep the headline from over-scaling in the mid range on narrow columns */
+@media(min-width:1010px){
+  .herocard{grid-template-columns:1.15fr minmax(190px,240px)}
+}
+.herocard .acts{flex-wrap:nowrap}
+@media(max-width:439px){.herocard .acts{flex-wrap:wrap}
+  .herocard .acts .btn{width:100%}}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SAFARI — backdrop-filter needs the -webkit- prefix on iOS. Without it the
+   sticky header loses its blur and renders as a flat block.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* iOS Safari: body overflow:hidden alone does not reliably stop background
+   scroll behind a fixed overlay. Pin the body while the drawer is open. */
+/* body pinning removed — it broke scroll restore (a real regression) to fix an
+   unverified iOS issue. Verify scroll-lock on a borrowed iPhone first; if it
+   fails, reinstate pinning WITH a correct scroll restore. */
+
+/* The scrolling element is <html>, so locking only <body> does nothing.
+   overflow:hidden on both preserves scroll position — unlike position:fixed,
+   which collapses document height and loses it. */
+/* Pinning the body is the only reliable cross-browser lock. overflow:hidden on
+   <html> locks but RESETS scroll to 0; position:fixed with a negative top
+   holds the visual position and we restore it exactly on close. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE HARDENING — buttons, images, overflow
+   Audited against the approved layout on every width from 320px up.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Every image is fluid and can never exceed its column. */
+img,picture,svg,video{max-width:100%;height:auto}
+
+/* Buttons: never wider than their container, never narrower than a thumb,
+   and long labels wrap instead of pushing the button past the viewport. */
+.btn{max-width:100%;white-space:normal;word-break:normal;overflow-wrap:break-word}
+
+/* 320-380px: the smallest phones still in real use. Full-width buttons stop
+   the CTA sitting in a lonely half-row, and the crest gets a touch smaller so
+   the headline and button stay above the fold. */
+@media(max-width:380px){
+  .hero .btn,.evcard .btn{width:100%}
+  .herologo{width:min(56%,180px)}
+  .evcrest img{width:min(52%,150px)}
+  .herocard h1{font-size:clamp(38px,11.5vw,46px)}
+}
+
+/* Long unbroken strings — a pasted URL, an email — must not widen the page. */
+h1,h2,h3,h4,p,a,li,td{overflow-wrap:anywhere}
+
+/* The gold ring behind the hero card is decorative; clip it so it can never
+   create a horizontal scrollbar on a narrow screen. */
+.herocard,.evcard{overflow:hidden}
+
+/* Tap targets: 44px minimum on anything interactive in the footer and nav. */
+footer a{display:inline-block;min-height:24px;padding-block:4px}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SMALL AND SHORT SCREENS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BUG — the drawer is position:fixed with no scroll. On a landscape phone
+   (844×390) the menu items, footer links and CTA are taller than the viewport,
+   so the bottom of the menu was unreachable. */
+
+/* Landscape phones and other short viewports: the drawer's display-serif links
+   are sized for portrait. Shrink them so the whole menu fits without scrolling. */
+@media(max-height:520px){
+  .herologo img{max-height:none}
+}
+
+/* Foldable cover screens and the smallest Androids still in use (280-320px).
+   The headline minimum was 38px, wide enough to force a mid-word break. */
+@media(max-width:339px){
+  .herocard h1{font-size:32px}
+  .evcard h1{font-size:31px}
+  .course .goal{font-size:18px}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FIX — buttons were a fixed 15.5px / 15px×30px at EVERY width, so the CTA
+   was identical on a 320px phone and a 1440px desktop: cramped on one, small
+   on the other. Now fluid between explicit floors and ceilings.
+
+   The floor is an accessibility limit, not a taste one: 48px minimum height
+   and 14.5px minimum text, so the target never gets too small for a thumb.
+   The ceiling stops it inflating into a slab on a large monitor.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.btn{
+  font-size:clamp(14.5px,.22vw + 13.8px,17px);
+  padding:clamp(13px,.36vw + 11.9px,17px) clamp(22px,1.25vw + 18px,36px);
+  min-height:clamp(48px,.71vw + 45.7px,56px);
+}
+
+/* Nav / inline button: same fluid behaviour, tighter range, 44px floor. */
+.btn-sm{
+  font-size:clamp(13.5px,.18vw + 12.9px,15px);
+  padding:clamp(10px,.27vw + 9.1px,13px) clamp(18px,.98vw + 14.9px,29px);
+  min-height:clamp(44px,.36vw + 42.8px,48px);
+}
+
+/* A full-width button on a wide column becomes an unreadable bar. Cap it, but
+   only above the widths where we deliberately go full-width on phones —
+   otherwise a 430px screen gets a capped button with an odd gap beside it. */
+@media(min-width:520px){
+  .btn-full{max-width:420px}
+}
+

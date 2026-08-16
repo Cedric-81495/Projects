@@ -1,1 +1,11 @@
-{"version":4,"routes":{"/app/freshman/credit-foundations":{},"/app/freshman/reading-your-report":{},"/app/freshman/cash-flow-basics":{},"/app/freshman/banking-and-debt":{},"/app/sophomore/business-setup":{},"/app/sophomore/records-that-hold-up":{},"/app/sophomore/funding-readiness":{},"/app/junior/revenue-systems":{},"/app/junior/accessing-capital":{},"/app/junior/protection":{},"/app/senior/assets-and-investing":{},"/app/senior/estate-and-legacy":{},"/app/freshman":{},"/app/sophomore":{},"/app/junior":{},"/app/senior":{}},"dynamicRoutes":{"/app/[level]/[module]":{"dataRoute":null,"dataRouteRegex":null,"fallback":null,"fallbackRevalidate":false,"fallbackSourceRoute":"/app/[level]/[module]","routeRegex":"^\\/app\\/([^/]+?)\\/([^/]+?)(?:\\/)?$","allowHeader":[]},"/app/[level]":{"dataRoute":null,"dataRouteRegex":null,"fallback":null,"fallbackRevalidate":false,"fallbackSourceRoute":"/app/[level]","routeRegex":"^\\/app\\/([^/]+?)(?:\\/)?$","allowHeader":[]}},"notFoundRoutes":[],"preview":{"previewModeId":"d911b0332b6e32dc7e16b7da9e0f585d","previewModeSigningKey":"08ec7241757e6f75605f2547829866f67bf0805bb611dc3654863d3e9acd330f","previewModeEncryptionKey":"13d1514fbc9bf24025da07625831a8b33539c31cb9ac2b7ff505097dc9f26164"}}
+{
+  "version": 4,
+  "routes": {},
+  "dynamicRoutes": {},
+  "notFoundRoutes": [],
+  "preview": {
+    "previewModeId": "3037dc993cbf4532122118570e751161",
+    "previewModeSigningKey": "b279bcd2525babf62db0529e760ea16485439527dc9c87b476a86e9ccaef5890",
+    "previewModeEncryptionKey": "46cc57ba06aa2cc423c97c19f8686054966a69c944e9151e945689b108144cb1"
+  }
+}

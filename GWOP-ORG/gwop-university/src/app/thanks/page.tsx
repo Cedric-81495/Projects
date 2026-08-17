@@ -30,9 +30,11 @@ export default function Thanks() {
             <Link className="btn btn-e" href={event.thanks.ctas.primary.href}>
               {event.thanks.ctas.primary.label}
             </Link>
+            {!event.thanks.ctas.secondary.pending && (
             <a className="btn btn-ol" href={event.thanks.ctas.secondary.href}>
               {event.thanks.ctas.secondary.label}
             </a>
+          )}
           </div>
         </div>
       </div>

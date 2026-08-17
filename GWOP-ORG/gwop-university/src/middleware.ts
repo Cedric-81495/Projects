@@ -1,25 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-/**
- * Middleware does three jobs and deliberately no more.
- *
- *  1. Refresh the Supabase session so a server component never sees an expired
- *     token mid-render.
- *  2. Apply security headers to every response, including a nonce-based CSP.
- *  3. Redirect unauthenticated browsers away from /dashboard.
- *
- * ⚠ That third job is a REDIRECT, not access control. It exists so people see a
- * sign-in page instead of an empty dashboard. The actual guarantee is the RLS
- * policy in 0006_rls.sql. Middleware runs on the edge, can be bypassed by
- * anything that speaks HTTP directly, and must never be the only thing standing
- * between a stranger and the client's paid content.
- *
- * ⚠ PHASE 1 BOUNDARY: the matcher below deliberately excludes `/`, `/830`,
- * `/thanks` and `/go/*`. Those routes are frozen for the Aug 30 event and this
- * middleware must not alter their responses.
- */
-
 const PROTECTED_PREFIXES = ['/dashboard', '/learn', '/account', '/admin']
 
 /** Only the origin of Jake's form may be framed — nothing else. */
@@ -32,10 +13,43 @@ const ghlOrigin = (() => {
   }
 })()
 
+/* ── CSP BUILDER ────────────────────────────────────────────────────────────
+   Extracted from applyHeaders so the SAME string can be put on the request
+   (where Next reads the nonce) and the response (where the browser enforces
+   it). Building it twice from one nonce would also work, but a single source
+   means the two can never drift apart after a future edit.
+   ───────────────────────────────────────────────────────────────────────── */
+function buildCsp(nonce: string): string {
+  const isDev = process.env.NODE_ENV === 'development'
+
+  return [
+    `default-src 'self'`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ''}`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+    `font-src 'self' https://fonts.gstatic.com data:`,
+    `img-src 'self' data: blob: https://*.supabase.co https://*.b-cdn.net`,
+    `media-src 'self' blob: https://*.b-cdn.net https://iframe.mediadelivery.net`,
+    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.b-cdn.net`,
+    `frame-src https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com https://iframe.mediadelivery.net${ghlOrigin ? ' ' + ghlOrigin : ''}`,
+    `form-action 'self'`,
+    `frame-ancestors 'none'`,
+    `base-uri 'self'`,
+    `object-src 'none'`,
+    `upgrade-insecure-requests`,
+  ].join('; ')
+}
+
 export async function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  const csp = buildCsp(nonce)
 
-  let response = NextResponse.next({ request })
+  /* Next extracts the nonce from the REQUEST's CSP header to stamp its own
+     inline bootstrap scripts. Response-only = hydration blocked wholesale. */
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('content-security-policy', csp)
+  requestHeaders.set('x-nonce', nonce)
+
+  let response = NextResponse.next({ request: { headers: requestHeaders } })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -45,7 +59,12 @@ export async function middleware(request: NextRequest) {
         getAll: () => request.cookies.getAll(),
         setAll: (toSet) => {
           toSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          response = NextResponse.next({ request })
+          /* MUST re-pass requestHeaders. `{ request }` here would rebuild the
+             response WITHOUT the CSP header, so any request that refreshes a
+             Supabase token would silently lose the nonce and break hydration
+             again — only for signed-in users, which is the worst way to find a
+             bug. */
+          response = NextResponse.next({ request: { headers: requestHeaders } })
           toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
         },
       },
@@ -62,38 +81,14 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('next', pathname)
-    return applyHeaders(NextResponse.redirect(url), nonce)
+    return applyHeaders(NextResponse.redirect(url), nonce, csp)
   }
 
-  return applyHeaders(response, nonce)
+  return applyHeaders(response, nonce, csp)
 }
 
-function applyHeaders(response: NextResponse, nonce: string) {
+function applyHeaders(response: NextResponse, nonce: string, csp: string) {
   const isDev = process.env.NODE_ENV === 'development'
-
-  // `strict-dynamic` lets Next's own bundles load from the nonced entry script
-  // without listing every chunk. 'unsafe-eval' is dev-only — React Refresh
-  // needs it, production must not have it.
-  const csp = [
-    `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ''}`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-    `font-src 'self' https://fonts.gstatic.com data:`,
-    `img-src 'self' data: blob: https://*.supabase.co https://*.b-cdn.net`,
-    `media-src 'self' blob: https://*.b-cdn.net https://iframe.mediadelivery.net`,
-    // PostHog is reverse-proxied through /ingest on our own origin, so it needs
-    // no third-party connect-src entry and is not blocked by ad blockers.
-    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.b-cdn.net`,
-    // Bunny player + Stripe + Turnstile + Jake's GoHighLevel form. The GHL
-    // origin is derived from the env value rather than hardcoded, so pointing
-    // at a different sub-account does not require a code change.
-    `frame-src https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com https://iframe.mediadelivery.net${ghlOrigin ? ' ' + ghlOrigin : ''}`,
-    `form-action 'self'`,
-    `frame-ancestors 'none'`,       // clickjacking; supersedes X-Frame-Options
-    `base-uri 'self'`,              // blocks <base> tag script hijacking
-    `object-src 'none'`,
-    `upgrade-insecure-requests`,
-  ].join('; ')
 
   const headers: Record<string, string> = {
     'Content-Security-Policy': csp,
@@ -106,7 +101,6 @@ function applyHeaders(response: NextResponse, nonce: string) {
   }
 
   if (!isDev) {
-    // Two years, subdomains, preload-eligible. Only ever on HTTPS.
     headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains; preload'
   }
 
@@ -116,12 +110,6 @@ function applyHeaders(response: NextResponse, nonce: string) {
 
 export const config = {
   matcher: [
-    /*
-     * Everything except:
-     *   · static assets and image optimisation
-     *   · the frozen Aug 30 event surface: /event, /830, /thanks, /go/*
-     *   · /api/webhooks/* — Stripe sends no cookies and must not be redirected
-     */
     '/((?!_next/static|_next/image|favicon.ico|830|event|thanks|go/|api/webhooks|.*\\.(?:png|jpg|jpeg|svg|webp|ico|woff2?)$).*)',
   ],
 }

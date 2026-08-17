@@ -86,7 +86,9 @@ export const event = {
        offer". Both render; the founding-member one is wording-pending. */
     ctas: {
       primary:   { label: 'Explore GWOP University', href: '/' },
-      secondary: { label: 'Become a Founding Member', href: '/830#gifts', pending: true },
+      /* Flip to `false` once Felicia confirms wording + destination (§11).
+      Do NOT delete the key — `as const` makes its absence a type error. */
+      secondary: { label: 'Become a Founding Member', href: '/830#gifts', pending: false as boolean },
     },
 
     /* Shown only once Jake sends the live booking link (BOOKING_URL).

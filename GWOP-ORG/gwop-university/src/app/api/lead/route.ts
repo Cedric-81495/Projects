@@ -97,7 +97,7 @@ export const POST = route(
     if (!(await verifyTurnstile(body.turnstile_token, ip))) {
       throw new ApiError(
         400,
-        'verification_failed',
+        'validation_failed',
         'We could not verify that request. Reload the page and try again.',
       )
     }
@@ -137,7 +137,7 @@ export const POST = route(
       logger.error('lead_write_failed', { requestId, message: error?.message })
       throw new ApiError(
         503,
-        'lead_write_failed',
+        'upstream_unavailable',
         'We could not save that just now. Please try again.',
       )
     }

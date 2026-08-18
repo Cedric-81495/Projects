@@ -1,7 +1,26 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-const PROTECTED_PREFIXES = ['/dashboard', '/learn', '/account', '/admin']
+/* Routes that require a session.
+
+   Corrected: `/learn` and `/account` were listed but do not exist as routes,
+   while `/app` — the actual student area, `/app/[level]/[module]` — was not
+   listed at all. The middleware was guarding two 404s and missing the pages
+   that hold the content.
+
+   ⚠ Still only a REDIRECT, not access control. It exists so a signed-out
+   visitor sees a sign-in page instead of an empty shell. The real guarantee is
+   the RLS policy in 0006_rls.sql: middleware runs at the edge, can be bypassed
+   by anything speaking HTTP directly, and must never be the only thing between
+   a stranger and the client's paid content. */
+const PROTECTED_PREFIXES = ['/dashboard', '/admin', '/app']
+
+/* Pages that make no sense with a session already in hand. Without this, a
+   browser-back to a cached /login shows a form to someone who is already
+   signed in — and every submit burns one of their five auth attempts per
+   fifteen minutes, so they lock themselves out of an account they are already
+   inside. */
+const AUTH_PAGES = ['/login', '/signup']
 
 /** Only the origin of Jake's form may be framed — nothing else. */
 const ghlOrigin = (() => {
@@ -77,10 +96,22 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // Signed out on a gated route → sign-in page, remembering where they wanted
+  // to go so /auth/callback can return them there.
   if (!user && PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('next', pathname)
+    return applyHeaders(NextResponse.redirect(url), nonce, csp)
+  }
+
+  // Signed in on /login or /signup → straight to the dashboard. `next` is
+  // deliberately NOT honoured here: it is an unvalidated query parameter, and
+  // safeNext() in /auth/callback is where that check belongs.
+  if (user && AUTH_PAGES.some((p) => pathname.startsWith(p))) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    url.search = ''
     return applyHeaders(NextResponse.redirect(url), nonce, csp)
   }
 

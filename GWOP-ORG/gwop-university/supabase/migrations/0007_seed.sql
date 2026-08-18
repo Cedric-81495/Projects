@@ -47,7 +47,7 @@ insert into public.lessons (module_id, level, slug, title, kind, sort_order, dur
 select mo.id, mo.level, l.slug, l.title, l.kind::public.lesson_kind, l.ord, l.secs, l.preview, l.pub
 from public.modules mo
 join (values
-  ('credit-and-cash-flow','credit-foundations','Credit Foundations','video',1::smallint,840,true,true),
+  ('credit-and-cash-flow','credit-foundations','Credit Foundations','video',1::smallint,840,false,true),
   ('credit-and-cash-flow','reading-your-report','Reading Your Report','video',2::smallint,1080,false,true),
   ('credit-and-cash-flow','cash-flow-basics','Cash Flow Basics','video',3::smallint,960,false,false),
   ('credit-and-cash-flow','banking-and-debt','Banking and Debt','video',4::smallint,1260,false,false),

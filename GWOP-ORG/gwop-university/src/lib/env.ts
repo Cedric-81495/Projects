@@ -47,9 +47,18 @@ const serverSchema = z.object({
   BUNNY_CDN_HOSTNAME: z.string().min(3),
   BUNNY_TOKEN_TTL_SECONDS: z.coerce.number().int().min(60).max(3600).default(900),
 
-  // NOTE: there is no GHL_API_TOKEN. We EMBED Jake's form; we never call his
-  // API and never receive his leads. Adding a token here would be the first
-  // step toward the second lead system §4 forbids.
+  /* GoHighLevel inbound webhook. SERVER ONLY — never NEXT_PUBLIC.
+
+     This is an unauthenticated write endpoint into the client's CRM. In client
+     JavaScript it would be a public form anyone could flood with fake contacts.
+
+     Optional so the whole flow ships and is testable before Jake supplies the
+     URL: lib/ghl/sync.ts no-ops without it, leads accumulate as 'pending', and
+     the cron drains them the moment it is configured.
+
+     SUPERSEDES the embed-only note that stood here. Felicia approved the
+     write-first + forward design on 2026-08-18. See ARCHITECTURE.md §14.1. */
+  GHL_WEBHOOK_URL: z.string().url().optional(),
 
   // Scheduled jobs
   CRON_SECRET: z.string().min(32),

@@ -88,7 +88,11 @@ export const event = {
       primary:   { label: 'Explore GWOP University', href: '/' },
       /* Flip to `false` once Felicia confirms wording + destination (§11).
       Do NOT delete the key — `as const` makes its absence a type error. */
-      secondary: { label: 'Become a Founding Member', href: '/830#gifts', pending: false as boolean },
+      /* Flip `pending` to false once Felicia confirms wording + destination
+         (§11). Do NOT delete the key — `as const` on this object makes its
+         absence a type error in thanks/page.tsx. `as boolean` widens the
+         literal so either value type-checks. */
+      secondary: { label: 'Become a Founding Member', href: '/830#gifts', pending: true as boolean },
     },
 
     /* Shown only once Jake sends the live booking link (BOOKING_URL).

@@ -31,9 +31,9 @@ export default function Thanks() {
               {event.thanks.ctas.primary.label}
             </Link>
             {!event.thanks.ctas.secondary.pending && (
-              <a className="btn btn-ol" href={event.thanks.ctas.secondary.href}>
-                {event.thanks.ctas.secondary.label}
-              </a>
+            <a className="btn btn-ol" href={event.thanks.ctas.secondary.href}>
+              {event.thanks.ctas.secondary.label}
+            </a>
           )}
           </div>
         </div>

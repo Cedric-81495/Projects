@@ -18,6 +18,7 @@ import { logger } from '@/lib/observability/logger'
 
 export type LimitName =
   | 'auth' // sign-in, sign-up, password reset — the expensive, abusable ones
+  | 'lead' // event signup capture
   | 'read' // catalogue and progress reads
   | 'write' // progress writes
   | 'checkout' // Stripe session creation
@@ -35,6 +36,11 @@ interface Rule {
  */
 export const RULES: Record<LimitName, Rule> = {
   auth: { limit: 5, windowSeconds: 900 },
+  /* Generous on purpose. Every attendee at the booth shares one venue IP — on
+     CGNAT or venue wifi a tight limit means they rate-limit each other and the
+     table silently stops taking signups mid-event. Turnstile is the real abuse
+     control here; this is only a backstop against a script. */
+  lead: { limit: 60, windowSeconds: 300 },
   read: { limit: 120, windowSeconds: 60 },
   write: { limit: 60, windowSeconds: 60 },
   checkout: { limit: 10, windowSeconds: 300 },

@@ -12,10 +12,16 @@ import { buildGhlEmbedUrl, GHL_EMBED_MODE } from '@/lib/ghl/embed'
  *   · no database write          · no local lead storage
  *   · no validation of the lead's fields
  *
- * GoHighLevel is the sole system of record for event leads (§4, §28). If a
- * future task asks this component to "also save the lead" or "queue it when
- * GHL is down", that is a second lead database and the answer is no — escalate
- * instead. See ARCHITECTURE.md §14.1 for the trade-off that was accepted.
+ * ⚠ STATUS 2026-08-18: this component is now the FALLBACK path, not the primary
+ * one. Felicia approved capturing the signup ourselves and forwarding it to GHL
+ * with retries (ARCHITECTURE.md §14.1). That work lives in POST /api/lead and
+ * src/lib/ghl/sync.ts.
+ *
+ * The "no local write" rule that stood here has been overturned by that
+ * decision — do not cite it to revert the new flow. This file stays because
+ * Felicia asked for the embed to remain live as a fallback until the new path
+ * passes end-to-end testing. Do not delete it, and do not clear
+ * NEXT_PUBLIC_GHL_FORM_URL, until that sign-off happens.
  * ═══════════════════════════════════════════════════════════════════════════
  */
 

@@ -271,8 +271,12 @@ a.evbar:hover{background:var(--forest-dk)}
 .evform .fh h3{font-size:17px}
 .evform .fh p{font-size:12.8px;color:var(--muted);margin-top:2px}
 .evform .fh .chosen{font-weight:600;color:var(--emerald)}
-.evslot{padding:5px;min-height:520px}
-.evslot iframe{width:100%;border:0;display:block;min-height:520px}
+.evslot{padding:5px;min-height:700px}
+/* 700 not 520: Jake's form is four fields plus legal links (~660px) and grows
+   again once the consent checkbox is added. Too low produces a scrollbar
+   INSIDE the frame — on a phone the Submit button then sits below the fold of
+   a box the attendee does not realise scrolls. A lost lead, with no error. */
+.evslot iframe{width:100%;border:0;display:block;min-height:700px}
 .evph{margin:13px;padding:28px 18px;text-align:center;border:2px dashed var(--emerald-lt);
   border-radius:12px;background:var(--ivory)}
 .evph b{display:block;font-family:var(--body);font-weight:600;font-size:14px;
@@ -734,8 +738,6 @@ body>section:only-of-type{display:grid;align-content:center}
   .mod{grid-template-columns:auto minmax(0,1fr)}
   .mod .go{display:none}
 }
-
-
 /* ═══════════════════════════════════════════════════════════════════════════
    /sign — VISUAL BUILD PACKAGE §06 PIECE 3 (PHONE / AIRDROP)
 

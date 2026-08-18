@@ -493,6 +493,24 @@ riding on top of a new auth system. This meets both documents.
    with no local copy, and there is no live signup counter for the booth. Accepted as a
    deliberate architectural decision, not an oversight.
 
+   > **SUPERSEDED 2026-08-18.** Felicia approved the write-first design after Jake
+   > proposed replacing the embedded form with an inbound webhook: *"proceed with
+   > saving the signup server-side first and forwarding to GHL with retries. GHL
+   > remains the operational CRM/marketing source of truth. Keep the current form
+   > live as fallback until the new flow passes end-to-end testing."*
+   >
+   > The distinction that makes this compatible with §4's intent:
+   > `public.leads` is the **record of submission** — what was entered, when, from
+   > which QR code, and the exact consent language shown. GHL remains where leads
+   > are **worked**: tags, pipeline, nurture, attribution. It is not a second CRM
+   > and must not grow into one.
+   >
+   > Implemented by migration `0008_leads.sql`, `POST /api/lead`,
+   > `src/lib/ghl/sync.ts` and the `/api/v1/cron/lead-sync` retry job.
+   > `GHLLeadForm.tsx` and `NEXT_PUBLIC_GHL_FORM_URL` are retained as the fallback
+   > path Felicia asked for, and must not be deleted until the new flow is signed
+   > off end to end.
+
 2. **§23 "do not add a footer where the hierarchy does not include one"** conflicts with
    §7, which requires `/privacy`, `/terms` and `/contact` to exist and be reachable, and
    with SMS compliance, which requires disclosure links near the signup path. Implemented

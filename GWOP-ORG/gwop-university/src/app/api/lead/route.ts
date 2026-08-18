@@ -30,7 +30,13 @@ import parsePhoneNumber from 'libphonenumber-js'
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-const interestValues = INTERESTS.map((i) => i.value)
+/* A Set, not a z.enum. z.enum needs a literal tuple and `.map()` returns a
+   mutable array, so the cast that would bridge them is unverifiable — that was
+   the build failure. This is better behaviour anyway: see the transform below. */
+const allowedInterests = new Set<string>([
+  ...INTERESTS.map((i) => i.value),
+  INTEREST_FALLBACK,
+])
 
 const LeadBody = z.object({
   first_name: z.string().trim().min(1, 'First name is required').max(80),
@@ -44,13 +50,22 @@ const LeadBody = z.object({
      is US-formatted, but this leaves the door open without a UI change. */
   phone_region: z.string().length(2).toUpperCase().optional().default('US'),
 
-  interest: z.enum([...interestValues, INTEREST_FALLBACK] as [string, ...string[]])
+  /* Falls back rather than rejecting. A stale or mistyped query parameter must
+     never cost a signup at the booth — an uncategorised lead is recoverable,
+     a refused one is gone. Unknown, missing and wrong-case all land on
+     `unspecified`, which is exactly the branch Jake needs a default for. */
+  interest: z
+    .string()
+    .trim()
     .optional()
-    .default(INTEREST_FALLBACK),
+    .transform((v) => (v && allowedInterests.has(v) ? v : INTEREST_FALLBACK)),
+
   interest_tag: z.string().trim().max(120).optional().default(''),
 
   source: z.string().trim().max(60).optional().default(''),
-  utm: z.record(z.string().max(200)).optional().default({}),
+  /* zod 4 requires BOTH key and value schemas here. A single argument compiles
+     on zod 3 and fails on 4 — this project is on ^4.1.0. */
+  utm: z.record(z.string(), z.string().max(200)).optional().default({}),
 
   /* Must be literally true. `.refine` rather than `z.literal(true)` so the
      message is the one the attendee should see. */
@@ -70,8 +85,7 @@ export const POST = route(
        IP — on CGNAT or venue wifi they would rate-limit each other and the
        table would stop taking signups mid-event, silently.
        Turnstile is the real abuse control here; this is only a backstop.
-       Requires adding to RULES in lib/http/rate-limit.ts:
-         lead: { limit: 60, windowSeconds: 300 }  */
+       Requires `lead: { limit: 60, windowSeconds: 300 }` in RULES. */
     limit: 'lead',
     limitByUser: false,
     body: LeadBody,

@@ -1,5 +1,6 @@
 import 'server-only'
 import { env } from '@/lib/env'
+import { EVENT_TAG } from '@/config/integrations'
 import { admin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/observability/logger'
 
@@ -75,7 +76,10 @@ function buildPayload(lead: LeadRow) {
     sms_consent_text: lead.consent_text,
     sms_consent_at: lead.consent_at,
 
-    event_tag: 'EVENT - Everybody Gotta Eat - 08/30/26',
+    /* From integrations.ts — the documented owner file for anything Jake
+       confirms. Was a duplicated literal here, which meant correcting the tag
+       in config would silently keep sending the old value on every lead. */
+    event_tag: EVENT_TAG,
     submitted_at: lead.created_at,
 
     /* Our row id. Lets Jake trace a contact back to a submission, and lets a

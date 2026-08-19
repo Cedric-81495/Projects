@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Script from 'next/script'
+import { AsYouType, isValidPhoneNumber } from 'libphonenumber-js'
 import { event } from '@/content/event'
 import { publicEnv } from '@/lib/env.public'
 import {
@@ -148,6 +149,9 @@ function NativeForm({ choice }: { choice: Choice }) {
   const [done, setDone] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [errors, setErrors] = useState<FieldErrors>({})
+  /* Controlled so AsYouType can reformat as they type. The server re-parses
+     the same string with the same library, so what passes here passes there. */
+  const [phone, setPhone] = useState('')
 
   const siteKey = publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY
   const consent = event.consent
@@ -164,8 +168,11 @@ function NativeForm({ choice }: { choice: Choice }) {
        /api/lead re-validates everything; this is not the guard. */
     if (!String(fd.get('first_name') ?? '').trim()) next.first_name = 'Required'
     if (!String(fd.get('email') ?? '').includes('@')) next.email = 'Enter a valid email'
-    if (String(fd.get('phone') ?? '').replace(/\D/g, '').length < 10) {
-      next.phone = 'Enter a valid mobile number'
+    /* Same function the route uses, so the verdict cannot disagree. The old
+       10-digit check passed numbers the server then rejected — the attendee
+       waited out a round trip on venue cellular to be told no. */
+    if (!isValidPhoneNumber(String(fd.get('phone') ?? ''), 'US')) {
+      next.phone = 'Enter a valid US mobile number'
     }
     /* Consent is deliberately NOT validated. Jake, 2026-08-19: optional and
        unchecked by default. The approved wording says "Consent is not a
@@ -255,7 +262,33 @@ function NativeForm({ choice }: { choice: Choice }) {
           inputMode="tel"
           autoComplete="tel"
           enterKeyHint="next"
-          placeholder="(555) 000-0000"
+          /* 555 is NOT an assigned US area code — the old placeholder was a
+             number the API rejects. 415 is real; 555-01xx is the reserved
+             fictional range, so a booth demo can never text a real person. */
+          placeholder="(415) 555-0123"
+          maxLength={16}
+          value={phone}
+          onChange={(e) => {
+            /* Backspace must be able to delete a formatting character.
+               Reformatting the raw digits on every keystroke would re-insert
+               the ')' the user just removed and trap the caret. */
+            const raw = e.target.value
+            setPhone(
+              raw.length < phone.length ? raw : new AsYouType('US').input(raw),
+            )
+            if (errors.phone) setErrors((p) => ({ ...p, phone: undefined }))
+          }}
+          /* On blur, not on keystroke: mid-typing, a correct number is
+             invalid for its first nine digits. */
+          onBlur={() =>
+            setErrors((p) => ({
+              ...p,
+              phone:
+                phone && !isValidPhoneNumber(phone, 'US')
+                  ? 'Enter a valid US mobile number'
+                  : undefined,
+            }))
+          }
           required
         />
         {errors.phone && <em>{errors.phone}</em>}

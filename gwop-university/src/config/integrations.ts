@@ -85,6 +85,19 @@ export const BOOKING_TAG = 'GWOP – Blueprint 1:1'
 export const STANDBY_FUNNEL_URL =
   'https://preview-1786530807575155018.vibepreview.com/#credit-review'
 
-/** Draft mode: highlights unconfirmed copy and shows the status bar.
- *  Set to false only when every `pending` flag in src/content is cleared. */
-export const DRAFT = true
+/* ── DRAFT MODE ─────────────────────────────────────────────────────────────
+   ARCHITECTURE.md deviation 3: the DRAFT banner must never reach a real
+   visitor, but the safeguard must survive someone forgetting to flip a flag.
+   So it is derived, not hand-set.
+
+   Draft stays ON for preview deployments AND for any *.vercel.app host — which
+   is every deployment we have today, so testing is unaffected. It switches
+   itself OFF the moment a real domain is serving production, which is exactly
+   when an attendee could see it.
+
+   Was a hardcoded `true`, meaning the banner would have shipped to the booth
+   the day the domain was attached. */
+const isPreview = process.env.VERCEL_ENV !== 'production'
+const onVercelHost = (process.env.NEXT_PUBLIC_SITE_URL ?? '').includes('.vercel.app')
+
+export const DRAFT = isPreview || onVercelHost

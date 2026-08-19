@@ -1,36 +1,46 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { buildGhlEmbedUrl, GHL_EMBED_MODE } from '@/lib/ghl/embed'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
  * THE ONLY PLACE A GOHIGHLEVEL EMBED APPEARS IN THIS CODEBASE (§5).
  *
- * Extracted from src/app/830/InterestForm.tsx so /event, /830 and any future
- * campaign page share one implementation. Replacing Jake's embed means editing
- * one env var — no page is redesigned, no second copy drifts out of sync.
- *
  * WHAT THIS COMPONENT DELIBERATELY DOES NOT HAVE:
  *   · no onSubmit handler        · no fetch or POST
  *   · no database write          · no local lead storage
  *   · no validation of the lead's fields
  *
- * GoHighLevel is the sole system of record for event leads (§4, §28). If a
- * future task asks this component to "also save the lead" or "queue it when
- * GHL is down", that is a second lead database and the answer is no — escalate
- * instead. See ARCHITECTURE.md §14.1 for the trade-off that was accepted.
+ * ⚠ STATUS 2026-08-18: this component is now the FALLBACK path, not the primary
+ * one. Felicia approved capturing the signup ourselves and forwarding it to GHL
+ * with retries (ARCHITECTURE.md §14.1). That work lives in POST /api/lead and
+ * src/lib/ghl/sync.ts.
+ *
+ * The "no local write" rule that stood here has been overturned by that
+ * decision — do not cite it to revert the new flow. This file stays because
+ * Felicia asked for the embed to remain live as a fallback until the new path
+ * passes end-to-end testing. Do not delete it, and do not clear
+ * NEXT_PUBLIC_GHL_FORM_URL, until that sign-off happens.
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
+/** GHL's resize + redirect-breakout helper. Loaded on the PARENT page. */
+const GHL_EMBED_SCRIPT = 'https://link.msgsndr.com/js/form_embed.js'
+
 interface Props {
-  /** Interest value forwarded to GHL, e.g. 'credit'. */
   interest?: string
-  /** Jake's exact tag text, forwarded verbatim so his workflow matches on it. */
   interestTag?: string
-  /** Accessible title for the iframe. */
   title?: string
-  /** Minimum height while GHL has not yet reported its own. */
+  /**
+   * Floor height, used until GHL reports its own.
+   *
+   * 700 not 620: Jake's form is four fields plus legal links (~660px), and an
+   * SMS consent checkbox is still to be added, which makes it taller again. A
+   * floor that is too low produces a scrollbar INSIDE the frame — on a phone
+   * the Submit button then sits below the fold of a box the attendee does not
+   * realise scrolls, which is a lost lead with no error anywhere.
+   */
   minHeight?: number
   className?: string
 }
@@ -39,12 +49,11 @@ export function GHLLeadForm({
   interest,
   interestTag,
   title = 'GWOP signup form',
-  minHeight = 620,
+  minHeight = 700,
   className,
 }: Props) {
   const [src, setSrc] = useState<string | null>(null)
   const [height, setHeight] = useState(minHeight)
-  const frameRef = useRef<HTMLIFrameElement>(null)
 
   // Built on the client, at mount, from window.location. This keeps the host
   // page fully static so it is served from the CDN edge — on congested venue
@@ -53,11 +62,34 @@ export function GHLLeadForm({
     setSrc(buildGhlEmbedUrl({ interest, interestTag, search: window.location.search }))
   }, [interest, interestTag])
 
+  /* ── GHL's embed script ────────────────────────────────────────────────────
+     Two jobs, and BOTH were missing before:
+
+       1. It is what makes GHL post its content height. Without it the height
+          listener below never fires and the frame stays at the floor value —
+          the nested-scrollbar bug.
+       2. It breaks the post-submit redirect out to top level. Without it the
+          thank-you page renders inside the iframe, in a ~700px box.
+
+     Injected once, shared by iframe and script mode. Idempotent — a second
+     mount reuses the existing tag rather than loading it twice.
+
+     ⚠ CSP: middleware.ts must allow link.msgsndr.com in `script-src`, or this
+     is blocked silently and both symptoms above return.
+     ───────────────────────────────────────────────────────────────────────── */
+  useEffect(() => {
+    if (!src) return
+    if (document.querySelector(`script[src="${GHL_EMBED_SCRIPT}"]`)) return
+    const tag = document.createElement('script')
+    tag.src = GHL_EMBED_SCRIPT
+    tag.async = true
+    document.body.appendChild(tag)
+  }, [src])
+
   // GHL posts its content height as it grows. Without this the form is clipped
   // on a short phone, or floats in a tall empty box on a tall one.
   useEffect(() => {
     function onMessage(e: MessageEvent) {
-      // Origin check: only the frame we actually loaded may resize us.
       if (!src) return
       let expected: string
       try {
@@ -90,12 +122,35 @@ export function GHLLeadForm({
     )
   }
 
-  // Script-mode embeds are supported because GHL ships either form depending
-  // on how the funnel was built. Same URL source, different delivery.
+  /* Script-mode embeds are supported because GHL ships either form depending on
+     how the funnel was built.
+
+     PREVIOUSLY BROKEN: this branch rendered an empty <div data-ghl-script-slot>
+     and nothing ever loaded a script, so script mode silently produced a blank
+     box. form_embed.js (injected above) hydrates the attribute contract below. */
   if (GHL_EMBED_MODE === 'script') {
+    const formId = (() => {
+      try {
+        return new URL(src).pathname.split('/').filter(Boolean).pop() ?? ''
+      } catch {
+        return ''
+      }
+    })()
+
     return (
       <div className={className} style={{ minHeight }}>
-        <div data-ghl-script-slot data-src={src} />
+        <iframe
+          src={src}
+          title={title}
+          id={`inline-${formId}`}
+          data-layout='{"id":"INLINE"}'
+          data-form-id={formId}
+          data-form-name={title}
+          data-height={String(minHeight)}
+          data-layout-iframe-id={`inline-${formId}`}
+          style={{ width: '100%', height, border: 0, display: 'block' }}
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
       </div>
     )
   }
@@ -103,15 +158,25 @@ export function GHLLeadForm({
   return (
     <div className={className} style={{ minHeight }}>
       <iframe
-        ref={frameRef}
         src={src}
         title={title}
         loading="eager"
         style={{ width: '100%', height, border: 0, display: 'block' }}
-        /* Least privilege. forms + scripts + same-origin is what a GHL form
-           needs; popups and top-navigation are not granted, so the embed can
-           never navigate the page out from under the attendee. */
-        sandbox="allow-forms allow-scripts allow-same-origin"
+        /* Least privilege, with ONE addition over the original.
+​
+           `allow-top-navigation-by-user-activation` is required for Jake's
+           post-submit redirect to reach /thanks at top level. Without it the
+           thank-you page loads inside this frame and reads as broken.
+​
+           This is narrower than `allow-top-navigation`: navigation is permitted
+           only in response to a real user gesture (the Submit click), so the
+           embed still cannot navigate the page unprompted — which was the point
+           of the original restriction. Popups remain denied.
+​
+           ⚠ This relaxes a constraint documented as deliberate. Confirm with
+           whoever wrote it before merging; the alternative is to keep the
+           sandbox as-is and host the thank-you content inside GHL instead. */
+        sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation-by-user-activation"
         referrerPolicy="strict-origin-when-cross-origin"
       />
     </div>

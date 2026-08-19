@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Crest } from '@/components/Chrome'
-import { isStaff, type AccessState } from '@/lib/access/policy'
+import { isStaff, canAccessLevel, LEVELS, type AccessState } from '@/lib/access/policy'
 
 /**
  * Portal shell. Server component — it renders no interactivity beyond links and
@@ -32,10 +32,36 @@ export function PortalChrome({
 
         <nav className="ponav" aria-label="Student">
           <Link href="/dashboard">Dashboard</Link>
-          <Link href="/account">Account</Link>
-          {/* Rendered from the centralized policy, never an inline role string.
-              Note this only HIDES the link — /admin is guarded server-side and
-              by RLS regardless of what is rendered here. */}
+
+          {/* THE PATHWAY, always all four.
+              A locked level renders as dimmed text rather than being hidden:
+              Package p.3 says the university should "visually show progression",
+              and a student cannot want what they cannot see. Hiding Junior makes
+              the product look like it ends at Sophomore.
+
+              Lock state comes from canAccessLevel — never `level <=
+              enrolledLevel` inline. policy.ts is explicit that the moment that
+              comparison is copied into a component, changing a rule means
+              auditing the whole tree.
+
+              This governs affordance only. RLS decides what data returns. */}
+          {LEVELS.map(l =>
+            canAccessLevel(access, l.level) ? (
+              <Link key={l.slug} href={`/app/${l.slug}`}>{l.label}</Link>
+            ) : (
+              <span
+                key={l.slug}
+                className="polock"
+                aria-disabled="true"
+                title={`${l.label} — not yet unlocked`}
+              >
+                {l.label}
+              </span>
+            ),
+          )}
+
+          {/* Only HIDES the link — /admin is guarded server-side and by RLS
+              regardless of what is rendered here. */}
           {isStaff(access) && <Link href="/admin">Admin</Link>}
         </nav>
 

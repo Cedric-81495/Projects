@@ -32,8 +32,15 @@ export const site = {
 
 /* ── LEGAL — ⚠️ ATTORNEY-SUPPLIED ONLY. Never draft or reword. ───────────── */
 export const legal = {
+  /* Still open. Felicia, Aug 18: "please confirm the exact legal entity name
+     and city being used for A2P so Cedric can mirror it across the website and
+     legal pages." The city came back; the entity name is with Surpaul / Jake. */
   entity:  { text: '[Legal Entity Name]', pending: true },
-  address: { text: '[City, State]', pending: true },
+  /* ✅ CONFIRMED — Surpaul proposed Boston, Felicia agreed Aug 18: "Boston, MA
+     works for me. It keeps everything consistent with the launch and current
+     activation. We can always update the primary location later as GWOP
+     expands." Treated as revisable by design, not as a placeholder. */
+  address: { text: 'Boston, MA', pending: false },
   disclosure: {
     text: 'GWOP University provides financial education. We do not guarantee any specific outcome, score change, or funding approval. Accurate, current and verifiable information cannot be removed from a consumer credit report. Individual results vary.',
     pending: true,

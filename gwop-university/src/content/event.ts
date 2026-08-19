@@ -73,6 +73,34 @@ export const event = {
   form: {
     step: 'Step 2 of 2 — your details',
     note: 'Takes under a minute.',
+    submit: 'Send my blueprint',
+  },
+
+  /* SMS consent shown beside the checkbox on /830.
+
+     ⚠ OWNED BY JAKE, not us. Felicia 2026-08-18: "since this needs to align
+     with the A2P registration/use case, please confirm the final approved SMS
+     consent language for Cedric to place beside the checkbox." Do NOT write
+     this ourselves — it is the legal record behind every message he sends.
+
+     `pending: true` makes the form refuse to render, so placeholder legal text
+     cannot reach an attendee. Flip to false the moment Jake supplies the text.
+     `as boolean` widens the literal so either value type-checks. */
+  consent: {
+    /* APPROVED 2026-08-19. Wording supplied by Jake to match the A2P
+       registration; business name confirmed as "GWOP University" by Felicia.
+
+       Do not reword any part of this without going back to Jake — it is the
+       legal record behind every message he sends, and the STOP/HELP keywords
+       and the "not a condition of purchase" line are carrier requirements,
+       not copy. */
+    pending: false as boolean,
+    text:
+      'I consent to receive marketing text messages from GWOP University at ' +
+      'the phone number provided. Message frequency may vary. Message and ' +
+      'data rates may apply. Reply STOP to opt out and HELP for assistance. ' +
+      'Consent is not a condition of purchase.',
+    fine: 'Msg & data rates may apply. Reply STOP to opt out.',
   },
 
   /* Felicia §11 prescribes this hierarchy: "YOU'RE IN." then "Your GWOP
@@ -86,16 +114,25 @@ export const event = {
        offer". Both render; the founding-member one is wording-pending. */
     ctas: {
       primary:   { label: 'Explore GWOP University', href: '/' },
-      secondary: { label: 'Become a Founding Member', href: '/830#gifts', pending: true },
+      /* Flip to `false` once Felicia confirms wording + destination (§11).
+      Do NOT delete the key — `as const` makes its absence a type error. */
+      /* Flip `pending` to false once Felicia confirms wording + destination
+         (§11). Do NOT delete the key — `as const` on this object makes its
+         absence a type error in thanks/page.tsx. `as boolean` widens the
+         literal so either value type-checks. */
+      secondary: { label: 'Become a Founding Member', href: '/830#gifts', pending: true as boolean },
     },
 
-    /* Shown only once Jake sends the live booking link (BOOKING_URL).
-       Jake, Aug 14: Beast's 1:1 GWOP Blueprint/Roadmap calendar, Mon–Fri 11–1. */
+    /* ✅ RESOLVED — Jake supplied the live booking link 2026-08-19, so
+       BOOKING_URL is set and this block renders.
+       Name matches his calendar exactly ("GWOP Blueprint/Roadmap") so the
+       attendee does not tap "Blueprint session" and land on a page titled
+       something else. Duration is his: 1 hr. */
     booking: {
-      h: 'Book your 1:1 Blueprint session',
-      p: 'Sit down with Beast and walk through your roadmap. Mon–Fri, 11 AM–1 PM.',
+      h: 'Book your 1:1 Blueprint / Roadmap session',
+      p: 'One hour with Beast, walking through your roadmap. Mon–Fri, 11 AM–1 PM.',
       label: 'Pick a time',
-      pending: true,
+      pending: false,
     },
 
     next: [

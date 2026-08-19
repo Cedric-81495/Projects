@@ -1,18 +1,36 @@
 'use client'
 
 import { useState } from 'react'
+import Script from 'next/script'
+import { AsYouType, isValidPhoneNumber } from 'libphonenumber-js'
 import { event } from '@/content/event'
+import { publicEnv } from '@/lib/env.public'
 import {
   GHL_FORM_URL, INTERESTS, INTEREST_FALLBACK, QR_CODES, CAMPAIGN_PARAMS,
 } from '@/config/integrations'
 
-/* The only client component on /830.
-   Implements Visual Build Package p.6: CHOOSE → CAPTURE.
+/* ═══════════════════════════════════════════════════════════════════════════
+   /830 — CHOOSE → CAPTURE (Visual Build Package p.6)
+
+   Two capture paths live here, chosen by NEXT_PUBLIC_LEAD_CAPTURE_MODE:
+
+     'native' (default) — our own form → POST /api/lead → Supabase → GHL.
+                          Felicia approved this on Aug 18.
+     'iframe'           — Jake's embedded GHL form. The fallback she asked to
+                          keep live until the native path passes end-to-end.
+
+   ⚠ Switching between them must stay an ENV CHANGE, not a code change. On
+   event day a revert has to take thirty seconds, not a redeploy. Do not delete
+   the iframe branch until sign-off.
 
    The QR source is read from the URL lazily, at click time, rather than via
    searchParams on the server — that keeps /830 fully static so it is served
    from the CDN edge. On congested venue cellular that is the difference
-   between a fast page and a slow one (CLAUDE.md invariant 15). */
+   between a fast page and a slow one (CLAUDE.md invariant 15).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const MODE = publicEnv.NEXT_PUBLIC_LEAD_CAPTURE_MODE ?? 'native'
+
 function readSource(): string {
   if (typeof window === 'undefined') return 'direct'
   const s = new URLSearchParams(window.location.search).get('s')
@@ -22,33 +40,38 @@ function readSource(): string {
 
 /* Felicia §3 + §7: one page, one QR destination, attribution on parameters.
    Allow-listed only — an arbitrary ?field=value in a scanned link must never
-   reach Jake's form. Values are truncated; a pasted novel is not attribution. */
-function readCampaign(): Array<[string, string]> {
-  if (typeof window === 'undefined') return []
+   reach the payload. Values truncated; a pasted novel is not attribution. */
+function readCampaign(): Record<string, string> {
+  if (typeof window === 'undefined') return {}
   const q = new URLSearchParams(window.location.search)
-  return CAMPAIGN_PARAMS
-    .map(k => [k, (q.get(k) ?? '').slice(0, 120)] as [string, string])
-    .filter(([, v]) => v.length > 0)
+  const out: Record<string, string> = {}
+  for (const k of CAMPAIGN_PARAMS) {
+    const v = (q.get(k) ?? '').slice(0, 120)
+    if (v) out[k] = v
+  }
+  return out
 }
 
+interface Choice { value: string; label: string; tag: string }
+
 export function InterestForm() {
-  const [choice, setChoice] = useState<{ value: string; label: string } | null>(null)
-  const [src, setSrc] = useState<string | null>(null)
+  const [choice, setChoice] = useState<Choice | null>(null)
+  const [iframeSrc, setIframeSrc] = useState<string | null>(null)
 
   function choose(value: string, label: string, tag: string) {
-    setChoice({ value, label })
-    if (!GHL_FORM_URL) return setSrc(null)
+    setChoice({ value, label, tag })
+    if (MODE !== 'iframe') return
+
+    if (!GHL_FORM_URL) return setIframeSrc(null)
     try {
       const u = new URL(GHL_FORM_URL)
       u.searchParams.set('interest', value)
-      /* Jake's exact tag text travels with the lead, so his workflow can tag on
-         a match rather than a lookup table that has to be kept in sync twice. */
       u.searchParams.set('interest_tag', tag)
       u.searchParams.set('s', readSource())
-      for (const [k, v] of readCampaign()) u.searchParams.set(k, v)
-      setSrc(u.toString())
+      for (const [k, v] of Object.entries(readCampaign())) u.searchParams.set(k, v)
+      setIframeSrc(u.toString())
     } catch {
-      setSrc(null) // malformed env value — show the placeholder instead of breaking
+      setIframeSrc(null)
     }
   }
 
@@ -74,7 +97,7 @@ export function InterestForm() {
       <button
         type="button"
         className="evskip"
-        onClick={() => choose(INTEREST_FALLBACK, 'general', 'Unspecified')}
+        onClick={() => choose(INTEREST_FALLBACK, 'everything', 'Unspecified')}
       >
         {event.choose.skip}
       </button>
@@ -87,21 +110,239 @@ export function InterestForm() {
               Interested in <span className="chosen">{choice.label}</span>. {event.form.note}
             </p>
           </div>
-          <div className="evslot">
-            {src ? (
-              <iframe src={src} title="GWOP signup form" loading="eager" />
-            ) : (
-              <div className="evph">
-                <b>Jake&rsquo;s GoHighLevel form loads here</b>
-                <span>
-                  Set <code>NEXT_PUBLIC_GHL_FORM_URL</code> in <code>.env.local</code>.
-                  Tracker task 3.
-                </span>
-              </div>
-            )}
-          </div>
+
+          {MODE === 'iframe'
+            ? <IframeFallback src={iframeSrc} />
+            : <NativeForm choice={choice} />}
         </div>
       )}
     </>
+  )
+}
+
+/* ── FALLBACK PATH ─────────────────────────────────────────────────────────
+   Unchanged behaviour, retained per Felicia's instruction. */
+function IframeFallback({ src }: { src: string | null }) {
+  return (
+    <div className="evslot">
+      {src ? (
+        <iframe src={src} title="GWOP signup form" loading="eager" />
+      ) : (
+        <div className="evph">
+          <b>Jake&rsquo;s GoHighLevel form loads here</b>
+          <span>Set <code>NEXT_PUBLIC_GHL_FORM_URL</code> to use the fallback path.</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ── PRIMARY PATH ──────────────────────────────────────────────────────────
+   Four fields and a consent box. Deliberately no more: every extra field costs
+   conversions with a staff member standing at the table waiting.
+   ───────────────────────────────────────────────────────────────────────── */
+
+type FieldErrors = Partial<Record<'first_name' | 'email' | 'phone', string>>
+
+function NativeForm({ choice }: { choice: Choice }) {
+  const [pending, setPending] = useState(false)
+  const [done, setDone] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<FieldErrors>({})
+  /* Controlled so AsYouType can reformat as they type. The server re-parses
+     the same string with the same library, so what passes here passes there. */
+  const [phone, setPhone] = useState('')
+
+  const siteKey = publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+  const consent = event.consent
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (pending) return
+
+    const fd = new FormData(e.currentTarget)
+    const next: FieldErrors = {}
+
+    /* Checked here as well as server-side, purely so the attendee sees the
+       problem next to the field instead of after a round trip on slow cellular.
+       /api/lead re-validates everything; this is not the guard. */
+    if (!String(fd.get('first_name') ?? '').trim()) next.first_name = 'Required'
+    if (!String(fd.get('email') ?? '').includes('@')) next.email = 'Enter a valid email'
+    /* Same function the route uses, so the verdict cannot disagree. The old
+       10-digit check passed numbers the server then rejected — the attendee
+       waited out a round trip on venue cellular to be told no. */
+    if (!isValidPhoneNumber(String(fd.get('phone') ?? ''), 'US')) {
+      next.phone = 'Enter a valid US mobile number'
+    }
+    /* Consent is deliberately NOT validated. Jake, 2026-08-19: optional and
+       unchecked by default. The approved wording says "Consent is not a
+       condition of purchase" — blocking submit would contradict the sentence
+       sitting right beside the box. */
+
+    if (Object.keys(next).length) return setErrors(next)
+    setErrors({})
+    setPending(true)
+    setFormError(null)
+
+    try {
+      const res = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          first_name: String(fd.get('first_name') ?? '').trim(),
+          last_name: String(fd.get('last_name') ?? '').trim(),
+          email: String(fd.get('email') ?? '').trim(),
+          phone: String(fd.get('phone') ?? '').trim(),
+          interest: choice.value,
+          interest_tag: choice.tag,
+          source: readSource(),
+          utm: readCampaign(),
+          consent_given: fd.get('consent') === 'yes',
+          /* The exact sentence rendered above travels with the submission, so
+             the stored record matches what was actually on screen. */
+          consent_text: consent.text,
+          turnstile_token: String(fd.get('cf-turnstile-response') ?? ''),
+        }),
+      })
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => null)
+        throw new Error(body?.error?.message ?? 'Something went wrong. Please try again.')
+      }
+
+      /* Full navigation, not a client-side push: the thank-you page must render
+         even if this component's JS has since failed, and a hard load is what
+         guarantees the attendee sees confirmation. */
+      setDone(true)
+      window.location.assign('/thanks')
+    } catch (err: unknown) {
+      setPending(false)
+      setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    }
+  }
+
+  /* Consent wording is not approved yet. The mechanism is built and testable,
+     but a placeholder must not reach an attendee — so the form refuses to
+     render rather than shipping unapproved legal text.
+     Flip event.consent.pending to false once Felicia supplies the sentence. */
+  if (consent.pending) {
+    return (
+      <div className="evph" role="status">
+        <b>Signup form ready — awaiting approved SMS consent wording</b>
+        <span>
+          The form is built and tested. It stays hidden until the consent
+          sentence is confirmed, so placeholder legal text cannot go live.
+          Set <code>event.consent.pending = false</code> once approved.
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <form className="evnf" onSubmit={onSubmit} noValidate>
+      <div className="evnf-row">
+        <label>
+          First name
+          <input name="first_name" autoComplete="given-name" enterKeyHint="next" required />
+          {errors.first_name && <em>{errors.first_name}</em>}
+        </label>
+        <label>
+          Last name
+          <input name="last_name" autoComplete="family-name" enterKeyHint="next" />
+        </label>
+      </div>
+
+      <label>
+        Mobile number
+        {/* type=tel brings up the numeric keypad. inputMode reinforces it on
+            Android, where type alone is not always enough. */}
+        <input
+          name="phone"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          enterKeyHint="next"
+          /* 555 is NOT an assigned US area code — the old placeholder was a
+             number the API rejects. 415 is real; 555-01xx is the reserved
+             fictional range, so a booth demo can never text a real person. */
+          placeholder="(415) 555-0123"
+          maxLength={16}
+          value={phone}
+          onChange={(e) => {
+            /* Backspace must be able to delete a formatting character.
+               Reformatting the raw digits on every keystroke would re-insert
+               the ')' the user just removed and trap the caret. */
+            const raw = e.target.value
+            setPhone(
+              raw.length < phone.length ? raw : new AsYouType('US').input(raw),
+            )
+            if (errors.phone) setErrors((p) => ({ ...p, phone: undefined }))
+          }}
+          /* On blur, not on keystroke: mid-typing, a correct number is
+             invalid for its first nine digits. */
+          onBlur={() =>
+            setErrors((p) => ({
+              ...p,
+              phone:
+                phone && !isValidPhoneNumber(phone, 'US')
+                  ? 'Enter a valid US mobile number'
+                  : undefined,
+            }))
+          }
+          required
+        />
+        {errors.phone && <em>{errors.phone}</em>}
+      </label>
+
+      <label>
+        Email
+        <input
+          name="email"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          enterKeyHint="done"
+          placeholder="you@email.com"
+          required
+        />
+        {errors.email && <em>{errors.email}</em>}
+      </label>
+
+      {/* Unchecked by default and never pre-ticked — the stored record is only
+          meaningful if the attendee actually performed the action. Optional
+          per Jake: declining still captures the lead, it just carries
+          sms_consent: false into GHL. */}
+      <label className="evnf-consent">
+        <input type="checkbox" name="consent" value="yes" />
+        <span>
+          {consent.text}
+          {/* Required beside the consent language for A2P compliance — the
+              terms being agreed to have to be reachable from the same place
+              the agreement is given. */}
+          <span className="evnf-legal">
+            <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+            {' · '}
+            <a href="/terms" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a>
+            {' · '}
+            <a href="/sms-terms" target="_blank" rel="noopener noreferrer">SMS Terms</a>
+          </span>
+        </span>
+      </label>
+
+      {siteKey && (
+        <>
+          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+          <div className="cf-turnstile" data-sitekey={siteKey} data-theme="light" />
+        </>
+      )}
+
+      {formError && <p className="evnf-err" role="alert">{formError}</p>}
+
+      <button className="btn btn-e evnf-submit" type="submit" disabled={pending || done}>
+        {pending ? 'Sending…' : done ? 'Done' : event.form.submit ?? 'Send my blueprint'}
+      </button>
+
+      <p className="evnf-fine">{consent.fine}</p>
+    </form>
   )
 }

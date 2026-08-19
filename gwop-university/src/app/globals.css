@@ -24,8 +24,13 @@
   --ink:#1A1D1B;
   --muted:#5F6560;
 
-  --display:'Cormorant Garamond',Georgia,'Times New Roman',serif;
-  --body:'Poppins',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  /* Supplied by next/font in app/layout.tsx, which self-hosts the files and
+     generates a metric-matched fallback. The literal family names used to sit
+     here alongside a <link> to Google Fonts; the fallbacks are kept so a build
+     that somehow ships without the variables still renders in the right
+     ballpark rather than in Times. */
+  --display:var(--font-display),Georgia,'Times New Roman',serif;
+  --body:var(--font-body),system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
 
   --wrap:1120px;
   --pad:clamp(20px,5vw,32px);
@@ -85,9 +90,17 @@ h3,h4{font-family:var(--body);font-weight:600;color:var(--emerald);
 
 /* ── HERO · Visual Build Package p.5 ─────────────────────────────────────── */
 .hero{padding:clamp(22px,4vw,34px) 0 0}
+/* Named areas rather than source order, because the two arrangements differ:
+   a phone reads copy → crest → CTA (button at the thumb end, right above the
+   fold break), while p.4's desktop layout puts the crest beside the copy with
+   the CTA under it. `.acts` is a direct child of the grid for this reason. */
 .herocard{background:var(--black);border-radius:var(--r-xl);
   padding:clamp(32px,6.5vw,64px) clamp(24px,5.5vw,56px);
-  display:grid;gap:clamp(28px,5vw,48px);position:relative;overflow:hidden}
+  display:grid;gap:clamp(28px,5vw,48px);position:relative;overflow:hidden;
+  grid-template-areas:'copy' 'art' 'cta'}
+.herocard>:first-child{grid-area:copy}
+.herocard .herologo{grid-area:art}
+.herocard .acts{grid-area:cta}
 .herocard::after{content:'';position:absolute;left:-130px;bottom:-160px;
   width:360px;height:360px;border:1px solid rgba(200,163,74,.13);border-radius:50%;
   pointer-events:none}
@@ -95,11 +108,26 @@ h3,h4{font-family:var(--body);font-weight:600;color:var(--emerald);
   position:relative}
 .herocard .sub{color:rgba(247,243,233,.82);font-size:clamp(16px,1.2vw + 14px,19.5px);
   margin-top:18px;max-width:32ch}
-.herocard .acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(24px,4vw,34px)}
+/* Three properties here are load-bearing, all guarding the same failure. As a
+   grid child `.acts` stretches to fill its row, and because the crest spans
+   both rows that row is as tall as the artwork — the button inflated to ~200px.
+   `align-self:start` stops the box stretching, `align-items:center` stops the
+   flex child stretching, and the explicit height on .btn pins it regardless,
+   since .btn only sets min-height. */
+.herocard .acts{display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+  align-self:start}
+.herocard .acts .btn{height:52px}
 /* The new artwork is portrait (0.64) where the old one was near-square, so it
    is sized by HEIGHT. Sizing a 2:3 image by width alone makes the hero card
    grow roughly 50% taller and pushes the CTA off a phone screen. */
-.herologo{width:min(46%,190px);margin-inline:auto;position:relative}
+/* The white plate is now declared HERE, not baked into the PNG. The crest
+   assets carry real alpha so `/830` can sit them on the ivory page; that same
+   change removed the implicit white rectangle this hero depended on. p.4 shows
+   a plain white rectangle behind the artwork on the dark card — square corners,
+   so no border-radius. Padding keeps the crest off the plate edges.
+   box-sizing:border-box is global, so the padding does not widen the box. */
+.herologo{width:min(46%,190px);margin-inline:auto;position:relative;
+  background:var(--white);padding:10px}
 .herologo img{display:block;width:100%;height:auto;
   max-height:min(46vh,420px);object-fit:contain;object-position:center}
 
@@ -150,12 +178,54 @@ section.tint{background:var(--white);border-block:1px solid var(--stone)}
 
 /* ── CTA BAND ────────────────────────────────────────────────────────────── */
 
+/* ── BACK TO TOP ──────────────────────────────────────────────────────────
+   Emerald disc with a gold hairline. Flat, no shadow — the brand language uses
+   gold as a rule rather than a fill, and there is no elevation anywhere else in
+   the system.
+
+   Hidden with opacity + a nudge rather than `display:none`, so it can be
+   transitioned. `visibility` is what actually removes it from hit-testing and
+   the accessibility tree; opacity alone would leave an invisible tap target
+   floating over the footer links.
+
+   48px is the minimum comfortable tap target, and the safe-area inset keeps it
+   clear of the iPhone home indicator. */
+.totop{position:fixed;right:clamp(16px,3vw,26px);
+  bottom:calc(clamp(16px,3vw,26px) + env(safe-area-inset-bottom));
+  width:48px;height:48px;border-radius:999px;
+  display:grid;place-items:center;
+  background:var(--emerald);color:#fff;
+  border:1px solid rgba(200,163,74,.55);
+  cursor:pointer;z-index:40;
+  opacity:0;visibility:hidden;transform:translateY(8px);
+  transition:opacity .22s ease,transform .22s ease,visibility .22s,
+    background .18s ease}
+.totop[data-shown]{opacity:1;visibility:visible;transform:none}
+.totop:hover{background:var(--emerald-dk)}
+.totop:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+/* Someone who has asked for less motion still gets the appear/disappear, just
+   without the slide. The scroll itself is handled by the reduced-motion rule on
+   `html` at the top of this file. */
+@media(prefers-reduced-motion:reduce){
+  .totop{transition:opacity .01s,visibility .01s;transform:none}
+  .totop[data-shown]{transform:none}
+}
+
 /* ── FOOTER ──────────────────────────────────────────────────────────────── */
 footer{background:var(--forest);color:rgba(247,243,233,.62);
   padding:clamp(40px,7vw,60px) 0 calc(28px + env(safe-area-inset-bottom));font-size:14px}
 .fg{display:grid;gap:30px;padding-bottom:30px;border-bottom:1px solid rgba(200,163,74,.2)}
-footer .logo b{color:#fff}
-footer .logo b small{color:var(--gold-lt)}
+/* The footer reuses the same <Logo> markup as the header, but only the header
+   had the rules that lay it out — so `<small>` stayed inline and it rendered as
+   "GWOP UNIVERSITYKNOWLEDGE PAYS" with no separation. Mirrors `.evbar` below,
+   at a size suited to the footer. */
+footer .logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+footer .logo .crest{flex:none}
+footer .logo b{font-family:var(--display);font-size:17px;font-weight:700;
+  color:#fff;line-height:1.05}
+footer .logo b small{display:block;font-family:var(--body);font-size:8px;
+  font-weight:600;letter-spacing:.24em;color:var(--gold-lt);margin-top:3px}
 footer .blurb{margin-top:14px;max-width:30ch;font-family:var(--display);
   font-size:17px;color:rgba(247,243,233,.78)}
 /* Felicia §12 — reserved space for the official accounts */
@@ -226,8 +296,16 @@ a.evbar:hover{background:var(--forest-dk)}
 /* Felicia §11 next-step CTAs on /thanks */
 .evacts{display:flex;flex-wrap:wrap;gap:11px;margin-top:26px}
 @media(max-width:439px){.evacts .btn{width:100%}}
-.evcrest{display:flex;justify-content:center;align-items:center}
-.evcrest img{display:block;width:min(42%,168px);height:auto}
+/* MOBILE-FIRST: on a phone the crest is its own full-width band, centred, with
+   no plate behind it — the PNGs carry real alpha now, so the ivory page shows
+   through. `42%` used to be the base width, which left the artwork small and
+   visually adrift in a column much wider than itself. The desktop rule at
+   min-width:720px puts it back in its 210px panel per Package p.7. */
+.evcrest{display:flex;justify-content:center;align-items:center;
+  width:100%;margin-inline:auto;background:none}
+.evcrest picture{display:block;width:100%;display:flex;justify-content:center}
+.evcrest img{display:block;height:auto;margin-inline:auto;background:none;
+  width:min(72vw,300px)}
 .evsect{padding:clamp(34px,7vw,52px) 0 0}
 .evsect.pb{padding-bottom:clamp(34px,7vw,52px)}
 .evsect h2{font-family:var(--display);font-size:clamp(24px,6vw,32px)}
@@ -271,8 +349,12 @@ a.evbar:hover{background:var(--forest-dk)}
 .evform .fh h3{font-size:17px}
 .evform .fh p{font-size:12.8px;color:var(--muted);margin-top:2px}
 .evform .fh .chosen{font-weight:600;color:var(--emerald)}
-.evslot{padding:5px;min-height:520px}
-.evslot iframe{width:100%;border:0;display:block;min-height:520px}
+.evslot{padding:5px;min-height:700px}
+/* 700 not 520: Jake's form is four fields plus legal links (~660px) and grows
+   again once the consent checkbox is added. Too low produces a scrollbar
+   INSIDE the frame — on a phone the Submit button then sits below the fold of
+   a box the attendee does not realise scrolls. A lost lead, with no error. */
+.evslot iframe{width:100%;border:0;display:block;min-height:700px}
 .evph{margin:13px;padding:28px 18px;text-align:center;border:2px dashed var(--emerald-lt);
   border-radius:12px;background:var(--ivory)}
 .evph b{display:block;font-family:var(--body);font-weight:600;font-size:14px;
@@ -465,11 +547,15 @@ footer{padding:clamp(36px,6vw,54px) 0 calc(26px + env(safe-area-inset-bottom))}
    floated away from its label. Tightened to the same density as /830.
    ═══════════════════════════════════════════════════════════════════════════ */
 @media(min-width:1024px){
+  /* Columns and padding only — do NOT re-declare grid-template-areas here.
+     This block used to also set `align-items:center` and a flat `gap:44px`,
+     which fought the row-gap the 1010px rule sets for the stacked copy/CTA
+     column. */
   .herocard{grid-template-columns:1.15fr minmax(190px,240px);
-    padding:52px 48px;align-items:center;gap:44px}
+    padding:52px 48px;column-gap:44px}
   .herocard h1{font-size:clamp(52px,5.2vw,68px);max-width:15ch}
   .herocard .sub{font-size:18px;max-width:34ch;margin-top:16px}
-  .herocard .acts{margin-top:28px}
+  /* .acts margin removed — row-gap owns this spacing now. */
 
   .courses{grid-template-columns:repeat(4,1fr);gap:16px}
   .course{min-height:0;padding:24px 22px 20px}
@@ -507,12 +593,46 @@ section:first-of-type{padding-top:clamp(34px,5.5vw,64px)}
   .herocard .sub{max-width:46ch}
 }
 @media(min-width:1010px){
-  .herocard{grid-template-columns:1.15fr minmax(190px,240px)}
-  .herologo{width:100%;margin:0}
+  /* Matches the deployed layout: copy top-left, CTA directly beneath it at its
+     natural size, crest spanning both rows and vertically centred. The crest is
+     taller than copy + CTA, so the row tracks grow — hence `align-self:start`
+     on the copy block, or it would float in the middle of its stretched row. */
+  .herocard{grid-template-columns:1.15fr minmax(190px,240px);
+    grid-template-areas:'copy art' 'cta art';
+    grid-template-rows:auto auto;row-gap:clamp(20px,2.4vw,28px)}
+  .herocard>:first-child{align-self:start}
+  .herologo{width:100%;margin:0;align-self:center}
 }
 .herocard .acts{flex-wrap:nowrap}
-@media(max-width:439px){.herocard .acts{flex-wrap:wrap}
-  .herocard .acts .btn{width:100%}}
+
+/* Below the 1010px split the card is a single stacked column, and the crest is
+   already centred by `margin-inline:auto`. The CTA was still left-aligned and
+   only went full-width under 439px, so at tablet widths the crest sat centred
+   with the button hanging off to the left.
+   One rule for every non-desktop width: centred, expanding, capped. The cap
+   matters — an unbounded 100% at 900px gives an 800px-wide pill, which reads as
+   a broken layout rather than a button. Under ~420px the cap is never reached,
+   so a phone still gets a true full-width tap target. */
+@media(max-width:1009px){
+  .herocard .acts{justify-content:center;flex-wrap:wrap}
+  .herocard .acts .btn{width:min(100%,380px)}
+
+  /* Crest enlarged to sit as a hero element rather than a thumbnail. Measured
+     at 530px viewport it was 238px against a 514px button — more than double,
+     which read as a mismatch.
+
+     max-height rises with the width deliberately. The image is `object-fit:
+     contain`, so widening the plate alone would letterbox the artwork inside a
+     wider white rectangle: a bigger plate holding the same-size crest.
+
+     Not larger than this. The artwork is 2:3 portrait, so width drives height
+     — the note on `.herologo` above records that sizing by width alone grew the
+     card ~50% and pushed the CTA off a phone screen. That risk is higher now
+     the button sits BELOW the crest, so 300px is the ceiling until it has been
+     checked on a real 375x667 screen. */
+  .herologo{width:min(74vw,300px)}
+  .herologo img{max-height:min(52vh,460px)}
+}
 
 /* The scrolling element is <html>, so locking only <body> does nothing.
    overflow:hidden on both preserves scroll position — unlike position:fixed,
@@ -538,8 +658,15 @@ img,picture,svg,video{max-width:100%;height:auto}
    the headline and button stay above the fold. */
 @media(max-width:399px){
   .hero .btn,.evcard .btn{width:100%}
-  .herologo{width:min(56%,180px)}
-  .evcrest img{width:min(52%,150px)}
+  /* Enlarged in step with the 1009px rule above (was min(56%,180px), which
+     undid it on exactly the phones that matter). Held below that rule's 300px
+     because vertical room is tightest here and the CTA now sits under the
+     crest — this is the width to revisit first if the button falls below the
+     fold on a 320x568 screen. */
+  .herologo{width:min(70vw,250px)}
+  /* Still centred and full-band, just shorter so the headline and CTA stay
+     above the fold on a 320px screen. */
+  .evcrest img{width:min(62vw,215px)}
   .herocard h1{font-size:clamp(38px,11.5vw,46px)}
 }
 
@@ -695,7 +822,20 @@ footer{margin-top:auto}
 
    `grid` not `flex` on purpose — a grid item stretches across the inline axis
    by default, so `.wrap` keeps its width. `display:flex` would shrink-wrap it. */
-body>section:only-of-type{display:grid;align-content:center}
+/* SHORT PAGES — the legal routes.
+   /privacy, /terms, /sms-terms and /disclosures currently hold one placeholder
+   paragraph each. With only the header and footer around it, the content band
+   collapsed to the height of that paragraph and the footer rode up under it,
+   which read as a broken or half-loaded page.
+
+   min-height, never a fixed height: the attorney copy will be many screens
+   long, and a fixed value would clip it. This sets a floor, not a ceiling.
+
+   The 60vh figure is the viewport minus the brand bar and a typical footer, so
+   the footer lands just below the fold — present when scrolled to, not competing
+   with the heading. `align-content:center` then sits the text in that space
+   rather than pinning it to the top of an empty band. */
+body>section:only-of-type{display:grid;align-content:center;min-height:90vh}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    OVERFLOW SAFETY NET
@@ -733,4 +873,196 @@ body>section:only-of-type{display:grid;align-content:center}
 @media(max-width:399px){
   .mod{grid-template-columns:auto minmax(0,1fr)}
   .mod .go{display:none}
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   /sign — VISUAL BUILD PACKAGE §06 PIECE 3 (PHONE / AIRDROP)
+
+   Vertical by construction, because §06 specifies a vertical graphic and
+   because it is held up in portrait. Black card on ivory per §01's "black for
+   premium contrast" — the same card treatment as the §06 mockup, not a new
+   look invented for this page.
+
+   Append to src/app/globals.css. Every value derives from the existing
+   token block at the top of that file; nothing new is introduced.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sign{
+  min-height:100dvh;                 /* dvh not vh — mobile browser chrome */
+  display:grid;
+  place-items:center;
+  padding:clamp(14px,4vw,28px);
+  background:var(--ivory);
+}
+
+.sign-card{
+  width:min(560px,100%);
+  background:var(--black);
+  border-radius:var(--r-xl);
+  padding:clamp(22px,6vw,40px);
+  text-align:center;
+  /* Gold hairline rather than a shadow: §01 lists gold as the metallic accent,
+     and a shadow on ivory reads as a generic card. */
+  box-shadow:inset 0 0 0 1px rgba(200,163,74,.28);
+}
+
+.sign-brand{
+  font-family:var(--body);
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--gold-lt);
+  margin:0 0 clamp(18px,5vw,28px);
+}
+
+/* Display face, matching /830's hero. Two lines, white then gold — the §06
+   mockup's exact treatment. */
+.sign-h1{
+  font-family:var(--display);
+  font-weight:700;
+  line-height:.98;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.sign-h1 span{
+  font-size:clamp(26px,7.5vw,40px);
+  color:var(--white);
+  letter-spacing:.01em;
+}
+.sign-h1 strong{
+  font-size:clamp(32px,10vw,54px);
+  color:var(--gold-lt);
+  font-weight:700;
+}
+
+.sign-kicker{
+  font-family:var(--body);
+  font-size:clamp(13px,3.4vw,15px);
+  color:var(--stone);
+  margin:clamp(12px,3vw,16px) 0 clamp(20px,6vw,30px);
+}
+
+/* THE SIGNATURE ELEMENT — the code is the hero.
+   §06 sizes it beside the button; that is a layout sketch, not a scanning
+   spec. generate-qr.mjs's rule is code ≈ 1/10 of scanning distance, so at
+   arm's length this wants to be as large as the card allows. */
+.sign-qr{
+  width:min(340px,74vw);
+  aspect-ratio:1;
+  margin:0 auto;
+  background:var(--white);
+  border-radius:var(--r);
+  padding:10px;                      /* on top of the SVG's own quiet zone */
+  display:block;
+}
+.sign-qr svg{
+  width:100%;
+  height:100%;
+  display:block;
+  shape-rendering:crispEdges;        /* never soften the modules */
+}
+
+.sign-cta{
+  font-family:var(--body);
+  font-weight:600;
+  font-size:clamp(13px,3.6vw,15px);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--white);
+  background:var(--emerald);
+  border-radius:999px;
+  padding:13px 26px;
+  display:inline-block;
+  margin:clamp(20px,5vw,28px) 0 0;
+}
+
+.sign-url{
+  font-family:var(--body);
+  font-size:12px;
+  color:var(--muted);
+  margin:clamp(14px,4vw,18px) 0 0;
+}
+.sign-url span{
+  color:var(--stone);
+  /* Read aloud by staff when a camera fails, so it must not wrap oddly or
+     turn a hyphen into an ambiguous dash. */
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Booth conditions: bright hall lighting, and a phone that may be near-dead.
+   Nothing animates, and the card holds its contrast if the OS forces dark. */
+@media (prefers-color-scheme:dark){
+  .sign{background:var(--ivory);}
+}
+
+/* ── /830 native signup form ───────────────────────────────────────────────
+   Mobile first by construction: filled in one-handed, standing at a table,
+   with a staff member waiting. 48px touch targets, submit reachable without
+   scrolling inside anything.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.evnf{display:flex;flex-direction:column;gap:14px;padding:clamp(14px,4vw,22px)}
+
+.evnf label{
+  display:flex;flex-direction:column;gap:6px;
+  font-family:var(--body);font-size:13px;font-weight:600;color:var(--ink);
+}
+
+.evnf input[type=text],
+.evnf input:not([type]),
+.evnf input[type=tel],
+.evnf input[type=email]{
+  font-family:var(--body);
+  /* 16px minimum. Below that iOS Safari zooms the page on focus, which on a
+     booth phone reads as the page having broken. */
+  font-size:16px;
+  padding:13px 14px;
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  background:var(--white);
+  min-height:48px;
+  width:100%;
+}
+.evnf input:focus-visible{outline:2px solid var(--emerald);outline-offset:1px}
+
+.evnf-row{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:430px){.evnf-row{grid-template-columns:1fr 1fr}}
+
+.evnf label em{font-style:normal;font-size:12px;font-weight:500;color:#9b3b25}
+
+.evnf-consent{
+  flex-direction:row!important;align-items:flex-start;gap:10px;
+  font-weight:400!important;font-size:12.5px;line-height:1.45;
+  color:var(--muted);
+  padding:12px;border:1px solid var(--line);border-radius:var(--r-sm);
+  background:var(--ivory);
+}
+.evnf-consent input{
+  /* Deliberately larger than default. A missed tap on the one legally
+     meaningful control is worse than a slightly heavy checkbox. */
+  width:22px;height:22px;min-width:22px;margin-top:1px;accent-color:var(--emerald);
+}
+
+.evnf-err{font-family:var(--body);font-size:13px;font-weight:500;color:#9b3b25;margin:0}
+
+.evnf-submit{width:100%;min-height:52px;font-size:16px}
+
+.evnf-fine{
+  font-family:var(--body);font-size:11.5px;color:var(--muted);
+  text-align:center;margin:2px 0 0;
+}
+
+/* Legal links beneath the consent sentence. Required beside A2P consent
+   language: the terms being agreed to must be reachable from the same place
+   the agreement is given. target=_blank so a tap never loses a half-filled
+   form at the booth. */
+.evnf-legal{display:block;margin-top:6px}
+.evnf-legal a{
+  color:var(--emerald);text-decoration:underline;
+  text-underline-offset:2px;font-weight:500;
+  /* Comfortable tap target without breaking the line height of the sentence
+     it sits under. */
+  display:inline-block;padding:3px 0;
 }

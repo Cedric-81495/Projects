@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { site, legal } from '@/content/site'
 import { PATHWAY } from '@/content/pathway'
 import { EVENT_PATH } from '@/config/integrations'
+import { BackToTop } from '@/components/BackToTop'
 
 /** Marks copy that is still awaiting approval. Renders plainly — the marker
  *  exists so a search for `Tbc` finds every unapproved string in the source. */
@@ -125,6 +126,13 @@ export function Footer() {
           <p>© {new Date().getFullYear()} <Tbc>{legal.entity.text}</Tbc>. All rights reserved.</p>
         </div>
       </div>
+
+      {/* Mounted here on purpose. <Footer> is not used on /830 — the event page
+          renders its own `.evfoot` — so the control cannot appear over the
+          signup form, per CLAUDE.md invariant 7. Keeping it inside the footer
+          means that stays true for any future page too: whatever gets the shared
+          footer gets this, and the event page never will. */}
+      <BackToTop />
     </footer>
   )
 }

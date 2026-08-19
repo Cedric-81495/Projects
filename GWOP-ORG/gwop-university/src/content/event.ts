@@ -10,8 +10,12 @@ export const event = {
   details: {
     name: 'Everybody Gotta Eat',
     date: 'August 30, 2026',
-    time:     { text: '', pending: true },   // ← paste when Felicia confirms
-    location: { text: '', pending: true },   // ← paste when Felicia confirms
+    /* ✅ CONFIRMED — Felicia, Aug 19: "The event is August 30, 2026, Central
+       Square, Cambridge, MA, 12–6 PM. Please use that for the event page."
+       The en-dash in "12–6 PM" is typographic and matches the rest of the copy.
+       Do not "fix" it to a hyphen. */
+    time:     { text: '12–6 PM', pending: false },
+    location: { text: 'Central Square, Cambridge, MA', pending: false },
   },
 
   // Prescribed by Visual Build Package p.7 + Felicia §2 — DO NOT REWORD

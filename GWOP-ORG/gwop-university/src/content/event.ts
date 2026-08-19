@@ -123,13 +123,16 @@ export const event = {
       secondary: { label: 'Become a Founding Member', href: '/830#gifts', pending: true as boolean },
     },
 
-    /* Shown only once Jake sends the live booking link (BOOKING_URL).
-       Jake, Aug 14: Beast's 1:1 GWOP Blueprint/Roadmap calendar, Mon–Fri 11–1. */
+    /* ✅ RESOLVED — Jake supplied the live booking link 2026-08-19, so
+       BOOKING_URL is set and this block renders.
+       Name matches his calendar exactly ("GWOP Blueprint/Roadmap") so the
+       attendee does not tap "Blueprint session" and land on a page titled
+       something else. Duration is his: 1 hr. */
     booking: {
-      h: 'Book your 1:1 Blueprint session',
-      p: 'Sit down with Beast and walk through your roadmap. Mon–Fri, 11 AM–1 PM.',
+      h: 'Book your 1:1 Blueprint / Roadmap session',
+      p: 'One hour with Beast, walking through your roadmap. Mon–Fri, 11 AM–1 PM.',
       label: 'Pick a time',
-      pending: true,
+      pending: false,
     },
 
     next: [

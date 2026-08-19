@@ -10,7 +10,7 @@ import { GHL_FORM_URL } from './src/config/integrations'
 
    Adding an origin here is a security decision, not a formality. One line per
    origin, with a reason. If a script is not needed, it does not go in.
-   ⚠ Jake's AI chat widget is deliberately NOT allowed — CLAUDE.md §8.7 keeps
+   Jake's AI chat widget is deliberately NOT allowed — CLAUDE.md §8.7 keeps
    every third-party script off /830 before Aug 27.
    ═══════════════════════════════════════════════════════════════════════════ */
 

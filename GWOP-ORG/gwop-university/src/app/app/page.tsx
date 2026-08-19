@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { BrandBar, Footer } from '@/components/Chrome'
 import { PathwayTarget } from '@/components/Pathway'
 
 export const metadata: Metadata = { title: 'Student Area — GWOP University' }
@@ -12,9 +11,7 @@ export const metadata: Metadata = { title: 'Student Area — GWOP University' }
 export default function StudentHome() {
   return (
     <>
-      <BrandBar />
       <PathwayTarget surface="app" />
-      <Footer />
     </>
   )
 }

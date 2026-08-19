@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PATHWAY } from '@/content/pathway'
 import { byLevel } from '@/content/modules'
-import { BrandBar, Footer } from '@/components/Chrome'
 
 export function generateStaticParams() {
   return PATHWAY.map(l => ({ level: l.slug }))
@@ -19,7 +18,6 @@ export default async function LevelPage(
 
   return (
     <>
-      <BrandBar />
       <section>
         <div className="wrap">
           <p className="crumb"><Link href="/app">Student area</Link> › {meta.label}</p>
@@ -52,7 +50,6 @@ export default async function LevelPage(
           </div>
         </div>
       </section>
-      <Footer />
     </>
   )
 }

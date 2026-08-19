@@ -73,6 +73,34 @@ export const event = {
   form: {
     step: 'Step 2 of 2 — your details',
     note: 'Takes under a minute.',
+    submit: 'Send my blueprint',
+  },
+
+  /* SMS consent shown beside the checkbox on /830.
+
+     ⚠ OWNED BY JAKE, not us. Felicia 2026-08-18: "since this needs to align
+     with the A2P registration/use case, please confirm the final approved SMS
+     consent language for Cedric to place beside the checkbox." Do NOT write
+     this ourselves — it is the legal record behind every message he sends.
+
+     `pending: true` makes the form refuse to render, so placeholder legal text
+     cannot reach an attendee. Flip to false the moment Jake supplies the text.
+     `as boolean` widens the literal so either value type-checks. */
+  consent: {
+    /* APPROVED 2026-08-19. Wording supplied by Jake to match the A2P
+       registration; business name confirmed as "GWOP University" by Felicia.
+
+       Do not reword any part of this without going back to Jake — it is the
+       legal record behind every message he sends, and the STOP/HELP keywords
+       and the "not a condition of purchase" line are carrier requirements,
+       not copy. */
+    pending: false as boolean,
+    text:
+      'I consent to receive marketing text messages from GWOP University at ' +
+      'the phone number provided. Message frequency may vary. Message and ' +
+      'data rates may apply. Reply STOP to opt out and HELP for assistance. ' +
+      'Consent is not a condition of purchase.',
+    fine: 'Msg & data rates may apply. Reply STOP to opt out.',
   },
 
   /* Felicia §11 prescribes this hierarchy: "YOU'RE IN." then "Your GWOP

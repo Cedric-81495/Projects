@@ -66,8 +66,11 @@ create table public.leads (
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now(),
 
-  -- Marketing SMS without consent is not a lead, it is a liability.
-  constraint leads_consent_required check (consent_given),
+  /* NOTE: consent is deliberately NOT required. Jake, 2026-08-19 — the box is
+     optional and unchecked by default, and the approved wording says so
+     outright: "Consent is not a condition of purchase." A lead with
+     consent_given = false is valid and capturable; Jake's workflow branches on
+     it to decide who receives SMS. See 0009_consent_optional.sql. */
   -- A failure must say why. Silent 'failed' rows are unactionable.
   constraint leads_failure_explained check (
     sync_status <> 'failed' or last_error is not null

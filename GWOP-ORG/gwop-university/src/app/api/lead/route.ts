@@ -67,9 +67,12 @@ const LeadBody = z.object({
      on zod 3 and fails on 4 — this project is on ^4.1.0. */
   utm: z.record(z.string(), z.string().max(200)).optional().default({}),
 
-  /* Must be literally true. `.refine` rather than `z.literal(true)` so the
-     message is the one the attendee should see. */
-  consent_given: z.boolean().refine((v) => v, 'Please agree to receive messages'),
+  /* Accepted either way. Jake, 2026-08-19: the checkbox is optional and
+     unchecked by default, and the approved wording says "Consent is not a
+     condition of purchase." Rejecting a declined lead would contradict the
+     sentence beside the box and lose signups from people who want the
+     Blueprint but not the texts. Jake's workflow branches on this value. */
+  consent_given: z.boolean(),
   /* The exact sentence rendered next to the checkbox, sent back by the client
      so the stored record matches what was actually on screen. Wording will
      change; this row must remain evidence of what THIS person agreed to. */

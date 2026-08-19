@@ -22,6 +22,19 @@ const clientSchema = z.object({
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
   NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
   NEXT_PUBLIC_POSTHOG_HOST: z.string().url().default('http://localhost:3000/ingest'),
+
+  /* Which capture path /830 renders.
+
+       'native' — our own form → POST /api/lead → Supabase → GHL webhook.
+                  Felicia approved 2026-08-18; Jake confirmed 08-19 that his
+                  GHL form is no longer needed and we should redirect to our
+                  own thank-you page directly.
+       'iframe' — Jake's embedded GHL form. Retained as the fallback Felicia
+                  asked to keep live until the native path is signed off.
+
+     An env var deliberately, not a code branch: on event day a revert has to
+     take thirty seconds, not a redeploy. */
+  NEXT_PUBLIC_LEAD_CAPTURE_MODE: z.enum(['native', 'iframe']).default('native'),
 })
 
 const parsed = clientSchema.safeParse({
@@ -32,6 +45,7 @@ const parsed = clientSchema.safeParse({
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
   NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+  NEXT_PUBLIC_LEAD_CAPTURE_MODE: process.env.NEXT_PUBLIC_LEAD_CAPTURE_MODE,
 })
 
 if (!parsed.success) {

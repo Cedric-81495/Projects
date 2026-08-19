@@ -860,3 +860,73 @@ body>section:only-of-type{display:grid;align-content:center}
 @media (prefers-color-scheme:dark){
   .sign{background:var(--ivory);}
 }
+
+/* ── /830 native signup form ───────────────────────────────────────────────
+   Mobile first by construction: filled in one-handed, standing at a table,
+   with a staff member waiting. 48px touch targets, submit reachable without
+   scrolling inside anything.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.evnf{display:flex;flex-direction:column;gap:14px;padding:clamp(14px,4vw,22px)}
+
+.evnf label{
+  display:flex;flex-direction:column;gap:6px;
+  font-family:var(--body);font-size:13px;font-weight:600;color:var(--ink);
+}
+
+.evnf input[type=text],
+.evnf input:not([type]),
+.evnf input[type=tel],
+.evnf input[type=email]{
+  font-family:var(--body);
+  /* 16px minimum. Below that iOS Safari zooms the page on focus, which on a
+     booth phone reads as the page having broken. */
+  font-size:16px;
+  padding:13px 14px;
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  background:var(--white);
+  min-height:48px;
+  width:100%;
+}
+.evnf input:focus-visible{outline:2px solid var(--emerald);outline-offset:1px}
+
+.evnf-row{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:430px){.evnf-row{grid-template-columns:1fr 1fr}}
+
+.evnf label em{font-style:normal;font-size:12px;font-weight:500;color:#9b3b25}
+
+.evnf-consent{
+  flex-direction:row!important;align-items:flex-start;gap:10px;
+  font-weight:400!important;font-size:12.5px;line-height:1.45;
+  color:var(--muted);
+  padding:12px;border:1px solid var(--line);border-radius:var(--r-sm);
+  background:var(--ivory);
+}
+.evnf-consent input{
+  /* Deliberately larger than default. A missed tap on the one legally
+     meaningful control is worse than a slightly heavy checkbox. */
+  width:22px;height:22px;min-width:22px;margin-top:1px;accent-color:var(--emerald);
+}
+
+.evnf-err{font-family:var(--body);font-size:13px;font-weight:500;color:#9b3b25;margin:0}
+
+.evnf-submit{width:100%;min-height:52px;font-size:16px}
+
+.evnf-fine{
+  font-family:var(--body);font-size:11.5px;color:var(--muted);
+  text-align:center;margin:2px 0 0;
+}
+
+/* Legal links beneath the consent sentence. Required beside A2P consent
+   language: the terms being agreed to must be reachable from the same place
+   the agreement is given. target=_blank so a tap never loses a half-filled
+   form at the booth. */
+.evnf-legal{display:block;margin-top:6px}
+.evnf-legal a{
+  color:var(--emerald);text-decoration:underline;
+  text-underline-offset:2px;font-weight:500;
+  /* Comfortable tap target without breaking the line height of the sentence
+     it sits under. */
+  display:inline-block;padding:3px 0;
+}

@@ -82,7 +82,12 @@ export default async function DashboardPage() {
                 )}
               </div>
               {unlocked ? (
-                <Link className="poenter" href={`/learn/${l.slug}`}>
+                /* `/app/[level]`, not `/learn/[level]`. There is no /learn route
+                   — middleware.ts already records that `/learn` and `/account`
+                   were listed as protected prefixes despite not existing, and
+                   this link was the last place still pointing at the old path.
+                   It 404'd for anyone with an unlocked level. */
+                <Link className="poenter" href={`/app/${l.slug}`}>
                   {l.completed > 0 ? 'Resume ›' : 'Enter ›'}
                 </Link>
               ) : (

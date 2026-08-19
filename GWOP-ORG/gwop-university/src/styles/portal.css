@@ -181,3 +181,33 @@
    WebKit, hence the 1px box and the negative clip. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
   overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ── PORTAL FOOTER ────────────────────────────────────────────────────────────
+   Deliberately lighter than the marketing footer: forest band, brand line, legal
+   routes, nothing else. `.poshell` is already a column flex with a growing
+   `.pomain`, so this lands at the bottom without sticky positioning.
+
+   The legal links are the reason it exists — a signed-in student had no route to
+   Terms or the refund policy from anywhere in the portal. */
+.pofoot{background:var(--forest,#1E3E2F);color:rgba(247,243,233,.62);
+  padding:22px var(--pad,24px) calc(22px + env(safe-area-inset-bottom));
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;
+  justify-content:space-between;font-size:13px}
+
+.pofoot-brand{margin:0;font-family:var(--display,Georgia,serif);
+  font-size:13.5px;font-weight:700;letter-spacing:.02em;color:#fff}
+.pofoot-brand span{font-family:var(--body,system-ui,sans-serif);font-size:9px;
+  font-weight:600;letter-spacing:.22em;color:var(--gold-lt,#D9B45C);
+  text-transform:uppercase}
+
+.pofoot-links{display:flex;flex-wrap:wrap;gap:8px 18px}
+.pofoot-links a{color:rgba(247,243,233,.66);text-decoration:none}
+.pofoot-links a:hover{color:var(--gold-lt,#D9B45C)}
+.pofoot-links a:focus-visible{outline:2px solid var(--gold,#C8A34A);
+  outline-offset:3px;border-radius:2px}
+
+/* On a phone the row would compress the links into two cramped columns beside
+   the brand line, so stack instead and left-align both. */
+@media(max-width:600px){
+  .pofoot{flex-direction:column;align-items:flex-start;gap:12px}
+}

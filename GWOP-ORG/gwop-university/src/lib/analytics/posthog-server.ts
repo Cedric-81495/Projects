@@ -28,6 +28,25 @@ export async function captureServer(
 ) {
   const ph = posthog()
   if (!ph) return
-  ph.capture({ distinctId, event, properties: sanitizeProps(properties) })
-  await ph.flush()
+
+  /* Analytics must never be able to fail the request it is reporting on.
+     `flush()` performs a real network call, so anything from a wrong host to a
+     PostHog outage makes it reject — and because this is awaited inside the
+     sign-in server action, that rejection surfaced to the user as
+     "Application error: a server-side exception has occurred" immediately after
+     a SUCCESSFUL login. The auth cookie was already set, which is why a refresh
+     then worked and made it look intermittent.
+
+     The specific trigger was NEXT_PUBLIC_POSTHOG_HOST defaulting to
+     `http://localhost:3000/ingest` in the deployed environment, so the server
+     was posting to itself. Setting the variable fixes that instance; this
+     try/catch is what stops the next one from logging anyone out of a working
+     login. */
+  try {
+    ph.capture({ distinctId, event, properties: sanitizeProps(properties) })
+    await ph.flush()
+  } catch {
+    /* Intentionally swallowed. A dropped analytics event is a reporting gap; a
+       thrown one is an outage. */
+  }
 }

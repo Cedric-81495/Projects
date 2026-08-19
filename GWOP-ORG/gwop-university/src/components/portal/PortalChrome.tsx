@@ -76,6 +76,33 @@ export function PortalChrome({
       {/* min-height, not height: a short page must not collapse, and a long one
           must not be clipped. This is the §22 "short content" fix. */}
       <main className="pomain">{children}</main>
+
+      {/* PORTAL FOOTER.
+          Not the marketing <Footer> — that carries a pathway sitemap, socials
+          and a course-card grid, which is navigation a student already has in
+          the bar above. Repeating it turns every lesson page into a landing
+          page.
+
+          What it does carry is the part that has to be reachable from every
+          page: the legal routes. A signed-in student is the person most likely
+          to need Terms or the refund policy, and until now the portal was the
+          one area of the site with no route to them at all.
+
+          Same emerald-on-forest treatment as the marketing footer, so it reads
+          as the same university — Package p.1: "every screen should feel like it
+          belongs to the same university." */}
+      <footer className="pofoot">
+        <p className="pofoot-brand">
+          GWOP UNIVERSITY <span>· Knowledge Pays</span>
+        </p>
+        <nav className="pofoot-links" aria-label="Legal">
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms &amp; Conditions</Link>
+          <Link href="/sms-terms">SMS Terms</Link>
+          <Link href="/refunds">Refunds</Link>
+          <Link href="/disclosures">Disclosures</Link>
+        </nav>
+      </footer>
     </div>
   )
-}
+} 

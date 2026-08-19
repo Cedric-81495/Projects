@@ -56,9 +56,6 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
           <p className="tag on-dark">{c.eyebrow}</p>
           <h1>{c.h1}</h1>
           <p className="sub">{c.sub}</p>
-          <div className="acts">
-            <Link className="btn btn-e" href={c.href}>{c.cta}</Link>
-          </div>
         </div>
 
         {/* Artwork on its white plate. Square corners — p.4 shows a plain
@@ -75,6 +72,16 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
               sizes="(max-width:820px) 58vw, 270px"
             />
           </picture>
+        </div>
+
+        {/* A DIRECT grid child, not nested in the copy block, so `grid-template-
+            areas` can place it after the crest on a phone and beside it on
+            desktop. Nesting it made that impossible: CSS cannot reorder an
+            element past its parent's sibling.
+            Mobile reads copy → crest → CTA, so the button sits at the thumb end
+            of the card. Desktop keeps p.4's two-column arrangement. */}
+        <div className="acts">
+          <Link className="btn btn-e" href={c.href}>{c.cta}</Link>
         </div>
       </div>
 

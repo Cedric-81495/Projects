@@ -64,7 +64,10 @@ export default function EventPage() {
               alt="GWOP University — The GWOP Blueprint"
               width={400}
               height={610}
-              sizes="(max-width:719px) 42vw, 210px"
+              /* Must track the CSS above: the crest is a full-width band on
+                 mobile now, not a 42vw inset. A stale `sizes` makes Next pick
+                 a source narrower than the box and the artwork renders soft. */
+              sizes="(max-width:399px) 62vw, (max-width:719px) 72vw, 210px"
             />
           </picture>
         </div>

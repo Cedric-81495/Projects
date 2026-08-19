@@ -542,3 +542,26 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
 - [ ] Vercel project under client ownership, preview URL to Jake ← **next action**
 - [ ] Device + cellular test matrix
 - [ ] Handoff folder contribution
+
+
+**Parked — Phase 2, after Aug 30. Do not start before Aug 27.**
+
+These are real gaps, deliberately not being built now. Aug 30 is lead capture
+only; accounts, dashboard and the student app come after.
+
+- [ ] **Account-creation URL for Jake's Path 01.** His nurture messages carry
+      `[LINK]` and `[CREATE YOUR ACCOUNT]` placeholders that point at our site.
+      Send him the URL once `/signup` is part of the flow.
+- [ ] **Link `leads` → `auth.users`.** No `user_id` on `leads` today, so nothing
+      tells GHL when someone creates an account and Jake's Path 01 exit rule
+      cannot fire. A booth lead who signs up later keeps getting "your access is
+      waiting" messages.
+- [ ] **Free-vs-paid access rule (Felicia).** Blocks both of the above. Sheena's
+      "Free Guide" is 14 credit-basics lessons and her only fully edited set;
+      prior notes say fully paid with only the credit review free. Cannot be
+      guessed — it changes how access is built, not just what is displayed.
+- [ ] **Does `/thanks` invite account creation?** Today its CTA goes to `/`, so
+      an attendee never learns an account exists. Either the page invites it or
+      Jake's follow-up does — both work, they must agree.
+- [ ] **Event time + venue owner.** Felicia §3 permits inserting them once
+      confirmed, but no tracker row assigns producing them.

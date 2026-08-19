@@ -131,6 +131,20 @@ export async function signUp(_prev: ActionState, formData: FormData): Promise<Ac
     await captureServer(data.user.id, ANALYTICS_EVENTS.signupCompleted, { platform: 'web' })
   }
 
+  /* Supabase tells us which flow ran, so don't guess.
+       · session present  → "Confirm email" is OFF in the project settings, the
+         account is already usable and the cookies are set. No email will ever
+         arrive, so telling someone to check their inbox sends them to wait for
+         nothing — which is exactly what happened during testing.
+       · session null     → confirmation is ON and the email is on its way.
+
+     Reading the response rather than a config flag means the two stay in step
+     automatically when someone toggles the setting in the Supabase dashboard,
+     where the app has no visibility. */
+  if (data.session) {
+    redirect(safeNext(formData.get('next')?.toString()))
+  }
+
   return { notice: 'Check your email to confirm your account.' }
 }
 

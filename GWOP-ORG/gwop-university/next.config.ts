@@ -3,9 +3,15 @@ import { GHL_FORM_URL } from './src/config/integrations'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SECURITY HEADERS
-   This site stores no data — Jake's GoHighLevel form is the system of record.
-   What it *does* have is (a) a user-controllable URL param and (b) a
-   third-party iframe. These headers constrain both.
+   Updated 2026-08-19. The earlier note here said this site stores no data — that
+   stopped being true when Felicia approved write-first capture on Aug 18. The
+   page now runs a Turnstile challenge and POSTs to /api/lead, so the allow-list
+   below has to name Turnstile explicitly.
+
+   Adding an origin here is a security decision, not a formality. One line per
+   origin, with a reason. If a script is not needed, it does not go in.
+   ⚠ Jake's AI chat widget is deliberately NOT allowed — CLAUDE.md §8.7 keeps
+   every third-party script off /830 before Aug 27.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /** Only the origin of Jake's form may be framed — nothing else. */
@@ -13,15 +19,22 @@ const ghlOrigin = (() => {
   try { return GHL_FORM_URL ? new URL(GHL_FORM_URL).origin : '' } catch { return '' }
 })()
 
+/* Cloudflare Turnstile. Required in BOTH script-src and frame-src: the loader is
+   a script, and the widget itself renders in an iframe. Missing either one and
+   the challenge never runs, so `cf-turnstile-response` is empty and /api/lead
+   rejects every submission with a 422 — which looks like a form bug, not a
+   header problem. */
+const TURNSTILE = 'https://challenges.cloudflare.com'
+
 const csp = [
   "default-src 'self'",
-  // Next injects inline bootstrap scripts; no third-party script origins allowed.
-  "script-src 'self' 'unsafe-inline'",
+  // Next injects inline bootstrap scripts. Turnstile is the only third-party origin.
+  `script-src 'self' 'unsafe-inline' ${TURNSTILE}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob:",
   "connect-src 'self'",
-  `frame-src ${ghlOrigin || "'none'"}`.trim(),
+  `frame-src ${[ghlOrigin, TURNSTILE].filter(Boolean).join(' ')}`,
   "form-action 'self'",
   "frame-ancestors 'none'",   // nobody may embed our pages (clickjacking)
   "base-uri 'self'",

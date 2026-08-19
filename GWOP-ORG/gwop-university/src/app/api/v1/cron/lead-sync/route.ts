@@ -17,7 +17,20 @@ import { syncLeadToGhl } from '@/lib/ghl/sync'
  * Same constant-time secret comparison as the expiry sweep: a plain `!==` on a
  * secret is a timing oracle, and this endpoint writes to the client's CRM.
  *
- * Add to vercel.json — every two minutes during the event window is cheap:
+ * ⚠ NOT SCHEDULED. See CRON-NOTE.md.
+ *
+ * Vercel Hobby allows one cron per day only; a sub-daily expression fails the
+ * ENTIRE deployment, not just the cron. That blocked the 2026-08-19 builds. A
+ * daily retry is useless at a booth, so the schedule was removed rather than
+ * degraded, and the decision deferred.
+ *
+ * Nothing is lost meanwhile: leads save before forwarding and stay 'pending'
+ * with the reason in last_error. Only the automatic calling is missing.
+ *
+ * Trigger by hand:
+ *   curl -H "Authorization: Bearer $CRON_SECRET" https://<domain>/api/v1/cron/lead-sync
+ *
+ * BEFORE AUG 30 — upgrade to Pro and restore:
  *   { "path": "/api/v1/cron/lead-sync", "schedule": "*\/2 * * * *" }
  */
 export const runtime = 'nodejs'

@@ -859,25 +859,24 @@ footer{margin-top:auto}
 
    `grid` not `flex` on purpose — a grid item stretches across the inline axis
    by default, so `.wrap` keeps its width. `display:flex` would shrink-wrap it. */
-/* SHORT PAGES — the legal routes.
-   /privacy, /terms, /sms-terms and /disclosures currently hold one placeholder
-   paragraph each. With only the header and footer around it, the content band
-   collapsed to the height of that paragraph and the footer rode up under it,
-   which read as a broken or half-loaded page.
+/* SHORT PAGES — the legal routes and /membership while pricing is unconfirmed.
 
-   min-height, never a fixed height: the attorney copy will be many screens
-   long, and a fixed value would clip it. This sets a floor, not a ceiling.
+   NO min-height. `flex:1 0 auto` above already makes this band absorb the
+   leftover viewport exactly, and `footer{margin-top:auto}` pins the footer to
+   the bottom edge. Any floor added on top of that fights a mechanism that
+   already works: 60vh left the footer a little below the fold for no reason,
+   90vh guaranteed a scroll on a page holding two lines of text, and both broke
+   on a landscape phone where the viewport is shorter than the number.
 
-   The 60vh figure is the viewport minus the brand bar and a typical footer, so
-   the footer lands just below the fold — present when scrolled to, not competing
-   with the heading. `align-content:center` then sits the text in that space
-   rather than pinning it to the top of an empty band. */
-/* 60vh, not 90vh. The band sits between the brand bar and the footer, so at 90vh
-   the page is guaranteed taller than the viewport and a one-paragraph legal page
-   always scrolls for no reason. 60vh gives the content a proper band while
-   leaving the footer just below the fold. min-height, never height — the
-   attorney copy will be many screens long and must not be clipped. */
-body>section:only-of-type{display:grid;align-content:center;min-height:60vh}
+   `align-content:center` is what actually fixes the look. The band was already
+   growing; the text stayed pinned to its top and every pixel of slack collected
+   in one block above the footer, which reads as a rendering fault. Centring
+   distributes it, so the page looks deliberate at any height without a single
+   fixed number in it.
+
+   `grid` not `flex` on purpose — a grid item stretches across the inline axis by
+   default, so `.wrap` keeps its width. `display:flex` would shrink-wrap it. */
+body>section:only-of-type{display:grid;align-content:center}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    OVERFLOW SAFETY NET

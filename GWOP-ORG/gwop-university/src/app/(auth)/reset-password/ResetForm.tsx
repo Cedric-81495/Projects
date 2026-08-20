@@ -4,6 +4,7 @@ import { useActionState } from 'react'
 import Script from 'next/script'
 import { requestPasswordReset, type ActionState } from '@/lib/auth/actions'
 import { publicEnv } from '@/lib/env.public'
+import { OfflineNotice } from '@/components/auth/OfflineNotice'
 
 const initial: ActionState = {}
 
@@ -23,6 +24,8 @@ export function ResetForm() {
 
   return (
     <form className="auform" action={action} noValidate>
+      <OfflineNotice />
+
       <label className="aufield">
         <span>Email</span>
         <input

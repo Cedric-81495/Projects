@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { signIn, type ActionState } from '@/lib/auth/actions'
 import { PasswordField } from '@/components/auth/PasswordField'
+import { OfflineNotice } from '@/components/auth/OfflineNotice'
 
 const initial: ActionState = {}
 
@@ -17,6 +18,8 @@ export function LoginForm({ next }: { next?: string }) {
   return (
     <form className="auform" action={action} noValidate>
       {next && <input type="hidden" name="next" value={next} />}
+
+      <OfflineNotice />
 
       {state.error && (
         <p className="aualert" role="alert">

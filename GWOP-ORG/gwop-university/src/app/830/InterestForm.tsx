@@ -31,11 +31,28 @@ import {
 
 const MODE = publicEnv.NEXT_PUBLIC_LEAD_CAPTURE_MODE ?? 'native'
 
+/* Felicia, Aug 20: "we'll have the website as the primary source, but we also
+   need to account for event/QR leads... I'd like those sources identified
+   separately in GHL so we can track where leads are coming from."
+
+   That separation already existed — a scanned code arrives as its staff role,
+   anything else did not. But the fallback was labelled `direct`, which in a CRM
+   reads as "direct traffic" rather than "came through the website form". Renamed
+   to `website` so the two groups are self-describing in Jake's reporting:
+
+     website                                        → someone found the site
+     booth-lead | greeter | ambassador |            → scanned a printed code,
+     signup-specialist | content-floater              identified by which one
+     unknown                                        → an `s` value we don't
+                                                      recognise; kept distinct so
+                                                      a mis-printed code shows up
+                                                      as a number rather than
+                                                      silently joining `website` */
 function readSource(): string {
-  if (typeof window === 'undefined') return 'direct'
+  if (typeof window === 'undefined') return 'website'
   const s = new URLSearchParams(window.location.search).get('s')
   const known = Object.values(QR_CODES) as readonly string[]
-  return s && known.includes(s) ? s : s === 'unknown' ? 'unknown' : 'direct'
+  return s && known.includes(s) ? s : s === 'unknown' ? 'unknown' : 'website'
 }
 
 /* Felicia §3 + §7: one page, one QR destination, attribution on parameters.
@@ -53,6 +70,57 @@ function readCampaign(): Record<string, string> {
 }
 
 interface Choice { value: string; label: string; tag: string }
+
+/* Distinguishes the failure modes that need different words. A plain Error
+   carries a message we want to show verbatim; these carry a kind we map below. */
+class NetworkError extends Error {
+  constructor(readonly kind: 'offline' | 'timeout' | 'unreachable' | 'server') {
+    super(kind)
+  }
+}
+
+/**
+ * Turns a thrown value into something worth reading at a booth.
+ *
+ * Every failure used to render "Something went wrong. Please try again." — true,
+ * but useless: it does not say whether to retry now, move somewhere with signal,
+ * or fetch someone. On a congested venue network the connection is the likely
+ * cause, and a staffer needs to know that in the two seconds they have.
+ *
+ * Each message says what happened and what to do next, and none of them blame
+ * the attendee for something the network did. Nothing they typed is lost — the
+ * fields keep their values, so retrying is one tap.
+ */
+function describeFailure(err: unknown): string {
+  /* AbortError is what our own 15s timeout produces. */
+  if (err instanceof DOMException && err.name === 'AbortError') {
+    return 'That took too long — the connection here looks slow. Tap Send again.'
+  }
+
+  if (err instanceof NetworkError) {
+    switch (err.kind) {
+      case 'offline':
+        return 'Your phone is offline. Reconnect to wifi or data, then tap Send again — nothing you typed has been lost.'
+      case 'server':
+        return 'Our end had a problem, not yours. Tap Send again in a moment.'
+      default:
+        return 'Could not reach us — the signal here may be weak. Move a few steps and tap Send again.'
+    }
+  }
+
+  /* fetch() rejects with a TypeError when the request never left the device:
+     DNS failure, connection dropped, captive portal. This is the common one on
+     venue wifi. */
+  if (err instanceof TypeError) {
+    return 'Could not reach us — the signal here may be weak. Move a few steps and tap Send again.'
+  }
+
+  /* Anything else is a validation message from our own API, already written for
+     the person reading it. */
+  return err instanceof Error && err.message
+    ? err.message
+    : 'Something went wrong. Please tap Send again.'
+}
 
 export function InterestForm() {
   const [choice, setChoice] = useState<Choice | null>(null)
@@ -180,13 +248,50 @@ function NativeForm({ choice }: { choice: Choice }) {
        sitting right beside the box. */
 
     if (Object.keys(next).length) return setErrors(next)
+
+    /* Catch a missing challenge token BEFORE the round trip.
+       The token is empty when Turnstile has not finished loading, when its
+       script was blocked, or when the challenge expired while the form sat open
+       — which happens at a booth, where someone starts typing, gets talked to,
+       and comes back a few minutes later.
+
+       Without this the request goes out, the server rejects it, and the attendee
+       waits out a round trip on venue cellular to be told something they cannot
+       act on. Catching it here is instant and says what to do. */
+    const token = String(fd.get('cf-turnstile-response') ?? '')
+    /* Guarded on siteKey: with no key the widget never renders, the token is
+       always empty, and this check would block every submission. The server
+       skips verification in that case too, so the two stay consistent. */
+    if (siteKey && !token) {
+      setErrors({})
+      setFormError(
+        'The security check has not finished. Give it a moment, then tap Send again — nothing you typed has been lost.',
+      )
+      return
+    }
+
     setErrors({})
     setPending(true)
     setFormError(null)
 
+    /* A request with no timeout can hang indefinitely on a congested cell
+       network — the spinner spins, the staffer does not know whether it is
+       working, and the queue builds. 15s is long enough for a genuinely slow
+       connection and short enough that nobody stands there guessing. */
+    const abort = new AbortController()
+    const timer = setTimeout(() => abort.abort(), 15_000)
+
     try {
+      /* Checked before the request rather than inferring it from the failure:
+         if the device knows it is offline, say so immediately instead of making
+         someone wait 15 seconds to be told. */
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        throw new NetworkError('offline')
+      }
+
       const res = await fetch('/api/lead', {
         method: 'POST',
+        signal: abort.signal,
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           first_name: String(fd.get('first_name') ?? '').trim(),
@@ -206,6 +311,9 @@ function NativeForm({ choice }: { choice: Choice }) {
       })
 
       if (!res.ok) {
+        /* 5xx is our side falling over, not anything the attendee did. Worth
+           separating so the message does not imply they typed something wrong. */
+        if (res.status >= 500) throw new NetworkError('server')
         const body = await res.json().catch(() => null)
         throw new Error(body?.error?.message ?? 'Something went wrong. Please try again.')
       }
@@ -217,7 +325,9 @@ function NativeForm({ choice }: { choice: Choice }) {
       window.location.assign('/thanks')
     } catch (err: unknown) {
       setPending(false)
-      setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setFormError(describeFailure(err))
+    } finally {
+      clearTimeout(timer)
     }
   }
 

@@ -5,6 +5,7 @@ import Script from 'next/script'
 import { signUp, type ActionState } from '@/lib/auth/actions'
 import { publicEnv } from '@/lib/env.public'
 import { PasswordField } from '@/components/auth/PasswordField'
+import { OfflineNotice } from '@/components/auth/OfflineNotice'
 
 const initial: ActionState = {}
 
@@ -22,6 +23,8 @@ export function SignupForm() {
 
   return (
     <form className="auform" action={action} noValidate>
+      <OfflineNotice />
+
       {state.error && (
         <p className="aualert" role="alert">
           {state.error}

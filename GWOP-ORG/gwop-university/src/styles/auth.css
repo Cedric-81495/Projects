@@ -100,3 +100,12 @@
   .pwwrap input{padding-right:54px}
   .pwtoggle{min-width:44px; letter-spacing:0}
 }
+
+/* Offline banner. Amber rather than the red of `.aualert`: nothing is wrong
+   with what the person typed, and red on a login screen reads as "wrong
+   password" no matter what the words say. */
+.aualert.is-offline{
+  background:rgba(200,163,74,.12);
+  border-color:rgba(200,163,74,.45);
+  color:var(--ink);
+}

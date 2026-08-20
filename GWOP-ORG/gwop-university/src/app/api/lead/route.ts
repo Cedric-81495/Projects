@@ -101,7 +101,12 @@ export const POST = route(
       throw new ApiError(
         400,
         'validation_failed',
-        'We could not verify that request. Reload the page and try again.',
+        /* Do NOT tell them to reload. This message is shown beneath a form the
+           attendee has just filled in, and a reload discards every field —
+           turning a recoverable hiccup into a retype at a table with a queue
+           behind them. Tapping Send again re-runs the challenge and keeps the
+           values. Also avoids "request", which means nothing to the reader. */
+        'The security check did not complete. Wait a moment and tap Send again — nothing you typed has been lost.',
       )
     }
 

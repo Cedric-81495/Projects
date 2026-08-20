@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { updatePassword, type ActionState } from '@/lib/auth/actions'
 import { PasswordField } from '@/components/auth/PasswordField'
+import { OfflineNotice } from '@/components/auth/OfflineNotice'
 
 const initial: ActionState = {}
 
@@ -11,6 +12,8 @@ export function UpdatePasswordForm() {
 
   return (
     <form className="auform" action={action} noValidate>
+      <OfflineNotice />
+
       {state.error && (
         <p className="aualert" role="alert">
           {state.error}

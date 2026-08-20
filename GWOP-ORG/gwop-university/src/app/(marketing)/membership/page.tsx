@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { createServerSupabase } from '@/lib/supabase/server'
+import { BrandBar, Footer } from '@/components/Chrome'
 import { PlanCard } from './PlanCard'
 
 export const metadata: Metadata = {
@@ -28,34 +30,54 @@ export default async function MembershipPage() {
     ? ((await supabase.rpc('max_enrolled_level', { uid: userData.user.id })).data as number) ?? 0
     : 0
 
-  return (
-    <section className="wrap mbsect">
-      <p className="tag">Membership</p>
-      <h1 className="h2">Four levels. One blueprint.</h1>
-      <p className="lede">
-        Each level has a clear purpose and a clear outcome. You finish one before you start
-        the next — that&rsquo;s the whole point.
-      </p>
+  /* This page had NO header and NO footer — no layout in the (marketing) group
+     and none imported here. Someone arriving from a locked level in the portal
+     landed on a bare page with no crest, no navigation and no route back except
+     the browser button. On a phone opened from a link, there may not even be a
+     back button.
 
-      {!plans?.length ? (
-        <div className="mbempty">
-          <h2>Pricing is being finalised</h2>
-          <p>
-            The four levels are set. Enrollment opens as soon as pricing is confirmed.
-          </p>
-        </div>
-      ) : (
-        <div className="mbgrid">
-          {plans.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              owned={enrolled >= plan.grants_level}
-              signedIn={Boolean(userData.user)}
-            />
-          ))}
-        </div>
-      )}
-    </section>
+     The crumb points at /dashboard for a signed-in student and / for a visitor,
+     because those are the two places people actually arrive from: the locked
+     level in the pathway rail, and the site. */
+  const back = userData.user
+    ? { href: '/dashboard', label: 'Dashboard' }
+    : { href: '/', label: 'GWOP University' }
+
+  return (
+    <>
+      <BrandBar />
+      <section className="wrap mbsect">
+        <p className="crumb">
+          <Link href={back.href}>‹ {back.label}</Link>
+        </p>
+        <p className="tag">Membership</p>
+        <h1 className="h2">Four levels. One blueprint.</h1>
+        <p className="lede">
+          Each level has a clear purpose and a clear outcome. You finish one before you start
+          the next — that&rsquo;s the whole point.
+        </p>
+
+        {!plans?.length ? (
+          <div className="mbempty">
+            <h2>Pricing is being finalised</h2>
+            <p>
+              The four levels are set. Enrollment opens as soon as pricing is confirmed.
+            </p>
+          </div>
+        ) : (
+          <div className="mbgrid">
+            {plans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                owned={enrolled >= plan.grants_level}
+                signedIn={Boolean(userData.user)}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+      <Footer />
+    </>
   )
 }

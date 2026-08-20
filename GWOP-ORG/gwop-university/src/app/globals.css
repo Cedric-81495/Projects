@@ -190,7 +190,19 @@ section.tint{background:var(--white);border-block:1px solid var(--stone)}
 
    48px is the minimum comfortable tap target, and the safe-area inset keeps it
    clear of the iPhone home indicator. */
-.totop{position:fixed;right:clamp(16px,3vw,26px);
+/* BOTTOM-LEFT, not bottom-right.
+   Jake's chat widget parks its bubble bottom-right, and when someone opens it
+   the panel fills roughly 400x600 of that corner — so nudging this up by a
+   bubble's height would still leave it buried the moment the chat is used.
+   Raising z-index is not the answer either: winning that fight means covering
+   the chat instead, which is the same problem pointed the other way.
+
+   The opposite corner sidesteps it entirely, stays within thumb reach, and is a
+   common enough placement that nobody has to look for it.
+
+   Note this never appears on /830 — it renders from <Footer>, which the event
+   page does not use. */
+.totop{position:fixed;left:clamp(16px,3vw,26px);
   bottom:calc(clamp(16px,3vw,26px) + env(safe-area-inset-bottom));
   width:48px;height:48px;border-radius:999px;
   display:grid;place-items:center;

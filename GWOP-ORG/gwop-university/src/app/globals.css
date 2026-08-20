@@ -265,6 +265,31 @@ footer a:hover{color:var(--gold-lt)}
   justify-content:center;gap:10px;padding-top:calc(12px + env(safe-area-inset-top));
   text-decoration:none;transition:background .18s ease}
 a.evbar:hover{background:var(--forest-dk)}
+
+/* The bar with a sign-in link. The crest stays optically centred by giving the
+   link and a matching invisible spacer equal width — centring the brand with
+   `justify-content:center` while one side carries a link would push the crest
+   left of true. */
+.evbar-nav{justify-content:space-between; gap:12px; position:relative}
+.evbar-nav .evbar-brand{display:flex; align-items:center; gap:10px;
+  text-decoration:none; margin-inline:auto; padding-left:56px}
+.evbar-signin{
+  position:absolute; right:var(--pad); top:50%; transform:translateY(-50%);
+  font-family:var(--body); font-size:11px; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold-lt); text-decoration:none;
+  padding:10px 4px; min-height:44px; display:inline-flex; align-items:center;
+}
+.evbar-signin:hover{color:#fff}
+.evbar-signin:focus-visible{outline:2px solid var(--gold); outline-offset:3px;
+  border-radius:2px}
+
+@media(max-width:479px){
+  /* No room to balance both on a small phone — let the brand sit left. */
+  .evbar-nav .evbar-brand{margin-inline:0; padding-left:0}
+  .evbar-signin{position:static; transform:none}
+  .evbar-nav{justify-content:space-between}
+}
 .evbar .crest{flex:none}
 .evbar b{font-family:var(--display);font-size:14.5px;font-weight:700;color:#fff;
   line-height:1.05}

@@ -375,3 +375,17 @@
 @media(max-width:600px){
   .pofoot{flex-direction:column;align-items:flex-start;gap:12px}
 }
+/* ── LOCKED LEVEL NOTICE ──────────────────────────────────────────────────────
+   Shown above the outline when someone opens a level they have not unlocked.
+   The outline stays visible on purpose: Package p.3 asks the university to show
+   progression, and seeing what a level covers is what makes it worth unlocking.
+   Hiding it would make the product look like it ends where the student stopped
+   paying. */
+.polocked{
+  margin:22px 0 28px; padding:20px 22px;
+  background:var(--white); border:1px solid rgba(200,163,74,.42);
+  border-radius:var(--r-md,10px);
+}
+.polocked-h{margin:0; font-family:var(--display); font-size:19px;
+  font-weight:700; color:var(--emerald)}
+.polocked-p{margin:8px 0 16px; font-size:14.5px; color:var(--muted)}

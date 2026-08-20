@@ -65,9 +65,26 @@ export function BrandBar({ linked = true }: { linked?: boolean }) {
       </b>
     </>
   )
-  return linked
-    ? <Link className="evbar" href="/">{inner}</Link>
-    : <div className="evbar">{inner}</div>
+
+  /* `linked={false}` is the event page. It gets the bare bar with no sign-in
+     link and nothing clickable — invariant 10: every tappable thing on /830
+     that is not the form is a lost signup. */
+  if (!linked) return <div className="evbar">{inner}</div>
+
+  /* SIGN IN.
+     The nav was removed from this bar because its two items duplicated the
+     course cards and the hero CTA. This does not duplicate anything: it was the
+     one destination reachable from nowhere. A returning student had to know to
+     type /login, or scroll the whole page to a "Student area" link in the
+     footer.
+
+     One item, not a menu — the reason the nav went in the first place. */
+  return (
+    <div className="evbar evbar-nav">
+      <Link className="evbar-brand" href="/">{inner}</Link>
+      <Link className="evbar-signin" href="/login">Sign in</Link>
+    </div>
+  )
 }
 
 export function Footer() {

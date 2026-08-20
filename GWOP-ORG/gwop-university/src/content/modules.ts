@@ -10,15 +10,33 @@ export type ModuleStatus = 'ready' | 'pending' | 'missing'
    Maui's tracker task is "upload modules, organize by level" — but until now
    there was nowhere to put a file. These four fields are that place.
 
-   Each is a URL. Two forms work:
-     · `/notes/L1-01-credit-foundations-note.pdf`  → served from public/
-     · `https://drive.google.com/...`              → Drive link, nothing to deploy
-
    Naming follows the file spec: L{level}-{order}-{slug}-{kind}.{ext}
 
-   ⚠️ ACCESS: anything under public/ is downloadable by anyone with the URL.
-   That is fine for `free: true` modules. Paid modules must use a Drive link
-   with restricted sharing, or wait for the real upload platform after Aug 30.
+   ⚠️ TWO KINDS OF PATH, AND THE DIFFERENCE IS ACCESS CONTROL
+
+   1. A LEADING SLASH means public/. Served straight from the CDN to anyone
+      holding the URL, signed in or not. Correct for `free: true` modules and
+      nothing else.
+        note: '/notes/L1-01-credit-foundations-note.pdf'
+
+   2. NO LEADING SLASH means a key in the private Supabase bucket. Reached only
+      through /api/v1/asset, which checks enrolment and then hands back a link
+      that expires in minutes. Use this for anything paid.
+        note: 'notes/L2-01-fundable-profile-note.pdf'
+
+   The distinction is deliberate and mechanical: a paid asset cannot be made
+   public by accident, because a public path has to be typed with a slash. The
+   route refuses to serve anything that starts with one.
+
+   Why expiring links rather than a proxy: a copied URL stops working within
+   minutes, so it cannot be shared in a group chat or indexed by a search
+   engine — while the file still streams from Supabase's CDN rather than through
+   a serverless function, which matters for a 3MB PDF on venue cellular. It is
+   the same mechanism playback.ts already uses for lesson video.
+
+   What it does NOT prevent is someone downloading the file and emailing it on.
+   Nothing short of DRM does, and that is not worth it here — the realistic risk
+   is a link leaking, and expiry closes that completely.
    ────────────────────────────────────────────────────────────────────────── */
 export type Module = {
   slug: string
@@ -36,6 +54,23 @@ export type Module = {
   video?: string
   /** Card thumbnail */
   thumb?: string
+}
+
+/**
+ * Turn an asset path into something a browser can follow.
+ *
+ * Pages should never branch on this themselves — a page that forgets is either
+ * a broken link or, worse, a paid file linked directly from the bucket. One
+ * function, one rule:
+ *
+ *   '/notes/x.pdf'  → returned as-is; public/, free, CDN-served
+ *   'notes/x.pdf'   → /api/v1/asset?key=..., which checks enrolment and
+ *                     redirects to a link that expires
+ *   'https://...'   → returned as-is; an external Drive link
+ */
+export function assetHref(path: string): string {
+  if (path.startsWith('/') || path.startsWith('http')) return path
+  return `/api/v1/asset?key=${encodeURIComponent(path)}`
 }
 
 /** Which assets a module is still missing. Drives /admin so Maui can see gaps. */

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PATHWAY } from '@/content/pathway'
-import { MODULES, byLevel } from '@/content/modules'
+import { MODULES, byLevel, assetHref } from '@/content/modules'
 
 export function generateStaticParams() {
   return MODULES.map(m => ({ level: m.level, module: m.slug }))
@@ -62,7 +62,10 @@ export default async function ModulePage(
               download button that 404s is worse than no button. */}
           {mod.note && (
             <p style={{ marginTop: 22 }}>
-              <a className="btn btn-o btn-sm" href={mod.note} target="_blank" rel="noopener">
+              {/* assetHref, never mod.note directly. A public path passes
+                  through; a bucket key becomes the entitlement-checked route
+                  that hands back an expiring link. */}
+              <a className="btn btn-o btn-sm" href={assetHref(mod.note)} target="_blank" rel="noopener">
                 Download course note (PDF)
               </a>
             </p>

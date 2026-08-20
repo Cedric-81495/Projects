@@ -45,11 +45,16 @@
                                     Safari zoom on focus and the layout jumps */
   padding:12px 14px;
   min-height:48px;               /* ≥44px tap target */
-  border:1.5px solid var(--line); border-radius:10px;
+  /* Same reasoning as the event form: --line is #E7E4DD, 1.27:1 against the
+     white field, so the box was invisible until focused. This is 3.37:1. */
+  border:1.5px solid rgba(13,91,63,.64); border-radius:10px;
+  transition:border-color .15s ease, box-shadow .15s ease;
   background:var(--white); color:var(--ink);
   width:100%;
 }
-.aufield input:focus-visible{outline:2px solid var(--emerald); outline-offset:2px; border-color:var(--emerald)}
+.aufield input:focus-visible{outline:2px solid var(--emerald); outline-offset:2px;
+  border-color:var(--emerald); box-shadow:0 0 0 3px rgba(13,91,63,.10)}
+.aufield input[aria-invalid="true"]{border-color:#B3261E}
 
 .aubtn{width:100%; margin-top:4px}
 .aubtn[disabled]{opacity:.6; cursor:progress}

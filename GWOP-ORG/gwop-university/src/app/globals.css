@@ -1060,13 +1060,36 @@ body>section:only-of-type{display:grid;align-content:center}
      booth phone reads as the page having broken. */
   font-size:16px;
   padding:13px 14px;
-  border:1px solid var(--line);
+  /* 1.5px of emerald at 64%, not 1px of --line.
+     --line is #E7E4DD, which measures 1.27:1 against the white field — well
+     under the 3:1 that WCAG asks for on the boundary of an interactive control.
+     In practice the fields were invisible until focused: on the booth page that
+     means an attendee cannot see where to tap, with a staff member waiting.
+     This value measures 3.37:1 and stays inside the brand palette rather than
+     introducing a grey. */
+  border:1.5px solid rgba(13,91,63,.64);
   border-radius:var(--r-sm);
   background:var(--white);
   min-height:48px;
   width:100%;
+  transition:border-color .15s ease, box-shadow .15s ease;
 }
-.evnf input:focus-visible{outline:2px solid var(--emerald);outline-offset:1px}
+/* Focus has to be clearly stronger than the resting state now that the resting
+   state is visible. Full-strength border plus a soft ring, rather than relying
+   on an outline alone. */
+.evnf input:focus-visible{
+  outline:2px solid var(--emerald);
+  outline-offset:1px;
+  border-color:var(--emerald);
+  box-shadow:0 0 0 3px rgba(13,91,63,.10);
+}
+
+/* An invalid field reads as red at a glance, without depending on the message
+   below it being on screen. */
+.evnf input[aria-invalid="true"]{border-color:#B3261E}
+.evnf input[aria-invalid="true"]:focus-visible{
+  outline-color:#B3261E; box-shadow:0 0 0 3px rgba(179,38,30,.10);
+}
 
 .evnf-row{display:grid;grid-template-columns:1fr;gap:14px}
 @media (min-width:430px){.evnf-row{grid-template-columns:1fr 1fr}}

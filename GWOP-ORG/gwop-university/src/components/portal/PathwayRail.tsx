@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { isStaff, canAccessLevel, LEVELS, type AccessState } from '@/lib/access/policy'
 
@@ -33,12 +34,37 @@ const NUMERAL = ['I', 'II', 'III', 'IV'] as const
  */
 export function PathwayRail({ access }: { access: AccessState }) {
   const pathname = usePathname()
+  const scroller = useRef<HTMLDivElement>(null)
+
+  /* Bring the current stop into view.
+     This is what makes horizontal scrolling honest rather than a trap. Without
+     it, a student on Senior opens the page to a rail showing Dashboard and
+     Freshman, with no indication that their own level is off to the right —
+     the navigation would be hiding the one item they care about.
+
+     `inline: 'center'` rather than 'nearest' so the neighbours on both sides
+     stay partly visible, which is what tells someone the rail scrolls at all.
+
+     Runs on pathname change, so moving between levels keeps the rail oriented.
+     `behavior: 'auto'` on first paint would be a visible jump, but the rail is
+     short and the alternative — animating on every navigation — is worse. */
+  useEffect(() => {
+    const el = scroller.current?.querySelector<HTMLElement>('[aria-current="page"]')
+    if (!el) return
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.scrollIntoView({
+      behavior: reduce ? 'auto' : 'smooth',
+      inline: 'center',
+      block: 'nearest',
+    })
+  }, [pathname])
 
   return (
     <nav className="porail" aria-label="Student">
       {/* The scroller is the overflow container; the hairline lives on the inner
           track so it spans the full rail rather than the visible window. */}
-      <div className="porail-scroll">
+      <div className="porail-scroll" ref={scroller}>
         <ul className="porail-track">
           <li>
             <Link

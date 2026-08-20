@@ -50,7 +50,7 @@ export const MODULES: Module[] = [
     note: '/notes/L1-01-credit-foundations-note.pdf' },
   { slug: 'reading-your-report',  level: 'freshman',  order: 2, title: 'Reading Your Report',       minutes: 18, status: 'ready' },
   { slug: 'cash-flow-basics',     level: 'freshman',  order: 3, title: 'Cash Flow Basics',          minutes: 16, status: 'pending' },
-  { slug: 'banking-and-debt',     level: 'freshman',  order: 4, title: 'Banking &amp; Debt',            minutes: 21, status: 'missing' },
+  { slug: 'banking-and-debt',     level: 'freshman',  order: 4, title: 'Banking & Debt',            minutes: 21, status: 'missing' },
 
   { slug: 'business-setup',       level: 'sophomore', order: 1, title: 'Business Setup',            minutes: 22, status: 'ready' },
   { slug: 'records-that-hold-up', level: 'sophomore', order: 2, title: 'Records That Hold Up',      minutes: 19, status: 'pending' },
@@ -60,8 +60,8 @@ export const MODULES: Module[] = [
   { slug: 'accessing-capital',    level: 'junior',    order: 2, title: 'Accessing Capital',         minutes: 26, status: 'missing' },
   { slug: 'protection',           level: 'junior',    order: 3, title: 'Protection',                minutes: 17, status: 'missing' },
 
-  { slug: 'assets-and-investing', level: 'senior',    order: 1, title: 'Assets &amp; Investing',        minutes: 23, status: 'missing' },
-  { slug: 'estate-and-legacy',    level: 'senior',    order: 2, title: 'Estate &amp; Legacy',           minutes: 25, status: 'missing' },
+  { slug: 'assets-and-investing', level: 'senior',    order: 1, title: 'Assets & Investing',        minutes: 23, status: 'missing' },
+  { slug: 'estate-and-legacy',    level: 'senior',    order: 2, title: 'Estate & Legacy',           minutes: 25, status: 'missing' },
 ]
 
 export const byLevel = (level: string) =>

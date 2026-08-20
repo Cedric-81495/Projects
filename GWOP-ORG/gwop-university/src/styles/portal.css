@@ -110,7 +110,12 @@
   list-style:none; margin:0;
   padding:0 clamp(12px,4vw,24px);
   min-width:max-content;
+  /* Snap so a flick lands on a stop rather than halfway through a label.
+     `proximity`, not `mandatory`: mandatory fights a deliberate small drag and
+     makes the rail feel like it is arguing with you. */
+  scroll-snap-type:x proximity;
 }
+.porail-track > li{scroll-snap-align:center}
 
 .porail-item{
   display:flex; align-items:baseline; gap:8px;

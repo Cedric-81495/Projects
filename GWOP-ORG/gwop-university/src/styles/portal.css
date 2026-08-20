@@ -14,62 +14,167 @@
    someone signed in — Package p.1: "every screen should feel like it belongs to
    the same university." The portal footer already uses forest, so the shell now
    brackets the content in the same colour top and bottom. */
+/* ── PORTAL BAR ───────────────────────────────────────────────────────────────
+   Two bands. Band one is identity and account; band two is the pathway rail.
+   Everything used to share one wrapping flex row, which had no width at which it
+   sat properly — "Senior" dropped to a second line around 1300px and the whole
+   thing rearranged below 600px.
+
+   Forest, matching the marketing brand bar and the portal footer, so the shell
+   brackets the content in the same colour top and bottom. Package p.1: every
+   screen should feel like it belongs to the same university. */
 .pobar{
-  display:flex; align-items:center; gap:16px;
-  padding:12px 20px; padding-top:calc(12px + env(safe-area-inset-top));
-  background:var(--forest); border-bottom:1px solid rgba(200,163,74,.2);
+  background:var(--forest);
   position:sticky; top:0; z-index:20;
-  /* Deliberately NO backdrop-filter here. It creates a containing block, which
-     is what previously clipped the mobile drawer to the header's height. */
+  padding-top:env(safe-area-inset-top);
+  /* Gold hairline, not a grey border. Gold is used as a rule throughout this
+     system, never as a fill. */
+  box-shadow:inset 0 -1px 0 rgba(200,163,74,.22);
+  /* Deliberately NO backdrop-filter. It creates a containing block, which is
+     what previously clipped the mobile drawer to the header's height. */
+}
+
+.pobar-top{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:11px clamp(16px,4vw,24px) 10px;
+  max-width:1180px; margin-inline:auto;
 }
 
 .pologo{display:flex; align-items:center; gap:10px; text-decoration:none; flex:none}
 .pologo b{
-  font-family:var(--display); font-size:13px; font-weight:700; color:#fff;
-  line-height:1.1; letter-spacing:-.01em;
+  font-family:var(--display); font-size:13.5px; font-weight:700; color:#fff;
+  line-height:1.1; letter-spacing:.01em;
 }
-/* gold-lt, not gold-ink: the ink variant is the shade that passes contrast on
-   ivory, and it disappears on forest. */
+/* gold-lt, not gold-ink: the ink variant is tuned for ivory and disappears on
+   forest. */
 .pologo b small{
   display:block; font-family:var(--body); font-size:7.5px; font-weight:600;
-  letter-spacing:.22em; color:var(--gold-lt); margin-top:2px;
+  letter-spacing:.24em; color:var(--gold-lt); margin-top:3px;
 }
 
-/* Six items now (Dashboard + four levels + Admin), so the row must be allowed
-   to wrap rather than force the bar wider than a laptop. */
-.ponav{display:flex; flex-wrap:wrap; gap:20px; margin-left:auto; align-items:center}
-/* Inverted for the forest bar. Muted grey on forest fails contrast. */
-.ponav a{color:rgba(247,243,233,.82); text-decoration:none; font-size:14.5px;
-  font-weight:500}
-.ponav a:hover{color:var(--gold-lt)}
-.ponav a:focus-visible{outline:2px solid var(--gold); outline-offset:3px;
-  border-radius:2px}
+/* ── ACCOUNT ──────────────────────────────────────────────────────────────────
+   An initial disc rather than the address. The email rendered as
+   "cedricsusmerano@gmail.c…", which told the reader nothing and read as a bug.
+   The full address is in the title attribute and in an sr-only span. */
+.poacct{display:flex; align-items:center; gap:12px; flex:none}
 
-/* A locked level: present and readable, clearly not yet available. Deliberately
-   NOT `display:none` — Package p.3 wants progression visible. `cursor:default`
-   plus no hover colour means it never looks clickable, so nobody taps it twice
-   wondering why nothing happened. */
-/* Ivory at low alpha rather than `--muted` + opacity: on forest, muted grey
-   dimmed to .42 is close to invisible. This keeps it clearly present but
-   clearly not available. */
-.polock{color:rgba(247,243,233,.42); font-size:14.5px; font-weight:500;
-  cursor:default; user-select:none}
-
-.poout{display:flex; align-items:center; gap:12px}
-.poemail{
-  font-size:13px; color:rgba(247,243,233,.6);
-  max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+.poinitial{
+  width:32px; height:32px; border-radius:50%;
+  display:grid; place-items:center;
+  font-family:var(--display); font-size:15px; font-weight:700; line-height:1;
+  color:var(--gold-lt);
+  background:rgba(247,243,233,.06);
+  border:1px solid rgba(200,163,74,.42);
+  /* Cormorant's cap-height sits high in the box; this centres it optically. */
+  padding-top:1px;
 }
-/* Gold, not emerald — emerald on forest is nearly the same value and the
-   button disappeared. */
-.poout button{
-  font:inherit; font-size:14px; font-weight:600;
+
+.poacct button{
+  font:inherit; font-family:var(--body); font-size:13px; font-weight:600;
+  letter-spacing:.02em;
   background:none; border:0; color:var(--gold-lt); cursor:pointer;
-  padding:10px 4px; min-height:44px;
+  padding:10px 2px; min-height:44px;
+  /* Was breaking into "Sign / out" in the wrapping row. */
+  white-space:nowrap;
 }
-.poout button:hover{color:#fff}
-.poout button:focus-visible{outline:2px solid var(--gold); outline-offset:3px;
+.poacct button:hover{color:#fff}
+.poacct button:focus-visible{outline:2px solid var(--gold); outline-offset:3px;
   border-radius:2px}
+
+/* ── PATHWAY RAIL — the signature element ─────────────────────────────────────
+   The four levels are a real sequence with cumulative access, so numbering them
+   encodes something true rather than decorating. Roman numerals in the display
+   face pick up the matriculation-year convention and the classical architecture
+   in the crest.
+
+   One continuous hairline runs the length of the rail. The current stop replaces
+   its segment with a gold underline — the line is the pathway, and you are
+   standing on it. */
+.porail{border-top:1px solid rgba(247,243,233,.08)}
+
+.porail-scroll{
+  max-width:1180px; margin-inline:auto;
+  overflow-x:auto; overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  /* Fades the cut edge on narrow screens so a clipped item reads as "more this
+     way" rather than as a broken layout. */
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18px,
+    #000 calc(100% - 18px),transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 18px,
+    #000 calc(100% - 18px),transparent 100%);
+}
+.porail-scroll::-webkit-scrollbar{display:none}
+
+.porail-track{
+  display:flex; align-items:stretch; gap:clamp(2px,1.4vw,10px);
+  list-style:none; margin:0;
+  padding:0 clamp(12px,4vw,24px);
+  min-width:max-content;
+}
+
+.porail-item{
+  display:flex; align-items:baseline; gap:8px;
+  padding:11px 10px 12px;
+  text-decoration:none; white-space:nowrap;
+  color:rgba(247,243,233,.74);
+  border-bottom:2px solid transparent;
+  transition:color .18s ease, border-color .18s ease;
+}
+.porail-item:hover{color:#fff}
+.porail-item:focus-visible{outline:2px solid var(--gold); outline-offset:-2px;
+  border-radius:2px}
+
+/* The numeral carries the sequence; the label names it. Two faces, two jobs. */
+.porail-mark{
+  font-family:var(--display); font-size:13px; font-weight:700; line-height:1;
+  color:var(--gold-lt); opacity:.85;
+  font-feature-settings:'lnum' 1;
+}
+.porail-label{
+  font-family:var(--body); font-size:11px; font-weight:600;
+  letter-spacing:.13em; text-transform:uppercase; line-height:1;
+}
+
+/* CURRENT STOP — gold underline replacing that stretch of the hairline. */
+.porail-item[aria-current='page']{
+  color:#fff;
+  border-bottom-color:var(--gold);
+}
+.porail-item[aria-current='page'] .porail-mark{opacity:1; color:var(--gold)}
+
+/* LOCKED — present, legible enough to want, clearly not available. Ivory at low
+   alpha rather than `--muted` dimmed: muted grey on forest is close to
+   invisible. `cursor:default` and no hover means it never looks tappable. */
+.porail-item.is-locked{
+  /* .44, not .34. Dimmer values looked better in isolation but measured
+     2.63:1 against forest — under the 3:1 floor, so a locked level was
+     effectively unreadable rather than merely quiet. .44 measures 3.39:1 and is
+     still clearly recessive next to the .74 of an available one. */
+  color:rgba(247,243,233,.44);
+  cursor:default; user-select:none;
+}
+.porail-item.is-locked .porail-mark{color:rgba(247,243,233,.40); opacity:1}
+
+/* Staff link separated by a rule rather than extra space, which reads as an
+   intentional division instead of a gap. */
+.porail-staff{
+  margin-left:6px; padding-left:10px;
+  border-left:1px solid rgba(247,243,233,.14);
+}
+
+@media(prefers-reduced-motion:reduce){
+  .porail-item{transition:none}
+}
+
+/* On a phone the numeral does the work and the labels would force a scroll for
+   every student. Keeping "Dashboard" and "Admin" labelled — they have no
+   numeral to fall back on. */
+@media(max-width:479px){
+  .porail-track{gap:0}
+  .porail-item{padding-inline:11px; gap:6px}
+  .porail-mark{font-size:14px}
+  .porail-label{font-size:10px; letter-spacing:.1em}
+}
 
 .pomain{
   flex:1;                                /* fills remaining height on short pages */
@@ -122,9 +227,9 @@
 .poenter.is-muted{color:var(--muted)}
 
 @media(max-width:620px){
-  .pobar{flex-wrap:wrap; row-gap:10px}
-  .ponav{order:3; width:100%; margin-left:0; justify-content:space-between}
-  .poemail{display:none}                  /* the address is on /account anyway */
+  /* The .pobar / .ponav / .poemail rules that lived here are gone with the
+     two-band bar: the bands never wrap, and the address is an initial disc now
+     rather than something to hide. */
   .polevel{grid-template-columns:auto 1fr; row-gap:12px}
   .poenter{grid-column:1 / -1; justify-content:flex-start}
 }

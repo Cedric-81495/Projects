@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createServerSupabase } from '@/lib/supabase/server'
-import { LEVELS } from '@/lib/access/policy'
+import { LEVELS, canAccessLevel, type AccessState } from '@/lib/access/policy'
 
 export const metadata: Metadata = {
   title: 'Dashboard · GWOP University',
@@ -29,6 +29,14 @@ export default async function DashboardPage() {
 
   const enrolledLevel = typeof enrolled === 'number' ? enrolled : 0
 
+  /* Assembled so the card gating can go through canAccessLevel rather than
+     comparing numbers here. Role is 'student' because this page only ever
+     decides whether to show a level card — and every query above already runs
+     through the RLS-bound client, so the real gate is the database. If a staff
+     override is ever wanted on this page, fetch the role rather than widening
+     the comparison. */
+  const access: AccessState = { userId, role: 'student', enrolledLevel }
+
   const progress = await Promise.all(
     LEVELS.map(async (l) => {
       const { data } = await supabase.rpc('level_progress', { p_level: l.level, uid: userId })
@@ -55,7 +63,11 @@ export default async function DashboardPage() {
 
       <ol className="polevels">
         {progress.map((l) => {
-          const unlocked = l.level <= enrolledLevel
+          /* canAccessLevel, not `l.level <= enrolledLevel`. policy.ts is
+             explicit that the moment that comparison is copied into a
+             component, changing the rule means auditing the whole tree — and
+             staff would have been shown locked cards despite having access. */
+          const unlocked = canAccessLevel(access, l.level)
           return (
             <li key={l.slug} className={unlocked ? 'polevel' : 'polevel is-locked'}>
               <span className="pon">{l.level}</span>

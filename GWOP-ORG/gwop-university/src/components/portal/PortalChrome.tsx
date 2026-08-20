@@ -1,14 +1,12 @@
 import Link from 'next/link'
 import { Crest } from '@/components/Chrome'
-import { isStaff, canAccessLevel, LEVELS, type AccessState } from '@/lib/access/policy'
+import { PathwayRail } from '@/components/portal/PathwayRail'
+import type { AccessState } from '@/lib/access/policy'
 
 /**
- * Portal shell. Server component — it renders no interactivity beyond links and
- * one POST form, so it ships zero JavaScript.
- *
- * Sign-out is a POST form, not a link: a GET sign-out is CSRF-able and gets
- * fired by link prefetchers and antivirus scanners, logging people out at
- * random for no reason they can see.
+ * Portal shell. Stays a server component — the only client code in the portal is
+ * PathwayRail, which needs `usePathname` to mark the current stop. Splitting it
+ * out keeps the shell, the account block and the footer server-rendered.
  */
 export function PortalChrome({
   access,
@@ -21,56 +19,44 @@ export function PortalChrome({
 }) {
   return (
     <div className="poshell">
+      {/* TWO BANDS, not one row.
+          Everything previously sat in a single wrapping flex row: crest,
+          wordmark, six nav links, the email and the sign-out button. There is no
+          width at which that fits gracefully — at ~1300px "Senior" fell to a
+          second line and "Sign out" broke into "Sign / out"; at ~500px the
+          order rearranged entirely.
+
+          Splitting identity from navigation removes the competition. Band one
+          never has more than three things in it, and the pathway gets its own
+          rail, which reads as deliberate rather than crowded. */}
       <header className="pobar">
-        <Link className="pologo" href="/dashboard">
-          <Crest size={32} />
-          <b>
-            GWOP UNIVERSITY
-            <small>KNOWLEDGE PAYS</small>
-          </b>
-        </Link>
+        <div className="pobar-top">
+          <Link className="pologo" href="/dashboard">
+            <Crest size={30} />
+            <b>
+              GWOP UNIVERSITY
+              <small>KNOWLEDGE PAYS</small>
+            </b>
+          </Link>
 
-        <nav className="ponav" aria-label="Student">
-          <Link href="/dashboard">Dashboard</Link>
+          {/* Sign-out is a POST form, not a link: a GET sign-out is CSRF-able
+              and gets fired by link prefetchers and antivirus scanners, logging
+              people out at random for no reason they can see. */}
+          <form className="poacct" action="/auth/signout" method="post">
+            {/* An initial disc instead of the address. The email rendered as
+                "cedricsusmerano@gmail.c…" — a truncation that told the reader
+                nothing and looked like a defect. The full address stays in the
+                title attribute for anyone who needs to check which account they
+                are in. */}
+            <span className="poinitial" title={email} aria-hidden="true">
+              {email.trim().charAt(0).toUpperCase() || '?'}
+            </span>
+            <span className="sr-only">Signed in as {email}</span>
+            <button type="submit">Sign out</button>
+          </form>
+        </div>
 
-          {/* THE PATHWAY, always all four.
-              A locked level renders as dimmed text rather than being hidden:
-              Package p.3 says the university should "visually show progression",
-              and a student cannot want what they cannot see. Hiding Junior makes
-              the product look like it ends at Sophomore.
-
-              Lock state comes from canAccessLevel — never `level <=
-              enrolledLevel` inline. policy.ts is explicit that the moment that
-              comparison is copied into a component, changing a rule means
-              auditing the whole tree.
-
-              This governs affordance only. RLS decides what data returns. */}
-          {LEVELS.map(l =>
-            canAccessLevel(access, l.level) ? (
-              <Link key={l.slug} href={`/app/${l.slug}`}>{l.label}</Link>
-            ) : (
-              <span
-                key={l.slug}
-                className="polock"
-                aria-disabled="true"
-                title={`${l.label} — not yet unlocked`}
-              >
-                {l.label}
-              </span>
-            ),
-          )}
-
-          {/* Only HIDES the link — /admin is guarded server-side and by RLS
-              regardless of what is rendered here. */}
-          {isStaff(access) && <Link href="/admin">Admin</Link>}
-        </nav>
-
-        <form className="poout" action="/auth/signout" method="post">
-          <span className="poemail" title={email}>
-            {email}
-          </span>
-          <button type="submit">Sign out</button>
-        </form>
+        <PathwayRail access={access} />
       </header>
 
       {/* min-height, not height: a short page must not collapse, and a long one

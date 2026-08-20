@@ -21,11 +21,16 @@ export const site = {
      Paste the real URLs in. Any entry left empty is not rendered — we never
      ship a link to a handle that does not exist yet. */
   social: [
-    { name: 'Instagram', url: '', pending: true },
-    { name: 'Facebook',  url: '', pending: true },
-    { name: 'TikTok',    url: '', pending: true },
-    { name: 'YouTube',   url: '', pending: true },
-    { name: 'LinkedIn',  url: '', pending: true },
+    /* ✅ CONFIRMED — Cedric, Aug 21. Tracking parameters stripped: the ones the
+       apps append (igsh, _r, _t, si) identify the person who shared the link,
+       so shipping them would attribute every visitor to whoever copied it. The
+       bare URLs resolve to the same profiles. */
+    { name: 'Instagram', url: 'https://www.instagram.com/gwopuniversity', pending: false },
+    { name: 'TikTok',    url: 'https://www.tiktok.com/@gwopuniversity',   pending: false },
+    { name: 'YouTube',   url: 'https://youtube.com/@cottrellenterprises', pending: false },
+    /* Facebook and LinkedIn removed rather than left empty — an unlinked label
+       reads as "coming soon", which is a promise nobody has made. Add them back
+       here when the accounts are confirmed. */
   ],
 
 } as const

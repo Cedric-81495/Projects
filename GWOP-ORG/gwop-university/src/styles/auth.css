@@ -71,3 +71,32 @@
 .auhp{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden}
 
 @media(max-width:400px){ .aucard{padding:26px 20px 24px; border-radius:14px} }
+
+/* ── PASSWORD FIELD WITH SHOW/HIDE ────────────────────────────────────────────
+   The toggle sits inside the input's box rather than beside it, so the field
+   keeps the same outer dimensions as the email input above it.
+
+   `padding-right` on the input reserves the toggle's space permanently. The
+   button only renders after hydration — see PasswordField.tsx — and without the
+   reservation the text would reflow under it the moment it appeared. */
+.pwwrap{position:relative; display:block}
+.pwwrap input{width:100%; padding-right:62px}
+
+.pwtoggle{
+  position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:50px; min-height:36px; padding:0 8px;
+  font:inherit; font-size:12px; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase;
+  background:none; border:0; border-radius:6px;
+  color:var(--emerald); cursor:pointer;
+}
+.pwtoggle:hover{background:rgba(13,91,63,.07)}
+.pwtoggle:focus-visible{outline:2px solid var(--gold); outline-offset:1px}
+
+/* Below 380px the toggle and a long password compete for the same row, so trade
+   the letter-spacing for characters rather than let the value scroll. */
+@media(max-width:379px){
+  .pwwrap input{padding-right:54px}
+  .pwtoggle{min-width:44px; letter-spacing:0}
+}

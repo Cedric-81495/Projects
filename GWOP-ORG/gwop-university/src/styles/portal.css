@@ -207,6 +207,19 @@
   padding:34px 20px calc(56px + env(safe-area-inset-bottom));
 }
 
+/* The portal pages reuse the marketing `<section>` and `.wrap` markup, which
+   carry their own generous spacing meant for a long scrolling landing page:
+   `section` adds up to 104px top and bottom, and `.wrap` re-applies a max-width
+   and horizontal padding that `.pomain` has already set.
+
+   Stacked inside `.pomain` that produced ~138px of dead space between the rail
+   and the breadcrumb, and a second inset on the sides. Neutralised here rather
+   than by editing each page, so any page added to the portal later inherits the
+   correct rhythm without anyone having to know about it. */
+.pomain > section{padding:0}
+.pomain > section + section{padding-top:clamp(28px,4vw,44px)}
+.pomain .wrap{max-width:none; padding-inline:0}
+
 .poh1{font-size:clamp(26px,5vw,38px); margin:0 0 28px}
 
 .poempty{
@@ -343,11 +356,13 @@
   display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;
   justify-content:space-between;font-size:13px}
 
-.pofoot-brand{margin:0;font-family:var(--display,Georgia,serif);
-  font-size:13.5px;font-weight:700;letter-spacing:.02em;color:#fff}
-.pofoot-brand span{font-family:var(--body,system-ui,sans-serif);font-size:9px;
-  font-weight:600;letter-spacing:.22em;color:var(--gold-lt,#D9B45C);
-  text-transform:uppercase}
+.pofoot-brand{display:flex; align-items:center; gap:10px}
+.pofoot-brand .crest{flex:none}
+.pofoot-brand b{font-family:var(--display,Georgia,serif); font-size:13.5px;
+  font-weight:700; letter-spacing:.01em; color:#fff; line-height:1.1}
+.pofoot-brand b small{display:block; font-family:var(--body,system-ui,sans-serif);
+  font-size:7.5px; font-weight:600; letter-spacing:.24em;
+  color:var(--gold-lt,#D9B45C); margin-top:3px}
 
 .pofoot-links{display:flex;flex-wrap:wrap;gap:8px 18px}
 .pofoot-links a{color:rgba(247,243,233,.66);text-decoration:none}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 
 /**
  * Password input with a show/hide toggle.
@@ -36,6 +36,20 @@ export function PasswordField({
   const [shown, setShown] = useState(false)
   const id = useId()
 
+  /* The toggle renders only after hydration, on purpose.
+     Everything else on these forms works without JavaScript — React's form
+     actions post natively, so sign-in and sign-up still function if a chunk
+     fails to load on a bad connection. The toggle cannot: it is `useState`, so
+     without hydration the button appears and does nothing when tapped.
+
+     A visible control that silently ignores you is worse than no control,
+     particularly on the screen where someone is already unsure whether they
+     typed their password correctly. So it stays out of the markup until it can
+     actually work. The wrapper reserves its width either way, so nothing shifts
+     when it arrives. */
+  const [ready, setReady] = useState(false)
+  useEffect(() => setReady(true), [])
+
   /* Mirrors the existing `.aufield` markup rather than introducing a second
      field pattern, so spacing and label styling stay identical to the email
      fields sitting above it. */
@@ -51,7 +65,7 @@ export function PasswordField({
           minLength={minLength}
           required={required}
         />
-        <button
+        {ready && <button
           type="button"
           className="pwtoggle"
           onClick={() => setShown(v => !v)}
@@ -67,7 +81,7 @@ export function PasswordField({
           tabIndex={-1}
         >
           {shown ? 'Hide' : 'Show'}
-        </button>
+        </button>}
       </div>
       {hint && <small>{hint}</small>}
     </label>

@@ -90,15 +90,31 @@ export function PortalChrome({
           as the same university — Package p.1: "every screen should feel like it
           belongs to the same university." */}
       <footer className="pofoot">
-        <p className="pofoot-brand">
-          GWOP UNIVERSITY <span>· Knowledge Pays</span>
-        </p>
+        {/* Crest + stacked wordmark, matching the bar above and the marketing
+            footer. It was a single inline line with a middle dot, which read as
+            a different mark from the one directly above it. */}
+        <div className="pofoot-brand">
+          <Crest size={26} />
+          <b>
+            GWOP UNIVERSITY
+            <small>KNOWLEDGE PAYS</small>
+          </b>
+        </div>
+
+        {/* target="_blank" on purpose. These are public marketing-chrome pages,
+            so following one in the same tab swaps the portal shell for the
+            website header — a signed-in student watches their pathway nav and
+            account disappear and reasonably concludes they have been logged out.
+            Opening a new tab keeps the portal where they left it.
+
+            rel="noopener" because target="_blank" otherwise hands the opened
+            page a reference back to this one. */}
         <nav className="pofoot-links" aria-label="Legal">
-          <Link href="/privacy">Privacy Policy</Link>
-          <Link href="/terms">Terms &amp; Conditions</Link>
-          <Link href="/sms-terms">SMS Terms</Link>
-          <Link href="/refunds">Refunds</Link>
-          <Link href="/disclosures">Disclosures</Link>
+          <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>
+          <a href="/terms" target="_blank" rel="noopener">Terms &amp; Conditions</a>
+          <a href="/sms-terms" target="_blank" rel="noopener">SMS Terms</a>
+          <a href="/refunds" target="_blank" rel="noopener">Refunds</a>
+          <a href="/disclosures" target="_blank" rel="noopener">Disclosures</a>
         </nav>
       </footer>
     </div>

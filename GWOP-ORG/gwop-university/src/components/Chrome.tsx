@@ -82,13 +82,22 @@ export function Footer() {
             {/* Felicia §12 — official accounts. Empty URLs render a plain
                 label, so the slot is visibly reserved without a dead link. */}
             <ul className="socials">
-              {site.social.map(s => (
-                <li key={s.name}>
-                  {s.url
-                    ? <a href={s.url} rel="me noopener" target="_blank">{s.name}</a>
-                    : <span className="soon">{s.name}</span>}
-                </li>
-              ))}
+              {site.social.map(s => {
+                /* Widened to `string` deliberately. `site` is `as const`, so
+                   with every entry now carrying a real URL TypeScript narrows
+                   `s.url` to a non-empty literal union and proves the unlinked
+                   branch unreachable — which fails the build. That branch is
+                   still wanted: it is what reserves a slot without shipping a
+                   dead link when an account is added but not yet live. */
+                const url: string = s.url
+                return (
+                  <li key={s.name}>
+                    {url
+                      ? <a href={url} rel="me noopener" target="_blank">{s.name}</a>
+                      : <span className="soon">{s.name}</span>}
+                  </li>
+                )
+              })}
             </ul>
           </div>
           <div>

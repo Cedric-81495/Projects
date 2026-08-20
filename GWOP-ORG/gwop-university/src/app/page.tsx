@@ -4,7 +4,10 @@ import { ChatWidget } from '@/components/integrations/ChatWidget'
 
 /* Visual Build Package p.4 — hero card + four course cards, and nothing else.
    The same component renders `/app`, so the two are identical by construction. */
-export default function Home() {
+/* async because <ChatWidget> reads the CSP nonce from headers(). That also makes
+   this page dynamic rather than static — acceptable for the homepage, and the
+   reason the widget is NOT on /830, which must stay prerendered. */
+export default async function Home() {
   return (
     <>
       <BrandBar />

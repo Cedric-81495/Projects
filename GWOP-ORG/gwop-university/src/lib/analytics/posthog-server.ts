@@ -49,4 +49,4 @@ export async function captureServer(
     /* Intentionally swallowed. A dropped analytics event is a reporting gap; a
        thrown one is an outage. */
   }
-}
+} 

@@ -38,18 +38,32 @@ const ghlOrigin = (() => {
    it). Building it twice from one nonce would also work, but a single source
    means the two can never drift apart after a future edit.
    ───────────────────────────────────────────────────────────────────────── */
+/* Jake's GHL chat widget. Added 2026-08-20.
+
+   Note this is the CSP that actually applies. next.config.ts also declares one,
+   but middleware runs after and its header wins — so a third-party origin has to
+   be added HERE. Adding it only to the config produces no error and no widget,
+   which is a genuinely confusing failure.
+
+   `loader.js` is fetched by our own nonced script tag, and `strict-dynamic`
+   propagates trust to whatever that loader then injects, so the widget's own
+   chunks do not each need listing. The host is still named in script-src for
+   browsers that ignore strict-dynamic. */
+const GHL_CHAT = 'https://widgets.leadconnectorhq.com'
+const GHL_API = 'https://services.leadconnectorhq.com https://backend.leadconnectorhq.com'
+
 function buildCsp(nonce: string): string {
   const isDev = process.env.NODE_ENV === 'development'
 
   return [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ''}`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://js.stripe.com https://challenges.cloudflare.com ${GHL_CHAT}${isDev ? " 'unsafe-eval'" : ''}`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com ${GHL_CHAT}`,
     `font-src 'self' https://fonts.gstatic.com data:`,
-    `img-src 'self' data: blob: https://*.supabase.co https://*.b-cdn.net`,
+    `img-src 'self' data: blob: https://*.supabase.co https://*.b-cdn.net ${GHL_CHAT}`,
     `media-src 'self' blob: https://*.b-cdn.net https://iframe.mediadelivery.net`,
-    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.b-cdn.net`,
-    `frame-src https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com https://iframe.mediadelivery.net${ghlOrigin ? ' ' + ghlOrigin : ''}`,
+    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.b-cdn.net ${GHL_CHAT} ${GHL_API} wss://backend.leadconnectorhq.com`,
+    `frame-src https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com https://iframe.mediadelivery.net ${GHL_CHAT}${ghlOrigin ? ' ' + ghlOrigin : ''}`,
     `form-action 'self'`,
     `frame-ancestors 'none'`,
     `base-uri 'self'`,
@@ -92,7 +106,28 @@ export async function middleware(request: NextRequest) {
 
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser()
+
+  /* A dead refresh token would otherwise error on EVERY request, forever.
+     Supabase returns `refresh_token_not_found` when the cookie holds a token the
+     auth server no longer recognises — after a global sign-out, a password
+     change, or a project whose sessions were reset. The app already behaves
+     correctly (user is null, so gated routes redirect), but nothing ever cleared
+     the dead cookie, so the browser kept presenting it and the server log filled
+     with AuthApiError on every navigation.
+
+     Clearing it here makes the failure self-healing: one bad request, then the
+     visitor is simply signed out. */
+  if (authError && !user) {
+    for (const c of request.cookies.getAll()) {
+      /* Supabase names its session cookies sb-<project-ref>-auth-token, with
+         numbered suffixes when the value is chunked across several cookies. */
+      if (c.name.startsWith('sb-') && c.name.includes('auth-token')) {
+        response.cookies.set(c.name, '', { maxAge: 0, path: '/' })
+      }
+    }
+  }
 
   const { pathname } = request.nextUrl
 

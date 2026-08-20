@@ -543,7 +543,6 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
 - [ ] Device + cellular test matrix
 - [ ] Handoff folder contribution
 
-
 **Parked — Phase 2, after Aug 30. Do not start before Aug 27.**
 
 These are real gaps, deliberately not being built now. Aug 30 is lead capture

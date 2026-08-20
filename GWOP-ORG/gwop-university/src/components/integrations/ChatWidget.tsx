@@ -1,4 +1,5 @@
 import Script from 'next/script'
+import { headers } from 'next/headers'
 import { CHAT_WIDGET_ID } from '@/config/integrations'
 
 /**
@@ -20,18 +21,30 @@ import { CHAT_WIDGET_ID } from '@/config/integrations'
  * content. It must never delay first paint or compete with the page's own
  * JavaScript, particularly on the slow connections this site is built for.
  *
- * The widget also requires widgets.leadconnectorhq.com in the CSP — see the
- * allow-list in next.config.ts. Without it the browser blocks the script and the
- * only symptom is a console error and no bubble.
+ * ⚠️ THE NONCE IS REQUIRED, not optional.
+ *
+ * The applied CSP comes from middleware.ts, not next.config.ts — middleware runs
+ * after and its header wins. That policy uses `strict-dynamic`, which makes the
+ * browser IGNORE host allow-lists for scripts and trust only what a nonced
+ * script loads. So without the nonce below this tag is blocked no matter how
+ * many LeadConnector domains are allow-listed, and the only symptom is a console
+ * error and no bubble.
+ *
+ * Middleware puts the per-request nonce on the `x-nonce` request header for
+ * exactly this purpose. Reading headers() makes this an async server component,
+ * which is why it is awaited at the call site.
  */
-export function ChatWidget() {
+export async function ChatWidget() {
   if (!CHAT_WIDGET_ID) return null
+
+  const nonce = (await headers()).get('x-nonce') ?? undefined
 
   return (
     <Script
       src="https://widgets.leadconnectorhq.com/loader.js"
       data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
       data-widget-id={CHAT_WIDGET_ID}
+      nonce={nonce}
       strategy="afterInteractive"
     />
   )

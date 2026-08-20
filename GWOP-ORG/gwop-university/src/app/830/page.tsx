@@ -7,6 +7,7 @@ import { PATHWAY, CAPSTONE } from '@/content/pathway'
 
 import { BrandBar, Tbc } from '@/components/Chrome'
 import { InterestForm } from './InterestForm'
+import { NoThirdPartyWidgets } from '@/components/integrations/NoThirdPartyWidgets'
 
 /* Event page must never be indexed — CLAUDE.md invariant 11 */
 export const metadata: Metadata = {
@@ -21,6 +22,9 @@ export default function EventPage() {
 
   return (
     <div className="ev">
+      {/* Sweeps any third-party DOM that arrived via a client-side navigation.
+          See the component for why this page in particular. */}
+      <NoThirdPartyWidgets />
       {/* brand identity only — no nav, nothing to click away to (invariant 10) */}
       <BrandBar linked={false} />
 

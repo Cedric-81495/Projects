@@ -103,7 +103,10 @@ export function Footer() {
             <h4>University</h4>
             <ul>
               <li><Link href="/app">Student area</Link></li>
-              <li><Link href={EVENT_PATH}>Get started</Link></li>
+              {/* Plain <a> for the same reason as the hero CTA in Pathway.tsx:
+                  a client-side navigation carries injected third-party DOM onto
+                  /830, where no third-party script may run. */}
+              <li><a href={EVENT_PATH}>Get started</a></li>
             </ul>
           </div>
           <div>

@@ -81,7 +81,27 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
             Mobile reads copy → crest → CTA, so the button sits at the thumb end
             of the card. Desktop keeps p.4's two-column arrangement. */}
         <div className="acts">
-          <Link className="btn btn-e" href={c.href}>{c.cta}</Link>
+          {/* A PLAIN <a>, not <Link>, when this points at the event page.
+
+              Third-party scripts inject themselves into document.body, outside
+              React's tree, so a client-side navigation does not remove them.
+              Jake's chat widget is mounted on this page — click through to /830
+              with <Link> and the bubble comes along, landing on the one page
+              CLAUDE.md invariant 7 keeps every third-party script off.
+
+              That is not hypothetical: it broke the form. The widget loads its
+              own copy of Cloudflare Turnstile, the second load bails with
+              "Turnstile already has been loaded", our challenge never renders,
+              and every submission comes back 422 with "Some fields need
+              attention" and no way for the attendee to fix it.
+
+              A hard navigation gives /830 a clean document every time. It costs
+              one page load on a path people take once. */}
+          {c.href === EVENT_PATH ? (
+            <a className="btn btn-e" href={c.href}>{c.cta}</a>
+          ) : (
+            <Link className="btn btn-e" href={c.href}>{c.cta}</Link>
+          )}
         </div>
       </div>
 

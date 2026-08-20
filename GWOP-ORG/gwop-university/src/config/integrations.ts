@@ -53,6 +53,12 @@ export const INTEREST_FALLBACK = 'unspecified'
 /** GHL source/tag for this event. Must match Jake's tag exactly. */
 export const EVENT_TAG = 'EVENT - Everybody Gotta Eat - 08/30/26'
 
+/* Jake's trained GHL chat widget, supplied 2026-08-19.
+   Rendered ONLY on marketing pages — see ChatWidget.tsx. Empty string disables
+   it everywhere, which is the switch to reach for if it misbehaves during the
+   event rather than editing pages under pressure. */
+export const CHAT_WIDGET_ID = '6a79e193ae5432b1ab54efbc'
+
 /* ── CAMPAIGN ATTRIBUTION ───────────────────────────────────────────────────
    Felicia §7: "We do not necessarily need separate signup pages for every staff
    member... tracking attribution on the backend" and §3: "Tracking should happen

@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { updatePassword, type ActionState } from '@/lib/auth/actions'
+import { PasswordField } from '@/components/auth/PasswordField'
 
 const initial: ActionState = {}
 
@@ -16,16 +17,12 @@ export function UpdatePasswordForm() {
         </p>
       )}
 
-      <label className="aufield">
-        <span>New password</span>
-        <input name="password" type="password" autoComplete="new-password" minLength={10} required />
-        <small>At least 10 characters.</small>
-      </label>
+      <PasswordField name="password" label="New password"
+        autoComplete="new-password" minLength={10} required
+        hint="At least 10 characters." />
 
-      <label className="aufield">
-        <span>Confirm new password</span>
-        <input name="confirm" type="password" autoComplete="new-password" minLength={10} required />
-      </label>
+      <PasswordField name="confirm" label="Confirm new password"
+        autoComplete="new-password" minLength={10} required />
 
       <button className="btn btn-e aubtn" type="submit" disabled={pending}>
         {pending ? 'Saving…' : 'Save password'}

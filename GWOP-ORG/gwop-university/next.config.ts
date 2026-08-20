@@ -26,15 +26,29 @@ const ghlOrigin = (() => {
    header problem. */
 const TURNSTILE = 'https://challenges.cloudflare.com'
 
+/* Jake's GHL chat widget. Loader, assets and the socket it opens back to
+   LeadConnector. Added 2026-08-20.
+   Adding a third-party origin here is a security decision: this grants the
+   script the ability to run on our pages. It is scoped as narrowly as the widget
+   allows, and it is NOT permitted on /830 — that exclusion is enforced by not
+   rendering the component there, since CSP cannot vary per route in this config.
+   If the bubble does not appear, check the console for a CSP violation naming a
+   host that is not in this list. */
+const GHL_CHAT = [
+  'https://widgets.leadconnectorhq.com',
+  'https://services.leadconnectorhq.com',
+  'https://backend.leadconnectorhq.com',
+]
+
 const csp = [
   "default-src 'self'",
   // Next injects inline bootstrap scripts. Turnstile is the only third-party origin.
-  `script-src 'self' 'unsafe-inline' ${TURNSTILE}`,
+  `script-src 'self' 'unsafe-inline' ${TURNSTILE} ${GHL_CHAT[0]}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: blob:",
-  "connect-src 'self'",
-  `frame-src ${[ghlOrigin, TURNSTILE].filter(Boolean).join(' ')}`,
+  `img-src 'self' data: blob: ${GHL_CHAT[0]}`,
+  `connect-src 'self' ${GHL_CHAT.join(' ')} wss://backend.leadconnectorhq.com`,
+  `frame-src ${[ghlOrigin, TURNSTILE, GHL_CHAT[0]].filter(Boolean).join(' ')}`,
   "form-action 'self'",
   "frame-ancestors 'none'",   // nobody may embed our pages (clickjacking)
   "base-uri 'self'",

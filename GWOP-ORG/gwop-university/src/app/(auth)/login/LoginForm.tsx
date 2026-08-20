@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { signIn, type ActionState } from '@/lib/auth/actions'
+import { PasswordField } from '@/components/auth/PasswordField'
 
 const initial: ActionState = {}
 
@@ -36,10 +37,8 @@ export function LoginForm({ next }: { next?: string }) {
         />
       </label>
 
-      <label className="aufield">
-        <span>Password</span>
-        <input name="password" type="password" autoComplete="current-password" required />
-      </label>
+      <PasswordField name="password" label="Password"
+        autoComplete="current-password" required />
 
       <button className="btn btn-e aubtn" type="submit" disabled={pending}>
         {pending ? 'Signing in…' : 'Sign in'}

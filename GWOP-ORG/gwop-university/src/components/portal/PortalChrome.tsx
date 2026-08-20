@@ -42,18 +42,30 @@ export function PortalChrome({
           {/* Sign-out is a POST form, not a link: a GET sign-out is CSRF-able
               and gets fired by link prefetchers and antivirus scanners, logging
               people out at random for no reason they can see. */}
-          <form className="poacct" action="/auth/signout" method="post">
-            {/* An initial disc instead of the address. The email rendered as
+          <div className="poacct">
+            {/* The disc is a LINK to /account, not decoration. It sat inside the
+                sign-out form doing nothing, which fails the first thing anyone
+                tries — tapping their own avatar. It also has to be outside that
+                form: a <Link> nested in a form is fine, but keeping them
+                separate means a stray Enter cannot submit sign-out.
+
+                An initial rather than the address, because the email rendered as
                 "cedricsusmerano@gmail.c…" — a truncation that told the reader
-                nothing and looked like a defect. The full address stays in the
-                title attribute for anyone who needs to check which account they
-                are in. */}
-            <span className="poinitial" title={email} aria-hidden="true">
-              {email.trim().charAt(0).toUpperCase() || '?'}
-            </span>
-            <span className="sr-only">Signed in as {email}</span>
-            <button type="submit">Sign out</button>
-          </form>
+                nothing and read as a defect. */}
+            <Link className="poinitial" href="/account" title={email}>
+              <span aria-hidden="true">
+                {email.trim().charAt(0).toUpperCase() || '?'}
+              </span>
+              <span className="sr-only">Account settings for {email}</span>
+            </Link>
+
+            {/* Sign-out is a POST form, not a link: a GET sign-out is CSRF-able
+                and gets fired by link prefetchers and antivirus scanners,
+                logging people out at random for no reason they can see. */}
+            <form action="/auth/signout" method="post">
+              <button type="submit">Sign out</button>
+            </form>
+          </div>
         </div>
 
         <PathwayRail access={access} />

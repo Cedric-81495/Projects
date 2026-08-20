@@ -4,6 +4,7 @@ import { useActionState } from 'react'
 import Script from 'next/script'
 import { signUp, type ActionState } from '@/lib/auth/actions'
 import { publicEnv } from '@/lib/env.public'
+import { PasswordField } from '@/components/auth/PasswordField'
 
 const initial: ActionState = {}
 
@@ -45,11 +46,9 @@ export function SignupForm() {
         />
       </label>
 
-      <label className="aufield">
-        <span>Password</span>
-        <input name="password" type="password" autoComplete="new-password" minLength={10} required />
-        <small>At least 10 characters.</small>
-      </label>
+      <PasswordField name="password" label="Password"
+        autoComplete="new-password" minLength={10} required
+        hint="At least 10 characters." />
 
       {/* Honeypot. Hidden from people and from screen readers; bots fill it in. */}
       <div className="auhp" aria-hidden="true">

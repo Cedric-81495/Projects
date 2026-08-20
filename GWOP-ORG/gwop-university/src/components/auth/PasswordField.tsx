@@ -83,7 +83,11 @@ export function PasswordField({
           {shown ? 'Hide' : 'Show'}
         </button>}
       </div>
-      {hint && <small>{hint}</small>}
+      {/* `.aufield > small` styles it, but the selector is a direct child and
+          this sits inside the label alongside .pwwrap — so it inherited nothing
+          and ran straight into the following field's label, rendering as
+          "At least 10 characters.Confirm new password". */}
+      {hint && <small className="pwhint">{hint}</small>}
     </label>
   )
 }

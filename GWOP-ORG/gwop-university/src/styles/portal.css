@@ -86,20 +86,51 @@
 .poinitial:hover{border-color:var(--gold); background:rgba(200,163,74,.14)}
 .poinitial:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
 
-/* ── ACCOUNT PAGE ──────────────────────────────────────────────────────────── */
+/* ── ACCOUNT PAGE ────────────────────────────────────────────────────────────
+   The name was rendering at hero scale — `.h2` is sized for a landing page, and
+   at 48px a person's own name reads as a banner rather than a label. Scaled to
+   sit with the section headings below it. */
 .acct{max-width:560px}
-.acct-facts{margin:26px 0 0; display:grid; gap:1px;
+.acct>.h2{font-size:clamp(28px,4vw,36px); margin:2px 0 0}
+
+.acct-facts{margin:24px 0 0; display:grid; gap:1px;
   background:var(--line); border:1px solid var(--line); border-radius:var(--r-md,10px);
   overflow:hidden}
-.acct-facts>div{background:var(--white); padding:14px 18px;
-  display:flex; flex-wrap:wrap; gap:4px 18px; justify-content:space-between}
+.acct-facts>div{background:var(--white); padding:15px 18px;
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 18px;
+  justify-content:space-between}
 .acct-facts dt{font-family:var(--body); font-size:10.5px; font-weight:600;
   letter-spacing:.16em; text-transform:uppercase; color:var(--gold-ink)}
-.acct-facts dd{margin:0; font-size:14.5px; color:var(--ink)}
-.acct-h{margin:38px 0 0; font-family:var(--display); font-size:22px;
-  font-weight:700; color:var(--emerald)}
-.acct-form{margin-top:16px}
-.acct-note{margin-top:26px; font-size:13px; color:var(--muted)}
+/* `break-all` on the value: an email is one unbroken token, so on a narrow
+   column it would otherwise push the row wider than the card. */
+.acct-facts dd{margin:0; font-size:14.5px; color:var(--ink);
+  text-align:right; overflow-wrap:anywhere}
+
+/* A gold hairline above the section, matching how the rest of the system
+   separates blocks — the heading previously floated with nothing tying it to
+   the form beneath. */
+.acct-h{margin:40px 0 0; padding-top:26px;
+  border-top:1px solid rgba(200,163,74,.28);
+  font-family:var(--display); font-size:21px; font-weight:700;
+  color:var(--emerald)}
+
+/* The form was inheriting the auth pages' full-width button, which is right on
+   a dedicated sign-in screen and wrong inside a settings page. */
+.acct-form{margin-top:18px; display:grid; gap:16px; max-width:380px}
+.acct-form .aubtn{width:auto; justify-self:start; padding-inline:26px}
+
+.acct-note{margin-top:30px; padding-top:18px;
+  border-top:1px solid var(--line);
+  font-size:13px; color:var(--muted)}
+
+@media(max-width:520px){
+  /* Stack label above value: side by side, a long email leaves the label
+     stranded on its own line anyway. */
+  .acct-facts>div{flex-direction:column; gap:5px}
+  .acct-facts dd{text-align:left}
+  .acct-form{max-width:none}
+  .acct-form .aubtn{width:100%; justify-self:stretch}
+}
 
 /* ── PATHWAY RAIL — the signature element ─────────────────────────────────────
    The four levels are a real sequence with cumulative access, so numbering them

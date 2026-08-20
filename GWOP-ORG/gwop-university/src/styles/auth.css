@@ -109,3 +109,8 @@
   border-color:rgba(200,163,74,.45);
   color:var(--ink);
 }
+
+/* The hint under a password field. `.aufield > small` does not reach it — that
+   selector is a direct child, and this sits after `.pwwrap` inside the label.
+   Without `display:block` it ran into the next field's label on one line. */
+.pwhint{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}

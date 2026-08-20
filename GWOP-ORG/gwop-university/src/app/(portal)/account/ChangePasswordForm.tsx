@@ -3,6 +3,11 @@
 import { useActionState } from 'react'
 import { updatePassword, type ActionState } from '@/lib/auth/actions'
 import { PasswordField } from '@/components/auth/PasswordField'
+/* auth.css is imported by the (auth) layout, which this page is not inside — so
+   without this the shared `.aufield` / `.pwwrap` rules never load and the inputs
+   render as unstyled browser defaults. Next dedupes the import when both are on
+   screen, so there is no cost to declaring it in both places. */
+import '@/styles/auth.css'
 
 const initial: ActionState = {}
 

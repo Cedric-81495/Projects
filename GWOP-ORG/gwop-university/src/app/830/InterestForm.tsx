@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Script from 'next/script'
 import { AsYouType, isValidPhoneNumber } from 'libphonenumber-js'
 import { event } from '@/content/event'
@@ -91,6 +91,43 @@ class NetworkError extends Error {
  * the attendee for something the network did. Nothing they typed is lost — the
  * fields keep their values, so retrying is one tap.
  */
+/* Fields in the order they appear on screen. Reported errors are an object, so
+   iterating it would follow key order rather than reading order and could send
+   someone to the third field when the first is also wrong. */
+const FIELD_ORDER = ['first_name', 'phone', 'email'] as const
+
+/**
+ * Move to the first field that needs attention.
+ *
+ * Without this, tapping Send with an empty name did nothing visible: the message
+ * rendered beside a field that was already scrolled off the top, so the attendee
+ * saw only "Some fields need attention" — or on a small screen, nothing at all —
+ * and tapped Send again.
+ *
+ * focus() rather than scrollIntoView alone. Focusing scrolls the field into view
+ * anyway, puts the caret where the person needs to type, and is what announces
+ * the problem to a screen reader. Scrolling alone does none of those.
+ */
+function focusFirstInvalid(form: HTMLFormElement | null, errs: FieldErrors) {
+  if (!form) return
+  const name = FIELD_ORDER.find(f => errs[f])
+  if (!name) return
+
+  const el = form.querySelector<HTMLInputElement>(`[name="${name}"]`)
+  if (!el) return
+
+  /* preventScroll then scrollIntoView with block:'center': the browser's own
+     focus scroll pins the field to the very edge of the viewport, often under
+     the sticky bar. Centring it puts the label and the error message on screen
+     together. */
+  el.focus({ preventScroll: true })
+  el.scrollIntoView({
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto' : 'smooth',
+    block: 'center',
+  })
+}
+
 function describeFailure(err: unknown): string {
   /* AbortError is what our own 15s timeout produces. */
   if (err instanceof DOMException && err.name === 'AbortError') {
@@ -216,6 +253,7 @@ function NativeForm({ choice }: { choice: Choice }) {
   const [pending, setPending] = useState(false)
   const [done, setDone] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const [errors, setErrors] = useState<FieldErrors>({})
   /* Controlled so AsYouType can reformat as they type. The server re-parses
      the same string with the same library, so what passes here passes there. */
@@ -247,7 +285,11 @@ function NativeForm({ choice }: { choice: Choice }) {
        condition of purchase" — blocking submit would contradict the sentence
        sitting right beside the box. */
 
-    if (Object.keys(next).length) return setErrors(next)
+    if (Object.keys(next).length) {
+      setErrors(next)
+      focusFirstInvalid(formRef.current, next)
+      return
+    }
 
     /* Catch a missing challenge token BEFORE the round trip.
        The token is empty when Turnstile has not finished loading, when its
@@ -349,12 +391,23 @@ function NativeForm({ choice }: { choice: Choice }) {
   }
 
   return (
-    <form className="evnf" onSubmit={onSubmit} noValidate>
+    <form className="evnf" ref={formRef} onSubmit={onSubmit} noValidate>
       <div className="evnf-row">
         <label>
           First name
-          <input name="first_name" autoComplete="given-name" enterKeyHint="next" required />
-          {errors.first_name && <em>{errors.first_name}</em>}
+          {/* aria-invalid + aria-describedby so a screen reader announces the
+              problem and reads the message when focus lands here. Without them
+              the field is announced as ordinary and the <em> beside it is never
+              connected to anything. */}
+          <input
+            name="first_name"
+            autoComplete="given-name"
+            enterKeyHint="next"
+            aria-invalid={errors.first_name ? true : undefined}
+            aria-describedby={errors.first_name ? 'err-first_name' : undefined}
+            required
+          />
+          {errors.first_name && <em id="err-first_name">{errors.first_name}</em>}
         </label>
         <label>
           Last name
@@ -377,6 +430,8 @@ function NativeForm({ choice }: { choice: Choice }) {
              fictional range, so a booth demo can never text a real person. */
           placeholder="(415) 555-0123"
           maxLength={16}
+          aria-invalid={errors.phone ? true : undefined}
+          aria-describedby={errors.phone ? 'err-phone' : undefined}
           value={phone}
           onChange={(e) => {
             /* Backspace must be able to delete a formatting character.
@@ -401,7 +456,7 @@ function NativeForm({ choice }: { choice: Choice }) {
           }
           required
         />
-        {errors.phone && <em>{errors.phone}</em>}
+        {errors.phone && <em id="err-phone">{errors.phone}</em>}
       </label>
 
       <label>
@@ -413,9 +468,11 @@ function NativeForm({ choice }: { choice: Choice }) {
           autoComplete="email"
           enterKeyHint="done"
           placeholder="you@email.com"
+          aria-invalid={errors.email ? true : undefined}
+          aria-describedby={errors.email ? 'err-email' : undefined}
           required
         />
-        {errors.email && <em>{errors.email}</em>}
+        {errors.email && <em id="err-email">{errors.email}</em>}
       </label>
 
       {/* Unchecked by default and never pre-ticked — the stored record is only

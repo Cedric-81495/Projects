@@ -99,14 +99,33 @@ export function PathwayRail({ access }: { access: AccessState }) {
                     <span className="porail-label">{l.label}</span>
                   </Link>
                 ) : (
-                  <span
+                  /* A locked level is a LINK to /membership, not a dead span.
+                     It was inert with a `title` tooltip, which meant a phone
+                     user — most of them — got a greyed-out word and no
+                     explanation at all. Dimmed and unclickable reads as broken
+                     rather than locked; the first reaction to it here was "is
+                     this a bug?", from the person who built it.
+
+                     Sending it to /membership also matches what the dashboard
+                     card already does with its "Unlock" button, so the same
+                     level behaves the same way in both places. */
+                  <Link
+                    href="/membership"
                     className="porail-item is-locked"
-                    aria-disabled="true"
-                    title={`${l.label} — unlocks with enrollment`}
+                    aria-label={`${l.label} — locked. See membership options`}
                   >
                     <span className="porail-mark" aria-hidden="true">{NUMERAL[i]}</span>
                     <span className="porail-label">{l.label}</span>
-                  </span>
+                    {/* A visible padlock, because the tooltip that used to carry
+                        this meaning never appeared on touch. */}
+                    <svg className="porail-lock" viewBox="0 0 24 24" width="11" height="11"
+                         aria-hidden="true">
+                      <path d="M7 10V7a5 5 0 0 1 10 0v3" fill="none"
+                            stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+                      <rect x="4" y="10" width="16" height="11" rx="2.2"
+                            fill="currentColor" />
+                    </svg>
+                  </Link>
                 )}
               </li>
             )

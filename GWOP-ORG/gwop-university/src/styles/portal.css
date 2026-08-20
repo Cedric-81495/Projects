@@ -170,15 +170,24 @@
 /* LOCKED — present, legible enough to want, clearly not available. Ivory at low
    alpha rather than `--muted` dimmed: muted grey on forest is close to
    invisible. `cursor:default` and no hover means it never looks tappable. */
+/* LOCKED — recessive, but clickable and clearly labelled.
+   .44, not .34: dimmer values looked better in isolation but measured 2.63:1
+   against forest, under the 3:1 floor, so a locked level was unreadable rather
+   than merely quiet. .44 measures 3.39:1 and still sits clearly behind the .74
+   of an available one.
+
+   `cursor:pointer`, not `default`. It goes to /membership now, and a link that
+   refuses to look like one is worse than no link. */
 .porail-item.is-locked{
-  /* .44, not .34. Dimmer values looked better in isolation but measured
-     2.63:1 against forest — under the 3:1 floor, so a locked level was
-     effectively unreadable rather than merely quiet. .44 measures 3.39:1 and is
-     still clearly recessive next to the .74 of an available one. */
-  color:rgba(247,243,233,.44);
-  cursor:default; user-select:none;
+  color:rgba(247,243,233,.46);
+  gap:7px;
 }
-.porail-item.is-locked .porail-mark{color:rgba(247,243,233,.40); opacity:1}
+.porail-item.is-locked:hover{color:rgba(247,243,233,.82)}
+.porail-item.is-locked .porail-mark{color:rgba(247,243,233,.42); opacity:1}
+.porail-item.is-locked:hover .porail-mark{color:var(--gold-lt)}
+
+.porail-lock{flex:none; opacity:.7; transform:translateY(1px)}
+.porail-item.is-locked:hover .porail-lock{opacity:1; color:var(--gold-lt)}
 
 /* Staff link separated by a rule rather than extra space, which reads as an
    intentional division instead of a gap. */

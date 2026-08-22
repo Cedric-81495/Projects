@@ -1168,3 +1168,14 @@ body>section:only-of-type{display:grid;align-content:center}
 .evas-steps p{margin:0;color:var(--muted);font-size:15px;line-height:1.5}
 .evas-close{margin:24px 0 0;padding-top:18px;border-top:1px solid var(--stone);
   color:var(--muted);font-style:italic}
+
+/* A focused heading is a programmatic focus, not a keyboard user tabbing to it,
+   so an outline would appear as an unexplained box after every tap. Screen
+   readers still announce it; :focus-visible keeps the ring for people actually
+   navigating by keyboard. */
+.evas-q:focus:not(:focus-visible),
+.evas-bp-h:focus:not(:focus-visible){outline:none}
+
+/* Breathing room above the section when it is scrolled to the top of the
+   viewport, so the heading is not flush against the edge of the screen. */
+.evas{scroll-margin-top:20px}

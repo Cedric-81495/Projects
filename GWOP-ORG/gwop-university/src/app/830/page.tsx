@@ -102,11 +102,12 @@ export default function EventPage() {
           </div>
         </section>
 
-        {/* ═══ CHOOSE → CAPTURE · p.6 ═══ */}
+        {/* ═══ CHOOSE → CAPTURE · p.6 ═══
+            The heading lives inside InterestForm rather than here: once the
+            assessment starts, "tell us what you want help with" is no longer
+            what the section is doing, and a stale heading sitting above
+            someone's Blueprint reads as a bug. */}
         <section className="evsect" id="choose">
-          <p className="tag">{event.choose.step}</p>
-          <h2>{event.choose.h2}</h2>
-          <p className="evlede">{event.choose.lede}</p>
           <InterestForm />
         </section>
 

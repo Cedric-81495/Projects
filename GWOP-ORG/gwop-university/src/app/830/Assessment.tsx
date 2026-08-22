@@ -41,6 +41,51 @@ export function Assessment({ token, firstName }: Props) {
   const [answers, setAnswers] = useState<Answers>({})
   const [blueprint, setBlueprint] = useState<BlueprintSlug | null>(null)
 
+  /* ── WHY THIS EXISTS ──────────────────────────────────────────────────────
+     The assessment replaces the form in place, and the form sits a long way
+     down a long page. Three things went wrong without it:
+
+     · The form is roughly twice the height of a question screen, so the page
+       collapsed underneath the attendee at the moment they submitted and the
+       first question landed off the top of the viewport. They saw the section
+       below it and assumed nothing had happened.
+     · Every later question is a different height too, so the content kept
+       shifting under their thumb.
+     · Focus stayed on the button they had just tapped, which no longer exists.
+       Keyboard and screen-reader users were dropped back at the top of the
+       document with no announcement.
+
+     So: after every change, put the top of this section at the top of the
+     viewport and move focus to the new heading. Predictable beats clever here —
+     the same thing happens every time, so it stops being a surprise by the
+     second question.
+     ───────────────────────────────────────────────────────────────────────── */
+  const sectionRef = useRef<HTMLElement>(null)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  /* Skips the very first render. On submit the browser is already sitting on
+     the form, which is where this section is — scrolling then would be a jolt
+     with no purpose. */
+  const mounted = useRef(false)
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true
+      /* Focus without scrolling, so the first question is announced but the
+         view stays where the attendee left it. */
+      headingRef.current?.focus({ preventScroll: true })
+      return
+    }
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    sectionRef.current?.scrollIntoView({
+      behavior: reduced ? 'auto' : 'smooth',
+      block: 'start',
+    })
+    /* preventScroll, because scrollIntoView above is already doing it. Letting
+       focus() scroll as well produces a visible double-jump on iOS. */
+    headingRef.current?.focus({ preventScroll: true })
+  }, [step, blueprint])
+
   /* Answers that failed to save, replayed on the next successful call. Held in
      a ref rather than state because a retry must not trigger a render — the
      attendee should never see anything about syncing. */
@@ -90,20 +135,37 @@ export function Assessment({ token, firstName }: Props) {
     setStep((s) => s + 1)
   }
 
-  if (blueprint) return <BlueprintView slug={blueprint} firstName={firstName} />
+  if (blueprint) {
+    return (
+      <BlueprintView
+        slug={blueprint}
+        firstName={firstName}
+        sectionRef={sectionRef}
+        headingRef={headingRef}
+      />
+    )
+  }
 
   return (
-    <section className="evas" aria-live="polite">
+    /* No aria-live on the section. It used to be here, which meant every tap
+       re-announced the progress bar, the heading and all the options together.
+       Moving focus to the heading announces the new question by itself, and the
+       progress counter below is the only thing that needs to speak on its own. */
+    <section className="evas" ref={sectionRef}>
       <ProgressBar current={step + 2} total={TOTAL_STEPS} />
 
       {step === 0 && (
         <p className="evas-lead">
-          Thanks{firstName ? `, ${firstName}` : ''} — six quick questions and your
-          Blueprint is ready.
+          Thanks{firstName ? `, ${firstName}` : ''} — you&apos;re saved. Six quick
+          questions and your Blueprint is ready.
         </p>
       )}
 
-      <h3 className="evas-q">{question.prompt}</h3>
+      {/* tabIndex -1 makes it focusable programmatically without adding it to
+          the tab order. This is what a screen reader reads on each step. */}
+      <h3 className="evas-q" ref={headingRef} tabIndex={-1}>
+        {question.prompt}
+      </h3>
 
       <div className="evpicks">
         {question.options.map((o) => (
@@ -140,7 +202,7 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
           style={{ width: `${(current / total) * 100}%` }}
         />
       </div>
-      <span className="evas-prog-text">
+      <span className="evas-prog-text" aria-live="polite">
         {current} of {total}
       </span>
     </div>
@@ -152,12 +214,26 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
    gated behind anything.
    ───────────────────────────────────────────────────────────────────────── */
 
-function BlueprintView({ slug, firstName }: { slug: BlueprintSlug; firstName: string }) {
+function BlueprintView({
+  slug,
+  firstName,
+  sectionRef,
+  headingRef,
+}: {
+  slug: BlueprintSlug
+  firstName: string
+  sectionRef: React.RefObject<HTMLElement | null>
+  headingRef: React.RefObject<HTMLHeadingElement | null>
+}) {
   const plan = blueprints[slug]
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [])
+  /* Deliberately no scroll here.
+
+     This used to call window.scrollTo({ top: 0 }), which threw the attendee to
+     the very top of the page — above the hero, the gifts section and the about
+     block — so the Blueprint they had just earned was several screens below
+     them and they had to hunt for it. The parent now scrolls this section to
+     the top of the viewport instead, which is where they actually want to be. */
 
   /* Same gate the consent wording uses. Unapproved copy must not reach an
      attendee, so the page says something true and useful instead of showing
@@ -165,8 +241,10 @@ function BlueprintView({ slug, firstName }: { slug: BlueprintSlug; firstName: st
      content/blueprints.ts once Surpaul signs off. */
   if (!BLUEPRINTS_APPROVED || plan.pending) {
     return (
-      <section className="evas evas-done">
-        <h3 className="evas-q">You&apos;re all set{firstName ? `, ${firstName}` : ''}</h3>
+      <section className="evas evas-done" ref={sectionRef}>
+        <h3 className="evas-q" ref={headingRef} tabIndex={-1}>
+          You&apos;re all set{firstName ? `, ${firstName}` : ''}
+        </h3>
         <p className="evas-lead">
           Your answers are saved. Your Blueprint is on its way to your phone
           shortly — a member of the team can talk you through it here in the
@@ -185,9 +263,11 @@ function BlueprintView({ slug, firstName }: { slug: BlueprintSlug; firstName: st
   }
 
   return (
-    <section className="evas evas-bp">
+    <section className="evas evas-bp" ref={sectionRef}>
       <span className="evas-eyebrow">Your Blueprint</span>
-      <h3 className="evas-bp-h">{plan.headline}</h3>
+      <h3 className="evas-bp-h" ref={headingRef} tabIndex={-1}>
+        {plan.headline}
+      </h3>
       <p className="evas-lead">{plan.intro}</p>
 
       <ol className="evas-steps">

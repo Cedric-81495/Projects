@@ -198,6 +198,10 @@ export function InterestForm() {
 
   return (
     <>
+      <p className="tag">{event.choose.step}</p>
+      <h2>{event.choose.h2}</h2>
+      <p className="evlede">{event.choose.lede}</p>
+
       <div className="evpicks">
         {INTERESTS.map(i => (
           <button

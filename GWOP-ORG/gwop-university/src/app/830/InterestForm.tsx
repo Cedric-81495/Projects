@@ -193,7 +193,13 @@ export function InterestForm() {
      picker and form rather than below them, so nobody scrolls back up and
      re-submits a form that has already succeeded. */
   if (captured) {
-    return <Assessment token={captured.token} firstName={captured.firstName} />
+    return (
+      <Assessment
+        token={captured.token}
+        firstName={captured.firstName}
+        initialInterest={choice?.value ?? INTEREST_FALLBACK}
+      />
+    )
   }
 
   return (

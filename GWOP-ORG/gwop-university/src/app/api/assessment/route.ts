@@ -11,6 +11,7 @@ import {
   EVENT_KEY,
   type AssessmentField,
 } from '@/config/assessment'
+import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -38,6 +39,11 @@ import {
 const AnswerBody = z.object({
   token: z.string().min(10),
   answers: z.record(z.string(), z.string().max(40)),
+  /* Q1 lives on `leads`, not here, because it is the interest field Jake's
+     workflow matches on. But an attendee correcting a mis-tap should be able to
+     reach it like any other answer, so this endpoint accepts it and updates the
+     lead. Sent only when they actually change it. */
+  interest: z.string().trim().max(60).optional(),
   /* Set when Q7 is answered. The client says so rather than us inferring it
      from a full row: someone may legitimately skip a question, and 'complete'
      should mean "reached the end", not "left nothing blank". */
@@ -97,6 +103,39 @@ export const POST = route(
       throw new ApiError(404, 'not_found', 'We could not find that signup. Please start again.')
     }
 
+    /* ── Q1, if they changed it ───────────────────────────────────────────
+       Written to `leads`, not `assessments`, because that column is what Jake's
+       workflow matches on and there must be exactly one source of truth for it.
+
+       Validated against the same INTERESTS list the buttons render from. A
+       value that was never on screen is dropped rather than rejected: this
+       arrives mid-flow at a booth, and refusing the whole request over a stale
+       option would cost the remaining answers too. */
+    let interest = lead.interest
+    if (body.interest && body.interest !== lead.interest) {
+      const known = INTERESTS.find((i) => i.value === body.interest)
+      const value = known?.value ?? (body.interest === INTEREST_FALLBACK ? INTEREST_FALLBACK : null)
+
+      if (value) {
+        const { error: leadUpdateError } = await admin
+          .from('leads')
+          .update({ interest: value, interest_tag: known?.tag ?? null })
+          .eq('id', leadId)
+
+        if (leadUpdateError) {
+          /* Not fatal. Their assessment answers still save and they still get a
+             roadmap — it just resolves against the interest we already had. */
+          logger.warn('assessment_interest_update_failed', {
+            requestId,
+            leadId,
+            message: leadUpdateError.message,
+          })
+        } else {
+          interest = value
+        }
+      }
+    }
+
     /* Read the row so a partial update can be merged before deciding the
        blueprint. Without this, answering Q7 first would resolve against an
        empty stage rather than the one they already gave. */
@@ -109,7 +148,7 @@ export const POST = route(
     const financialStage = clean.financial_stage ?? existing?.financial_stage ?? null
 
     const blueprintSlug = selectBlueprint({
-      interest: lead.interest,
+      interest,
       financial_stage: financialStage,
     })
 

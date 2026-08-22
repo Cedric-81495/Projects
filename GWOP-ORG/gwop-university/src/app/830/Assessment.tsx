@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ASSESSMENT_QUESTIONS, TOTAL_STEPS, type AssessmentField } from '@/config/assessment'
 import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/blueprints'
 import { event } from '@/content/event'
+import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    THE SEVEN QUESTIONS — Felicia, 2026-08-21.
@@ -33,13 +34,28 @@ interface Props {
   token: string
   /** Rendered above the first question so the handoff does not feel like a reset. */
   firstName: string
+  /** What they picked before the form, so step one shows it already selected. */
+  initialInterest: string
 }
 
 type Answers = Partial<Record<AssessmentField, string>>
 
-export function Assessment({ token, firstName }: Props) {
-  const [step, setStep] = useState(0)
+/* Step 0 is the interest question. Steps 1..6 are ASSESSMENT_QUESTIONS.
+
+   Q1 used to sit outside this component entirely, above the contact form, which
+   made it the one answer nobody could go back and change — and it is one of the
+   two that decides which roadmap someone gets. Mis-tap it and the Blueprint was
+   wrong with no way back short of starting again.
+
+   It still WRITES to leads.interest, because that is Jake's field. Only its
+   position in the flow moved. */
+const INTEREST_STEP = 0
+const firstQuestionStep = 1
+
+export function Assessment({ token, firstName, initialInterest }: Props) {
+  const [step, setStep] = useState(firstQuestionStep)
   const [answers, setAnswers] = useState<Answers>({})
+  const [interest, setInterest] = useState(initialInterest)
   const [blueprint, setBlueprint] = useState<BlueprintSlug | null>(null)
 
   /* ── WHY THIS EXISTS ──────────────────────────────────────────────────────
@@ -63,28 +79,53 @@ export function Assessment({ token, firstName }: Props) {
      ───────────────────────────────────────────────────────────────────────── */
   const sectionRef = useRef<HTMLElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
-  /* Skips the very first render. On submit the browser is already sitting on
-     the form, which is where this section is — scrolling then would be a jolt
-     with no purpose. */
   const mounted = useRef(false)
 
   useEffect(() => {
+    const heading = headingRef.current
+    if (!heading) return
+
     if (!mounted.current) {
       mounted.current = true
-      /* Focus without scrolling, so the first question is announced but the
-         view stays where the attendee left it. */
-      headingRef.current?.focus({ preventScroll: true })
+      /* Focus without scrolling. On submit the browser is already sitting on
+         the form, which is where this section is, so moving would be a jolt
+         with no purpose. */
+      heading.focus({ preventScroll: true })
       return
     }
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    sectionRef.current?.scrollIntoView({
-      behavior: reduced ? 'auto' : 'smooth',
-      block: 'start',
-    })
-    /* preventScroll, because scrollIntoView above is already doing it. Letting
-       focus() scroll as well produces a visible double-jump on iOS. */
-    headingRef.current?.focus({ preventScroll: true })
+    /* ── ONLY MOVE IF WE HAVE TO ────────────────────────────────────────────
+       This used to scroll on every single answer, which is the jumping. On a
+       phone the section usually fills most of the screen already, so the
+       question that replaces it is right where the attendee is looking —
+       scrolling then yanks the page for no reason, and it happens six times in
+       a row.
+
+       So: check where the heading actually is first. If it is already sitting
+       comfortably in view, change the content and leave the scroll position
+       completely alone. Only move when the new question would otherwise be off
+       screen or jammed against the very top or bottom.
+       ────────────────────────────────────────────────────────────────────── */
+    const rect = heading.getBoundingClientRect()
+    const viewport = window.innerHeight
+
+    /* The comfortable band: below the top edge, and inside the upper two
+       thirds. A heading in the bottom third is technically visible but the
+       options underneath it would not be, which is worse than scrolling. */
+    const comfortable = rect.top >= 0 && rect.top <= viewport * 0.6
+
+    if (!comfortable) {
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      sectionRef.current?.scrollIntoView({
+        behavior: reduced ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    }
+
+    /* preventScroll always. Either scrollIntoView is handling movement above,
+       or we deliberately decided not to move — and letting focus() scroll would
+       override that decision. */
+    heading.focus({ preventScroll: true })
   }, [step, blueprint])
 
   /* Answers that failed to save, replayed on the next successful call. Held in
@@ -93,13 +134,18 @@ export function Assessment({ token, firstName }: Props) {
   const unsaved = useRef<Answers>({})
 
   const post = useCallback(
-    async (patch: Answers, complete: boolean) => {
+    async (patch: Answers, complete: boolean, interestValue?: string) => {
       const payload = { ...unsaved.current, ...patch }
       try {
         const res = await fetch('/api/assessment', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ token, answers: payload, complete }),
+          body: JSON.stringify({
+            token,
+            answers: payload,
+            complete,
+            ...(interestValue ? { interest: interestValue } : {}),
+          }),
         })
         if (!res.ok) throw new Error(String(res.status))
         unsaved.current = {}
@@ -116,18 +162,57 @@ export function Assessment({ token, firstName }: Props) {
     [token],
   )
 
-  const question = ASSESSMENT_QUESTIONS[step]
-  const isLast = step === ASSESSMENT_QUESTIONS.length - 1
+  const onInterestStep = step === INTEREST_STEP
+  const question = onInterestStep ? null : ASSESSMENT_QUESTIONS[step - 1]
+  const isLast = step === ASSESSMENT_QUESTIONS.length
+
+  /* Once they have seen their Blueprint, re-answering a question should take
+     them straight back to it rather than marching them through the remaining
+     screens again. Held in a ref: it changes what happens next but nothing on
+     screen depends on it. */
+  const hasCompleted = useRef(false)
+
+  function goBack() {
+    if (blueprint) {
+      /* From the Blueprint, back lands on the last question rather than the
+         first. Someone who wants to change an earlier answer can keep tapping,
+         and someone who mis-tapped the final option — the most likely reason
+         to go back at all — is exactly where they need to be. */
+      setBlueprint(null)
+      setStep(ASSESSMENT_QUESTIONS.length)
+      return
+    }
+    setStep((s) => Math.max(INTEREST_STEP, s - 1))
+  }
+
+  /** Step one. Writes to the lead rather than the assessment row. */
+  async function answerInterest(value: string) {
+    setInterest(value)
+
+    const complete = hasCompleted.current
+    const slug = await post({}, complete, value)
+    if (complete) {
+      setBlueprint(slug ?? 'foundation')
+      return
+    }
+    setStep(firstQuestionStep)
+  }
 
   async function answer(field: AssessmentField, value: string | null) {
     const patch: Answers = value ? { [field]: value } : {}
     setAnswers((a) => ({ ...a, ...patch }))
 
-    if (isLast) {
+    /* Stays 'complete' once it has been. Someone revisiting an answer after
+       finishing has not un-finished the assessment, and flipping them back to
+       partial would put them in the wrong follow-up. */
+    const complete = isLast || hasCompleted.current
+
+    if (complete) {
+      hasCompleted.current = true
       const slug = await post(patch, true)
-      /* Falls back to the foundation roadmap if the final call failed. Everyone
-         who reaches the end sees something — a blank screen after seven
-         questions is the worst outcome available here. */
+      /* Falls back to the foundation roadmap if the call failed. Everyone who
+         reaches the end sees something — a blank screen after seven questions
+         is the worst outcome available here. */
       setBlueprint(slug ?? 'foundation')
       return
     }
@@ -140,6 +225,7 @@ export function Assessment({ token, firstName }: Props) {
     return (
       <BlueprintView
         slug={blueprint}
+        onBack={goBack}
         sectionRef={sectionRef}
         headingRef={headingRef}
       />
@@ -152,43 +238,74 @@ export function Assessment({ token, firstName }: Props) {
        Moving focus to the heading announces the new question by itself, and the
        progress counter below is the only thing that needs to speak on its own. */
     <section className="evas" ref={sectionRef}>
-      <ProgressBar current={step + 2} total={TOTAL_STEPS} />
+      <ProgressBar current={step + 1} total={TOTAL_STEPS} />
 
-      {step === 0 && (
+      {step === firstQuestionStep && (
         <p className="evas-lead">
-          Thanks{firstName ? `, ${firstName}` : ''} — you&apos;re saved. Six quick
-          questions and your Blueprint is ready.
+          Thanks{firstName ? `, ${firstName}` : ''} — you&apos;re saved. A few
+          quick questions and your Blueprint is ready.
         </p>
       )}
 
       {/* tabIndex -1 makes it focusable programmatically without adding it to
           the tab order. This is what a screen reader reads on each step. */}
       <h3 className="evas-q" ref={headingRef} tabIndex={-1}>
-        {question.prompt}
+        {onInterestStep ? event.choose.h2 : question!.prompt}
       </h3>
 
       <div className="evpicks">
-        {question.options.map((o) => (
-          <button
-            key={o.value}
-            type="button"
-            className="evpick"
-            aria-pressed={answers[question.field] === o.value}
-            onClick={() => void answer(question.field, o.value)}
-          >
-            <span className="dot" />
-            {o.label}
-          </button>
-        ))}
+        {onInterestStep
+          ? INTERESTS.map((i) => (
+              <button
+                key={i.value}
+                type="button"
+                className="evpick"
+                aria-pressed={interest === i.value}
+                onClick={() => void answerInterest(i.value)}
+              >
+                <span className="dot" />
+                {i.label}
+              </button>
+            ))
+          : question!.options.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                className="evpick"
+                aria-pressed={answers[question!.field] === o.value}
+                onClick={() => void answer(question!.field, o.value)}
+              >
+                <span className="dot" />
+                {o.label}
+              </button>
+            ))}
       </div>
 
-      <button
-        type="button"
-        className="evas-skip"
-        onClick={() => void answer(question.field, null)}
-      >
-        Skip this one
-      </button>
+      {/* Back and Skip sit together, both deliberately quiet. Neither is the
+          action we want, but both need to be findable without hunting —
+          someone who mis-tapped an option at a booth will otherwise just hand
+          the phone back. */}
+      <div className="evas-nav">
+        {step > INTEREST_STEP ? (
+          <button type="button" className="evas-back" onClick={goBack}>
+            ← Back
+          </button>
+        ) : (
+          <span />
+        )}
+
+        <button
+          type="button"
+          className="evas-skip"
+          onClick={() =>
+            onInterestStep
+              ? void answerInterest(INTEREST_FALLBACK)
+              : void answer(question!.field, null)
+          }
+        >
+          {onInterestStep ? event.choose.skip : 'Skip this one'}
+        </button>
+      </div>
     </section>
   )
 }
@@ -216,10 +333,12 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 function BlueprintView({
   slug,
+  onBack,
   sectionRef,
   headingRef,
 }: {
   slug: BlueprintSlug
+  onBack: () => void
   sectionRef: React.RefObject<HTMLElement | null>
   headingRef: React.RefObject<HTMLHeadingElement | null>
 }) {
@@ -269,6 +388,10 @@ function BlueprintView({
             </span>
           </p>
         )}
+
+        <button type="button" className="evas-back" onClick={onBack}>
+          ← Change an answer
+        </button>
       </section>
     )
   }
@@ -294,6 +417,12 @@ function BlueprintView({
       </ol>
 
       <p className="evas-close">{plan.closing}</p>
+
+      {/* Quiet, below the roadmap. Someone who realises they mis-tapped a
+          question should not have to start the whole thing again. */}
+      <button type="button" className="evas-back" onClick={onBack}>
+        ← Change an answer
+      </button>
 
       {/* CTA slot. Empty by design.
 

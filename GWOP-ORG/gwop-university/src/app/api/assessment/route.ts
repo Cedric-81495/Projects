@@ -141,9 +141,26 @@ export const POST = route(
        empty stage rather than the one they already gave. */
     const { data: existing } = await admin
       .from('assessments')
-      .select('financial_stage')
+      .select('financial_stage, status')
       .eq('lead_id', leadId)
-      .maybeSingle<{ financial_stage: string | null }>()
+      .maybeSingle<{ financial_stage: string | null; status: string }>()
+
+    /* ── SUBMITTED MEANS SUBMITTED ────────────────────────────────────────
+       The attendee reviews every answer and submits deliberately, and after
+       that the record is closed. Enforced here rather than only by hiding the
+       buttons, because the client is a page anyone in the room can reach from a
+       printed code — and because a record that can change after the fact is not
+       evidence of what someone actually told us.
+
+       It also protects the follow-up: once this forwards to GHL, a later edit
+       would mean the roadmap someone was sent no longer matches the row. */
+    if (existing?.status === 'complete') {
+      throw new ApiError(
+        409,
+        'conflict',
+        'Your answers are already submitted. Ask a staff member if something needs changing.',
+      )
+    }
 
     const financialStage = clean.financial_stage ?? existing?.financial_stage ?? null
 

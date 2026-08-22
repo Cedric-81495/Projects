@@ -1,7 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ASSESSMENT_QUESTIONS, TOTAL_STEPS, type AssessmentField } from '@/config/assessment'
+import {
+  ASSESSMENT_QUESTIONS,
+  TOTAL_STEPS,
+  labelFor,
+  type AssessmentField,
+} from '@/config/assessment'
 import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/blueprints'
 import { event } from '@/content/event'
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
@@ -52,6 +57,9 @@ type Answers = Partial<Record<AssessmentField, string>>
    position in the flow moved. */
 const INTEREST_STEP = 0
 const firstQuestionStep = 1
+/* One past the last question. Answers are reviewed here before anything is
+   submitted, and nothing is editable afterwards. */
+const REVIEW_STEP = ASSESSMENT_QUESTIONS.length + 1
 
 export function Assessment({ token, firstName, initialInterest }: Props) {
   const [step, setStep] = useState(firstQuestionStep)
@@ -172,75 +180,142 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
 
   const onInterestStep = step === INTEREST_STEP
   const question = onInterestStep ? null : ASSESSMENT_QUESTIONS[step - 1]
-  const isLast = step === ASSESSMENT_QUESTIONS.length
+  const onReview = step === REVIEW_STEP
 
-  /* Once they have seen their Blueprint, re-answering a question should take
-     them straight back to it rather than marching them through the remaining
-     screens again. Held in a ref: it changes what happens next but nothing on
-     screen depends on it. */
-  const hasCompleted = useRef(false)
+  /* True while correcting a single answer from the review screen, so answering
+     it returns there instead of continuing forwards. A ref because it changes
+     what happens next, not what is on screen. */
+  const cameFromReview = useRef(false)
 
   function goBack() {
-    if (blueprint) {
-      /* From the Blueprint, back lands on the last question rather than the
-         first. Someone who wants to change an earlier answer can keep tapping,
-         and someone who mis-tapped the final option — the most likely reason
-         to go back at all — is exactly where they need to be. */
-      setBlueprint(null)
-      setStep(ASSESSMENT_QUESTIONS.length)
-      return
-    }
     setStep((s) => Math.max(INTEREST_STEP, s - 1))
+  }
+
+  /** Jump straight to one answer from the review screen. */
+  function editStep(target: number) {
+    setStep(target)
   }
 
   /** Step one. Writes to the lead rather than the assessment row. */
   async function answerInterest(value: string) {
     setInterest(value)
-
-    const complete = hasCompleted.current
-    if (complete) setBuilding(true)
-    const slug = await post({}, complete, value)
-    if (complete) {
-      setBuilding(false)
-      setBlueprint(slug ?? 'foundation')
-      return
-    }
-    setStep(firstQuestionStep)
+    void post({}, false, value)
+    /* Straight back to review if that is where they came from, so correcting
+       one answer does not march them through the other six again. */
+    setStep(cameFromReview.current ? REVIEW_STEP : firstQuestionStep)
+    cameFromReview.current = false
   }
 
   async function answer(field: AssessmentField, value: string | null) {
     const patch: Answers = value ? { [field]: value } : {}
     setAnswers((a) => ({ ...a, ...patch }))
 
-    /* Stays 'complete' once it has been. Someone revisiting an answer after
-       finishing has not un-finished the assessment, and flipping them back to
-       partial would put them in the wrong follow-up. */
-    const complete = isLast || hasCompleted.current
+    /* Saved as they go, but never marked complete here. Completion is a
+       separate, deliberate act on the review screen — see submit(). Saving
+       early still means an abandoned assessment keeps whatever they gave us. */
+    void post(patch, false)
 
-    if (complete) {
-      hasCompleted.current = true
-      setBuilding(true)
-      const slug = await post(patch, true)
-      setBuilding(false)
-      /* Falls back to the foundation roadmap if the call failed. Everyone who
-         reaches the end sees something — a blank screen after seven questions
-         is the worst outcome available here. */
-      setBlueprint(slug ?? 'foundation')
+    if (cameFromReview.current) {
+      cameFromReview.current = false
+      setStep(REVIEW_STEP)
       return
     }
-
-    void post(patch, false)
     setStep((s) => s + 1)
+  }
+
+  /** The one irreversible action in the flow. */
+  async function submit() {
+    setBuilding(true)
+    const slug = await post({}, true)
+    setBuilding(false)
+    /* Falls back to the foundation roadmap if the call failed. Everyone who
+       reaches the end sees something — a blank screen after seven questions is
+       the worst outcome available here. */
+    setBlueprint(slug ?? 'foundation')
   }
 
   if (blueprint) {
     return (
       <BlueprintView
         slug={blueprint}
-        onBack={goBack}
         sectionRef={sectionRef}
         headingRef={headingRef}
       />
+    )
+  }
+
+  /* ── REVIEW ───────────────────────────────────────────────────────────────
+     Everything they told us, in one place, before anything is final.
+
+     This exists because the last tap used to submit immediately — no pause, no
+     chance to notice a mis-tap on the question that had just gone past. At a
+     table with a queue that is exactly when it happens. It also means the
+     record we keep is one the attendee actually looked at and agreed to, rather
+     than a series of taps.
+
+     After submitting, none of it is editable. That is enforced on the server as
+     well, not just by hiding the buttons here — see /api/assessment. */
+  if (onReview && !building) {
+    const rows = [
+      {
+        step: INTEREST_STEP,
+        prompt: event.choose.h2,
+        answer:
+          INTERESTS.find((i) => i.value === interest)?.label ??
+          (interest === INTEREST_FALLBACK ? 'Not sure yet' : null),
+      },
+      ...ASSESSMENT_QUESTIONS.map((q, i) => ({
+        step: i + 1,
+        prompt: q.prompt,
+        answer: labelFor(q.field, answers[q.field] ?? null),
+      })),
+    ]
+
+    return (
+      <section className="evas evas-review" ref={sectionRef}>
+        <span className="evas-eyebrow">Last step</span>
+        <h3 className="evas-q" ref={headingRef} tabIndex={-1}>
+          Check your answers
+        </h3>
+        <p className="evas-lead">
+          Tap any line to change it. Once you get your Blueprint these are
+          locked in.
+        </p>
+
+        <ul className="evas-review-list">
+          {rows.map((r) => (
+            <li key={r.step}>
+              <button
+                type="button"
+                className="evas-review-row"
+                onClick={() => {
+                  cameFromReview.current = true
+                  editStep(r.step)
+                }}
+              >
+                <span className="evas-review-q">{r.prompt}</span>
+                <span className={r.answer ? 'evas-review-a' : 'evas-review-a is-empty'}>
+                  {r.answer ?? 'Skipped'}
+                </span>
+                <span className="evas-review-edit" aria-hidden="true">
+                  Change
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <button type="button" className="btn btn-e evas-submit" onClick={() => void submit()}>
+          Get my Blueprint
+        </button>
+
+        <div className="evas-nav evas-nav-single">
+          <button type="button" className="evas-back" onClick={goBack}>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
+            Back
+          </button>
+        </div>
+      </section>
     )
   }
 
@@ -359,12 +434,10 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 function BlueprintView({
   slug,
-  onBack,
   sectionRef,
   headingRef,
 }: {
   slug: BlueprintSlug
-  onBack: () => void
   sectionRef: React.RefObject<HTMLElement | null>
   headingRef: React.RefObject<HTMLHeadingElement | null>
 }) {
@@ -415,10 +488,6 @@ function BlueprintView({
           </p>
         )}
 
-        <button type="button" className="evas-back" onClick={onBack}>
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
-          Change an answer
-        </button>
       </section>
     )
   }
@@ -445,12 +514,6 @@ function BlueprintView({
 
       <p className="evas-close">{plan.closing}</p>
 
-      {/* Quiet, below the roadmap. Someone who realises they mis-tapped a
-          question should not have to start the whole thing again. */}
-      <button type="button" className="evas-back" onClick={onBack}>
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
-        Change an answer
-      </button>
 
       {/* CTA slot. Empty by design.
 

@@ -11,6 +11,7 @@ import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/b
 import { event } from '@/content/event'
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 import { identityiq } from '@/config/identityiq'
+import { teaser } from '@/config/teaser'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    THE SEVEN QUESTIONS — Felicia, 2026-08-21.
@@ -412,6 +413,66 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
   )
 }
 
+/* ── BLUEPRINT TEASER ──────────────────────────────────────────────────────
+   Between the roadmap and the IdentityIQ card, per Felicia's sequence.
+
+   Never autoplays and never preloads. At a booth, a video that starts talking
+   by itself is startling in a quiet moment and inaudible in a loud one, and
+   preloading spends an attendee's data on something they may not watch. They
+   tap it if they want it.
+   ───────────────────────────────────────────────────────────────────────── */
+function Teaser() {
+  const ready = !teaser.pending && teaser.src
+
+  /* Nothing at all for attendees until there is a file. An empty frame reads as
+     broken, which is worse than an absence nobody notices. */
+  if (!ready) {
+    if (process.env.NODE_ENV === 'production') return null
+    return (
+      <div className="evas-teaser">
+        <div className="evas-teaser-ph" role="status">
+          <b>Blueprint teaser video</b>
+          <span>
+            Placeholder — nothing renders here for attendees until a file exists.
+            Add the URL to <code>src</code> in <code>config/teaser.ts</code> and
+            set <code>pending: false</code>. An .mp4 on our own domain needs no
+            other change; a Bunny embed also needs <code>frame-src</code> in{' '}
+            <code>next.config.ts</code>.
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  const isFile = teaser.src.endsWith('.mp4')
+
+  return (
+    <div className="evas-teaser">
+      <h4>{teaser.heading}</h4>
+      <div className="evas-teaser-frame">
+        {isFile ? (
+          <video
+            controls
+            playsInline
+            preload="none"
+            poster={teaser.poster || undefined}
+            src={teaser.src}
+          />
+        ) : (
+          <iframe
+            src={teaser.src}
+            title={teaser.heading}
+            loading="lazy"
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+          />
+        )}
+      </div>
+      {teaser.caption && <p className="evas-teaser-cap">{teaser.caption}</p>}
+    </div>
+  )
+}
+
 /* ── OPTIONAL NEXT STEP ────────────────────────────────────────────────────
    Sits AFTER the Blueprint, as a visually separate card.
 
@@ -518,6 +579,7 @@ function BlueprintView({
         <p className="evas-bp-h">{event.thanks.h2}</p>
         <p className="evas-lead">{event.thanks.lede}</p>
 
+        <Teaser />
         <NextStep />
 
         {/* Development only. A note to whoever is building, not to an attendee —
@@ -562,8 +624,8 @@ function BlueprintView({
 
       <p className="evas-close">{plan.closing}</p>
 
+      <Teaser />
       <NextStep />
-
 
       {/* CTA slot. Empty by design.
 

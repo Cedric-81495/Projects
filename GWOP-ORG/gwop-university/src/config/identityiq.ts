@@ -27,6 +27,36 @@ export const identityiq = {
   eyebrow: 'Optional next step',
   heading: 'Know what your report actually says',
 
+  /* ── BLUEPRINT TEASER VIDEO ─────────────────────────────────────────────
+     A short piece from Surpaul, above the CTA, framing why reading your report
+     first matters. Held open until the file exists.
+
+     `pending: true` means nothing renders to an attendee — same protection the
+     Blueprint copy and the consent wording use. An empty player, a broken
+     frame or a spinner that never resolves is worse than no video at all,
+     particularly on venue cellular where a heavy embed competes with the
+     signups happening at the same table.
+
+     TO SWITCH ON:
+       1. Upload to Bunny, take the video ID from the dashboard
+       2. Put it in `bunnyId` below and set `pending: false`
+       3. Add https://iframe.mediadelivery.net to `frame-src` in next.config.ts
+          — the CSP blocks it otherwise, and it will fail silently with only a
+          console error to show for it
+       4. Watch it once on a phone on cellular before the event
+
+     Unsigned embed, deliberately. The module player uses signed Bunny tokens
+     because that content is paid; this is public marketing and a token would
+     add a round trip for nothing. */
+  video: {
+    pending: true,
+    bunnyId: '',
+    title: 'A quick word from Surpaul',
+    /* Under the player. Gives someone a reason to press play rather than
+       scroll past it. */
+    caption: '',
+  },
+
   /* No claims, no outcomes, no numbers. Says why it is a sensible next move
      without promising what happens if they take it. */
   body:

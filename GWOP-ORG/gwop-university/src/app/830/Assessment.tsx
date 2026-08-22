@@ -245,19 +245,31 @@ function BlueprintView({
         <h3 className="evas-q" ref={headingRef} tabIndex={-1}>
           You&apos;re all set{firstName ? `, ${firstName}` : ''}
         </h3>
+        {/* Says only what is actually true. The previous wording promised the
+            Blueprint was "on its way to your phone shortly", which nothing
+            currently sends — a booth is the worst possible place to make a
+            promise the system cannot keep, because the person is standing in
+            front of the staff member who will hear about it. */}
         <p className="evas-lead">
-          Your answers are saved. Your Blueprint is on its way to your phone
-          shortly — a member of the team can talk you through it here in the
-          meantime.
+          Thanks — your answers are saved. Grab one of the team and they&apos;ll
+          walk you through where to start.
         </p>
-        <p className="evph" role="status">
-          <b>Blueprint copy awaiting approval</b>
-          <span>
-            The roadmaps are drafted and the flow is live. They stay hidden until
-            Surpaul signs the wording off, so draft copy cannot reach an attendee.
-            Clear <code>pending</code> in <code>content/blueprints.ts</code>.
-          </span>
-        </p>
+
+        {/* Development only. This is a note to whoever is building, not to an
+            attendee, and it was appearing on the deployed preview where testers
+            and the client could see it. Referring someone to a filename is not
+            a user interface. */}
+        {process.env.NODE_ENV !== 'production' && (
+          <p className="evph" role="status">
+            <b>Blueprint copy awaiting approval</b>
+            <span>
+              The roadmaps are drafted and the flow is live. They stay hidden
+              until Surpaul signs the wording off, so draft copy cannot reach an
+              attendee. Clear <code>pending</code> in{' '}
+              <code>content/blueprints.ts</code>.
+            </span>
+          </p>
+        )}
       </section>
     )
   }

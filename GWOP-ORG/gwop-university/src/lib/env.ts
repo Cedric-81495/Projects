@@ -63,6 +63,16 @@ const serverSchema = z.object({
   // Scheduled jobs
   CRON_SECRET: z.string().min(32),
 
+  /* Signs the short-lived token that lets a browser attach assessment answers
+     to the lead it just created. SERVER ONLY.
+
+     Falls back to CRON_SECRET rather than being required, so the assessment
+     flow runs on every existing deployment without a new variable having to
+     reach Vercel first — one less thing to be missing at 9am on the 30th. Set
+     it properly in production; rotating it only invalidates in-flight tokens,
+     which expire in an hour anyway. */
+  ASSESSMENT_TOKEN_SECRET: z.string().min(32).optional(),
+
   // Storage
   MODULE_BUCKET: z.string().default('course-materials'),
   SIGNED_URL_TTL_SECONDS: z.coerce.number().int().min(60).max(3600).default(900),

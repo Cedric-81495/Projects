@@ -7,6 +7,7 @@ import { admin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/observability/logger'
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 import { syncLeadToGhl } from '@/lib/ghl/sync'
+import { mintAssessmentToken } from '@/lib/assessment/token'
 import parsePhoneNumber from 'libphonenumber-js'
 
 /**
@@ -169,6 +170,11 @@ export const POST = route(
       })
     })
 
-    return { id: lead.id }
+    /* The token is what lets this browser attach assessment answers to the lead
+       it just created. Minted here rather than derived client-side for the
+       obvious reason: anything the client can construct, anyone can construct,
+       and this endpoint is behind a QR code handed to several hundred people.
+       See lib/assessment/token.ts. */
+    return { id: lead.id, assessment_token: mintAssessmentToken(lead.id) }
   },
 )

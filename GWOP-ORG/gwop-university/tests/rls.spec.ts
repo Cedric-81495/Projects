@@ -44,6 +44,34 @@ describe('anonymous access', () => {
     expect(data ?? []).toHaveLength(0)
   })
 
+  /* Both tables hold the personal details of several hundred attendees, and
+     the page that writes to them is behind a code printed on a card and handed
+     out in a public room. Anon must not read them, and — the one people forget
+     — must not WRITE them either. An anon insert policy is the obvious
+     shortcut when the endpoint feels awkward, and it would let anyone in the
+     room fill the table. */
+  it('cannot read or write leads', async () => {
+    const read = await anon.from('leads').select('id').limit(1)
+    expect(read.data ?? []).toHaveLength(0)
+
+    const write = await anon.from('leads').insert({
+      first_name: 'Anon', email: 'anon@example.test', phone: '+15550000000',
+      consent_given: false, consent_text: 'x',
+    })
+    expect(write.error).toBeTruthy()
+  })
+
+  it('cannot read or write assessments', async () => {
+    const read = await anon.from('assessments').select('id').limit(1)
+    expect(read.data ?? []).toHaveLength(0)
+
+    const write = await anon.from('assessments').insert({
+      lead_id: '00000000-0000-0000-0000-000000000000',
+      financial_stage: 'building',
+    })
+    expect(write.error).toBeTruthy()
+  })
+
   it('cannot read enrollments, payments or audit records', async () => {
     for (const table of ['enrollments', 'payment_references', 'audit_records', 'stripe_events']) {
       const { data } = await anon.from(table).select('*')

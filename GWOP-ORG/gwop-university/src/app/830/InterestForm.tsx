@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import Script from 'next/script'
 import { AsYouType, isValidPhoneNumber } from 'libphonenumber-js'
 import { event } from '@/content/event'
+import { Assessment } from './Assessment'
 import { publicEnv } from '@/lib/env.public'
 import {
   GHL_FORM_URL, INTERESTS, INTEREST_FALLBACK, QR_CODES, CAMPAIGN_PARAMS,
@@ -163,6 +164,14 @@ export function InterestForm() {
   const [choice, setChoice] = useState<Choice | null>(null)
   const [iframeSrc, setIframeSrc] = useState<string | null>(null)
 
+  /* Set once the lead is saved. From here the seven questions take over this
+     page — see Assessment.tsx for why it stays on the same page load. */
+  const [captured, setCaptured] = useState<{ token: string; firstName: string } | null>(null)
+
+  function onCaptured(token: string, firstName: string) {
+    setCaptured({ token, firstName })
+  }
+
   function choose(value: string, label: string, tag: string) {
     setChoice({ value, label, tag })
     if (MODE !== 'iframe') return
@@ -178,6 +187,13 @@ export function InterestForm() {
     } catch {
       setIframeSrc(null)
     }
+  }
+
+  /* The lead is saved and the questions take the page. Rendered instead of the
+     picker and form rather than below them, so nobody scrolls back up and
+     re-submits a form that has already succeeded. */
+  if (captured) {
+    return <Assessment token={captured.token} firstName={captured.firstName} />
   }
 
   return (
@@ -218,7 +234,7 @@ export function InterestForm() {
 
           {MODE === 'iframe'
             ? <IframeFallback src={iframeSrc} />
-            : <NativeForm choice={choice} />}
+            : <NativeForm choice={choice} onCaptured={onCaptured} />}
         </div>
       )}
     </>
@@ -249,7 +265,13 @@ function IframeFallback({ src }: { src: string | null }) {
 
 type FieldErrors = Partial<Record<'first_name' | 'email' | 'phone', string>>
 
-function NativeForm({ choice }: { choice: Choice }) {
+function NativeForm({
+  choice,
+  onCaptured,
+}: {
+  choice: Choice
+  onCaptured: (token: string, firstName: string) => void
+}) {
   const [pending, setPending] = useState(false)
   const [done, setDone] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
@@ -360,11 +382,34 @@ function NativeForm({ choice }: { choice: Choice }) {
         throw new Error(body?.error?.message ?? 'Something went wrong. Please try again.')
       }
 
-      /* Full navigation, not a client-side push: the thank-you page must render
-         even if this component's JS has since failed, and a hard load is what
-         guarantees the attendee sees confirmation. */
+      /* CHANGED 2026-08-22, Felicia's beta-assessment brief.
+         Was: hard navigation to /thanks.
+         Now: the lead is saved, so the attendee is safe, and the seven
+         questions run on this page.
+
+         Staying put is the point. A navigation here would reload /830, which is
+         where the third-party chat widget gets a second chance to inject its
+         own copy of Turnstile — the failure that 422s every submission. It also
+         costs a round trip on venue cellular between capture and question one,
+         which is exactly where someone hands the phone back.
+
+         /thanks still exists and is still the destination if anything below
+         fails to mount. */
+      const payload = (await res.json().catch(() => null)) as
+        | { data?: { id?: string; assessment_token?: string } }
+        | null
+
+      const token = payload?.data?.assessment_token
+      if (!token) {
+        /* Lead is saved either way — this only means we cannot attach answers
+           to it. Confirmation beats a broken assessment. */
+        setDone(true)
+        window.location.assign('/thanks')
+        return
+      }
+
       setDone(true)
-      window.location.assign('/thanks')
+      onCaptured(token, String(fd.get('first_name') ?? '').trim())
     } catch (err: unknown) {
       setPending(false)
       setFormError(describeFailure(err))

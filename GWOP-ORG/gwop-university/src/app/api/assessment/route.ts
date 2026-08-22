@@ -1,0 +1,153 @@
+import { z } from 'zod'
+import { route } from '@/lib/http/handler'
+import { ApiError } from '@/lib/http/errors'
+import { admin } from '@/lib/supabase/admin'
+import { logger } from '@/lib/observability/logger'
+import { readAssessmentToken } from '@/lib/assessment/token'
+import { selectBlueprint } from '@/config/blueprint'
+import {
+  ALLOWED_ANSWERS,
+  ASSESSMENT_FIELDS,
+  EVENT_KEY,
+  type AssessmentField,
+} from '@/config/assessment'
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * POST /api/assessment — the seven-question needs assessment.
+ *
+ * CALLED ONCE PER ANSWER, not once at the end. That is the design, and it is
+ * the reason someone can lock their phone at question five, reopen it, and
+ * carry on. A single submission at the end would mean a dropped connection
+ * halfway costs every answer they gave.
+ *
+ * It also means a partial row is normal. Contact is already captured by
+ * /api/lead before the first question appears, so somebody who walks away at
+ * Q4 is a lead we can still follow up, with four answers attached, rather than
+ * a scan that went nowhere.
+ *
+ * AUTHORISATION is the signed token from /api/lead, never a raw lead id. This
+ * endpoint is reachable from a code printed on a card and handed to strangers.
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+/* Answers validated against the same config that renders the buttons, so the
+   two cannot disagree. Unknown field names are rejected outright rather than
+   silently dropped — a typo in a field name should be loud in testing, not a
+   column that quietly stays null for four hundred people. */
+const AnswerBody = z.object({
+  token: z.string().min(10),
+  answers: z.record(z.string(), z.string().max(40)),
+  /* Set when Q7 is answered. The client says so rather than us inferring it
+     from a full row: someone may legitimately skip a question, and 'complete'
+     should mean "reached the end", not "left nothing blank". */
+  complete: z.boolean().optional().default(false),
+})
+
+export const POST = route(
+  {
+    auth: 'public',
+    /* Same generous shape as the lead limit and for the same reason: every
+       attendee at the booth shares one venue IP. This route is called six or
+       seven times per person, so it needs headroom the lead route does not.
+       Reuses the 'lead' rule rather than adding one that would also have to be
+       tuned — the failure mode of a strict limit here is the assessment
+       silently refusing to save halfway through, which nobody would notice
+       until the data came back thin. */
+    limit: 'lead',
+    limitByUser: false,
+    body: AnswerBody,
+  },
+  async ({ body, requestId }) => {
+    const leadId = readAssessmentToken(body.token)
+    if (!leadId) {
+      /* Deliberately vague, and deliberately not a 401 — there is no login here
+         to retry. The attendee-facing consequence is that answers stop saving,
+         so the message tells staff what to do rather than describing a token. */
+      throw new ApiError(
+        400,
+        'validation_failed',
+        'This session has expired. Ask a staff member and they will start you again.',
+      )
+    }
+
+    // ── Keep only answers that were actually on screen ────────────────────
+    const clean: Partial<Record<AssessmentField, string>> = {}
+    for (const [field, value] of Object.entries(body.answers)) {
+      if (!ASSESSMENT_FIELDS.includes(field as AssessmentField)) {
+        throw new ApiError(400, 'validation_failed', 'Unrecognised answer.')
+      }
+      const allowed = ALLOWED_ANSWERS[field as AssessmentField]
+      if (!allowed.has(value)) {
+        throw new ApiError(400, 'validation_failed', 'Unrecognised answer.')
+      }
+      clean[field as AssessmentField] = value
+    }
+
+    /* Q1 lives on the lead, so the blueprint needs both sides. Read it here
+       rather than trusting the client to send back what it was given. */
+    const { data: lead, error: leadErr } = await admin
+      .from('leads')
+      .select('id, interest')
+      .eq('id', leadId)
+      .single<{ id: string; interest: string | null }>()
+
+    if (leadErr || !lead) {
+      logger.error('assessment_lead_missing', { requestId, leadId, message: leadErr?.message })
+      throw new ApiError(404, 'not_found', 'We could not find that signup. Please start again.')
+    }
+
+    /* Read the row so a partial update can be merged before deciding the
+       blueprint. Without this, answering Q7 first would resolve against an
+       empty stage rather than the one they already gave. */
+    const { data: existing } = await admin
+      .from('assessments')
+      .select('financial_stage')
+      .eq('lead_id', leadId)
+      .maybeSingle<{ financial_stage: string | null }>()
+
+    const financialStage = clean.financial_stage ?? existing?.financial_stage ?? null
+
+    const blueprintSlug = selectBlueprint({
+      interest: lead.interest,
+      financial_stage: financialStage,
+    })
+
+    /* Upsert on lead_id. Idempotent by construction: a retry after a dropped
+       connection rewrites the same answer rather than creating a second row,
+       which matters because the client retries automatically on a bad signal. */
+    const { error } = await admin
+      .from('assessments')
+      .upsert(
+        {
+          lead_id: leadId,
+          ...clean,
+          blueprint_slug: blueprintSlug,
+          event_key: EVENT_KEY,
+          status: body.complete ? 'complete' : 'partial',
+          ...(body.complete ? { completed_at: new Date().toISOString() } : {}),
+        },
+        { onConflict: 'lead_id' },
+      )
+
+    if (error) {
+      logger.error('assessment_write_failed', { requestId, leadId, message: error.message })
+      throw new ApiError(
+        503,
+        'upstream_unavailable',
+        'We could not save that just now. Tap again in a moment.',
+      )
+    }
+
+    if (body.complete) {
+      logger.info('assessment_completed', { requestId, leadId, blueprintSlug })
+      /* Forwarding the completed assessment to GHL goes here once Jake confirms
+         whether he wants a second webhook or a single payload at the end. Left
+         unwired deliberately: guessing would mean either contacts updated by a
+         workflow that is not expecting it, or abandoned assessments never
+         reaching him at all. See GHL-SETUP-FOR-JAKE.md §1. */
+    }
+
+    return { blueprint: blueprintSlug }
+  },
+)

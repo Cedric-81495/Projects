@@ -1130,3 +1130,41 @@ body>section:only-of-type{display:grid;align-content:center}
      it sits under. */
   display:inline-block;padding:3px 0;
 }
+/* ── ASSESSMENT (Felicia's beta brief, 2026-08-22) ─────────────────────────
+   Reuses .evpicks / .evpick for the options, so tap targets and spacing stay
+   identical to the interest step. Only the surrounding furniture is new. */
+.evas{max-width:640px;margin:0 auto;padding:4px 0 8px}
+.evas-lead{color:var(--muted);margin:0 0 18px;line-height:1.55}
+.evas-q{font-family:var(--display);font-size:clamp(20px,5vw,26px);line-height:1.25;
+  margin:0 0 16px;color:var(--forest)}
+.evas-eyebrow{display:inline-block;font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold-ink);margin-bottom:8px}
+
+/* Progress. Sits above the question because a booth attendee decides whether
+   to continue before reading it, not after. */
+.evas-prog{display:flex;align-items:center;gap:10px;margin:0 0 18px}
+.evas-prog-track{flex:1;height:6px;background:var(--stone);border-radius:999px;overflow:hidden}
+.evas-prog-fill{height:100%;background:var(--emerald);border-radius:999px;
+  transition:width .25s ease}
+@media (prefers-reduced-motion:reduce){.evas-prog-fill{transition:none}}
+.evas-prog-text{flex:none;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* Always visible, never styled as the primary action. An honest skip is better
+   data than a guessed answer. */
+.evas-skip{display:block;margin:16px auto 0;background:none;border:0;
+  color:var(--muted);font-size:14px;text-decoration:underline;
+  text-underline-offset:3px;padding:10px 16px;min-height:44px;cursor:pointer}
+.evas-skip:hover{color:var(--forest)}
+
+/* Blueprint */
+.evas-bp-h{font-family:var(--display);font-size:clamp(22px,5.5vw,30px);line-height:1.2;
+  margin:0 0 12px;color:var(--forest)}
+.evas-steps{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:16px}
+.evas-steps li{display:flex;gap:14px;align-items:flex-start}
+.evas-step-n{flex:none;width:30px;height:30px;border-radius:50%;
+  background:var(--emerald);color:var(--white);display:grid;place-items:center;
+  font-size:14px;font-weight:600}
+.evas-steps b{display:block;color:var(--forest);margin-bottom:4px}
+.evas-steps p{margin:0;color:var(--muted);font-size:15px;line-height:1.5}
+.evas-close{margin:24px 0 0;padding-top:18px;border-top:1px solid var(--stone);
+  color:var(--muted);font-style:italic}

@@ -10,6 +10,7 @@ import {
 import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/blueprints'
 import { event } from '@/content/event'
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
+import { identityiq } from '@/config/identityiq'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    THE SEVEN QUESTIONS — Felicia, 2026-08-21.
@@ -411,6 +412,51 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
   )
 }
 
+/* ── OPTIONAL NEXT STEP ────────────────────────────────────────────────────
+   Sits AFTER the Blueprint, as a visually separate card.
+
+   Not before it and not inside it, deliberately. The Blueprint is what was
+   promised free; anything between the attendee and that promise makes the free
+   thing feel conditional, which is the one thing Felicia said it must not be.
+   By the time this appears the promise has already been kept, so it reads as a
+   suggestion rather than a toll.
+
+   The same card shows to everyone. Surfacing it harder for people who answered
+   "Don't Know" on their credit range is tempting — it is genuinely the right
+   advice for them — but aiming a paid credit product at the people least sure
+   of their position is exactly the thing that reads badly in hindsight.
+   ───────────────────────────────────────────────────────────────────────── */
+function NextStep() {
+  if (!identityiq.enabled) return null
+
+  return (
+    <aside className="evas-next" aria-labelledby="evas-next-h">
+      <span className="evas-eyebrow">{identityiq.eyebrow}</span>
+      <h4 id="evas-next-h">{identityiq.heading}</h4>
+      <p>{identityiq.body}</p>
+
+      {/* Cost before the disclosure, and both before the button. Someone who
+          taps without reading has still walked past the price. */}
+      <p className="evas-next-cost">{identityiq.cost}</p>
+      <p className="evas-next-disclosure">{identityiq.disclosure}</p>
+
+      <a
+        className="btn btn-e evas-next-cta"
+        href={identityiq.href}
+        target="_blank"
+        /* sponsored: this is a paid affiliate link and search engines are
+           entitled to know. noopener: never hand a third-party tab a handle on
+           ours. */
+        rel="sponsored noopener noreferrer"
+      >
+        {identityiq.cta}
+      </a>
+
+      <p className="evas-next-note">{identityiq.reassurance}</p>
+    </aside>
+  )
+}
+
 function ProgressBar({ current, total }: { current: number; total: number }) {
   return (
     <div className="evas-prog">
@@ -472,6 +518,8 @@ function BlueprintView({
         <p className="evas-bp-h">{event.thanks.h2}</p>
         <p className="evas-lead">{event.thanks.lede}</p>
 
+        <NextStep />
+
         {/* Development only. A note to whoever is building, not to an attendee —
             it was appearing on the deployed preview where testers and the client
             could see it. Referring someone to a filename is not a user
@@ -513,6 +561,8 @@ function BlueprintView({
       </ol>
 
       <p className="evas-close">{plan.closing}</p>
+
+      <NextStep />
 
 
       {/* CTA slot. Empty by design.

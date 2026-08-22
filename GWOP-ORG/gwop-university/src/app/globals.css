@@ -1273,3 +1273,26 @@ body>section:only-of-type{display:grid;align-content:center}
 /* Back sits alone under the submit button here, so it needs the row to stop
    stretching it across the full width. */
 .evas-nav-single{justify-content:center}
+
+/* ── OPTIONAL NEXT STEP (IdentityIQ) ───────────────────────────────────────
+   Visually separated from the Blueprint above it. The rule and the tinted
+   panel both exist to say "this is a different thing" — an affiliate offer
+   that looked like part of the roadmap would be the roadmap recommending a
+   paid product, which is not what it does. */
+.evas-next{margin-top:32px;padding-top:28px;border-top:2px solid var(--stone)}
+.evas-next h4{font-family:var(--display);font-size:20px;line-height:1.3;
+  margin:6px 0 10px;color:var(--forest)}
+.evas-next p{margin:0 0 12px;color:var(--muted);font-size:15px;line-height:1.55}
+
+/* Cost and disclosure sit in a tinted block so they read as terms rather than
+   as more sales copy — and so neither can be mistaken for decoration. Both are
+   full-contrast body text, not small grey print. */
+.evas-next-cost,.evas-next-disclosure{background:var(--ivory);
+  border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.5;
+  color:var(--ink)}
+.evas-next-cost{margin-bottom:8px;font-weight:600}
+.evas-next-disclosure{margin-bottom:16px}
+
+.evas-next-cta{display:block;width:100%;text-align:center}
+.evas-next-note{margin:12px 0 0;text-align:center;font-size:14px;
+  color:var(--muted)}

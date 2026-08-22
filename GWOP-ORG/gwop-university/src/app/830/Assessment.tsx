@@ -40,6 +40,7 @@ interface Props {
 
 type Answers = Partial<Record<AssessmentField, string>>
 
+
 /* Step 0 is the interest question. Steps 1..6 are ASSESSMENT_QUESTIONS.
 
    Q1 used to sit outside this component entirely, above the contact form, which
@@ -57,6 +58,13 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
   const [answers, setAnswers] = useState<Answers>({})
   const [interest, setInterest] = useState(initialInterest)
   const [blueprint, setBlueprint] = useState<BlueprintSlug | null>(null)
+  /* Covers the gap between the last tap and the roadmap appearing. Every other
+     answer is optimistic — the screen advances immediately and the save happens
+     behind it — but the final one genuinely has to wait, because the answer
+     decides which Blueprint comes back. On venue cellular that can be a couple
+     of seconds, and a screen that does nothing after a tap is a screen someone
+     taps again. */
+  const [building, setBuilding] = useState(false)
 
   /* ── WHY THIS EXISTS ──────────────────────────────────────────────────────
      The assessment replaces the form in place, and the form sits a long way
@@ -190,8 +198,10 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
     setInterest(value)
 
     const complete = hasCompleted.current
+    if (complete) setBuilding(true)
     const slug = await post({}, complete, value)
     if (complete) {
+      setBuilding(false)
       setBlueprint(slug ?? 'foundation')
       return
     }
@@ -209,7 +219,9 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
 
     if (complete) {
       hasCompleted.current = true
+      setBuilding(true)
       const slug = await post(patch, true)
+      setBuilding(false)
       /* Falls back to the foundation roadmap if the call failed. Everyone who
          reaches the end sees something — a blank screen after seven questions
          is the worst outcome available here. */
@@ -229,6 +241,19 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
         sectionRef={sectionRef}
         headingRef={headingRef}
       />
+    )
+  }
+
+  if (building) {
+    return (
+      <section className="evas evas-building" ref={sectionRef}>
+        <div className="evas-spin" aria-hidden="true">
+          <span /><span /><span />
+        </div>
+        <p className="evas-lead" role="status">
+          Building your Blueprint&hellip;
+        </p>
+      </section>
     )
   }
 
@@ -288,7 +313,8 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
       <div className="evas-nav">
         {step > INTEREST_STEP ? (
           <button type="button" className="evas-back" onClick={goBack}>
-            ← Back
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
+            Back
           </button>
         ) : (
           <span />
@@ -390,7 +416,8 @@ function BlueprintView({
         )}
 
         <button type="button" className="evas-back" onClick={onBack}>
-          ← Change an answer
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
+          Change an answer
         </button>
       </section>
     )
@@ -421,7 +448,8 @@ function BlueprintView({
       {/* Quiet, below the roadmap. Someone who realises they mis-tapped a
           question should not have to start the whole thing again. */}
       <button type="button" className="evas-back" onClick={onBack}>
-        ← Change an answer
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
+        Change an answer
       </button>
 
       {/* CTA slot. Empty by design.

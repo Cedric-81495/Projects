@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ASSESSMENT_QUESTIONS, TOTAL_STEPS, type AssessmentField } from '@/config/assessment'
 import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/blueprints'
+import { event } from '@/content/event'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    THE SEVEN QUESTIONS — Felicia, 2026-08-21.
@@ -139,7 +140,6 @@ export function Assessment({ token, firstName }: Props) {
     return (
       <BlueprintView
         slug={blueprint}
-        firstName={firstName}
         sectionRef={sectionRef}
         headingRef={headingRef}
       />
@@ -216,12 +216,10 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 function BlueprintView({
   slug,
-  firstName,
   sectionRef,
   headingRef,
 }: {
   slug: BlueprintSlug
-  firstName: string
   sectionRef: React.RefObject<HTMLElement | null>
   headingRef: React.RefObject<HTMLHeadingElement | null>
 }) {
@@ -242,23 +240,24 @@ function BlueprintView({
   if (!BLUEPRINTS_APPROVED || plan.pending) {
     return (
       <section className="evas evas-done" ref={sectionRef}>
-        <h3 className="evas-q" ref={headingRef} tabIndex={-1}>
-          You&apos;re all set{firstName ? `, ${firstName}` : ''}
-        </h3>
-        {/* Says only what is actually true. The previous wording promised the
-            Blueprint was "on its way to your phone shortly", which nothing
-            currently sends — a booth is the worst possible place to make a
-            promise the system cannot keep, because the person is standing in
-            front of the staff member who will hear about it. */}
-        <p className="evas-lead">
-          Thanks — your answers are saved. Grab one of the team and they&apos;ll
-          walk you through where to start.
-        </p>
+        {/* Felicia §11 prescribes this exact hierarchy — "YOU'RE IN." then
+            "Your GWOP Blueprint starts here." then confirm delivery. Pulled
+            from content/event.ts rather than retyped, so this screen and
+            /thanks can never drift apart and a reword lands in both at once.
 
-        {/* Development only. This is a note to whoever is building, not to an
-            attendee, and it was appearing on the deployed preview where testers
-            and the client could see it. Referring someone to a filename is not
-            a user interface. */}
+            The delivery line is a promise Jake's automation has to keep. If his
+            follow-up does not actually send a Blueprint, this sentence is the
+            first thing that will be wrong at the booth. */}
+        <h3 className="evas-q" ref={headingRef} tabIndex={-1}>
+          {event.thanks.h1}
+        </h3>
+        <p className="evas-bp-h">{event.thanks.h2}</p>
+        <p className="evas-lead">{event.thanks.lede}</p>
+
+        {/* Development only. A note to whoever is building, not to an attendee —
+            it was appearing on the deployed preview where testers and the client
+            could see it. Referring someone to a filename is not a user
+            interface. */}
         {process.env.NODE_ENV !== 'production' && (
           <p className="evph" role="status">
             <b>Blueprint copy awaiting approval</b>

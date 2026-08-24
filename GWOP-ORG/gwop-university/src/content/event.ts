@@ -84,17 +84,19 @@ export const event = {
   },
 
   choose: {
-    /* Was 'Step 1 of 2', which was true when the flow was pick-then-form. With
-       seven questions and a review screen it understated the journey, and a
-       label that says two when it means seven is worse than no label. */
-    step: '60 seconds · 7 questions',
+    /* ⚠ Says two; the flow is now seven questions plus a review screen. Left
+       exactly as it was because nobody has approved replacement wording — not
+       a change to make unilaterally. Flagged with Felicia. */
+    step: 'Step 1 of 2',
     h2: 'What do you want help with?',
     lede: 'Pick one and we’ll send the right blueprint.',
     skip: 'Not sure yet — just sign me up',
   },
 
   form: {
-    step: 'Your details',
+    /* ⚠ Same as above — the count no longer matches the flow. Unchanged
+       pending approved wording. */
+    step: 'Step 2 of 2 — your details',
     note: 'Takes under a minute.',
     submit: 'Send my blueprint',
   },

@@ -45,23 +45,6 @@ export interface Blueprint {
   readonly path: string
 }
 
-/**
- * Q7 in their own words, shown under "What's Holding You Back".
- *
- * Six lines reused across all nine roadmaps rather than written into each one —
- * that would be fifty-four pieces of copy to approve instead of fifteen, for a
- * difference nobody would notice. This is what makes the section feel like it
- * was written after reading their answers, because it was.
- */
-export const blockerNote: Record<string, string> = {
-  debt: 'You told us debt is the thing in the way. That usually means the order matters more than the effort — which debt, in what sequence, and what to leave alone while you work.',
-  credit: 'You told us credit is the thing in the way. The useful news is that credit responds to structure more reliably than almost anything else in your finances.',
-  income: 'You told us income is the constraint. That changes the sequence rather than the destination — the foundation work still comes first, it just moves at the pace it can.',
-  knowledge: 'You told us it is knowledge. That is the most fixable one on the list, and it is the reason GWOP University exists in the form it does.',
-  consistency: 'You told us consistency is the hard part. Nearly everyone says this eventually. Systems beat willpower here, and the smaller the first step the better.',
-  unsure: 'You told us you are not sure where to start. That is a real answer rather than a gap — and it means the first move below matters more than the other two.',
-}
-
 export const blueprints = {
   foundation: {
     pending: true,

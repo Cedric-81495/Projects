@@ -7,12 +7,7 @@ import {
   labelFor,
   type AssessmentField,
 } from '@/config/assessment'
-import {
-  blueprints,
-  blockerNote,
-  BLUEPRINTS_APPROVED,
-  type BlueprintSlug,
-} from '@/content/blueprints'
+import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/blueprints'
 import { event } from '@/content/event'
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 import { identityiq } from '@/config/identityiq'
@@ -247,7 +242,6 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
         slug={blueprint}
         interest={interest}
         creditRange={answers.credit_range ?? null}
-        blockerKey={answers.biggest_blocker ?? null}
         sectionRef={sectionRef}
         headingRef={headingRef}
       />
@@ -574,19 +568,16 @@ function BlueprintView({
   slug,
   interest,
   creditRange,
-  blockerKey,
   sectionRef,
   headingRef,
 }: {
   slug: BlueprintSlug
   interest: string
   creditRange: string | null
-  blockerKey: string | null
   sectionRef: React.RefObject<HTMLElement | null>
   headingRef: React.RefObject<HTMLHeadingElement | null>
 }) {
   const plan = blueprints[slug]
-  const blocker = blockerKey ? blockerNote[blockerKey] : null
 
   /* Deliberately no scroll here.
 
@@ -658,9 +649,6 @@ function BlueprintView({
       <div className="evas-sec">
         <h4>What&apos;s Holding You Back</h4>
         <p>{plan.holdingYouBack}</p>
-        {/* Their own Q7 answer, reflected back. This is the line that makes the
-            page feel written for them rather than selected for them. */}
-        {blocker && <p className="evas-sec-you">{blocker}</p>}
       </div>
 
       <div className="evas-sec">

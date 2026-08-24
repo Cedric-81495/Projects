@@ -45,16 +45,12 @@ export default function EventPage() {
           {/* Felicia §2 supporting copy */}
           <p className="evsupport">{event.support}</p>
 
-          {/* Felicia, 2026-08-22 — the offer stated plainly, directly above the
-              button. Simple front end, personalised behind it: the attendee
-              never learns there are nine roadmap versions, only that seven
-              questions produce one written for them. */}
-          <p className="evoffer">
-            <b>{event.offer.badge}</b>
-            <span>{event.offer.line}</span>
-          </p>
+          {/* Felicia, 2026-08-22 — her wording, verbatim. Reuses .evkw and
+              .evsupport, the existing hero text styles. No new styling. */}
+          <p className="evkw">{event.offer.badge}</p>
+          <p className="evsupport">{event.offer.line}</p>
 
-          <a className="btn btn-e" href="#choose" style={{ marginTop: 18 }}>
+          <a className="btn btn-e" href="#choose" style={{ marginTop: 26 }}>
             {event.cta}
           </a>
 

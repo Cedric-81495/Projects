@@ -1328,25 +1328,8 @@ body>section:only-of-type{display:grid;align-content:center}
   text-transform:uppercase;color:var(--gold-ink);margin:0 0 10px}
 .evas-sec > p{margin:0;color:var(--ink);font-size:16px;line-height:1.6}
 
-/* Their own answer reflected back. Tinted so it reads as "this is about you"
-   rather than as more of the same paragraph. */
-.evas-sec-you{margin:12px 0 0;padding:12px 14px;background:var(--emerald-lt);
-  border-radius:10px;font-size:15px;line-height:1.55;color:var(--forest)}
-
-/* What NOT to do. Warmer border so it reads as caution rather than another
-   list of tasks — it is the section people skim past otherwise. */
-.evas-sec-not{padding:18px;background:var(--ivory);border-radius:var(--r);
-  border-left:3px solid var(--gold)}
-.evas-sec-not h4{margin-top:0}
 .evas-not{list-style:none;margin:0;padding:0;display:grid;gap:14px}
 .evas-not b{display:block;color:var(--forest);margin-bottom:3px}
 .evas-not p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.5}
 
-/* ── THE OFFER, STATED PLAINLY ─────────────────────────────────────────────
-   Sits between the supporting copy and the button, inside the dark hero card.
-   Deliberately not styled as a badge or a pill — it is the promise, not
-   decoration, and at a booth it is the line a staff member points at. */
-.evoffer{margin:22px 0 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.16)}
-.evoffer b{display:block;font-family:var(--display);font-size:15px;
-  letter-spacing:.06em;color:var(--gold-lt);margin-bottom:4px}
-.evoffer span{display:block;font-size:15px;line-height:1.5;color:rgba(255,255,255,.85)}
+

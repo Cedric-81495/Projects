@@ -7,7 +7,12 @@ import {
   labelFor,
   type AssessmentField,
 } from '@/config/assessment'
-import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/blueprints'
+import {
+  blueprints,
+  blockerNote,
+  BLUEPRINTS_APPROVED,
+  type BlueprintSlug,
+} from '@/content/blueprints'
 import { event } from '@/content/event'
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 import { identityiq } from '@/config/identityiq'
@@ -240,6 +245,9 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
     return (
       <BlueprintView
         slug={blueprint}
+        interest={interest}
+        creditRange={answers.credit_range ?? null}
+        blockerKey={answers.biggest_blocker ?? null}
         sectionRef={sectionRef}
         headingRef={headingRef}
       />
@@ -487,8 +495,31 @@ function Teaser() {
    advice for them — but aiming a paid credit product at the people least sure
    of their position is exactly the thing that reads badly in hindsight.
    ───────────────────────────────────────────────────────────────────────── */
-function NextStep() {
+function NextStep({
+  interest,
+  creditRange,
+}: {
+  interest: string
+  creditRange: string | null
+}) {
   if (!identityiq.enabled) return null
+
+  /* ── SHOWN WHEN IT FITS, NOT TO EVERYONE ────────────────────────────────
+     Felicia, 2026-08-22: don't force every person into this simply because
+     they finished the assessment. It should follow from their path.
+
+     So it appears when credit is genuinely part of what they came for:
+     they picked a credit or funding goal, or they told us they don't know
+     their range — in which case reading the report IS the honest first move
+     and this stops being an ad.
+
+     It does NOT appear for someone focused on wealth or business who already
+     knows their position. For them it is an unrelated paid product attached
+     to a free gift, which is exactly the thing that erodes trust in the free
+     gift. */
+  const creditIsTheirTopic = interest === 'credit' || interest === 'funding'
+  const doesNotKnowRange = creditRange === 'unknown' || creditRange === null
+  if (!creditIsTheirTopic && !doesNotKnowRange) return null
 
   return (
     <aside className="evas-next" aria-labelledby="evas-next-h">
@@ -541,14 +572,21 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 
 function BlueprintView({
   slug,
+  interest,
+  creditRange,
+  blockerKey,
   sectionRef,
   headingRef,
 }: {
   slug: BlueprintSlug
+  interest: string
+  creditRange: string | null
+  blockerKey: string | null
   sectionRef: React.RefObject<HTMLElement | null>
   headingRef: React.RefObject<HTMLHeadingElement | null>
 }) {
   const plan = blueprints[slug]
+  const blocker = blockerKey ? blockerNote[blockerKey] : null
 
   /* Deliberately no scroll here.
 
@@ -580,7 +618,7 @@ function BlueprintView({
         <p className="evas-lead">{event.thanks.lede}</p>
 
         <Teaser />
-        <NextStep />
+        <NextStep interest={interest} creditRange={creditRange} />
 
         {/* Development only. A note to whoever is building, not to an attendee —
             it was appearing on the deployed preview where testers and the client
@@ -604,40 +642,64 @@ function BlueprintView({
 
   return (
     <section className="evas evas-bp" ref={sectionRef}>
-      <span className="evas-eyebrow">Your Blueprint</span>
+      <span className="evas-eyebrow">Your GWOP Blueprint</span>
       <h3 className="evas-bp-h" ref={headingRef} tabIndex={-1}>
         {plan.headline}
       </h3>
-      <p className="evas-lead">{plan.intro}</p>
 
-      <ol className="evas-steps">
-        {plan.steps.map((s, i) => (
-          <li key={s.title}>
-            <span className="evas-step-n">{i + 1}</span>
-            <div>
-              <b>{s.title}</b>
-              <p>{s.detail}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+      {/* Five sections, same five every time, in the same order. The
+          consistency is the product: an attendee comparing notes with the
+          person beside them should recognise the same shape. */}
+      <div className="evas-sec">
+        <h4>Where You Are</h4>
+        <p>{plan.whereYouAre}</p>
+      </div>
 
-      <p className="evas-close">{plan.closing}</p>
+      <div className="evas-sec">
+        <h4>What&apos;s Holding You Back</h4>
+        <p>{plan.holdingYouBack}</p>
+        {/* Their own Q7 answer, reflected back. This is the line that makes the
+            page feel written for them rather than selected for them. */}
+        {blocker && <p className="evas-sec-you">{blocker}</p>}
+      </div>
+
+      <div className="evas-sec">
+        <h4>Your Next 3 Moves</h4>
+        <ol className="evas-steps">
+          {plan.nextMoves.map((m, i) => (
+            <li key={m.title}>
+              <span className="evas-step-n">{i + 1}</span>
+              <div>
+                <b>{m.title}</b>
+                <p>{m.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* The section nobody else gives them. Telling someone what to leave
+          alone is worth as much as telling them what to do, and it is what
+          stops them spending money badly between now and the next step. */}
+      <div className="evas-sec evas-sec-not">
+        <h4>What NOT to Do Yet</h4>
+        <ul className="evas-not">
+          {plan.notYet.map((n) => (
+            <li key={n.title}>
+              <b>{n.title}</b>
+              <p>{n.detail}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="evas-sec">
+        <h4>Your GWOP Path</h4>
+        <p>{plan.path}</p>
+      </div>
 
       <Teaser />
-      <NextStep />
-
-      {/* CTA slot. Empty by design.
-
-          IdentityIQ is proposed but the flow around it is not settled — the
-          3:01am message describes a version with no assessment and calls this
-          page a teaser, which contradicts the brief this was built from.
-          Wiring is twenty minutes once confirmed.
-
-          Whatever lands here: the disclosure goes directly above the button,
-          not in a footer, and the price is stated. IdentityIQ has no free tier
-          and no trial. Someone handed something free by people they trust will
-          tap a button assuming the next thing is free too. */}
+      <NextStep interest={interest} creditRange={creditRange} />
     </section>
   )
 }

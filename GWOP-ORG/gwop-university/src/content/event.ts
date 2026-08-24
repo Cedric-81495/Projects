@@ -31,6 +31,22 @@ export const event = {
 
   cta: 'Start your blueprint',
 
+  /* Felicia, 2026-08-22: "keep the offer extremely simple — FREE GWOP
+     BLUEPRINT™ / 60 seconds. 7 questions. Your next financial moves."
+
+     Added BENEATH the prescribed headline rather than replacing it. Two
+     reasons: h1a/h1b are marked DO NOT REWORD from the Visual Build Package,
+     and `signage.headline` below carries the same words to Maui's print run —
+     changing one without the other would put the table sign and the screen out
+     of step days before it prints.
+
+     ⚠ The ™ asserts a trademark claim. Worth confirming before print; it is
+     the kind of symbol that is easy to add and awkward to walk back. */
+  offer: {
+    badge: 'FREE GWOP BLUEPRINT™',
+    line: '60 seconds. 7 questions. Your next financial moves.',
+  },
+
   /* Felicia §2: "For QR/event signage, we can also use: SCAN TO START."
      Single approved source for Maui's print run — signage and screen must not
      drift apart. Maui pulls the wording from here, not from a chat message. */
@@ -68,14 +84,17 @@ export const event = {
   },
 
   choose: {
-    step: 'Step 1 of 2',
+    /* Was 'Step 1 of 2', which was true when the flow was pick-then-form. With
+       seven questions and a review screen it understated the journey, and a
+       label that says two when it means seven is worse than no label. */
+    step: '60 seconds · 7 questions',
     h2: 'What do you want help with?',
     lede: 'Pick one and we’ll send the right blueprint.',
     skip: 'Not sure yet — just sign me up',
   },
 
   form: {
-    step: 'Step 2 of 2 — your details',
+    step: 'Your details',
     note: 'Takes under a minute.',
     submit: 'Send my blueprint',
   },

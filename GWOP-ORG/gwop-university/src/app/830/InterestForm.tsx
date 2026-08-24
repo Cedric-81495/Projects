@@ -194,16 +194,33 @@ export function InterestForm() {
      re-submits a form that has already succeeded. */
   if (captured) {
     return (
-      <Assessment
-        token={captured.token}
-        firstName={captured.firstName}
-        initialInterest={choice?.value ?? INTEREST_FALLBACK}
-      />
+      <div className="evstage">
+        <Assessment
+          token={captured.token}
+          firstName={captured.firstName}
+          initialInterest={choice?.value ?? INTEREST_FALLBACK}
+        />
+      </div>
     )
   }
 
+  /* ── ONE STAGE, MANY STATES ──────────────────────────────────────────────
+     Everything interactive lives inside .evstage: the picker, the form, the
+     seven questions, the review and the Blueprint.
+
+     Why it is one element rather than several siblings — the form is roughly
+     twice the height of a question screen, so when it was replaced the whole
+     page collapsed by a few hundred pixels. The pathway section below jumped
+     up, the attendee's scroll position was suddenly pointing at different
+     content, and the next question landed off the top of the viewport. They
+     had scrolled nowhere; the page moved underneath them.
+
+     The stage holds a floor height, so a shorter state cannot pull the page
+     up. The top edge stays where it is, which means the attendee stays looking
+     at the same place for the whole flow. Taller states still grow downward —
+     that is fine, because everything they care about is anchored at the top. */
   return (
-    <>
+    <div className="evstage">
       <p className="tag">{event.choose.step}</p>
       <h2>{event.choose.h2}</h2>
       <p className="evlede">{event.choose.lede}</p>
@@ -247,7 +264,7 @@ export function InterestForm() {
             : <NativeForm choice={choice} onCaptured={onCaptured} />}
         </div>
       )}
-    </>
+    </div>
   )
 }
 

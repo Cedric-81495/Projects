@@ -1333,3 +1333,22 @@ body>section:only-of-type{display:grid;align-content:center}
 .evas-not p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.5}
 
 
+
+/* ── THE STAGE ─────────────────────────────────────────────────────────────
+   Holds every state of the flow: picker, form, questions, review, Blueprint.
+
+   The floor height is the whole point. The contact form is the tallest of the
+   early states, so without it the page collapsed by a few hundred pixels the
+   moment the form was replaced by a question — the section below jumped up and
+   the attendee was suddenly looking at different content without having
+   scrolled. Setting a minimum keeps the top edge fixed, so they stay put.
+
+   Sized to the form rather than to the tallest state overall: the Blueprint is
+   much taller and is allowed to grow downward, which costs nothing because
+   everything the attendee reads is anchored at the top of the stage. */
+.evstage{min-height:560px}
+@media (min-width:700px){.evstage{min-height:520px}}
+
+/* Breathing room when a state does need scrolling into view, so the heading
+   is not flush against the top edge of the screen. */
+.evstage{scroll-margin-top:20px}

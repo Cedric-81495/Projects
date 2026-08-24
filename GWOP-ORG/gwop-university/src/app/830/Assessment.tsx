@@ -124,7 +124,11 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
        completely alone. Only move when the new question would otherwise be off
        screen or jammed against the very top or bottom.
        ────────────────────────────────────────────────────────────────────── */
-    const rect = heading.getBoundingClientRect()
+    /* Measured against the stage, not the heading, so every state anchors to
+       the same point on the page. Anchoring to the heading meant the anchor
+       moved whenever a state had a different amount above it. */
+    const stage = sectionRef.current?.closest('.evstage') ?? sectionRef.current
+    const rect = (stage ?? heading).getBoundingClientRect()
     const viewport = window.innerHeight
 
     /* The comfortable band: below the top edge, and inside the upper two
@@ -134,7 +138,7 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
 
     if (!comfortable) {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      sectionRef.current?.scrollIntoView({
+      ;(stage ?? sectionRef.current)?.scrollIntoView({
         behavior: reduced ? 'auto' : 'smooth',
         block: 'start',
       })

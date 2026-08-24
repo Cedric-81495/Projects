@@ -60,6 +60,13 @@ const serverSchema = z.object({
      write-first + forward design on 2026-08-18. See ARCHITECTURE.md §14.1. */
   GHL_WEBHOOK_URL: z.string().url().optional(),
 
+  /* Jake's SECOND inbound webhook, supplied 2026-08-25 — the assessment
+     answers, posted when the attendee submits the review screen. Separate from
+     the lead webhook because the contact reaches him about a minute earlier,
+     before the answers exist. Optional for the same reason as the first: the
+     flow ships and is testable without it. */
+  GHL_ASSESSMENT_WEBHOOK_URL: z.string().url().optional(),
+
   // Scheduled jobs
   CRON_SECRET: z.string().min(32),
 

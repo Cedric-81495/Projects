@@ -3,6 +3,7 @@ import { route } from '@/lib/http/handler'
 import { ApiError } from '@/lib/http/errors'
 import { admin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/observability/logger'
+import { syncAssessmentToGhl } from '@/lib/ghl/sync-assessment'
 import { readAssessmentToken } from '@/lib/assessment/token'
 import { selectBlueprint } from '@/config/blueprint'
 import {
@@ -197,11 +198,21 @@ export const POST = route(
 
     if (body.complete) {
       logger.info('assessment_completed', { requestId, leadId, blueprintSlug })
-      /* Forwarding the completed assessment to GHL goes here once Jake confirms
-         whether he wants a second webhook or a single payload at the end. Left
-         unwired deliberately: guessing would mean either contacts updated by a
-         workflow that is not expecting it, or abandoned assessments never
-         reaching him at all. See GHL-SETUP-FOR-JAKE.md §1. */
+      /* Jake chose the two-webhook approach on 2026-08-25, so the answers
+         forward here — separately from the contact, which reached him about a
+         minute ago when the form was submitted.
+
+         Not awaited, exactly like the lead forward. The attendee is already
+         looking at their Blueprint; a slow or failing CRM must never be
+         something they wait on. Failures are recorded on the row and retried
+         rather than surfaced. */
+      void syncAssessmentToGhl(leadId).catch((err: unknown) => {
+        logger.error('assessment_sync_threw', {
+          requestId,
+          leadId,
+          message: err instanceof Error ? err.message : String(err),
+        })
+      })
     }
 
     return { blueprint: blueprintSlug }

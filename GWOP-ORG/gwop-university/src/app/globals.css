@@ -1352,3 +1352,10 @@ body>section:only-of-type{display:grid;align-content:center}
 /* Breathing room when a state does need scrolling into view, so the heading
    is not flush against the top edge of the screen. */
 .evstage{scroll-margin-top:20px}
+
+/* Footer items shown but not navigable — the Pathway levels and Student area
+   on pages an attendee can reach mid-signup. Visible so the page still reads
+   as the real site; inert so nothing leads to a login wall they have no
+   account for. Not a disabled button: no pointer, no hover, nothing to tap
+   twice at. */
+.navoff{color:var(--muted);opacity:.55;cursor:default;user-select:none}

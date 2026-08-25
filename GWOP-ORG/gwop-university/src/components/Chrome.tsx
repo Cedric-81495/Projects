@@ -87,7 +87,15 @@ export function BrandBar({ linked = true }: { linked?: boolean }) {
   )
 }
 
-export function Footer() {
+export function Footer({ legalOnly = false }: { legalOnly?: boolean }) {
+  /* `legalOnly` is for pages an attendee can reach mid-signup: the three legal
+     pages linked from the /830 form. They must stay readable — the consent
+     wording depends on them — but every other route out of them is a way to
+     lose a signup, and the Pathway and Student area links all lead to a login
+     wall the attendee has no account for.
+
+     Same reasoning as `BrandBar linked={false}`: on the event path, every
+     tappable thing that is not the form is a lost lead. */
   return (
     <footer>
       <div className="wrap">
@@ -121,17 +129,34 @@ export function Footer() {
             <h4>Pathway</h4>
             <ul>
               {PATHWAY.map(l => (
-                <li key={l.slug}><Link href={`/app/${l.slug}`}>{l.label}</Link></li>
+                <li key={l.slug}>
+                  {/* On legalOnly pages the levels stay VISIBLE but are not
+                      links. An attendee reads a legal page mid-signup; these
+                      all lead to a login wall they have no account for, and
+                      every tappable thing that is not the form is a lost lead.
+                      Shown rather than removed so the page still reads as the
+                      real site. */}
+                  {legalOnly
+                    ? <span className="navoff">{l.label}</span>
+                    : <Link href={`/app/${l.slug}`}>{l.label}</Link>}
+                </li>
               ))}
             </ul>
           </div>
           <div>
             <h4>University</h4>
             <ul>
-              <li><Link href="/app">Student area</Link></li>
+              <li>
+                {legalOnly
+                  ? <span className="navoff">Student area</span>
+                  : <Link href="/app">Student area</Link>}
+              </li>
               {/* Plain <a> for the same reason as the hero CTA in Pathway.tsx:
                   a client-side navigation carries injected third-party DOM onto
-                  /830, where no third-party script may run. */}
+                  /830, where no third-party script may run.
+
+                  Kept even when legalOnly: it is the way back to the form for
+                  an attendee who opened a legal page mid-signup. */}
               <li><a href={EVENT_PATH}>Get started</a></li>
             </ul>
           </div>

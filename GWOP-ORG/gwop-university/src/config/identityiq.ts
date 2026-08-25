@@ -22,7 +22,7 @@ export const identityiq = {
 
      ⚠ Nobody has confirmed this resolves and registers against his account.
      A silently dead affiliate link is money we would never know we lost. */
-  href: 'https://www.identityiq.com/sc-securepreferred.aspx?offercode=431291D8',
+  href: 'https://www.identityiq.com/sc-securepreferred.aspx?offercode=43129179',
 
   eyebrow: 'Optional next step',
   heading: 'Know what your report actually says',
@@ -65,15 +65,20 @@ export const identityiq = {
     + 'and it changes what you should do next.',
 
   /* ⚠ THE LINE THAT MATTERS MOST.
-     IdentityIQ has no free tier and no free trial — every plan is a paid
-     monthly subscription. This card follows the word "free" on the same screen,
-     so somebody handed something free by people they trust will tap the button
-     assuming the next thing is free too, and land on a payment page.
-     Stating the cost is not optional caution; it is the difference between an
-     offer and a surprise. */
+     Verified against the live page on 2026-08-25: a flat $27.99/month, no
+     trial. B had IdentityIQ remove the $1/7-day trial from the affiliate offer
+     and supplied a new offer code the same day.
+
+     Stating the figure matters because this card follows the word "free" on the
+     same screen. Somebody handed something free by people they trust will tap
+     the button assuming the next thing is free too. The price is the difference
+     between an offer and a surprise.
+
+     ⚠ If the offer code ever changes again, OPEN THE PAGE and check this
+     number. It has already changed once. */
   cost:
-    'IdentityIQ is a paid monthly subscription — there is no free tier or trial. '
-    + 'They are a separate company with their own terms and pricing.',
+    'IdentityIQ costs $27.99 per month. They are a separate company with their '
+    + 'own terms and pricing.',
 
   /* Felicia's wording, verbatim.
 

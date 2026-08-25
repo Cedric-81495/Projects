@@ -8,6 +8,7 @@ import { logger } from '@/lib/observability/logger'
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 import { syncLeadToGhl } from '@/lib/ghl/sync'
 import { mintAssessmentToken } from '@/lib/assessment/token'
+import { waitUntil } from '@vercel/functions'
 import parsePhoneNumber from 'libphonenumber-js'
 
 /**
@@ -162,13 +163,25 @@ export const POST = route(
        Deliberately not awaited into the response. A failure here leaves the
        row 'pending' and the retry cron collects it. No-ops until Jake's
        webhook URL is configured, so this ships before he replies. */
-    void syncLeadToGhl(lead.id).catch((err: unknown) => {
+    /* waitUntil, NOT a bare `void`.
+
+       On serverless the instance can be frozen the moment the response is
+       returned, and any promise still in flight is simply discarded — no error,
+       no log, no attempt. We caught this on 2026-08-25: a completed assessment
+       showed sync_attempts = 0 with last_error NULL, because the forward never
+       ran at all. It had appeared to work in testing only because the instance
+       sometimes stayed warm long enough.
+
+       waitUntil tells the platform to keep the instance alive until this
+       settles, while still returning the response immediately. The attendee
+       waits for nothing; the forward actually happens. */
+    waitUntil(syncLeadToGhl(lead.id).catch((err: unknown) => {
       logger.warn('lead_sync_deferred', {
         requestId,
         leadId: lead.id,
         message: err instanceof Error ? err.message : String(err),
       })
-    })
+    }))
 
     /* The token is what lets this browser attach assessment answers to the lead
        it just created. Minted here rather than derived client-side for the

@@ -4,6 +4,7 @@ import { ApiError } from '@/lib/http/errors'
 import { admin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/observability/logger'
 import { syncAssessmentToGhl } from '@/lib/ghl/sync-assessment'
+import { waitUntil } from '@vercel/functions'
 import { readAssessmentToken } from '@/lib/assessment/token'
 import { selectBlueprint } from '@/config/blueprint'
 import {
@@ -206,13 +207,16 @@ export const POST = route(
          looking at their Blueprint; a slow or failing CRM must never be
          something they wait on. Failures are recorded on the row and retried
          rather than surfaced. */
-      void syncAssessmentToGhl(leadId).catch((err: unknown) => {
+      /* waitUntil, not a bare `void` — see the same note in /api/lead. A
+         discarded promise here means the answers silently never reach Jake,
+         with no error anywhere to say so. */
+      waitUntil(syncAssessmentToGhl(leadId).catch((err: unknown) => {
         logger.error('assessment_sync_threw', {
           requestId,
           leadId,
           message: err instanceof Error ? err.message : String(err),
         })
-      })
+      }))
     }
 
     return { blueprint: blueprintSlug }

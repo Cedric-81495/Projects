@@ -1,23 +1,33 @@
 /**
- * THE ROADMAP COPY.
+ * THE BLUEPRINT ROADMAPS.
  *
- * ⚠ DRAFT — NOT APPROVED. Every version below is `pending: true`, which means
- * the Blueprint page will not render it to an attendee. Same mechanism the
- * consent wording uses: unapproved text cannot reach a real person by accident.
+ * ✅ APPROVED — Felicia, 2026-08-25. This is her Condensed Event Version,
+ * applied verbatim. She reviewed all nine, kept the five-section structure and
+ * the nine paths as built, and rewrote the copy shorter for someone reading on
+ * a phone immediately after finishing the assessment.
  *
- * These are drafted from the language already approved in the About GWOP deck —
- * "a step-by-step strategy to understand credit, build structure, and stop
- * guessing" — so Surpaul is editing rather than authoring, which is usually the
- * difference between copy landing on time and not.
+ * Do not lengthen these. The brevity is the point — an attendee is standing at
+ * a table with a queue behind them, not sitting down to read.
  *
- * ── RULES THAT ARE NOT STYLE PREFERENCES ─────────────────────────────────────
- * No score numbers. No funding amounts. No timelines. No guarantees. Nothing
- * that reads as a promise about an outcome. This is a credit-adjacent business
- * speaking to people in financial difficulty, and a sentence like "raise your
- * score 80 points" is a claim someone can be held to.
+ * ── STRUCTURE (Felicia, 2026-08-22) ─────────────────────────────────────────
+ * Every roadmap answers the same five things in the same order:
+ *   1. Where You Are
+ *   2. What's Holding You Back
+ *   3. Your Next 3 Moves
+ *   4. What NOT to Do Yet
+ *   5. Your GWOP Path
  *
- * Say what to DO, not what will HAPPEN.
- * ─────────────────────────────────────────────────────────────────────────────
+ * The consistency is the product. Section four is the one nobody else gives
+ * them — telling someone what to leave alone is worth as much as telling them
+ * what to do.
+ *
+ * ── THE FRONT END STAYS SIMPLE ──────────────────────────────────────────────
+ * Nine versions exist; the attendee never learns that.
+ *
+ * ── RULES THAT ARE NOT STYLE PREFERENCES ────────────────────────────────────
+ * No score numbers. No funding amounts. No timelines. No guarantees. Note how
+ * carefully Felicia hedged the claims — "may evaluate", "possible credit
+ * impact", "appropriate for you". Keep that if anything is ever edited.
  */
 
 export type BlueprintSlug =
@@ -33,190 +43,186 @@ export type BlueprintSlug =
 
 export interface Blueprint {
   readonly pending: boolean
-  /** One line. Names their situation back to them before advising anything. */
   readonly headline: string
   readonly whereYouAre: string
   readonly holdingYouBack: string
-  /** Exactly three. Ordered — the first is the next thing they physically do. */
   readonly nextMoves: readonly { readonly title: string; readonly detail: string }[]
-  /** Two or three. What to leave alone for now, and why. */
   readonly notYet: readonly { readonly title: string; readonly detail: string }[]
-  /** Which level of the pathway they belong in, and what happens next. */
   readonly path: string
 }
 
 export const blueprints = {
   foundation: {
-    pending: true,
+    pending: false,
     headline: 'Start with a clear picture',
     whereYouAre:
-      'You want direction more than any single fix. That is a more common place to be than anyone in a room like this says out loud, and it is a reasonable place to begin.',
+      'You\'re at the starting point. Before choosing a credit, funding, business or wealth strategy, get clear on where you stand.',
     holdingYouBack:
-      'Without a clear picture of where things stand, every decision is a guess. Most people here are not doing the wrong things — they are doing reasonable things in the wrong order.',
+      'Without a clear picture, it\'s easy to make the right moves in the wrong order.',
     nextMoves: [
-      { title: 'Read your credit report', detail: 'Not the score, the report. Most decisions people make about their credit are made without reading it first.' },
-      { title: 'Put one month on paper', detail: 'Money in, money out, for a single month. Not a budget yet — just the facts you are actually working with.' },
-      { title: 'Choose one area, not five', detail: 'The people who make progress pick one thing and stay with it. The people who stall try to fix everything at once.' },
+      { title: 'Know your numbers', detail: 'Income, expenses, debt and savings.' },
+      { title: 'Know what\'s reporting', detail: 'Review your credit reports, not just the scores.' },
+      { title: 'Choose your priority', detail: 'Credit, cash flow, funding, business or wealth.' },
     ],
     notYet: [
-      { title: 'Do not apply for anything', detail: 'Applications leave a record. Applying before you know your position is how people collect denials that then sit on the file.' },
-      { title: 'Do not pay anyone to fix it yet', detail: 'Until you have read the report, you cannot judge whether an offer to fix it is worth anything.' },
+      { title: 'Don\'t apply blindly', detail: 'Understand your profile and possible credit impact first.' },
+      { title: 'Don\'t pay for a quick fix', detail: 'Know what actually needs attention first.' },
     ],
-    path: 'Freshman — Foundation. Credit, cash flow, banking and debt, in that order.',
+    path: 'Freshman — Foundation',
   },
 
   'credit-early': {
-    pending: true,
+    pending: false,
     headline: 'Credit, from the ground up',
     whereYouAre:
-      'You want to work on credit, and you are rebuilding rather than fine-tuning. The order matters more here than anywhere else in your finances.',
+      'You\'re rebuilding credit, not fine-tuning it. At this stage, the order of your moves matters.',
     holdingYouBack:
-      'Rebuilding is slow when it is done out of sequence, and most people are handed the steps in the wrong order — or handed the last one first.',
+      'Adding new accounts before understanding what\'s already reporting can work against your progress.',
     nextMoves: [
-      { title: 'Read the report before changing anything', detail: 'You cannot dispute what you have not seen, and you cannot plan around a balance you are guessing at.' },
-      { title: 'Separate errors from accurate history', detail: 'Different problems, different routes. Treating accurate history as a paperwork problem wastes months.' },
-      { title: 'Build one habit you can hold', detail: 'One payment, one date, every month. Consistency does more here than any single dramatic action.' },
+      { title: 'Read the reports', detail: 'Know what\'s reporting and whether it appears accurate.' },
+      { title: 'Separate the issues', detail: 'Errors and accurate negative history require different strategies.' },
+      { title: 'Build consistency', detail: 'Focus on on-time payments and manageable balances.' },
     ],
     notYet: [
-      { title: 'Do not open new accounts', detail: 'New credit while the foundation is unsteady tends to undo the work rather than speed it up.' },
-      { title: 'Do not close old accounts', detail: 'It feels like tidying. It usually costs you the thing that was quietly helping.' },
-      { title: 'Do not pay for a quick fix', detail: 'Anyone promising a specific number by a specific date is describing something they do not control.' },
+      { title: 'Don\'t open accounts just because you can', detail: 'New credit should have a purpose.' },
+      { title: 'Don\'t chase guaranteed fixes', detail: 'Be cautious of promised scores or timelines.' },
     ],
-    path: 'Freshman — Foundation. This is exactly what the first level covers, in this sequence.',
+    path: 'Freshman — Foundation',
   },
 
   'credit-established': {
-    pending: true,
+    pending: false,
     headline: 'Credit, with something to protect',
     whereYouAre:
-      'You already have a foundation. The work now is protecting what you have built while positioning for whatever comes next.',
+      'You have a credit foundation. Now the goal is protecting it while positioning for your next move.',
     holdingYouBack:
-      'At this stage the obstacle is rarely damage. It is that the profile has never been read the way a lender reads it.',
+      'A score is only part of the picture. Lenders may evaluate your overall profile.',
     nextMoves: [
-      { title: 'Audit how it reports', detail: 'Utilisation, account ages, mix. Small structural details carry real weight at this stage.' },
-      { title: 'Learn what lenders actually read', detail: 'Banks look at profiles, history, credibility and preparation. Knowing what they read changes what you put in front of them.' },
-      { title: 'Position before you approach', detail: 'The work happens before the application, not during it.' },
+      { title: 'Audit your profile', detail: 'Review utilization, balances, history and inquiries.' },
+      { title: 'Know the requirements', detail: 'Different products and lenders use different criteria.' },
+      { title: 'Position before applying', detail: 'Prepare first instead of fixing problems afterward.' },
     ],
     notYet: [
-      { title: 'Do not apply broadly to see what sticks', detail: 'Scattered applications leave a trail that works against the next one.' },
-      { title: 'Do not add new obligations mid-preparation', detail: 'Anything new changes the picture at exactly the point you want it steady.' },
+      { title: 'Don\'t apply everywhere', detail: 'Unnecessary applications may add inquiries or accounts.' },
+      { title: 'Don\'t add unnecessary obligations', detail: 'Keep your profile stable while preparing.' },
     ],
-    path: 'Sophomore — Readiness. Business setup, records and funding readiness.',
+    path: 'Sophomore — Readiness',
   },
 
   'funding-early': {
-    pending: true,
+    pending: false,
     headline: 'Getting fundable',
     whereYouAre:
-      'You want funding, and the honest starting point is the profile it will be judged on rather than the amount you have in mind.',
+      'You want access to funding. Start with the profile a potential lender may evaluate — not the dollar amount you want.',
     holdingYouBack:
-      'Funding decisions are made from what is already reported about you. Most people discover that by being declined.',
+      'Searching for lenders before you\'re ready can lead to unnecessary applications and poor-fit products.',
     nextMoves: [
-      { title: 'Find out what your profile says now', detail: 'Before any plan, read what a lender would see. Cheapest step there is, and it changes the rest.' },
-      { title: 'Fix the foundation first', detail: 'Structure, history and consistency are what make a file fundable. None of it is luck and all of it is learnable.' },
-      { title: 'Separate personal from business', detail: 'How the two are structured determines what becomes available, and on what terms.' },
+      { title: 'Know your profile', detail: 'Understand what a lender may see.' },
+      { title: 'Strengthen the foundation', detail: 'Focus on credit, cash flow and organization.' },
+      { title: 'Know the difference', detail: 'Understand personal vs. business funding and possible guarantees.' },
     ],
     notYet: [
-      { title: 'Do not apply yet', detail: 'Applying before the profile is ready is how people collect denials that sit on the record and make the next attempt harder.' },
-      { title: 'Do not chase a guaranteed approval', detail: 'Anyone guaranteeing approval before seeing your file is selling something other than funding.' },
+      { title: 'Don\'t apply without a strategy', detail: 'Know the requirements and possible credit impact.' },
+      { title: 'Don\'t chase guaranteed approvals', detail: 'Legitimate funding still requires evaluation.' },
     ],
-    path: 'Freshman, then Sophomore. The preparation rather than the shortcut.',
+    path: 'Freshman → Sophomore',
   },
 
   'funding-established': {
-    pending: true,
+    pending: false,
     headline: 'Funding, positioned properly',
     whereYouAre:
-      'You have a base to work from. The question now is sequence — what you approach, in what order, with what prepared.',
+      'You have a base. Now funding becomes about fit, preparation and timing.',
     holdingYouBack:
-      'At this stage the limit is usually presentation rather than position. Good files get declined for being approached in the wrong order.',
+      'A strong profile doesn\'t guarantee the right outcome. Documentation, terms and lender requirements matter.',
     nextMoves: [
-      { title: 'Separate the two profiles properly', detail: 'What the business can access on its own record, versus what still rests on you.' },
-      { title: 'Prepare the file before the conversation', detail: 'Records, structure and consistency assembled first. The meeting is not where the work happens.' },
-      { title: 'Sequence your approaches', detail: 'Order affects outcome. One prepared approach beats five hopeful ones.' },
+      { title: 'Understand both profiles', detail: 'Know where personal and business credit overlap.' },
+      { title: 'Prepare your file', detail: 'Organize financials, records and business structure.' },
+      { title: 'Apply intentionally', detail: 'Choose opportunities that fit your profile and goal.' },
     ],
     notYet: [
-      { title: 'Do not take funding under pressure', detail: 'Money sought urgently is money taken on someone else\u2019s terms.' },
-      { title: 'Do not stack applications', detail: 'Several at once reads as distress, whatever the reality is.' },
+      { title: 'Don\'t take money just because it\'s available', detail: 'Understand cost and repayment terms.' },
+      { title: 'Don\'t stack unnecessary applications', detail: 'Protect the profile you\'ve built.' },
     ],
-    path: 'Junior — Build + Scale. Revenue, capital, systems and protection.',
+    path: 'Junior — Build + Scale',
   },
 
   'business-early': {
-    pending: true,
+    pending: false,
     headline: 'Building the business properly',
     whereYouAre:
-      'You are building something. Getting the structure right early costs far less than correcting it later.',
+      'You\'re building something. A clean structure now makes the business easier to operate, document and eventually finance.',
     holdingYouBack:
-      'Most early businesses are structured by accident, and the correction costs more than the setup would have.',
+      'Many businesses grow before their records and financial systems do.',
     nextMoves: [
-      { title: 'Set the entity up correctly', detail: 'The structure determines what the business can access on its own later.' },
-      { title: 'Separate business from personal', detail: 'Mixed finances are one of the most common reasons a business cannot be funded on its own record.' },
-      { title: 'Start the business credit profile deliberately', detail: 'It is built on purpose, in a sequence. It does not accumulate by itself.' },
+      { title: 'Set up correctly', detail: 'Handle entity, registration and compliance needs.' },
+      { title: 'Separate finances', detail: 'Use dedicated business banking and clean records.' },
+      { title: 'Build deliberately', detail: 'Develop consistent bookkeeping, banking and business credit practices.' },
     ],
     notYet: [
-      { title: 'Do not fund the business personally by default', detail: 'It is the fastest route, and the one that ties the two together for years.' },
-      { title: 'Do not buy tools before you have records', detail: 'Software does not fix bookkeeping that has not started.' },
+      { title: 'Don\'t mix money by default', detail: 'Document personal contributions properly.' },
+      { title: 'Don\'t buy every business tool', detail: 'Start with what you actually need.' },
     ],
-    path: 'Sophomore — Readiness. LLC setup, banking relationships, records.',
+    path: 'Sophomore — Readiness',
   },
 
   'business-established': {
-    pending: true,
-    headline: 'Scaling what you have started',
+    pending: false,
+    headline: 'Scaling what you\'ve started',
     whereYouAre:
-      'The business exists and it is moving. The work now is making it credible on its own record rather than resting on yours.',
+      'The business is moving. Now strengthen the financial profile and systems behind the growth.',
     holdingYouBack:
-      'A business that cannot be assessed separately from its owner is a business that borrows on the owner\u2019s terms.',
+      'Revenue matters, but clean records and documented cash flow help others understand the business.',
     nextMoves: [
-      { title: 'Audit how the business reports', detail: 'What a lender can see about the business, separately from you.' },
-      { title: 'Strengthen the banking relationship', detail: 'History and consistency with a bank are assets. Built deliberately, and over time.' },
-      { title: 'Prepare before you need the money', detail: 'The best terms go to the businesses that were ready before they asked.' },
+      { title: 'Audit the business profile', detail: 'Know what banks and potential lenders may see.' },
+      { title: 'Strengthen the records', detail: 'Keep banking and bookkeeping consistent.' },
+      { title: 'Prepare before you need capital', detail: 'Give yourself time to compare options.' },
     ],
     notYet: [
-      { title: 'Do not scale spending ahead of records', detail: 'Growth without documentation is growth you cannot prove to anyone who matters.' },
-      { title: 'Do not personally guarantee out of habit', detail: 'Sometimes necessary, rarely examined. Worth knowing when you are choosing it.' },
+      { title: 'Don\'t let spending outrun your records', detail: 'Keep documentation current.' },
+      { title: 'Don\'t personally guarantee automatically', detail: 'Understand the obligation first.' },
     ],
-    path: 'Senior — Legacy, and the Capstone. Assets, protection, long-term wealth.',
+    path: 'Junior → Senior',
   },
 
   'wealth-early': {
-    pending: true,
-    headline: 'Building toward wealth, from where you are',
+    pending: false,
+    headline: 'Building toward wealth',
     whereYouAre:
-      'You are thinking past the immediate, which is the right instinct. The foundation still comes first — that is not a delay, it is what makes the rest hold.',
+      'You\'re thinking beyond today\'s needs. First, build a foundation strong enough to support long-term growth.',
     holdingYouBack:
-      'Building on an unprotected base means the first setback undoes the progress, and it happens quietly enough that people blame themselves for it.',
+      'Without financial stability, unexpected expenses can interrupt bigger plans.',
     nextMoves: [
-      { title: 'Know your position', detail: 'What comes in, what goes out, and what is reported about you. Everything else builds on that.' },
-      { title: 'Build a cushion before building anything else', detail: 'The least exciting step, and the one that decides whether the rest survives.' },
-      { title: 'Learn the structures before using them', detail: 'Money responds to structure. Understanding it first is cheaper than learning by mistake.' },
+      { title: 'Know your position', detail: 'Understand income, expenses, debt, savings and credit.' },
+      { title: 'Build a cushion', detail: 'Create emergency reserves appropriate for you.' },
+      { title: 'Understand before investing', detail: 'Know the risk, cost, purpose and time horizon.' },
     ],
     notYet: [
-      { title: 'Do not invest money you may need soon', detail: 'Investing before a cushion exists usually means selling at the worst possible moment.' },
-      { title: 'Do not follow a strategy you cannot explain', detail: 'If you cannot say why it works, you cannot tell when it has stopped working.' },
+      { title: 'Don\'t invest money you may need soon', detail: 'Match decisions to your timeline.' },
+      { title: 'Don\'t follow what you can\'t explain', detail: 'Know where your money is going and why.' },
     ],
-    path: 'Freshman — Foundation, then the full pathway.',
+    path: 'Freshman — Foundation → Full GWOP Pathway',
   },
 
   'wealth-established': {
-    pending: true,
+    pending: false,
     headline: 'Building on purpose',
     whereYouAre:
-      'You have stability and you want to put it to work. From here it is structure and sequence rather than starting over.',
+      'You have stability and want to put it to work. The focus now is intentional growth and protection.',
     holdingYouBack:
-      'Growth on an unprotected base is fragile, and protection is the step most people skip precisely because nothing appears to be wrong.',
+      'Growth without planning can leave otherwise strong finances exposed.',
     nextMoves: [
-      { title: 'Protect what already exists', detail: 'Structure and protection come before growth, not after it.' },
-      { title: 'Use credit as a tool rather than a fallback', detail: 'At this stage credit is leverage, and leverage rewards preparation.' },
-      { title: 'Build to a plan you can name', detail: 'Wealth built on purpose looks different from wealth that simply accumulated.' },
+      { title: 'Protect what exists', detail: 'Review reserves, insurance and financial structure.' },
+      { title: 'Use credit strategically', detail: 'Credit is a tool, not a substitute for cash flow.' },
+      { title: 'Define the goal', detail: 'Give your wealth plan a purpose, timeline and priorities.' },
     ],
     notYet: [
-      { title: 'Do not add complexity for its own sake', detail: 'Structures you do not fully understand cost more to unwind than they ever saved.' },
-      { title: 'Do not skip the protection step', detail: 'The one nobody regrets, and the one everybody postpones.' },
+      { title: 'Don\'t add complexity for appearance', detail: 'Understand the purpose and cost first.' },
+      { title: 'Don\'t ignore protection while growing', detail: 'Build and protect together.' },
     ],
-    path: 'Senior — Legacy, and the completed GWOP Blueprint.',
+    path: 'Senior — Legacy',
   },
+
 } as const satisfies Record<BlueprintSlug, Blueprint>
 
 /** True when every version has been signed off. Gates the page. */

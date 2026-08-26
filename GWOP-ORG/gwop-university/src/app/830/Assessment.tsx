@@ -9,8 +9,10 @@ import {
 } from '@/config/assessment'
 import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/blueprints'
 import { event } from '@/content/event'
+import { Tbc } from '@/components/Chrome'
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 import { identityiq } from '@/config/identityiq'
+import { BOOKING_URL } from '@/config/integrations'
 import { teaser } from '@/config/teaser'
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -479,6 +481,61 @@ function Teaser() {
   )
 }
 
+/* ── WHAT HAPPENS NEXT ─────────────────────────────────────────────────────
+   Moved here from /thanks. The flow now ends on the Blueprint, so /thanks is
+   only a fallback — which left Beast's calendar live with nothing leading to
+   it. This is the route to it.
+
+   Sits ABOVE the IdentityIQ card: booking a session is GWOP's own next step,
+   the affiliate offer is secondary.
+
+   Copy comes from event.thanks so it stays the same wording Felicia approved
+   for /thanks and cannot drift between the two.
+   ───────────────────────────────────────────────────────────────────────── */
+function NextSteps() {
+  return (
+    <section className="evas-next-steps">
+      <span className="evas-eyebrow">What happens next</span>
+      <h4>Three things.</h4>
+      <p className="evas-lead">
+        In the next few minutes, and before you leave the table.
+      </p>
+
+      <ol className="evas-steps">
+        {event.thanks.next.map((n, i) => (
+          <li key={n.h}>
+            <span className="evas-step-n">{i + 1}</span>
+            <div>
+              <b>{n.h}</b>
+              {/* Unapproved copy stays behind the DRAFT marker, same as
+                  everywhere else — the founding-member wording is still
+                  pending. */}
+              <p>{'pending' in n ? <Tbc>{n.p}</Tbc> : n.p}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      {/* Hidden if the booking link is unset. A dead button at a booth is
+          worse than no button. */}
+      {BOOKING_URL && (
+        <div className="evas-booking">
+          <b>{event.thanks.booking.h}</b>
+          <p>{event.thanks.booking.p}</p>
+          <a
+            className="btn btn-e evas-booking-cta"
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {event.thanks.booking.label}
+          </a>
+        </div>
+      )}
+    </section>
+  )
+}
+
 /* ── OPTIONAL NEXT STEP ────────────────────────────────────────────────────
    Sits AFTER the Blueprint, as a visually separate card.
 
@@ -613,6 +670,7 @@ function BlueprintView({
         <p className="evas-lead">{event.thanks.lede}</p>
 
         <Teaser />
+        <NextSteps />
         <NextStep interest={interest} creditRange={creditRange} />
 
         {/* Development only. A note to whoever is building, not to an attendee —
@@ -691,6 +749,7 @@ function BlueprintView({
       </div>
 
       <Teaser />
+      <NextSteps />
       <NextStep interest={interest} creditRange={creditRange} />
     </section>
   )

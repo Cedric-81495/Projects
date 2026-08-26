@@ -1359,3 +1359,32 @@ body>section:only-of-type{display:grid;align-content:center}
    account for. Not a disabled button: no pointer, no hover, nothing to tap
    twice at. */
 .navoff{color:var(--muted);opacity:.55;cursor:default;user-select:none}
+
+/* Course cards shown but not navigable until the university opens. No pointer,
+   no hover lift — nothing that invites a tap that goes nowhere. */
+.course-off{cursor:default}
+.course-off:hover{transform:none;border-color:var(--stone);box-shadow:none}
+
+/* ── WHAT HAPPENS NEXT + BOOKING ───────────────────────────────────────────
+   Moved from /thanks onto the Blueprint screen. Reuses .evas-steps so the
+   numbered list matches "Your Next 3 Moves" above it — same visual language,
+   one less thing for an attendee to parse. */
+.evas-next-steps{margin-top:32px;padding-top:28px;border-top:2px solid var(--stone)}
+.evas-next-steps h4{font-family:var(--display);font-size:20px;line-height:1.3;
+  margin:6px 0 8px;color:var(--forest)}
+.evas-next-steps .evas-lead{margin-bottom:18px}
+
+/* The booking block. Emerald tint so it reads as the primary action on the
+   screen — this is GWOP's own next step, not an outside offer. */
+.evas-booking{margin-top:22px;padding:18px;border-radius:var(--r);
+  background:var(--emerald-lt)}
+.evas-booking b{display:block;font-family:var(--display);font-size:17px;
+  line-height:1.35;color:var(--forest);margin-bottom:6px}
+.evas-booking p{margin:0 0 14px;font-size:14.5px;line-height:1.5;color:var(--ink)}
+
+/* Full width on a phone so it is a comfortable one-handed tap; sized to its
+   text from 480px up, where a full-bleed button starts to look odd. */
+.evas-booking-cta{display:block;width:100%;text-align:center}
+@media (min-width:480px){
+  .evas-booking-cta{display:inline-block;width:auto;min-width:200px}
+}

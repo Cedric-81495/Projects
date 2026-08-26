@@ -34,10 +34,10 @@ export const teaser = {
      rectangle, which looks broken rather than pending. */
   poster: '/teaser-poster.jpg',
 
-  /* ⚠ MY WORDING, NOT APPROVED. Sits between the roadmap someone has just been
-     given and the booking CTA, so it is attendee-facing copy — replace with
-     Felicia's or Surpaul's words when they supply them. */
-  heading: 'Watch this first',
+  /* ✅ Felicia, 2026-08-27, verbatim. Replaced my placeholder "Watch this
+     first". Sits between the roadmap someone has just been given and the
+     booking CTA — do not reword. */
+  heading: 'Your Blueprint Is Just the Beginning.',
   /* Optional. Kept short — this sits between the roadmap someone just earned
      and the next-step card, and anything long here delays both. */
   caption: '',

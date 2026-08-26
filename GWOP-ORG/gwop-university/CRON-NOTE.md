@@ -8,7 +8,15 @@ scheduled. This note previously explained why it wasn't.
 | Path | Schedule | What it does |
 |---|---|---|
 | `/api/v1/cron/expire` | `0 7 * * *` — daily | Expires stale enrolments |
-| `/api/v1/cron/lead-sync` | `*/2 * * * *` — every 2 min | Retries leads and assessments that failed to reach GHL |
+| `/api/v1/cron/lead-sync` | `0 8 * * *` — daily ⚠️ | Retries leads and assessments that failed to reach GHL |
+
+⚠️ **The retry job is on a daily schedule because the plan is still Hobby.**
+Hobby allows one cron per day and rejects any sub-daily expression — not as a
+build error, but at config validation, so the deployment never appears in the
+list at all. That is what silently blocked three pushes on 27 August.
+
+**Change to `*/2 * * * *` the moment Pro is active**, and confirm the deployment
+goes through afterwards.
 
 ## Why two minutes
 

@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/v1/cron/lead-sync",
-      "schedule": "*/2 * * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }

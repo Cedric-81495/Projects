@@ -1435,43 +1435,47 @@ body>section:only-of-type{display:grid;align-content:center}
    treatment: same words, but the three proof points now carry their own
    weight instead of reading as one more paragraph in a dark card. */
 
-.evoffer-badge{display:flex;align-items:center;gap:10px;margin:22px 0 0}
-.evoffer-badge img{flex:none}
-.evoffer-badge b{font-family:var(--display);font-size:16px;letter-spacing:.04em;
-  color:var(--gold-lt)}
+/* ── HERO PROOF POINTS ────────────────────────────────────────────────────
+   Three across at every size, with thin gold dividers between them — the row
+   is the point, and stacking turned it into another list.
 
-/* THREE ACROSS AT EVERY SIZE, as in the mockup — the row of three is the
-   point, and stacking them turned it into another list.
+   All of it in one place: the earlier version was split across three appended
+   blocks that partly overrode each other, which is what made the dividers look
+   wrong at some widths.
 
-   The trick is letting the label wrap rather than forcing equal-width columns:
-   "YOUR NEXT 3 FINANCIAL MOVES" is four times longer than "7 QUESTIONS", so
-   equal columns leave two thirds nearly empty and squeeze the third. Sizing to
-   content keeps the icons evenly spaced and lets the text find its own width. */
+   Dividers are drawn as a PSEUDO-ELEMENT, not a border. A border runs the full
+   height of the tallest column, so "YOUR NEXT 3 FINANCIAL MOVES" wrapping to two
+   lines made two long lines and one short one. This one is a fixed height,
+   vertically centred on the icon, so all three match regardless of how the text
+   wraps. */
+
 .evstats{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);
-  align-items:start;gap:clamp(6px,2.5vw,14px);margin:20px 0 0;padding:0}
+  align-items:start;gap:0;margin:20px 0 0;padding:0}
 
-.evstats li{display:flex;flex-direction:column;align-items:center;
-  text-align:center;gap:8px;min-width:0}
+.evstats li{position:relative;display:flex;flex-direction:column;
+  align-items:center;text-align:center;gap:8px;min-width:0;
+  padding-inline:clamp(6px,2.5vw,14px)}
 
-/* Icons scale with the viewport instead of sitting at a fixed 44px — at 360px
-   three fixed icons plus gaps crowd the card edges, and on a tablet they look
-   undersized against the headline. */
+/* The divider: sits on the left edge of the 2nd and 3rd items only, so it never
+   appears on the outer edges of the row. */
+.evstats li + li::before{content:'';position:absolute;left:0;top:4px;
+  width:1px;height:clamp(44px,13vw,58px);
+  background:var(--gold);opacity:.38}
+
 .evstats img{flex:none;width:clamp(34px,10vw,46px);height:auto}
 
-/* Labels shrink a little on the narrowest phones rather than wrapping to four
-   lines. Below 12px it stops being readable at arm's length, so that is the
-   floor. */
 .evstats b{display:block;font-size:clamp(9.5px,2.5vw,11.5px);letter-spacing:.06em;
   line-height:1.25;text-transform:uppercase;color:var(--gold-lt);
   text-wrap:balance}
 .evstats span{display:block;margin-top:3px;font-size:clamp(10.5px,2.7vw,12.5px);
   line-height:1.35;color:rgba(247,243,233,.7);text-wrap:balance}
 
-/* Under 340px there is genuinely no room for three columns of text. Only the
-   very smallest phones reach this. */
+/* Under 340px three columns of text genuinely will not fit. Stack, and drop the
+   dividers — a vertical rule between stacked rows makes no sense. */
 @media (max-width:339px){
   .evstats{grid-template-columns:1fr;gap:14px}
-  .evstats li{flex-direction:row;text-align:left}
+  .evstats li{flex-direction:row;text-align:left;padding-inline:0}
+  .evstats li + li::before{display:none}
   .evstats b,.evstats span{font-size:12px}
 }
 
@@ -1537,24 +1541,12 @@ body>section:only-of-type{display:grid;align-content:center}
   font-weight:700;letter-spacing:.01em;color:#fff}
 .evoffer-badge b em{font-style:normal;color:var(--gold-lt)}
 
-/* ── MOCKUP MATCH · VERTICAL DIVIDERS ─────────────────────────────────────
-   The three columns are separated by thin vertical gold lines, which is what
-   makes them read as one unit rather than three floating groups. Drawn as a
-   left border on the 2nd and 3rd items so they never appear on the outer
-   edges, and so they disappear by themselves if the row ever stacks. */
-.evstats li + li{border-left:1px solid rgba(200,163,74,.42)}
-.evstats li{padding-inline:clamp(4px,2vw,10px)}
-
 /* Thin outlined arrow in a hairline circle, matching the mockup. */
 .evcta-chev{background:transparent;border:1px solid var(--gold);
   width:28px;height:28px}
 .evcta-chev svg{width:15px;height:15px;stroke:var(--gold-lt);stroke-width:1.4}
 .evcta:hover .evcta-chev{background:transparent;border-color:var(--gold-lt)}
 
-/* Stacked only on the very narrowest phones — drop the dividers there. */
-@media (max-width:339px){
-  .evstats li + li{border-left:none}
-}
 
 /* The ™ sits small and raised, as in the mockup. */
 .evoffer-badge b sup{font-size:.5em;vertical-align:super;margin-left:1px;

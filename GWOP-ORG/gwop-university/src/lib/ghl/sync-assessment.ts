@@ -67,11 +67,19 @@ function buildPayload(a: AssessmentRow) {
        fields to custom fields directly; nesting means hand-written JSON paths
        for every field and a rename silently breaks the mapping. */
 
-    /* The join key. Jake matches on this to find the contact he already has —
-       not on email, because people mistype emails at booths. Phone travels too
-       as a secondary match, already normalised to E.164 our side. */
+    /* THE JOIN KEYS. All three, deliberately.
+
+       Jake reported on 2026-08-26 that the two deliveries were not merging into
+       one contact — a contact created by the lead webhook, then a separate
+       record from this one. The cause was almost certainly that this payload
+       carried only phone and lead_id: GoHighLevel matches contacts on EMAIL
+       first, so with no email there was nothing for it to match against.
+
+       Sending all three means GHL can match on whichever it is configured to
+       use, and lead_id remains available for tracing a specific submission. */
     lead_id: a.lead_id,
     phone: a.leads?.phone ?? '',
+    email: a.leads?.email ?? '',
 
     /* Machine values, not display labels. These are what his workflow
        conditions match on, and they come from the same config that renders the

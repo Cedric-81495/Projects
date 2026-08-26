@@ -51,20 +51,19 @@ export default function EventPage() {
               .evsupport, the existing hero text styles. No new styling. */}
           <p className="evsupport">{event.offer.promise}</p>
 
-          {/* Felicia's mockup has a full-width gold hairline above the offer
-              badge and another above the icon row — they separate the three
-              blocks of the card without adding weight. */}
-          <span className="evhr" aria-hidden="true" />
-
+          {/* The rule sits on the badge line, leading in from the right of the
+              icon — per the mockup, not stacked above as a divider. And FREE is
+              gold while the rest is white, which is why the word carries. */}
           <p className="evoffer-badge">
             <picture>
               <source srcSet="/icon-blueprint-128.webp" type="image/webp" />
-              <img src="/icon-blueprint-128.png" alt="" width={30} height={30} />
+              <img src="/icon-blueprint-128.png" alt="" width={44} height={44} />
             </picture>
-            <b>{event.offer.badge}</b>
+            <span className="evoffer-lead" aria-hidden="true" />
+            <b>
+              <em>FREE</em> GWOP BLUEPRINT<sup>™</sup>
+            </b>
           </p>
-
-          <span className="evhr" aria-hidden="true" />
 
           <ul className="evstats">
             {event.offer.stats.map(st => (
@@ -81,8 +80,6 @@ export default function EventPage() {
               </li>
             ))}
           </ul>
-
-          <span className="evhr" aria-hidden="true" />
 
           <a className="btn evcta" href="#choose">
             <span className="evcta-chev" aria-hidden="true">

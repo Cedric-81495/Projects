@@ -1513,15 +1513,39 @@ body>section:only-of-type{display:grid;align-content:center}
 .evcta{width:100%}
 @media (min-width:480px){.evcta{width:auto;min-width:280px}}
 
-/* Full-width gold hairlines separating the blocks of the hero card, per the
-   mockup: below the promise line, above the icon row, above the button. Very
-   low opacity — they are there to group, not to draw the eye. */
-.evhr{display:block;width:100%;height:1px;margin:20px 0;
-  background:var(--gold);opacity:.28}
+/* ── MOCKUP MATCH · BADGE ROW ──────────────────────────────────────────────
+   Looking at the mockup properly: the rule beside the badge is NOT full width
+   above it. It sits on the same line as the text, starting to the right of the
+   clipboard icon and stopping short of the edge — a rule that leads into the
+   offer name rather than a divider stacked above it. */
+.evoffer-badge{display:grid;grid-template-columns:auto 1fr;align-items:center;
+  gap:14px;margin:22px 0 0}
+.evoffer-badge img{grid-row:1 / span 2}
+.evoffer-badge .evoffer-lead{display:block;height:1px;width:min(100%,220px);
+  background:var(--gold);opacity:.5;margin-bottom:8px}
+.evoffer-badge b{font-family:var(--body);font-size:clamp(15px,4vw,18px);
+  font-weight:700;letter-spacing:.01em;color:#fff}
+.evoffer-badge b em{font-style:normal;color:var(--gold-lt)}
 
-/* Thin outlined arrow in a hairline circle, matching the mockup — the filled
-   gold disc with a heavy chevron was too loud beside it. */
+/* ── MOCKUP MATCH · VERTICAL DIVIDERS ─────────────────────────────────────
+   The three columns are separated by thin vertical gold lines, which is what
+   makes them read as one unit rather than three floating groups. Drawn as a
+   left border on the 2nd and 3rd items so they never appear on the outer
+   edges, and so they disappear by themselves if the row ever stacks. */
+.evstats li + li{border-left:1px solid rgba(200,163,74,.42)}
+.evstats li{padding-inline:clamp(4px,2vw,10px)}
+
+/* Thin outlined arrow in a hairline circle, matching the mockup. */
 .evcta-chev{background:transparent;border:1px solid var(--gold);
   width:28px;height:28px}
 .evcta-chev svg{width:15px;height:15px;stroke:var(--gold-lt);stroke-width:1.4}
 .evcta:hover .evcta-chev{background:transparent;border-color:var(--gold-lt)}
+
+/* Stacked only on the very narrowest phones — drop the dividers there. */
+@media (max-width:339px){
+  .evstats li + li{border-left:none}
+}
+
+/* The ™ sits small and raised, as in the mockup. */
+.evoffer-badge b sup{font-size:.5em;vertical-align:super;margin-left:1px;
+  color:rgba(247,243,233,.75)}

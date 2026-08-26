@@ -1409,16 +1409,7 @@ body>section:only-of-type{display:grid;align-content:center}
 
 /* Full width on a phone so it is a comfortable one-handed tap; sized to its
    text from 480px, where a full-bleed button starts to look wrong. */
-.evas-booking-cta{display:flex;align-items:center;justify-content:center;
-  gap:8px;width:100%;text-align:center}
-@media (min-width:480px){
-  .evas-booking-cta{display:inline-flex;width:auto;min-width:210px}
-}
 
-/* External-link arrow. Small, inherits the button's text colour, and stated in
-   words underneath as well — an icon alone is not an explanation. */
-.evas-ext{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;
-  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .evas-booking-note{display:block;margin-top:8px;font-size:12.5px;
   color:var(--muted);text-align:center}
 @media (min-width:480px){.evas-booking-note{text-align:left}}
@@ -1499,33 +1490,46 @@ body>section:only-of-type{display:grid;align-content:center}
 .evkw{letter-spacing:.06em;font-size:clamp(13px,3.2vw,15px);
   text-transform:uppercase;font-weight:600}
 
-/* ── MOCKUP MATCH · CTA ────────────────────────────────────────────────────
-   Felicia's mockup exactly: deep green fill, gold hairline border, gold text,
-   and a SOLID gold disc on the left holding a dark chevron. Not the outlined
-   version I first built — the mockup's button is filled, which is why it holds
-   its weight against the dark card instead of receding into it. */
-.evcta{margin-top:26px;gap:14px;
-  padding:16px 30px 16px 18px;
-  background:var(--forest-dk);
-  color:var(--gold-lt);
+/* ── THE BUTTON, EVERYWHERE ────────────────────────────────────────────────
+   One treatment across the whole event flow, taken from Felicia's mockup:
+   deep green fill, gold hairline border, gold uppercase text, and a chevron in
+   a hairline circle on the left.
+
+   `.evgold` replaces `.btn-e` on every button in the flow — the hero CTA, the
+   form submit, the assessment submit, the booking CTA and the next-step link.
+   Five buttons that were three different styles before this. */
+.evgold{gap:10px;padding:16px 30px;
+  background:var(--forest-dk);color:var(--gold-lt);
   border:1px solid var(--gold);
-  font-size:14.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:600;
+  font-size:14px;letter-spacing:.11em;text-transform:uppercase;font-weight:600;
   transition:background .18s ease,border-color .18s ease,color .18s ease}
-.evcta:hover{background:var(--forest);border-color:var(--gold-lt);color:#fff}
-.evcta:focus-visible{outline:2px solid var(--gold-lt);outline-offset:3px}
+.evgold:hover:not(:disabled){background:var(--forest);border-color:var(--gold-lt);
+  color:#fff}
+.evgold:focus-visible{outline:2px solid var(--gold-lt);outline-offset:3px}
+/* Disabled state has to remain visibly a button — a booth staffer needs to see
+   that a submit is in progress rather than broken. */
+.evgold:disabled{opacity:.55;cursor:default}
 
-/* Solid gold disc, dark chevron — the mockup's treatment. */
+/* A bare chevron — no circle, no arrow shaft, per the mockup. Only the hero
+   button carries one; the four buttons deeper in the flow are the same style
+   without it, so the chevron reads as "start here" rather than decoration. */
 .evcta-chev{display:inline-flex;align-items:center;justify-content:center;
-  width:26px;height:26px;flex:none;border-radius:999px;
-  background:var(--gold);border:none}
-.evcta-chev svg{width:11px;height:11px;fill:none;stroke:var(--forest-dk);
-  stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-.evcta:hover .evcta-chev{background:var(--gold-lt)}
+  flex:none}
+.evcta-chev svg{width:13px;height:13px;fill:none;stroke:var(--gold-lt);
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.evgold:hover .evcta-chev svg{stroke:#fff}
 
-/* Full width on a phone — it is the only action on the screen. Sized to its
-   text from 480px, where full-bleed starts to look wrong. */
-.evcta{width:100%}
-@media (min-width:480px){.evcta{width:auto;min-width:280px}}
+/* Full width on a phone, sized to content from 480px. Applies to every button
+   in the flow, so the rhythm is the same on each screen. */
+.evgold{width:100%}
+@media (min-width:480px){.evgold{width:auto;min-width:280px}}
+
+/* ── HERO CTA · CENTRED ────────────────────────────────────────────────────
+   The hero card's content is left-aligned, so a block-level button inherits
+   that. Centring it deliberately: it is the only action on the screen and it
+   should sit under the middle of the card, not hang off the left edge. */
+.evcta{margin:26px auto 0;display:flex}
+@media (min-width:480px){.evcta{margin-inline:auto}}
 
 /* ── MOCKUP MATCH · BADGE ROW ──────────────────────────────────────────────
    Looking at the mockup properly: the rule beside the badge is NOT full width
@@ -1537,12 +1541,6 @@ body>section:only-of-type{display:grid;align-content:center}
 .evoffer-badge b{font-family:var(--body);font-size:clamp(15px,4vw,18px);
   font-weight:700;letter-spacing:.01em;line-height:1.2;color:#fff}
 .evoffer-badge b em{font-style:normal;color:var(--gold-lt)}
-
-/* Thin outlined arrow in a hairline circle, matching the mockup. */
-.evcta-chev{background:transparent;border:1px solid var(--gold);
-  width:28px;height:28px}
-.evcta-chev svg{width:15px;height:15px;stroke:var(--gold-lt);stroke-width:1.4}
-.evcta:hover .evcta-chev{background:transparent;border-color:var(--gold-lt)}
 
 
 /* The ™ sits small and raised, as in the mockup. */

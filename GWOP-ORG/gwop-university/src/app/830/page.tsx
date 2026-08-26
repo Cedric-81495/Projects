@@ -51,15 +51,15 @@ export default function EventPage() {
               .evsupport, the existing hero text styles. No new styling. */}
           <p className="evsupport">{event.offer.promise}</p>
 
-          {/* The rule sits on the badge line, leading in from the right of the
-              icon — per the mockup, not stacked above as a divider. And FREE is
-              gold while the rest is white, which is why the word carries. */}
+          {/* FREE in gold, the rest white — that split is what makes the word
+              carry. The lead-in rule the mockup shows above this line is gone:
+              at real widths it sat awkwardly against the icon and read as a
+              stray mark rather than a divider. */}
           <p className="evoffer-badge">
             <picture>
               <source srcSet="/icon-blueprint-128.webp" type="image/webp" />
               <img src="/icon-blueprint-128.png" alt="" width={44} height={44} />
             </picture>
-            <span className="evoffer-lead" aria-hidden="true" />
             <b>
               <em>FREE</em> GWOP BLUEPRINT<sup>™</sup>
             </b>

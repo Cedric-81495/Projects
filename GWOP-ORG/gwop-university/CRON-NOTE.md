@@ -1,83 +1,53 @@
-# ⚠ CRON NOT SCHEDULED — action required before production
+# Scheduled jobs
 
-**Status: TESTING. This is a deliberate, temporary state.**
-**Owner: Cedric. Deadline: before Aug 30.**
+**Updated 2026-08-27** — Felicia approved Vercel Pro, so the retry job is now
+scheduled. This note previously explained why it wasn't.
 
----
+## What runs
 
-## What is missing
+| Path | Schedule | What it does |
+|---|---|---|
+| `/api/v1/cron/expire` | `0 7 * * *` — daily | Expires stale enrolments |
+| `/api/v1/cron/lead-sync` | `*/2 * * * *` — every 2 min | Retries leads and assessments that failed to reach GHL |
 
-`/api/v1/cron/lead-sync` **exists and works**, but it is **not scheduled**. It
-has been removed from `vercel.json`.
+## Why two minutes
 
-## Why
+A lead that fails to forward at 2pm should not wait until the next morning. On
+the free plan only one job a day was allowed, and a sub-daily expression failed
+the entire deployment — which is what broke the builds on 19 August.
 
-Vercel **Hobby plans allow cron jobs once per day only**. Any more frequent
-expression is rejected at deploy time and **fails the entire deployment** — not
-just the cron. That is what blocked the 2026-08-19 builds.
+The retry matters less than it did, since the `waitUntil` fix means the forward
+now actually completes rather than being discarded mid-flight. But it is the
+backstop for a genuine network failure during the event, and a booth on venue
+cellular is exactly where that happens.
 
-A once-daily retry is useless at a booth. If a lead fails to forward at 2pm it
-should not wait until 4am. So rather than schedule something that does not help,
-the schedule is removed and the decision deferred.
+## Running either by hand
 
-## What still works without it
-
-Nothing is lost. The retry path is intact:
-
-- A lead is saved to Supabase **before** any forward is attempted
-- If the forward fails, the row stays `sync_status = 'pending'` with the reason
-  in `last_error`
-- The route drains those rows whenever it is called
-
-The only thing missing is **automatic** calling.
-
-## Manual trigger
-
+```bash
+curl -X POST "https://go.thegwopblueprint.com/api/v1/cron/lead-sync" \
+  -H "Authorization: Bearer $CRON_SECRET"
 ```
+
+Both routes are guarded by `CRON_SECRET`, compared in constant time.
+
+## Lead export
+
+Not scheduled, deliberately — a timed job writing personal data somewhere is a
+liability nobody asked for. Run it when it is wanted:
+
+```bash
 curl -H "Authorization: Bearer $CRON_SECRET" \
-  https://<domain>/api/v1/cron/lead-sync
+  "https://go.thegwopblueprint.com/api/v1/export/leads?event=egc-2026-08-30" \
+  -o gwop-leads.csv
 ```
 
-Returns `{ processed, synced, stillPending, failed }`.
+Every lead plus their assessment answers, including the ones who did not finish.
+Drop the `?event=` filter to get everything, test rows included.
 
-Check the backlog at any time:
+**Do this at the end of event day.** Four hundred leads are the entire value of
+the activation, and a file someone keeps removes the dependency on any single
+platform.
 
-```sql
-select sync_status, count(*) from public.leads group by sync_status;
-```
-
----
-
-## BEFORE AUG 30 — pick one
-
-**Option A — upgrade to Vercel Pro.** Allows per-minute crons. Restore to
-`vercel.json`:
-
-```json
-{ "path": "/api/v1/cron/lead-sync", "schedule": "*/2 * * * *" }
-```
-
-Two minutes is the right interval: a lead that fails at the table reaches Jake
-before the attendee has left the venue.
-
-**Option B — assign a person.** Someone on the booth team runs the manual
-trigger hourly, or watches the signup count and runs it if the number looks
-wrong. Free, but depends on somebody remembering during a busy event.
-
-**Option C — accept it.** Leads still save and are never lost; they simply reach
-Jake later. Acceptable only if nobody needs same-day follow-up, which
-contradicts the nurture plan's immediate-SMS design.
-
-**Recommendation: A.** One month of Pro costs less than one lost lead, and it is
-the only option that does not depend on a person remembering something during a
-five-hour event.
-
----
-
-## Do NOT do this
-
-Do not re-add a sub-daily cron while on Hobby. It does not warn or degrade — it
-fails the whole deployment, and the site keeps serving the previous build. That
-failure mode is silent from the outside: the deploy goes red, the old version
-stays up, and everything looks fine until someone notices the new form is
-missing.
+⚠️ One response contains every attendee's name, phone and email — the most
+sensitive endpoint in the project. Do not put the URL anywhere it could be read,
+and store the file somewhere appropriate.

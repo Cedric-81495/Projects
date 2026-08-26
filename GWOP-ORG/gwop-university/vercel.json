@@ -3,6 +3,10 @@
     {
       "path": "/api/v1/cron/expire",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/v1/cron/lead-sync",
+      "schedule": "*/2 * * * *"
     }
   ]
 }

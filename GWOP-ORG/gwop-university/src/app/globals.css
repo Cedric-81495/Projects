@@ -1307,10 +1307,20 @@ body>section:only-of-type{display:grid;align-content:center}
 .evas-teaser{margin-top:28px}
 .evas-teaser h4{font-family:var(--display);font-size:19px;margin:0 0 10px;
   color:var(--forest)}
-.evas-teaser-frame{position:relative;aspect-ratio:16/9;background:var(--forest-dk);
-  border-radius:var(--r);overflow:hidden}
+/* PORTRAIT. The supplied file is 720×1280, so a 16/9 frame would letterbox it
+   into a thin strip with black bars either side.
+
+   Capped at 66vh and centred rather than filling the column: at full width on a
+   desktop a portrait video becomes absurdly tall, and on a phone an uncapped
+   9/16 frame pushes the booking CTA well below the fold — which is the one thing
+   we want visible after the roadmap. */
+.evas-teaser-frame{position:relative;aspect-ratio:9/16;
+  max-height:66vh;width:auto;max-width:100%;margin-inline:auto;
+  background:var(--forest-dk);border-radius:var(--r);overflow:hidden}
 .evas-teaser-frame video,.evas-teaser-frame iframe{
-  position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+  position:absolute;inset:0;width:100%;height:100%;border:0;display:block;
+  /* `contain` not `cover`: never crop the video to fit the frame. */
+  object-fit:contain}
 .evas-teaser-cap{margin:10px 0 0;font-size:14px;color:var(--muted)}
 
 /* Development-only placeholder. Dashed so nobody mistakes it for a real

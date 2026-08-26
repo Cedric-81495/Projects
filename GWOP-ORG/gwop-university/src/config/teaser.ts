@@ -15,8 +15,9 @@
  */
 
 export const teaser = {
-  /* Flip to false once `src` points at a real file. */
-  pending: true,
+  /* ✅ LIVE — file supplied 2026-08-27. 720×1280 portrait, 29 seconds, under
+     1 MB after compression. */
+  pending: false,
 
   /* Two shapes are supported, decided by the extension:
        · ends in .mp4  → rendered with a native <video> element
@@ -27,12 +28,15 @@ export const teaser = {
      silently — the player simply never appears and the console explains why to
      nobody. An .mp4 served from our own domain needs no change at all, which is
      the reason to prefer it for a single short clip. */
-  src: '',
+  src: '/blueprint-teaser.mp4',
 
   /* First frame shown before playback. Without one, mobile Safari shows a black
      rectangle, which looks broken rather than pending. */
-  poster: '',
+  poster: '/teaser-poster.jpg',
 
+  /* ⚠ MY WORDING, NOT APPROVED. Sits between the roadmap someone has just been
+     given and the booking CTA, so it is attendee-facing copy — replace with
+     Felicia's or Surpaul's words when they supply them. */
   heading: 'Watch this first',
   /* Optional. Kept short — this sits between the roadmap someone just earned
      and the next-step card, and anything long here delays both. */

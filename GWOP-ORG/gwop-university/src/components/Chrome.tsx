@@ -18,7 +18,7 @@ export function Crest({ size = 38 }: { size?: number }) {
   return (
     <Image
       className="crest"
-      src="/mark-128.png"
+      src="/crest-128.png"
       alt=""
       width={size}
       height={size}
@@ -79,10 +79,17 @@ export function BrandBar({ linked = true }: { linked?: boolean }) {
      footer.
 
      One item, not a menu — the reason the nav went in the first place. */
+  /* ⚠ SIGN IN IS INERT UNTIL AFTER 8/30.
+     Shown so the bar still reads as a real site, but not a link. The 30th is a
+     lead-capture activation with the modules locked — nobody at the booth has an
+     account, so every route to a login is a way to lose a signup or leave
+     someone stuck on a form they cannot complete.
+
+     Restore the Link after the event, when the student area actually opens. */
   return (
     <div className="evbar evbar-nav">
       <Link className="evbar-brand" href="/">{inner}</Link>
-      <Link className="evbar-signin" href="/login">Sign in</Link>
+      <span className="evbar-signin navoff">Sign in</span>
     </div>
   )
 }

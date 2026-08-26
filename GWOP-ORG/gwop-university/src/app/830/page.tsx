@@ -47,8 +47,33 @@ export default function EventPage() {
 
           {/* Felicia, 2026-08-22 — her wording, verbatim. Reuses .evkw and
               .evsupport, the existing hero text styles. No new styling. */}
-          <p className="evkw">{event.offer.badge}</p>
-          <p className="evsupport">{event.offer.line}</p>
+          <p className="evsupport">{event.offer.promise}</p>
+
+          {/* Felicia's 2026-08-26 mockup: badge beside the offer name, then the
+              three proof points. Icons from Shin, 2026-08-27. */}
+          <p className="evoffer-badge">
+            <picture>
+              <source srcSet="/icon-blueprint-128.webp" type="image/webp" />
+              <img src="/icon-blueprint-128.png" alt="" width={30} height={30} />
+            </picture>
+            <b>{event.offer.badge}</b>
+          </p>
+
+          <ul className="evstats">
+            {event.offer.stats.map(st => (
+              <li key={st.h}>
+                <picture>
+                  <source srcSet={`/${st.icon}-128.webp`} type="image/webp" />
+                  {/* Decorative: the label beside it already says the same
+                      thing, so alt text would only repeat it to a screen
+                      reader. */}
+                  <img src={`/${st.icon}-128.png`} alt="" width={44} height={44} />
+                </picture>
+                <b>{st.h}</b>
+                <span>{st.p}</span>
+              </li>
+            ))}
+          </ul>
 
           <a className="btn btn-e" href="#choose" style={{ marginTop: 26 }}>
             {event.cta}

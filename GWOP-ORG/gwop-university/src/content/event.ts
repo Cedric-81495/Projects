@@ -21,7 +21,10 @@ export const event = {
   // Prescribed by Visual Build Package p.7 + Felicia §2 — DO NOT REWORD
   h1a: 'BUILD YOUR',
   h1b: 'GWOP BLUEPRINT',
-  kicker: 'Credit. Funding. Business. Wealth.',
+  /* Dot separators per Felicia's 2026-08-26 mockup. Same four words as the
+     Visual Build Package, punctuation only — the signage kicker below is left
+     exactly as approved, because that one goes to print. */
+  kicker: 'CREDIT · FUNDING · BUSINESS · WEALTH',
 
   /* Felicia §2 "Supporting copy", verbatim. Note the fourth sentence — the
      event page carries it; the homepage hero (p.5) deliberately does not. */
@@ -45,6 +48,17 @@ export const event = {
   offer: {
     badge: 'FREE GWOP BLUEPRINT™',
     line: '60 seconds. 7 questions. Your next financial moves.',
+    /* From Felicia's 2026-08-26 mockup. */
+    promise: 'See where you stand — and what to do next.',
+
+    /* The three proof points, icons supplied by Shin 2026-08-27.
+       Order matches her mockup: time, effort, outcome — cheapest commitment
+       first, payoff last. */
+    stats: [
+      { icon: 'icon-seconds',   h: '60 SECONDS',   p: 'Quick to complete.' },
+      { icon: 'icon-questions', h: '7 QUESTIONS',  p: 'Simple. Straightforward.' },
+      { icon: 'icon-moves',     h: 'YOUR NEXT 3 FINANCIAL MOVES', p: 'Personalized for you.' },
+    ],
   },
 
   /* Felicia §2: "For QR/event signage, we can also use: SCAN TO START."

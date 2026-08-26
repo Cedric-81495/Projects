@@ -315,7 +315,7 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
           ))}
         </ul>
 
-        <button type="button" className="btn btn-e evas-submit" onClick={() => void submit()}>
+        <button type="button" className="btn evgold evas-submit" onClick={() => void submit()}>
           Get my Blueprint
         </button>
 
@@ -527,15 +527,12 @@ function NextSteps() {
               Blueprint they just read — and at a booth, losing the thing you
               were handed is worse than an extra tab. */}
           <a
-            className="btn btn-e evas-booking-cta"
+            className="btn evgold evas-booking-cta"
             href={BOOKING_URL}
             target="_blank"
             rel="noopener noreferrer"
           >
             {event.thanks.booking.label}
-            <svg viewBox="0 0 16 16" aria-hidden="true" className="evas-ext">
-              <path d="M6 3h7v7M13 3L6.5 9.5" />
-            </svg>
           </a>
           <span className="evas-booking-note">Opens in a new tab</span>
         </div>
@@ -596,7 +593,7 @@ function NextStep({
       <p className="evas-next-disclosure">{identityiq.disclosure}</p>
 
       <a
-        className="btn btn-e evas-next-cta"
+        className="btn evgold evas-next-cta"
         href={identityiq.href}
         target="_blank"
         /* sponsored: this is a paid affiliate link and search engines are

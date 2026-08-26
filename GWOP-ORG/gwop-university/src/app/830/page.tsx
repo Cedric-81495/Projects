@@ -81,11 +81,9 @@ export default function EventPage() {
             ))}
           </ul>
 
-          <a className="btn evcta" href="#choose">
+          <a className="btn evgold evcta" href="#choose">
             <span className="evcta-chev" aria-hidden="true">
-              <svg viewBox="0 0 20 20">
-                <path d="M4 10h11M11 6l4 4-4 4" />
-              </svg>
+              <svg viewBox="0 0 20 20"><path d="M8 5l6 5-6 5" /></svg>
             </span>
             {event.cta}
           </a>

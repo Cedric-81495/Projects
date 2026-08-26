@@ -577,7 +577,7 @@ function NativeForm({
 
       {formError && <p className="evnf-err" role="alert">{formError}</p>}
 
-      <button className="btn btn-e evnf-submit" type="submit" disabled={pending || done}>
+      <button className="btn evgold evnf-submit" type="submit" disabled={pending || done}>
         {pending ? 'Sending…' : done ? 'Done' : event.form.submit ?? 'Send my blueprint'}
       </button>
 

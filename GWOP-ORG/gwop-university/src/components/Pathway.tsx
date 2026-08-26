@@ -108,12 +108,16 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
       {/* ── FOUR COURSE CARDS · p.4 ── label, goal, Enter. Identical on both
              surfaces. Module readiness counts are internal and live on /admin. */}
       <div className="courses">
+        {/* Cards are NOT links until after 8/30. The modules are locked for the
+            event, so "Enter" would take someone to a login wall or an empty
+            level. Shown so the page still explains the pathway; inert so nothing
+            leads into a part of the site that is not open yet.
+            Restore the Link when the university opens. */}
         {PATHWAY.map(l => (
-          <Link className="course" href={`/app/${l.slug}`} key={l.slug}>
+          <div className="course course-off" key={l.slug}>
             <span className="nm">{l.label}</span>
             <span className="goal">{l.goal}</span>
-            <span className="enter">Enter ›</span>
-          </Link>
+          </div>
         ))}
       </div>
     </div>

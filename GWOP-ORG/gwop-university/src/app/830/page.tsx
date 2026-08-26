@@ -51,8 +51,11 @@ export default function EventPage() {
               .evsupport, the existing hero text styles. No new styling. */}
           <p className="evsupport">{event.offer.promise}</p>
 
-          {/* Felicia's 2026-08-26 mockup: badge beside the offer name, then the
-              three proof points. Icons from Shin, 2026-08-27. */}
+          {/* Felicia's mockup has a full-width gold hairline above the offer
+              badge and another above the icon row — they separate the three
+              blocks of the card without adding weight. */}
+          <span className="evhr" aria-hidden="true" />
+
           <p className="evoffer-badge">
             <picture>
               <source srcSet="/icon-blueprint-128.webp" type="image/webp" />
@@ -60,6 +63,8 @@ export default function EventPage() {
             </picture>
             <b>{event.offer.badge}</b>
           </p>
+
+          <span className="evhr" aria-hidden="true" />
 
           <ul className="evstats">
             {event.offer.stats.map(st => (
@@ -77,9 +82,13 @@ export default function EventPage() {
             ))}
           </ul>
 
+          <span className="evhr" aria-hidden="true" />
+
           <a className="btn evcta" href="#choose">
             <span className="evcta-chev" aria-hidden="true">
-              <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" /></svg>
+              <svg viewBox="0 0 20 20">
+                <path d="M4 10h11M11 6l4 4-4 4" />
+              </svg>
             </span>
             {event.cta}
           </a>

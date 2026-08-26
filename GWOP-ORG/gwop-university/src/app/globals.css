@@ -1448,3 +1448,46 @@ body>section:only-of-type{display:grid;align-content:center}
   text-transform:uppercase;color:var(--gold-lt)}
 .evstats span{display:block;margin-top:2px;font-size:12.5px;line-height:1.4;
   color:rgba(247,243,233,.7)}
+
+/* ── MOCKUP MATCH · TOP BAR ────────────────────────────────────────────────
+   Felicia's 2026-08-26 mockup shows the motto flanked by short gold rules
+   rather than sitting alone. Larger brand text and a bigger crest too — the
+   bar in the mockup reads as an institution, not a utility strip. */
+.evbar{padding-block:14px}
+.evbar b{font-size:17px;letter-spacing:.01em}
+.evbar b small{display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:8px;letter-spacing:.28em;margin-top:4px}
+.evbar b small i{display:block;height:1px;width:16px;flex:none;
+  background:var(--gold);opacity:.65}
+
+/* ── MOCKUP MATCH · HERO ───────────────────────────────────────────────────
+   Short gold rule between the headline and the kicker. */
+.evrule{display:block;width:58px;height:2px;margin:20px 0 16px;
+  background:var(--gold);opacity:.9}
+
+/* Bullet-separated kicker: wider tracking and uppercase, matching the mockup. */
+.evkw{letter-spacing:.06em;font-size:clamp(13px,3.2vw,15px);
+  text-transform:uppercase;font-weight:600}
+
+/* ── MOCKUP MATCH · CTA ────────────────────────────────────────────────────
+   Gold-outlined pill on the dark card with a circled chevron on the left,
+   rather than the solid emerald button. Reads as an invitation rather than a
+   form submit — which is right for the top of the page, where the attendee has
+   not yet been asked for anything. */
+.evcta{margin-top:24px;gap:12px;padding:15px 28px 15px 20px;
+  background:transparent;color:#fff;
+  border:1.5px solid var(--gold);
+  transition:background .18s ease,border-color .18s ease}
+.evcta:hover{background:rgba(200,163,74,.14);border-color:var(--gold-lt)}
+.evcta:focus-visible{outline:2px solid var(--gold-lt);outline-offset:3px}
+
+.evcta-chev{display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;flex:none;border-radius:999px;
+  border:1.5px solid var(--gold)}
+.evcta-chev svg{width:11px;height:11px;fill:none;stroke:var(--gold-lt);
+  stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* Full width on a phone: it is the only action on the screen and deserves the
+   whole tap target. */
+.evcta{width:100%}
+@media (min-width:480px){.evcta{width:auto}}

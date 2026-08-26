@@ -24,7 +24,7 @@ export const event = {
   /* Dot separators per Felicia's 2026-08-26 mockup. Same four words as the
      Visual Build Package, punctuation only — the signage kicker below is left
      exactly as approved, because that one goes to print. */
-  kicker: 'CREDIT · FUNDING · BUSINESS · WEALTH',
+  kicker: 'CREDIT • FUNDING • BUSINESS • WEALTH',
 
   /* Felicia §2 "Supporting copy", verbatim. Note the fourth sentence — the
      event page carries it; the homepage hero (p.5) deliberately does not. */
@@ -32,7 +32,7 @@ export const event = {
     'Build your financial foundation. Strengthen your credit. Prepare your ' +
     'business for capital. Build toward long-term wealth.',
 
-  cta: 'Start your blueprint',
+  cta: 'START YOUR BLUEPRINT',
 
   /* Felicia, 2026-08-22: "keep the offer extremely simple — FREE GWOP
      BLUEPRINT™ / 60 seconds. 7 questions. Your next financial moves."

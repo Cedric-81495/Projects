@@ -34,7 +34,7 @@ export function Logo() {
       <Crest />
       <b>
         {site.brand}
-        <small>{site.motto}</small>
+        <small><i aria-hidden="true" />{site.motto}<i aria-hidden="true" /></small>
       </b>
     </Link>
   )
@@ -61,7 +61,7 @@ export function BrandBar({ linked = true }: { linked?: boolean }) {
       <Crest size={34} />
       <b>
         {site.brand}
-        <small>{site.motto}</small>
+        <small><i aria-hidden="true" />{site.motto}<i aria-hidden="true" /></small>
       </b>
     </>
   )

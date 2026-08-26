@@ -40,6 +40,8 @@ export default function EventPage() {
             {event.h1a}
             <em>{event.h1b}</em>
           </h1>
+          {/* Short gold rule under the headline, per Felicia's mockup. */}
+          <span className="evrule" aria-hidden="true" />
           <p className="evkw">{event.kicker}</p>
 
           {/* Felicia §2 supporting copy */}
@@ -75,7 +77,10 @@ export default function EventPage() {
             ))}
           </ul>
 
-          <a className="btn btn-e" href="#choose" style={{ marginTop: 26 }}>
+          <a className="btn evcta" href="#choose">
+            <span className="evcta-chev" aria-hidden="true">
+              <svg viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" /></svg>
+            </span>
             {event.cta}
           </a>
 

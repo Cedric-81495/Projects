@@ -520,8 +520,12 @@ function NextSteps() {
           worse than no button. */}
       {BOOKING_URL && (
         <div className="evas-booking">
-          <b>{event.thanks.booking.h}</b>
+          <span className="evas-booking-eyebrow">Your next step</span>
+          <h5>{event.thanks.booking.h}</h5>
           <p>{event.thanks.booking.p}</p>
+          {/* New tab, deliberately. Booking inside the page would replace the
+              Blueprint they just read — and at a booth, losing the thing you
+              were handed is worse than an extra tab. */}
           <a
             className="btn btn-e evas-booking-cta"
             href={BOOKING_URL}
@@ -529,7 +533,11 @@ function NextSteps() {
             rel="noopener noreferrer"
           >
             {event.thanks.booking.label}
+            <svg viewBox="0 0 16 16" aria-hidden="true" className="evas-ext">
+              <path d="M6 3h7v7M13 3L6.5 9.5" />
+            </svg>
           </a>
+          <span className="evas-booking-note">Opens in a new tab</span>
         </div>
       )}
     </section>

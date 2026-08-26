@@ -57,7 +57,12 @@ export const EVENT_TAG = 'EVENT - Everybody Gotta Eat - 08/30/26'
    Rendered ONLY on marketing pages — see ChatWidget.tsx. Empty string disables
    it everywhere, which is the switch to reach for if it misbehaves during the
    event rather than editing pages under pressure. */
-export const CHAT_WIDGET_ID = '6a79e193ae5432b1ab54efbc'
+/* Updated 2026-08-26 — Jake supplied a new widget. The old ID was
+   6a79e193ae5432b1ab54efbc.
+   Empty string disables the widget everywhere without a deploy: the switch to
+   reach for if it misbehaves on the day rather than editing pages under
+   pressure. */
+export const CHAT_WIDGET_ID = '6a8ef044c9f1f7efa741592c'
 
 /* ── CAMPAIGN ATTRIBUTION ───────────────────────────────────────────────────
    Felicia §7: "We do not necessarily need separate signup pages for every staff

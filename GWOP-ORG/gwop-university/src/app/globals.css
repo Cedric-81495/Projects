@@ -1279,8 +1279,11 @@ body>section:only-of-type{display:grid;align-content:center}
    panel both exist to say "this is a different thing" — an affiliate offer
    that looked like part of the roadmap would be the roadmap recommending a
    paid product, which is not what it does. */
-.evas-next{margin-top:32px;padding-top:28px;border-top:2px solid var(--stone)}
-.evas-next h4{font-family:var(--display);font-size:20px;line-height:1.3;
+/* Last block, lightest weight — an optional offer, not a step in the flow.
+   Thinner rule and muted heading so it reads as an aside. */
+.evas-next{margin-top:34px;padding-top:26px;
+  border-top:1px solid var(--stone)}
+.evas-next h4{font-family:var(--display);font-size:18px;line-height:1.3;
   margin:6px 0 10px;color:var(--forest)}
 .evas-next p{margin:0 0 12px;color:var(--muted);font-size:15px;line-height:1.55}
 
@@ -1369,7 +1372,13 @@ body>section:only-of-type{display:grid;align-content:center}
    Moved from /thanks onto the Blueprint screen. Reuses .evas-steps so the
    numbered list matches "Your Next 3 Moves" above it — same visual language,
    one less thing for an attendee to parse. */
-.evas-next-steps{margin-top:32px;padding-top:28px;border-top:2px solid var(--stone)}
+/* Felicia, 2026-08-27: one page, but visually segmented so it reads as a
+   progression rather than competing CTAs. Each block below the roadmap gets
+   clear separation and a descending visual weight — roadmap is the reward,
+   next steps is the instruction, booking is the ask, IdentityIQ is optional.
+   Nothing below the roadmap should compete with it for attention. */
+.evas-next-steps{margin-top:36px;padding-top:30px;
+  border-top:1px solid var(--stone)}
 .evas-next-steps h4{font-family:var(--display);font-size:20px;line-height:1.3;
   margin:6px 0 8px;color:var(--forest)}
 .evas-next-steps .evas-lead{margin-bottom:18px}
@@ -1388,3 +1397,10 @@ body>section:only-of-type{display:grid;align-content:center}
 @media (min-width:480px){
   .evas-booking-cta{display:inline-block;width:auto;min-width:200px}
 }
+
+/* Section eyebrows carry the progression. Same treatment across the roadmap,
+   next steps and the optional offer, so an attendee reads them as a sequence
+   of named stages rather than three unrelated blocks. */
+.evas-bp .evas-eyebrow,
+.evas-next-steps .evas-eyebrow,
+.evas-next .evas-eyebrow{display:block;margin-bottom:4px}

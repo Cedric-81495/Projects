@@ -19,10 +19,6 @@ export default function Page() {
           <div className="head">
             <p className="tag">Legal</p>
             <h2 className="h2">SMS Terms &amp; Consent</h2>
-            <p className="lede" data-tbc>
-              Awaiting the client attorney&rsquo;s approved text. Paste the supplied
-              document here verbatim.
-            </p>
             <p className="lede">{legal.sms}</p>
           </div>
         </div>

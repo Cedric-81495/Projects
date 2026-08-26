@@ -10,10 +10,6 @@ export default function Page() {
           <div className="head">
             <p className="tag">Legal</p>
             <h2 className="h2">Disclosures</h2>
-            <p className="lede" data-tbc>
-              Awaiting the client attorney&rsquo;s approved text. Do not draft placeholder
-              legal language — paste the supplied document here verbatim.
-            </p>
           </div>
         </div>
       </section>

@@ -62,7 +62,7 @@ export const EVENT_TAG = 'EVENT - Everybody Gotta Eat - 08/30/26'
    Empty string disables the widget everywhere without a deploy: the switch to
    reach for if it misbehaves on the day rather than editing pages under
    pressure. */
-export const CHAT_WIDGET_ID = '6a8ef044c9f1f7efa741592c'
+export const CHAT_WIDGET_ID = '6a903f99d45d62178f802e29'
 
 /* ── CAMPAIGN ATTRIBUTION ───────────────────────────────────────────────────
    Felicia §7: "We do not necessarily need separate signup pages for every staff

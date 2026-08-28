@@ -33,9 +33,18 @@ export const site = {
     { name: 'Instagram', url: 'https://www.instagram.com/gwopuniversity', pending: false },
     { name: 'TikTok',    url: 'https://www.tiktok.com/@gwopuniversity',   pending: false },
     { name: 'YouTube',   url: 'https://youtube.com/@cottrellenterprises', pending: false },
-    /* Facebook and LinkedIn removed rather than left empty — an unlinked label
-       reads as "coming soon", which is a promise nobody has made. Add them back
-       here when the accounts are confirmed. */
+    /* ✅ CONFIRMED — supplied 2026-08-27.
+       ⚠ Left percent-encoded ON PURPOSE. The LinkedIn vanity slug ends in a
+       trademark symbol followed by an emoji variation selector (U+2122 U+FE0F).
+       Written as literal characters they are easy to strip, normalise away or
+       mangle in transit, and any of those produces a 404. %E2%84%A2%EF%B8%8F is
+       the same slug in a form that survives copy-paste. Do not "clean this up".
+       Worth asking LinkedIn admin to set a plain slug — the symbol buys nothing
+       in a URL and is a standing fragility. */
+    { name: 'LinkedIn',  url: 'https://www.linkedin.com/company/gwop-university-%E2%84%A2%EF%B8%8F/', pending: false },
+    /* Facebook removed rather than left empty — an unlinked label reads as
+       "coming soon", which is a promise nobody has made. Add it back here when
+       the account is confirmed. */
   ],
 
 } as const

@@ -439,6 +439,28 @@ function NativeForm({
       onCaptured(token, String(fd.get('first_name') ?? '').trim())
     } catch (err: unknown) {
       setPending(false)
+
+      /* ⚠ RESET THE CHALLENGE BEFORE SHOWING THE ERROR.
+
+         Turnstile tokens are SINGLE-USE. Without this reset, the widget still
+         holds the token it already spent, so tapping Send again resubmits the
+         same dead value, the server rejects it, and the attendee sees "the
+         security check did not complete — tap Send again". Which is advice
+         that can never work: every subsequent tap fails identically. The only
+         way out is a reload, which discards every field and, because
+         leads.email is not unique, writes a SECOND row for the same person.
+
+         Found 2026-08-28 in testing: a submit reached the server and wrote the
+         lead, the connection dropped before the response came back, and the
+         form was then stuck in exactly that loop with the lead already saved.
+         That is the venue-cellular case this whole path is built for.
+
+         Optional-chained and cast rather than typed: the Turnstile script is a
+         third-party global that is absent when the key is unset, when the
+         script is blocked, or before it finishes loading — all of which happen
+         at a booth. A missing reset must not throw inside the error handler. */
+      ;(window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset()
+
       setFormError(describeFailure(err))
     } finally {
       clearTimeout(timer)

@@ -99,20 +99,26 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
      ───────────────────────────────────────────────────────────────────────── */
   const sectionRef = useRef<HTMLElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
-  const mounted = useRef(false)
 
   useEffect(() => {
     const heading = headingRef.current
     if (!heading) return
 
-    if (!mounted.current) {
-      mounted.current = true
-      /* Focus without scrolling. On submit the browser is already sitting on
-         the form, which is where this section is, so moving would be a jolt
-         with no purpose. */
-      heading.focus({ preventScroll: true })
-      return
-    }
+    /* ⚠ NO FIRST-MOUNT EXEMPTION. There used to be one, on the reasoning that
+       "on submit the browser is already sitting on the form, which is where
+       this section is, so moving would be a jolt with no purpose."
+
+       That holds only when the form is short. It is not: the form is roughly
+       twice the height of a question screen, and the attendee has just
+       scrolled to its BOTTOM to reach Send. So the top of the stage is above
+       the viewport, question one renders up there, and they are left looking
+       at the section below with no visible indication anything happened.
+       Reported 2026-08-28 on both mobile and desktop.
+
+       The comfort check below already refuses to move when the stage is
+       comfortably in view, so running it on mount cannot reintroduce the
+       jumping it was written to prevent. It simply covers the one transition
+       that was exempt from it. */
 
     /* ── ONLY MOVE IF WE HAVE TO ────────────────────────────────────────────
        This used to scroll on every single answer, which is the jumping. On a

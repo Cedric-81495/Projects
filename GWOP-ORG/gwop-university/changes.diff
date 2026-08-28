@@ -1,0 +1,421 @@
+diff -ru /tmp/src-before/app/(auth)/login/page.tsx src/app/(auth)/login/page.tsx
+--- /tmp/src-before/app/(auth)/login/page.tsx	2026-08-28 01:42:10.811060858 +0000
++++ src/app/(auth)/login/page.tsx	2026-08-28 01:43:03.064073056 +0000
+@@ -19,7 +19,7 @@
+   return (
+     <>
+       <h1 className="auh1">Sign in</h1>
+-      <p className="ausub">Pick up where you left off.</p>
++      <p className="ausub">Continue your GWOP journey.</p>
+ 
+       {params.error === 'link_invalid' && (
+         <p className="aualert" role="alert">
+diff -ru /tmp/src-before/app/(auth)/signup/page.tsx src/app/(auth)/signup/page.tsx
+--- /tmp/src-before/app/(auth)/signup/page.tsx	2026-08-28 01:42:10.811676645 +0000
++++ src/app/(auth)/signup/page.tsx	2026-08-28 01:43:03.064314441 +0000
+@@ -11,7 +11,7 @@
+   return (
+     <>
+       <h1 className="auh1">Create your account</h1>
+-      <p className="ausub">Start your blueprint. Study in order, at your own pace.</p>
++      <p className="ausub">Your blueprint starts here. Learn at your pace. Build in order.</p>
+       <SignupForm />
+       <p className="aufoot">
+         Already have an account? <Link href="/login">Sign in</Link>
+diff -ru /tmp/src-before/app/(marketing)/membership/page.tsx src/app/(marketing)/membership/page.tsx
+--- /tmp/src-before/app/(marketing)/membership/page.tsx	2026-08-28 01:42:10.812648667 +0000
++++ src/app/(marketing)/membership/page.tsx	2026-08-28 01:43:03.064494565 +0000
+@@ -52,17 +52,17 @@
+         </p>
+         <p className="tag">Membership</p>
+         <h1 className="h2">Four levels. One blueprint.</h1>
++        {/* Felicia §8, 2026-08-27, verbatim. */}
+         <p className="lede">
+-          Each level has a clear purpose and a clear outcome. You finish one before you start
+-          the next — that&rsquo;s the whole point.
++          Build the foundation. Become capital-ready. Build and scale. Protect what you create.
+         </p>
+ 
+         {!plans?.length ? (
+           <div className="mbempty">
+-            <h2>Pricing is being finalised</h2>
+-            <p>
+-              The four levels are set. Enrollment opens as soon as pricing is confirmed.
+-            </p>
++            {/* Felicia §8: "same meaning, but it reads intentionally rather
++                than like unfinished development." */}
++            <h2>Founding Membership Coming Soon</h2>
++            <p>Enrollment details are coming soon.</p>
+           </div>
+         ) : (
+           <div className="mbgrid">
+diff -ru /tmp/src-before/app/830/Assessment.tsx src/app/830/Assessment.tsx
+--- /tmp/src-before/app/830/Assessment.tsx	2026-08-28 01:42:10.813447083 +0000
++++ src/app/830/Assessment.tsx	2026-08-28 07:35:18.389437855 +0000
+@@ -99,20 +99,26 @@
+      ───────────────────────────────────────────────────────────────────────── */
+   const sectionRef = useRef<HTMLElement>(null)
+   const headingRef = useRef<HTMLHeadingElement>(null)
+-  const mounted = useRef(false)
+ 
+   useEffect(() => {
+     const heading = headingRef.current
+     if (!heading) return
+ 
+-    if (!mounted.current) {
+-      mounted.current = true
+-      /* Focus without scrolling. On submit the browser is already sitting on
+-         the form, which is where this section is, so moving would be a jolt
+-         with no purpose. */
+-      heading.focus({ preventScroll: true })
+-      return
+-    }
++    /* ⚠ NO FIRST-MOUNT EXEMPTION. There used to be one, on the reasoning that
++       "on submit the browser is already sitting on the form, which is where
++       this section is, so moving would be a jolt with no purpose."
++
++       That holds only when the form is short. It is not: the form is roughly
++       twice the height of a question screen, and the attendee has just
++       scrolled to its BOTTOM to reach Send. So the top of the stage is above
++       the viewport, question one renders up there, and they are left looking
++       at the section below with no visible indication anything happened.
++       Reported 2026-08-28 on both mobile and desktop.
++
++       The comfort check below already refuses to move when the stage is
++       comfortably in view, so running it on mount cannot reintroduce the
++       jumping it was written to prevent. It simply covers the one transition
++       that was exempt from it. */
+ 
+     /* ── ONLY MOVE IF WE HAVE TO ────────────────────────────────────────────
+        This used to scroll on every single answer, which is the jumping. On a
+diff -ru /tmp/src-before/app/830/InterestForm.tsx src/app/830/InterestForm.tsx
+--- /tmp/src-before/app/830/InterestForm.tsx	2026-08-28 01:42:10.813971485 +0000
++++ src/app/830/InterestForm.tsx	2026-08-28 06:10:06.677222991 +0000
+@@ -439,6 +439,28 @@
+       onCaptured(token, String(fd.get('first_name') ?? '').trim())
+     } catch (err: unknown) {
+       setPending(false)
++
++      /* ⚠ RESET THE CHALLENGE BEFORE SHOWING THE ERROR.
++
++         Turnstile tokens are SINGLE-USE. Without this reset, the widget still
++         holds the token it already spent, so tapping Send again resubmits the
++         same dead value, the server rejects it, and the attendee sees "the
++         security check did not complete — tap Send again". Which is advice
++         that can never work: every subsequent tap fails identically. The only
++         way out is a reload, which discards every field and, because
++         leads.email is not unique, writes a SECOND row for the same person.
++
++         Found 2026-08-28 in testing: a submit reached the server and wrote the
++         lead, the connection dropped before the response came back, and the
++         form was then stuck in exactly that loop with the lead already saved.
++         That is the venue-cellular case this whole path is built for.
++
++         Optional-chained and cast rather than typed: the Turnstile script is a
++         third-party global that is absent when the key is unset, when the
++         script is blocked, or before it finishes loading — all of which happen
++         at a booth. A missing reset must not throw inside the error handler. */
++      ;(window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset()
++
+       setFormError(describeFailure(err))
+     } finally {
+       clearTimeout(timer)
+diff -ru /tmp/src-before/app/830/page.tsx src/app/830/page.tsx
+--- /tmp/src-before/app/830/page.tsx	2026-08-28 01:42:10.814407374 +0000
++++ src/app/830/page.tsx	2026-08-28 01:42:54.526952018 +0000
+@@ -44,10 +44,12 @@
+           <span className="evrule" aria-hidden="true" />
+           <p className="evkw">{event.kicker}</p>
+ 
+-          {/* Felicia §2 supporting copy */}
+-          <p className="evsupport">{event.support}</p>
++          {/* Felicia §2, 2026-08-27: the longer supporting paragraph that sat
++              here is no longer rendered — "we don't need the longer paragraph
++              above it". The single promise line below now carries the hero.
++              event.support is left in content/event.ts as the p.7 record. */}
+ 
+-          {/* Felicia, 2026-08-22 — her wording, verbatim. Reuses .evkw and
++          {/* Felicia, 2026-08-22, reworded by her 2026-08-27. Reuses .evkw and
+               .evsupport, the existing hero text styles. No new styling. */}
+           <p className="evsupport">{event.offer.promise}</p>
+ 
+diff -ru /tmp/src-before/app/disclosures/page.tsx src/app/disclosures/page.tsx
+--- /tmp/src-before/app/disclosures/page.tsx	2026-08-28 01:42:10.823128416 +0000
++++ src/app/disclosures/page.tsx	2026-08-28 02:02:04.543004580 +0000
+@@ -4,7 +4,15 @@
+ export default function Page() {
+   return (
+     <>
+-      <BrandBar />
++      {/* Unlinked bar and legal-only footer: an attendee reaches this page
++          mid-signup from the /830 consent wording, and every route out of it —
++          Sign In, the Pathway levels, the Student area — leads to a login wall
++          they have no account for. The page itself must stay readable; the ways
++          off it must not exist. Invariant 10.
++          Brought into line with /privacy, /terms and /sms-terms on 2026-08-27:
++          these two were the only legal routes still shipping the linked bar and
++          the live footer. */}
++      <BrandBar linked={false} />
+       <section>
+         <div className="wrap">
+           <div className="head">
+@@ -13,7 +21,7 @@
+           </div>
+         </div>
+       </section>
+-      <Footer />
++      <Footer legalOnly />
+     </>
+   )
+ }
+diff -ru /tmp/src-before/app/refunds/page.tsx src/app/refunds/page.tsx
+--- /tmp/src-before/app/refunds/page.tsx	2026-08-28 01:42:10.827488182 +0000
++++ src/app/refunds/page.tsx	2026-08-28 02:02:04.540570167 +0000
+@@ -8,7 +8,15 @@
+ export default function Page() {
+   return (
+     <>
+-      <BrandBar />
++      {/* Unlinked bar and legal-only footer: an attendee reaches this page
++          mid-signup from the /830 consent wording, and every route out of it —
++          Sign In, the Pathway levels, the Student area — leads to a login wall
++          they have no account for. The page itself must stay readable; the ways
++          off it must not exist. Invariant 10.
++          Brought into line with /privacy, /terms and /sms-terms on 2026-08-27:
++          these two were the only legal routes still shipping the linked bar and
++          the live footer. */}
++      <BrandBar linked={false} />
+       <section>
+         <div className="wrap">
+           <div className="head">
+@@ -25,7 +33,7 @@
+           </div>
+         </div>
+       </section>
+-      <Footer />
++      <Footer legalOnly />
+     </>
+   )
+ }
+diff -ru /tmp/src-before/components/Pathway.tsx src/components/Pathway.tsx
+--- /tmp/src-before/components/Pathway.tsx	2026-08-28 01:42:10.829989923 +0000
++++ src/components/Pathway.tsx	2026-08-28 03:39:17.358995476 +0000
+@@ -23,13 +23,15 @@
+ type Surface = 'website' | 'app'
+ 
+ const SURFACES: Record<Surface, {
+-  eyebrow: string; h1: string; sub: string; cta: string; href: string
++  eyebrow: string; h1: string; sub: string; subKicker?: string
++  cta: string; href: string
+ }> = {
+   /* Public site. Copy is prescribed by p.4 — do not reword. */
+   website: {
+     eyebrow: site.hero.eyebrow,
+     h1: site.hero.h1,
+     sub: site.hero.sub,
++    subKicker: site.hero.subKicker,
+     cta: site.hero.primary,
+     href: EVENT_PATH,
+   },
+@@ -56,6 +58,9 @@
+           <p className="tag on-dark">{c.eyebrow}</p>
+           <h1>{c.h1}</h1>
+           <p className="sub">{c.sub}</p>
++          {/* Felicia §1, 2026-08-27: the hero carries two lines now. Reuses
++              .sub rather than adding a class — same style, no new component. */}
++          {c.subKicker && <p className="sub">{c.subKicker}</p>}
+         </div>
+ 
+         {/* Artwork on its white plate. Square corners — p.4 shows a plain
+@@ -115,7 +120,11 @@
+             Restore the Link when the university opens. */}
+         {PATHWAY.map(l => (
+           <div className="course course-off" key={l.slug}>
+-            <span className="nm">{l.label}</span>
++            {/* Felicia 2026-08-27: the card label carries the role as a second
++                half, e.g. FRESHMAN · FOUNDATION. Appended inside the existing
++                .nm span rather than as a new element — .nm already uppercases
++                and tracks the text, so no CSS changes and no new component. */}
++            <span className="nm">{l.label} · {l.role}</span>
+             <span className="goal">{l.goal}</span>
+           </div>
+         ))}
+diff -ru /tmp/src-before/config/integrations.ts src/config/integrations.ts
+--- /tmp/src-before/config/integrations.ts	2026-08-28 01:42:10.830895037 +0000
++++ src/config/integrations.ts	2026-08-28 01:45:17.039838778 +0000
+@@ -57,12 +57,15 @@
+    Rendered ONLY on marketing pages — see ChatWidget.tsx. Empty string disables
+    it everywhere, which is the switch to reach for if it misbehaves during the
+    event rather than editing pages under pressure. */
+-/* Updated 2026-08-26 — Jake supplied a new widget. The old ID was
+-   6a79e193ae5432b1ab54efbc.
++/* Updated 2026-08-27 — Jake supplied a third widget. Previous IDs, newest
++   first: 6a8ef044c9f1f7efa741592c (26 Aug), 6a79e193ae5432b1ab54efbc (19 Aug).
++   Only the ID changes between them; the loader src and data-resources-url in
++   Jake's embed snippet have been identical each time, so ChatWidget.tsx needs
++   no edit.
+    Empty string disables the widget everywhere without a deploy: the switch to
+    reach for if it misbehaves on the day rather than editing pages under
+    pressure. */
+-export const CHAT_WIDGET_ID = '6a8ef044c9f1f7efa741592c'
++export const CHAT_WIDGET_ID = '6a903f99d45d62178f802e29'
+ 
+ /* ── CAMPAIGN ATTRIBUTION ───────────────────────────────────────────────────
+    Felicia §7: "We do not necessarily need separate signup pages for every staff
+diff -ru /tmp/src-before/content/event.ts src/content/event.ts
+--- /tmp/src-before/content/event.ts	2026-08-28 01:42:10.831607957 +0000
++++ src/content/event.ts	2026-08-28 01:42:48.203988227 +0000
+@@ -48,16 +48,20 @@
+   offer: {
+     badge: 'FREE GWOP BLUEPRINT™',
+     line: '60 seconds. 7 questions. Your next financial moves.',
+-    /* From Felicia's 2026-08-26 mockup. */
+-    promise: 'See where you stand — and what to do next.',
++    /* Felicia §2, 2026-08-27: this line now carries the hero on its own. The
++       longer `support` paragraph above it is no longer rendered — her reason:
++       "This page is being scanned in a live event environment, so I want the
++       value understood immediately." `support` is kept in this file because
++       it is Visual Build Package p.7 copy; it is simply not shown on /830. */
++    promise: 'See where you stand — and get your next 3 financial moves.',
+ 
+     /* The three proof points, icons supplied by Shin 2026-08-27.
+        Order matches her mockup: time, effort, outcome — cheapest commitment
+        first, payoff last. */
+     stats: [
+       { icon: 'icon-seconds',   h: '60 SECONDS',   p: 'Quick to complete.' },
+-      { icon: 'icon-questions', h: '7 QUESTIONS',  p: 'Simple. Straightforward.' },
+-      { icon: 'icon-moves',     h: 'YOUR NEXT 3 FINANCIAL MOVES', p: 'Personalized for you.' },
++      { icon: 'icon-questions', h: '7 QUESTIONS',  p: 'Simple and straightforward.' },
++      { icon: 'icon-moves',     h: '3 NEXT MOVES', p: 'Personalized for you.' },
+     ],
+   },
+ 
+@@ -73,27 +77,30 @@
+ 
+   // Offer — Surpaul approves (Tracker: due Aug 17)
+   incentives: {
+-    h2: 'Three things, free, for showing up.',
++    h2: 'Three benefits. Yours today.',
+     lede: 'Sign up at the table and all three are yours.',
+     items: [
+-      { h: 'Free GWOP Wealth Blueprint',
+-        p: 'Your personal starting point, built around what you need help with.',
+-        pending: true },
++      /* Wording supplied verbatim by Felicia, 2026-08-27 §3. `pending` flipped
++         to false: she is the approver, and these are now her words. */
++      { h: 'Free GWOP Blueprint',
++        p: 'Your personalized starting point based on where you are now.',
++        pending: false },
+       { h: 'Founding Member Access',
+-        p: 'Get in ahead of everyone else, at founding member terms.',
+-        pending: true },
+-      { h: 'Scholarship Chance',
+-        p: 'Everyone who signs up today is entered.',
+-        pending: true },
++        p: 'Get early access to GWOP University.',
++        pending: false },
++      { h: 'Scholarship Opportunity',
++        p: 'Sign up today to be entered.',
++        pending: false },
+     ],
+   },
+ 
+   about: {
+     h2: 'What is GWOP University?',
+     lines: [
+-      'We teach everyday people how to go from financial confusion to financial confidence — credit, funding, business and wealth.',
+-      'Money does not respond to emotion. It responds to structure.',
+-      'We show you the structure.',
++      /* Felicia §4, 2026-08-27, verbatim. */
++      'GWOP University teaches the money game most of us were never taught — credit, funding, business and wealth.',
++      'Money doesn’t respond to emotion. It responds to structure.',
++      'We teach you the structure.',
+     ],
+   },
+ 
+@@ -103,7 +110,7 @@
+        a change to make unilaterally. Flagged with Felicia. */
+     step: 'Step 1 of 2',
+     h2: 'What do you want help with?',
+-    lede: 'Pick one and we’ll send the right blueprint.',
++    lede: 'Choose where you need the most help right now.',
+     skip: 'Not sure yet — just sign me up',
+   },
+ 
+diff -ru /tmp/src-before/content/pathway.ts src/content/pathway.ts
+--- /tmp/src-before/content/pathway.ts	2026-08-28 01:42:10.831995020 +0000
++++ src/content/pathway.ts	2026-08-28 03:56:34.192200899 +0000
+@@ -4,6 +4,14 @@
+    Safe to edit: label, goal, detail, role. Do not change `slug` or order.
+    ═══════════════════════════════════════════════════════════════════════════ */
+ export const PATHWAY = [
++  /* `role` is the second half of the card label, e.g. FRESHMAN · FOUNDATION.
++     Wording is Felicia's polish pass §1, which matches each `goal` below.
++     ⚠ Her 27 Aug message proposed Foundation / Build / Scale / Wealth instead.
++     NOT applied: three of the four would sit above a goal line that says
++     something else (BUILD above "Become capital-ready", SCALE above "Build +
++     scale"), and the role also renders on /830, which she asked to keep stable.
++     Flagged with her; change these only on her confirmation, and update the
++     `goal` lines in the same edit if she wants them. */
+   { slug: 'freshman',  n: 1, label: 'Freshman',  role: 'Foundation',
+     goal: 'Build the foundation',
+     detail: 'Credit · cash flow · banking · debt' },
+diff -ru /tmp/src-before/content/site.ts src/content/site.ts
+--- /tmp/src-before/content/site.ts	2026-08-28 01:42:10.832017951 +0000
++++ src/content/site.ts	2026-08-28 02:19:13.150816941 +0000
+@@ -8,11 +8,16 @@
+   motto:   'KNOWLEDGE PAYS',
+   tagline: 'They never taught us the game — so we built the school.',
+ 
+-  /* Prescribed verbatim by Visual Build Package p.5. DO NOT REWORD. */
++  /* Prescribed verbatim by Visual Build Package p.5. DO NOT REWORD.
++     Exception: `sub` / `subKicker` replaced 2026-08-27 on Felicia's written
++     instruction (§1 of her polish pass). She owns this copy and superseded
++     p.5 explicitly, so the DO-NOT-REWORD note above still stands against
++     anyone else editing it. */
+   hero: {
+     eyebrow:   'GWOP University',
+     h1:        'Knowledge Pays.',
+-    sub:       'Build your financial foundation. Strengthen your credit. Prepare your business for capital.',
++    sub:       'Learn the money game. Build your blueprint.',
++    subKicker: 'Credit. Funding. Business. Wealth.',
+     primary:   'Start your blueprint',
+   },
+ 
+@@ -28,19 +33,29 @@
+     { name: 'Instagram', url: 'https://www.instagram.com/gwopuniversity', pending: false },
+     { name: 'TikTok',    url: 'https://www.tiktok.com/@gwopuniversity',   pending: false },
+     { name: 'YouTube',   url: 'https://youtube.com/@cottrellenterprises', pending: false },
+-    /* Facebook and LinkedIn removed rather than left empty — an unlinked label
+-       reads as "coming soon", which is a promise nobody has made. Add them back
+-       here when the accounts are confirmed. */
++    /* ✅ CONFIRMED — supplied 2026-08-27.
++       ⚠ Left percent-encoded ON PURPOSE. The LinkedIn vanity slug ends in a
++       trademark symbol followed by an emoji variation selector (U+2122 U+FE0F).
++       Written as literal characters they are easy to strip, normalise away or
++       mangle in transit, and any of those produces a 404. %E2%84%A2%EF%B8%8F is
++       the same slug in a form that survives copy-paste. Do not "clean this up".
++       Worth asking LinkedIn admin to set a plain slug — the symbol buys nothing
++       in a URL and is a standing fragility. */
++    { name: 'LinkedIn',  url: 'https://www.linkedin.com/company/gwop-university-%E2%84%A2%EF%B8%8F/', pending: false },
++    /* Facebook removed rather than left empty — an unlinked label reads as
++       "coming soon", which is a promise nobody has made. Add it back here when
++       the account is confirmed. */
+   ],
+ 
+ } as const
+ 
+ /* ── LEGAL — ⚠️ ATTORNEY-SUPPLIED ONLY. Never draft or reword. ───────────── */
+ export const legal = {
+-  /* Still open. Felicia, Aug 18: "please confirm the exact legal entity name
+-     and city being used for A2P so Cedric can mirror it across the website and
+-     legal pages." The city came back; the entity name is with Surpaul / Jake. */
+-  entity:  { text: '[Legal Entity Name]', pending: true },
++  /* ✅ CONFIRMED — supplied 2026-08-27 in Felicia's polish pass §10: "replaced
++     everywhere before launch with the exact registered legal entity name."
++     ⚠ This string must match the entity registered for A2P exactly. If the A2P
++     filing reads differently, the filing wins and this changes to match. */
++  entity:  { text: 'Simple Strategy Consulting LLC', pending: false },
+   /* ✅ CONFIRMED — Surpaul proposed Boston, Felicia agreed Aug 18: "Boston, MA
+      works for me. It keeps everything consistent with the launch and current
+      activation. We can always update the primary location later as GWOP

@@ -120,7 +120,11 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
             Restore the Link when the university opens. */}
         {PATHWAY.map(l => (
           <div className="course course-off" key={l.slug}>
-            <span className="nm">{l.label}</span>
+            {/* Felicia 2026-08-27: the card label carries the role as a second
+                half, e.g. FRESHMAN · FOUNDATION. Appended inside the existing
+                .nm span rather than as a new element — .nm already uppercases
+                and tracks the text, so no CSS changes and no new component. */}
+            <span className="nm">{l.label} · {l.role}</span>
             <span className="goal">{l.goal}</span>
           </div>
         ))}

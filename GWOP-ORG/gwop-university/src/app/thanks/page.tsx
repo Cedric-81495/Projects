@@ -42,8 +42,12 @@ export default function Thanks() {
       <div className="wrap">
         <section className="evsect pb">
           <p className="tag">What happens next</p>
-          <h2>Three things.</h2>
-          <p className="evlede">In the next few minutes, and before you leave the table.</p>
+          {/* ⚠ Count hardcoded here AND in Assessment.tsx's NextSteps. Both
+              must match event.thanks.next.length. Cut to two on 2026-08-27
+              when Felicia removed the founding-member item and the
+              text-delivery promise for Sunday. */}
+          <h2>Two things.</h2>
+          <p className="evlede">Before you leave the table.</p>
 
           <div className="evgifts">
             {event.thanks.next.map((n, i) => (

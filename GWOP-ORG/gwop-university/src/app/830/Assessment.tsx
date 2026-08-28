@@ -502,9 +502,13 @@ function NextSteps() {
   return (
     <section className="evas-next-steps">
       <span className="evas-eyebrow">What happens next</span>
-      <h4>Three things.</h4>
+      {/* ⚠ Count is hardcoded and MUST match event.thanks.next.length. It was
+          "Three things" until 2026-08-27, when Felicia cut the founding-member
+          item and the text-delivery promise for Sunday. If that array changes
+          again, change this line in the same edit. */}
+      <h4>Two things.</h4>
       <p className="evas-lead">
-        In the next few minutes, and before you leave the table.
+        Before you leave the table.
       </p>
 
       <ol className="evas-steps">

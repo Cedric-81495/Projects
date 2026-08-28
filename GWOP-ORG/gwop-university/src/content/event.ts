@@ -181,10 +181,27 @@ export const event = {
       pending: false,
     },
 
+    /* ⚠ TWO ITEMS, NOT THREE, AND NEITHER PROMISES A DELIVERY.
+       Felicia, 2026-08-27, ruling on the 8/30 scope: the journey is lead
+       capture → Blueprint → booking, with no account creation on the day.
+
+       · "Watch for a text" is gone. It promised a Blueprint by text that no
+         nurture message actually sends, and the attendee has just read the
+         Blueprint on screen — so there was nothing to deliver. Her words:
+         "reword the on-screen line rather than promising delivery of something
+         they've already seen. Follow-up can reinforce their next step." The
+         replacement points at the booking, which is live and is the real next
+         step.
+       · The founding-member item is gone for Sunday. It was marked
+         `pending: true`, but that flag never hid anything — Tbc renders its
+         children plainly — so unapproved wording was live in front of every
+         attendee. Felicia: "hide it for Sunday."
+
+       ⚠ NextSteps hardcodes the count in its heading. If this array changes
+       length again, fix the heading in Assessment.tsx too. */
     next: [
-      { h: 'Watch for a text', p: 'Your starting point arrives in the next few minutes.' },
       { h: 'Talk to Surpaul', p: 'Come find him at the table — he’ll walk you through what your blueprint means.' },
-      { h: 'Founding member', p: 'Ask about founding member access while you’re here.', pending: true },
+      { h: 'Book your session', p: 'One hour with Beast to walk through your roadmap. Pick a time below.' },
     ],
   },
 } as const

@@ -8,11 +8,16 @@ export const site = {
   motto:   'KNOWLEDGE PAYS',
   tagline: 'They never taught us the game — so we built the school.',
 
-  /* Prescribed verbatim by Visual Build Package p.5. DO NOT REWORD. */
+  /* Prescribed verbatim by Visual Build Package p.5. DO NOT REWORD.
+     Exception: `sub` / `subKicker` replaced 2026-08-27 on Felicia's written
+     instruction (§1 of her polish pass). She owns this copy and superseded
+     p.5 explicitly, so the DO-NOT-REWORD note above still stands against
+     anyone else editing it. */
   hero: {
     eyebrow:   'GWOP University',
     h1:        'Knowledge Pays.',
-    sub:       'Build your financial foundation. Strengthen your credit. Prepare your business for capital.',
+    sub:       'Learn the money game. Build your blueprint.',
+    subKicker: 'Credit. Funding. Business. Wealth.',
     primary:   'Start your blueprint',
   },
 
@@ -37,10 +42,11 @@ export const site = {
 
 /* ── LEGAL — ⚠️ ATTORNEY-SUPPLIED ONLY. Never draft or reword. ───────────── */
 export const legal = {
-  /* Still open. Felicia, Aug 18: "please confirm the exact legal entity name
-     and city being used for A2P so Cedric can mirror it across the website and
-     legal pages." The city came back; the entity name is with Surpaul / Jake. */
-  entity:  { text: '[Legal Entity Name]', pending: true },
+  /* ✅ CONFIRMED — supplied 2026-08-27 in Felicia's polish pass §10: "replaced
+     everywhere before launch with the exact registered legal entity name."
+     ⚠ This string must match the entity registered for A2P exactly. If the A2P
+     filing reads differently, the filing wins and this changes to match. */
+  entity:  { text: 'Simple Strategy Consulting LLC', pending: false },
   /* ✅ CONFIRMED — Surpaul proposed Boston, Felicia agreed Aug 18: "Boston, MA
      works for me. It keeps everything consistent with the launch and current
      activation. We can always update the primary location later as GWOP

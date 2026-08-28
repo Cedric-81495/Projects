@@ -44,10 +44,12 @@ export default function EventPage() {
           <span className="evrule" aria-hidden="true" />
           <p className="evkw">{event.kicker}</p>
 
-          {/* Felicia §2 supporting copy */}
-          <p className="evsupport">{event.support}</p>
+          {/* Felicia §2, 2026-08-27: the longer supporting paragraph that sat
+              here is no longer rendered — "we don't need the longer paragraph
+              above it". The single promise line below now carries the hero.
+              event.support is left in content/event.ts as the p.7 record. */}
 
-          {/* Felicia, 2026-08-22 — her wording, verbatim. Reuses .evkw and
+          {/* Felicia, 2026-08-22, reworded by her 2026-08-27. Reuses .evkw and
               .evsupport, the existing hero text styles. No new styling. */}
           <p className="evsupport">{event.offer.promise}</p>
 

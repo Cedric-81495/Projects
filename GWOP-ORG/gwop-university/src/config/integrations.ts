@@ -57,8 +57,11 @@ export const EVENT_TAG = 'EVENT - Everybody Gotta Eat - 08/30/26'
    Rendered ONLY on marketing pages — see ChatWidget.tsx. Empty string disables
    it everywhere, which is the switch to reach for if it misbehaves during the
    event rather than editing pages under pressure. */
-/* Updated 2026-08-26 — Jake supplied a new widget. The old ID was
-   6a79e193ae5432b1ab54efbc.
+/* Updated 2026-08-27 — Jake supplied a third widget. Previous IDs, newest
+   first: 6a8ef044c9f1f7efa741592c (26 Aug), 6a79e193ae5432b1ab54efbc (19 Aug).
+   Only the ID changes between them; the loader src and data-resources-url in
+   Jake's embed snippet have been identical each time, so ChatWidget.tsx needs
+   no edit.
    Empty string disables the widget everywhere without a deploy: the switch to
    reach for if it misbehaves on the day rather than editing pages under
    pressure. */

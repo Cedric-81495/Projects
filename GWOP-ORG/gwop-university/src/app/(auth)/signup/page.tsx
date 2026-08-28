@@ -11,7 +11,7 @@ export default function SignupPage() {
   return (
     <>
       <h1 className="auh1">Create your account</h1>
-      <p className="ausub">Start your blueprint. Study in order, at your own pace.</p>
+      <p className="ausub">Your blueprint starts here. Learn at your pace. Build in order.</p>
       <SignupForm />
       <p className="aufoot">
         Already have an account? <Link href="/login">Sign in</Link>

@@ -52,17 +52,17 @@ export default async function MembershipPage() {
         </p>
         <p className="tag">Membership</p>
         <h1 className="h2">Four levels. One blueprint.</h1>
+        {/* Felicia §8, 2026-08-27, verbatim. */}
         <p className="lede">
-          Each level has a clear purpose and a clear outcome. You finish one before you start
-          the next — that&rsquo;s the whole point.
+          Build the foundation. Become capital-ready. Build and scale. Protect what you create.
         </p>
 
         {!plans?.length ? (
           <div className="mbempty">
-            <h2>Pricing is being finalised</h2>
-            <p>
-              The four levels are set. Enrollment opens as soon as pricing is confirmed.
-            </p>
+            {/* Felicia §8: "same meaning, but it reads intentionally rather
+                than like unfinished development." */}
+            <h2>Founding Membership Coming Soon</h2>
+            <p>Enrollment details are coming soon.</p>
           </div>
         ) : (
           <div className="mbgrid">

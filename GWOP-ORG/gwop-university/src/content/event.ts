@@ -48,16 +48,20 @@ export const event = {
   offer: {
     badge: 'FREE GWOP BLUEPRINT™',
     line: '60 seconds. 7 questions. Your next financial moves.',
-    /* From Felicia's 2026-08-26 mockup. */
-    promise: 'See where you stand — and what to do next.',
+    /* Felicia §2, 2026-08-27: this line now carries the hero on its own. The
+       longer `support` paragraph above it is no longer rendered — her reason:
+       "This page is being scanned in a live event environment, so I want the
+       value understood immediately." `support` is kept in this file because
+       it is Visual Build Package p.7 copy; it is simply not shown on /830. */
+    promise: 'See where you stand — and get your next 3 financial moves.',
 
     /* The three proof points, icons supplied by Shin 2026-08-27.
        Order matches her mockup: time, effort, outcome — cheapest commitment
        first, payoff last. */
     stats: [
       { icon: 'icon-seconds',   h: '60 SECONDS',   p: 'Quick to complete.' },
-      { icon: 'icon-questions', h: '7 QUESTIONS',  p: 'Simple. Straightforward.' },
-      { icon: 'icon-moves',     h: 'YOUR NEXT 3 FINANCIAL MOVES', p: 'Personalized for you.' },
+      { icon: 'icon-questions', h: '7 QUESTIONS',  p: 'Simple and straightforward.' },
+      { icon: 'icon-moves',     h: '3 NEXT MOVES', p: 'Personalized for you.' },
     ],
   },
 
@@ -73,27 +77,30 @@ export const event = {
 
   // Offer — Surpaul approves (Tracker: due Aug 17)
   incentives: {
-    h2: 'Three things, free, for showing up.',
+    h2: 'Three benefits. Yours today.',
     lede: 'Sign up at the table and all three are yours.',
     items: [
-      { h: 'Free GWOP Wealth Blueprint',
-        p: 'Your personal starting point, built around what you need help with.',
-        pending: true },
+      /* Wording supplied verbatim by Felicia, 2026-08-27 §3. `pending` flipped
+         to false: she is the approver, and these are now her words. */
+      { h: 'Free GWOP Blueprint',
+        p: 'Your personalized starting point based on where you are now.',
+        pending: false },
       { h: 'Founding Member Access',
-        p: 'Get in ahead of everyone else, at founding member terms.',
-        pending: true },
-      { h: 'Scholarship Chance',
-        p: 'Everyone who signs up today is entered.',
-        pending: true },
+        p: 'Get early access to GWOP University.',
+        pending: false },
+      { h: 'Scholarship Opportunity',
+        p: 'Sign up today to be entered.',
+        pending: false },
     ],
   },
 
   about: {
     h2: 'What is GWOP University?',
     lines: [
-      'We teach everyday people how to go from financial confusion to financial confidence — credit, funding, business and wealth.',
-      'Money does not respond to emotion. It responds to structure.',
-      'We show you the structure.',
+      /* Felicia §4, 2026-08-27, verbatim. */
+      'GWOP University teaches the money game most of us were never taught — credit, funding, business and wealth.',
+      'Money doesn’t respond to emotion. It responds to structure.',
+      'We teach you the structure.',
     ],
   },
 
@@ -103,7 +110,7 @@ export const event = {
        a change to make unilaterally. Flagged with Felicia. */
     step: 'Step 1 of 2',
     h2: 'What do you want help with?',
-    lede: 'Pick one and we’ll send the right blueprint.',
+    lede: 'Choose where you need the most help right now.',
     skip: 'Not sure yet — just sign me up',
   },
 

@@ -23,13 +23,15 @@ import { EVENT_PATH } from '@/config/integrations'
 type Surface = 'website' | 'app'
 
 const SURFACES: Record<Surface, {
-  eyebrow: string; h1: string; sub: string; cta: string; href: string
+  eyebrow: string; h1: string; sub: string; subKicker?: string
+  cta: string; href: string
 }> = {
   /* Public site. Copy is prescribed by p.4 — do not reword. */
   website: {
     eyebrow: site.hero.eyebrow,
     h1: site.hero.h1,
     sub: site.hero.sub,
+    subKicker: site.hero.subKicker,
     cta: site.hero.primary,
     href: EVENT_PATH,
   },
@@ -56,6 +58,9 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
           <p className="tag on-dark">{c.eyebrow}</p>
           <h1>{c.h1}</h1>
           <p className="sub">{c.sub}</p>
+          {/* Felicia §1, 2026-08-27: the hero carries two lines now. Reuses
+              .sub rather than adding a class — same style, no new component. */}
+          {c.subKicker && <p className="sub">{c.subKicker}</p>}
         </div>
 
         {/* Artwork on its white plate. Square corners — p.4 shows a plain

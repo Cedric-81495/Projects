@@ -19,7 +19,7 @@ export default async function LoginPage({
   return (
     <>
       <h1 className="auh1">Sign in</h1>
-      <p className="ausub">Pick up where you left off.</p>
+      <p className="ausub">Continue your GWOP journey.</p>
 
       {params.error === 'link_invalid' && (
         <p className="aualert" role="alert">

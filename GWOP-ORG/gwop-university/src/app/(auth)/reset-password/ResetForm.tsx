@@ -1,10 +1,10 @@
 'use client'
 
 import { useActionState } from 'react'
-import Script from 'next/script'
 import { requestPasswordReset, type ActionState } from '@/lib/auth/actions'
 import { publicEnv } from '@/lib/env.public'
 import { OfflineNotice } from '@/components/auth/OfflineNotice'
+import { TurnstileWidget } from '@/components/auth/TurnstileWidget'
 
 const initial: ActionState = {}
 
@@ -41,8 +41,12 @@ export function ResetForm() {
 
       {siteKey && (
         <>
-          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
-          <div className="cf-turnstile" data-sitekey={siteKey} data-theme="light" />
+          {/* Explicit render — see TurnstileWidget. The implicit `.cf-turnstile`
+              pattern that used to sit here only renders on the script's first
+              load, so arriving here by client-side navigation (log out → /login
+              → "Create your account") produced no widget, no token, and a form
+              that could not be submitted. */}
+          <TurnstileWidget siteKey={siteKey} />
         </>
       )}
 

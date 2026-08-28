@@ -10,6 +10,67 @@ diff -ru /tmp/src-before/app/(auth)/login/page.tsx src/app/(auth)/login/page.tsx
  
        {params.error === 'link_invalid' && (
          <p className="aualert" role="alert">
+diff -ru /tmp/src-before/app/(auth)/reset-password/ResetForm.tsx src/app/(auth)/reset-password/ResetForm.tsx
+--- /tmp/src-before/app/(auth)/reset-password/ResetForm.tsx	2026-08-28 01:42:10.811447825 +0000
++++ src/app/(auth)/reset-password/ResetForm.tsx	2026-08-28 09:25:07.283325841 +0000
+@@ -1,10 +1,10 @@
+ 'use client'
+ 
+ import { useActionState } from 'react'
+-import Script from 'next/script'
+ import { requestPasswordReset, type ActionState } from '@/lib/auth/actions'
+ import { publicEnv } from '@/lib/env.public'
+ import { OfflineNotice } from '@/components/auth/OfflineNotice'
++import { TurnstileWidget } from '@/components/auth/TurnstileWidget'
+ 
+ const initial: ActionState = {}
+ 
+@@ -41,8 +41,12 @@
+ 
+       {siteKey && (
+         <>
+-          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+-          <div className="cf-turnstile" data-sitekey={siteKey} data-theme="light" />
++          {/* Explicit render — see TurnstileWidget. The implicit `.cf-turnstile`
++              pattern that used to sit here only renders on the script's first
++              load, so arriving here by client-side navigation (log out → /login
++              → "Create your account") produced no widget, no token, and a form
++              that could not be submitted. */}
++          <TurnstileWidget siteKey={siteKey} />
+         </>
+       )}
+ 
+diff -ru /tmp/src-before/app/(auth)/signup/SignupForm.tsx src/app/(auth)/signup/SignupForm.tsx
+--- /tmp/src-before/app/(auth)/signup/SignupForm.tsx	2026-08-28 01:42:10.811889073 +0000
++++ src/app/(auth)/signup/SignupForm.tsx	2026-08-28 09:25:07.280184804 +0000
+@@ -1,11 +1,11 @@
+ 'use client'
+ 
+ import { useActionState } from 'react'
+-import Script from 'next/script'
+ import { signUp, type ActionState } from '@/lib/auth/actions'
+ import { publicEnv } from '@/lib/env.public'
+ import { PasswordField } from '@/components/auth/PasswordField'
+ import { OfflineNotice } from '@/components/auth/OfflineNotice'
++import { TurnstileWidget } from '@/components/auth/TurnstileWidget'
+ 
+ const initial: ActionState = {}
+ 
+@@ -63,8 +63,12 @@
+ 
+       {siteKey && (
+         <>
+-          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+-          <div className="cf-turnstile" data-sitekey={siteKey} data-theme="light" />
++          {/* Explicit render — see TurnstileWidget. The implicit `.cf-turnstile`
++              pattern that used to sit here only renders on the script's first
++              load, so arriving here by client-side navigation (log out → /login
++              → "Create your account") produced no widget, no token, and a form
++              that could not be submitted. */}
++          <TurnstileWidget siteKey={siteKey} />
+         </>
+       )}
+ 
 diff -ru /tmp/src-before/app/(auth)/signup/page.tsx src/app/(auth)/signup/page.tsx
 --- /tmp/src-before/app/(auth)/signup/page.tsx	2026-08-28 01:42:10.811676645 +0000
 +++ src/app/(auth)/signup/page.tsx	2026-08-28 01:43:03.064314441 +0000
@@ -240,6 +301,7 @@ diff -ru /tmp/src-before/components/Pathway.tsx src/components/Pathway.tsx
              <span className="goal">{l.goal}</span>
            </div>
          ))}
+Only in src/components/auth: TurnstileWidget.tsx
 diff -ru /tmp/src-before/config/integrations.ts src/config/integrations.ts
 --- /tmp/src-before/config/integrations.ts	2026-08-28 01:42:10.830895037 +0000
 +++ src/config/integrations.ts	2026-08-28 01:45:17.039838778 +0000

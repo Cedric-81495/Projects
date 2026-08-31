@@ -41,9 +41,13 @@ interface Row {
   interest: string | null
   interest_tag: string | null
   source: string | null
-  utm_source: string | null
-  utm_medium: string | null
-  utm_campaign: string | null
+  /* ⚠ ONE jsonb COLUMN, NOT THREE. `leads.utm` is `jsonb not null default
+     '{}'` — there are no utm_source / utm_medium / utm_campaign columns on the
+     table. Selecting them by name is what made this route 500 with "column
+     leads.utm_source does not exist" every time it ran, from the day it was
+     written until 2026-08-31. sync.ts had it right all along: select `utm`,
+     then read the keys off the object. */
+  utm: Record<string, string> | null
   consent_given: boolean | null
   consent_text: string | null
   consent_at: string | null
@@ -106,7 +110,7 @@ export async function GET(req: Request) {
     .from('leads')
     .select(
       'first_name, last_name, email, phone, interest, interest_tag, source, ' +
-        'utm_source, utm_medium, utm_campaign, consent_given, consent_text, ' +
+        'utm, consent_given, consent_text, ' +
         'consent_at, sync_status, created_at, ' +
         'assessments(status, financial_stage, credit_range, emergency_fund, ' +
         'budget_status, currently_building, biggest_blocker, blueprint_slug, ' +
@@ -135,7 +139,11 @@ export async function GET(req: Request) {
     lines.push([
       cell(r.first_name), cell(r.last_name), cell(r.email), cell(r.phone),
       cell(r.interest), cell(r.interest_tag), cell(r.source),
-      cell(r.utm_source), cell(r.utm_medium), cell(r.utm_campaign),
+      /* Header order is utm_source, utm_medium, utm_campaign — keep these
+         three in step with LEAD_EXPORT_HEADERS above. */
+      cell(r.utm?.utm_source ?? null),
+      cell(r.utm?.utm_medium ?? null),
+      cell(r.utm?.utm_campaign ?? null),
       cell(r.consent_given), cell(r.consent_text), cell(r.consent_at),
       cell(a?.status), cell(a?.financial_stage), cell(a?.credit_range),
       cell(a?.emergency_fund), cell(a?.budget_status),

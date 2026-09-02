@@ -1,71 +1,202 @@
-diff -ru /tmp/src-before-fel/app/830/Assessment.tsx src/app/830/Assessment.tsx
---- /tmp/src-before-fel/app/830/Assessment.tsx	2026-08-28 13:37:20.578080652 +0000
-+++ src/app/830/Assessment.tsx	2026-08-28 13:37:27.120404563 +0000
-@@ -502,9 +502,13 @@
-   return (
-     <section className="evas-next-steps">
-       <span className="evas-eyebrow">What happens next</span>
--      <h4>Three things.</h4>
-+      {/* ⚠ Count is hardcoded and MUST match event.thanks.next.length. It was
-+          "Three things" until 2026-08-27, when Felicia cut the founding-member
-+          item and the text-delivery promise for Sunday. If that array changes
-+          again, change this line in the same edit. */}
-+      <h4>Two things.</h4>
+diff -ru /tmp/src-before-evergreen/app/830/Assessment.tsx src/app/830/Assessment.tsx
+--- /tmp/src-before-evergreen/app/830/Assessment.tsx	2026-09-02 02:03:18.563947471 +0000
++++ src/app/830/Assessment.tsx	2026-09-02 02:05:15.694852592 +0000
+@@ -506,9 +506,12 @@
+           "Three things" until 2026-08-27, when Felicia cut the founding-member
+           item and the text-delivery promise for Sunday. If that array changes
+           again, change this line in the same edit. */}
++      {/* ⚠ "Before you leave the table" removed 2026-09-01 — there is no
++          table. The count is still hardcoded and must match
++          event.thanks.next.length. */}
+       <h4>Two things.</h4>
        <p className="evas-lead">
--        In the next few minutes, and before you leave the table.
-+        Before you leave the table.
+-        Before you leave the table.
++        What to do with this.
        </p>
  
        <ol className="evas-steps">
-diff -ru /tmp/src-before-fel/app/thanks/page.tsx src/app/thanks/page.tsx
---- /tmp/src-before-fel/app/thanks/page.tsx	2026-08-28 13:37:20.587273996 +0000
-+++ src/app/thanks/page.tsx	2026-08-28 13:39:16.431878720 +0000
-@@ -42,8 +42,12 @@
-       <div className="wrap">
-         <section className="evsect pb">
-           <p className="tag">What happens next</p>
--          <h2>Three things.</h2>
--          <p className="evlede">In the next few minutes, and before you leave the table.</p>
-+          {/* ⚠ Count hardcoded here AND in Assessment.tsx's NextSteps. Both
-+              must match event.thanks.next.length. Cut to two on 2026-08-27
-+              when Felicia removed the founding-member item and the
-+              text-delivery promise for Sunday. */}
-+          <h2>Two things.</h2>
-+          <p className="evlede">Before you leave the table.</p>
+diff -ru /tmp/src-before-evergreen/app/830/page.tsx src/app/830/page.tsx
+--- /tmp/src-before-evergreen/app/830/page.tsx	2026-09-02 02:03:18.564479476 +0000
++++ src/app/830/page.tsx	2026-09-02 02:05:37.213628338 +0000
+@@ -9,9 +9,19 @@
+ import { InterestForm } from './InterestForm'
+ import { NoThirdPartyWidgets } from '@/components/integrations/NoThirdPartyWidgets'
+ 
+-/* Event page must never be indexed — CLAUDE.md invariant 11 */
++/* ⚠ TITLE DE-DATED 2026-09-01. Was "Build Your GWOP Blueprint — Aug 30".
++   The title is what shows in the browser tab, in a shared link preview, and in
++   a bookmark — so the stalest copy on the page was also the most portable.
++   Someone opening a printed QR card in March would have seen a date five
++   months gone before the page even painted.
++
++   ⚠ STILL NOT INDEXED. Invariant 11 stands. The page is reached by scanning a
++   card or by a funnel handing off to it, never by search, and it has no
++   context of its own for a cold search visitor — /credit is the page built to
++   be found. Do not flip this without deciding what a search result for it
++   should actually promise. */
+ export const metadata: Metadata = {
+-  title: 'Build Your GWOP Blueprint — Aug 30',
++  title: 'Build Your GWOP Blueprint',
+   description: event.kicker,
+   robots: { index: false, follow: false },
+ }
+@@ -90,14 +100,16 @@
+             {event.cta}
+           </a>
+ 
+-          {/* Felicia §3 — renders only once she confirms time/location.
+-              Empty values render nothing rather than an empty label. */}
+-          {(event.details.time.text || event.details.location.text) && (
+-            <p className="evmeta">
+-              {[event.details.time.text, event.details.location.text]
+-                .filter(Boolean).join(' · ')}
+-            </p>
+-          )}
++          {/* ⚠ EVENT META LINE REMOVED 2026-09-01. This rendered
++              "12–6 PM · Central Square, Cambridge, MA" beneath the CTA. The
++              event has passed, so the line was telling every visitor about a
++              date and a room that no longer exist — and Surpaul's printed QR
++              cards point here permanently, so it would have kept doing that
++              indefinitely.
++
++              The `event.details` object was deleted with it rather than
++              blanked, so this condition cannot be quietly revived by someone
++              filling a value back in. */}
+         </div>
+ 
+         {/* p.7: the artwork sits in its own panel to the right of the card */}
+diff -ru /tmp/src-before-evergreen/app/thanks/page.tsx src/app/thanks/page.tsx
+--- /tmp/src-before-evergreen/app/thanks/page.tsx	2026-09-02 02:03:18.571674555 +0000
++++ src/app/thanks/page.tsx	2026-09-02 02:05:15.695539046 +0000
+@@ -46,8 +46,11 @@
+               must match event.thanks.next.length. Cut to two on 2026-08-27
+               when Felicia removed the founding-member item and the
+               text-delivery promise for Sunday. */}
++          {/* ⚠ "Before you leave the table" removed 2026-09-01 — no table.
++              Count hardcoded here AND in Assessment.tsx; both must match
++              event.thanks.next.length. */}
+           <h2>Two things.</h2>
+-          <p className="evlede">Before you leave the table.</p>
++          <p className="evlede">What to do with this.</p>
  
            <div className="evgifts">
              {event.thanks.next.map((n, i) => (
-diff -ru /tmp/src-before-fel/content/event.ts src/content/event.ts
---- /tmp/src-before-fel/content/event.ts	2026-08-28 13:37:20.589212589 +0000
-+++ src/content/event.ts	2026-08-28 13:37:20.680671860 +0000
-@@ -181,10 +181,27 @@
-       pending: false,
-     },
+diff -ru /tmp/src-before-evergreen/config/assessment.ts src/config/assessment.ts
+--- /tmp/src-before-evergreen/config/assessment.ts	2026-09-02 02:03:18.573269205 +0000
++++ src/config/assessment.ts	2026-09-02 02:06:19.096840684 +0000
+@@ -129,6 +129,27 @@
+  * touching real ones. Anything that reaches his live workflow by accident during
+  * testing is a real person receiving a real text.
+  */
++/* ⚠ LEFT UNCHANGED AFTER THE 8/30 DE-EVENTING — DELIBERATELY, BUT IT NEEDS A
++   DECISION.
++
++   This value is stamped on every assessment row. It was not changed with the
++   rest of the event references because it is DATA, not copy: the six existing
++   rows carry it, Jake's reporting groups on it, and rewriting it would break
++   continuity with what has already been captured and delivered to his CRM.
++
++   But it is now wrong going forward. The four leads captured on 31 Aug did not
++   attend the event, and neither will anyone arriving from /credit — yet all of
++   them are stamped as if they had. Every future lead inherits an event key for
++   an afternoon in Cambridge they were never at.
++
++   ⚠ THE FIX IS NOT A CODE CHANGE ALONE. Whatever replaces it has to match what
++   Jake segments on in GHL, so it needs agreeing with him first. The likely
++   answer is a neutral key for evergreen traffic — the funnel already carries
++   its own attribution in utm_source, so the event key could simply become
++   something like 'gwop-evergreen' for anyone not at a physical event.
++
++   Overridable by NEXT_PUBLIC_EVENT_KEY, so a real future event can set its own
++   without a deploy. */
+ export const EVENT_KEY =
+   process.env.NEXT_PUBLIC_EVENT_KEY ?? 'egc-2026-08-30'
  
-+    /* ⚠ TWO ITEMS, NOT THREE, AND NEITHER PROMISES A DELIVERY.
-+       Felicia, 2026-08-27, ruling on the 8/30 scope: the journey is lead
-+       capture → Blueprint → booking, with no account creation on the day.
+diff -ru /tmp/src-before-evergreen/content/event.ts src/content/event.ts
+--- /tmp/src-before-evergreen/content/event.ts	2026-09-02 02:03:18.574116451 +0000
++++ src/content/event.ts	2026-09-02 02:03:55.881754072 +0000
+@@ -1,22 +1,38 @@
+ /* ═══════════════════════════════════════════════════════════════════════════
+-   8/30 EVENT PAGE COPY  —  OWNER: SURPAUL (offer)  ·  SUPPORT: MAUI
++   /830 BLUEPRINT PAGE COPY  —  OWNER: SURPAUL
+    Source: Visual Build Package p.7 + Tracker "8-30 SIGNUP FUNNEL" tab
 +
-+       · "Watch for a text" is gone. It promised a Blueprint by text that no
-+         nurture message actually sends, and the attendee has just read the
-+         Blueprint on screen — so there was nothing to deliver. Her words:
-+         "reword the on-screen line rather than promising delivery of something
-+         they've already seen. Follow-up can reinforce their next step." The
-+         replacement points at the booking, which is live and is the real next
-+         step.
-+       · The founding-member item is gone for Sunday. It was marked
-+         `pending: true`, but that flag never hid anything — Tbc renders its
-+         children plainly — so unapproved wording was live in front of every
-+         attendee. Felicia: "hide it for Sunday."
++   ⚠ NO LONGER AN EVENT PAGE. Rewritten 2026-09-01, after 8/30.
 +
-+       ⚠ NextSteps hardcodes the count in its heading. If this array changes
-+       length again, fix the heading in Assessment.tsx too. */
++   This started as signage for one afternoon in Cambridge and is now the
++   permanent lead-capture and assessment flow. Every reference to a date, a
++   venue, a table, or "today" has been removed — those lines were true on the
++   30th and are actively confusing now. Someone scanning Surpaul's printed
++   cards next March should not read that the offer expires today or be told to
++   find someone at a table that is not there.
++
++   The route stays /830 because the printed QR codes encode it and cannot be
++   reprinted. The name is now just a name.
++
++   ⚠ WHAT THIS MEANS FOR NEW COPY: nothing here may assume the reader is
++   standing in a room with us, or that the offer is time-limited. If a
++   time-bound campaign is wanted later, it belongs on its own funnel page —
++   see /credit for the pattern — not here.
+    ═══════════════════════════════════════════════════════════════════════════ */
+ export const event = {
+-  /* Felicia §3: "Exact event time/location details can be inserted once
+-     confirmed." Editable placeholders so a late answer costs a one-line edit,
+-     not a layout change. Anything still `pending` is highlighted in DRAFT and
+-     is simply not rendered — a blank beats a wrong time on the signage page. */
+-  details: {
+-    name: 'Everybody Gotta Eat',
+-    date: 'August 30, 2026',
+-    /* ✅ CONFIRMED — Felicia, Aug 19: "The event is August 30, 2026, Central
+-       Square, Cambridge, MA, 12–6 PM. Please use that for the event page."
+-       The en-dash in "12–6 PM" is typographic and matches the rest of the copy.
+-       Do not "fix" it to a hyphen. */
+-    time:     { text: '12–6 PM', pending: false },
+-    location: { text: 'Central Square, Cambridge, MA', pending: false },
+-  },
++  /* ⚠ EVENT DETAILS REMOVED 2026-09-01.
++
++     This block carried the name, date, time and venue of the 8/30 activation,
++     and the hero rendered "12–6 PM · Central Square, Cambridge, MA" beneath the
++     CTA. All of it is now false.
++
++     Deleted rather than blanked. An empty `details` object would leave the
++     rendering condition in page.tsx alive, and the next person to add a value
++     there would silently reintroduce a line nobody asked for. The condition is
++     gone too.
++
++     If a future event needs a date and venue on a landing page, build it as its
++     own funnel page rather than making this one time-bound again. */
+ 
+   // Prescribed by Visual Build Package p.7 + Felicia §2 — DO NOT REWORD
+   h1a: 'BUILD YOUR',
+@@ -77,8 +93,12 @@
+ 
+   // Offer — Surpaul approves (Tracker: due Aug 17)
+   incentives: {
+-    h2: 'Three benefits. Yours today.',
+-    lede: 'Sign up at the table and all three are yours.',
++    /* ⚠ DE-EVENTED 2026-09-01. Was "Three benefits. Yours today." with
++       "Sign up at the table and all three are yours." Both assumed the reader
++       was standing at the stand on the day. "Today" also implied an expiry that
++       was never real — the blueprint is free permanently. */
++    h2: 'Three things you get.',
++    lede: 'Free, and yours as soon as you finish the questions.',
+     items: [
+       /* Wording supplied verbatim by Felicia, 2026-08-27 §3. `pending` flipped
+          to false: she is the approver, and these are now her words. */
+@@ -200,7 +220,14 @@
+        ⚠ NextSteps hardcodes the count in its heading. If this array changes
+        length again, fix the heading in Assessment.tsx too. */
      next: [
--      { h: 'Watch for a text', p: 'Your starting point arrives in the next few minutes.' },
-       { h: 'Talk to Surpaul', p: 'Come find him at the table — he’ll walk you through what your blueprint means.' },
--      { h: 'Founding member', p: 'Ask about founding member access while you’re here.', pending: true },
-+      { h: 'Book your session', p: 'One hour with Beast to walk through your roadmap. Pick a time below.' },
+-      { h: 'Talk to Surpaul', p: 'Come find him at the table — he’ll walk you through what your blueprint means.' },
++      /* ⚠ "Talk to Surpaul — come find him at the table" was removed on
++         2026-09-01. There is no table. It was the single most misleading line
++         left on the page: it told someone reading at home to go and find a
++         person in a room that does not exist.
++
++         Replaced with the thing that is true and available at any hour — the
++         roadmap they are looking at, and the booking. */
++      { h: 'Read your next moves', p: 'Your roadmap is above. Start with the first move and work down.' },
+       { h: 'Book your session', p: 'One hour with Beast to walk through your roadmap. Pick a time below.' },
      ],
    },
- } as const
-\ No newline at end of file

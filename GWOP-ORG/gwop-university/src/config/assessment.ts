@@ -129,6 +129,27 @@ export const TOTAL_STEPS = ASSESSMENT_QUESTIONS.length + 1
  * touching real ones. Anything that reaches his live workflow by accident during
  * testing is a real person receiving a real text.
  */
+/* ⚠ LEFT UNCHANGED AFTER THE 8/30 DE-EVENTING — DELIBERATELY, BUT IT NEEDS A
+   DECISION.
+
+   This value is stamped on every assessment row. It was not changed with the
+   rest of the event references because it is DATA, not copy: the six existing
+   rows carry it, Jake's reporting groups on it, and rewriting it would break
+   continuity with what has already been captured and delivered to his CRM.
+
+   But it is now wrong going forward. The four leads captured on 31 Aug did not
+   attend the event, and neither will anyone arriving from /credit — yet all of
+   them are stamped as if they had. Every future lead inherits an event key for
+   an afternoon in Cambridge they were never at.
+
+   ⚠ THE FIX IS NOT A CODE CHANGE ALONE. Whatever replaces it has to match what
+   Jake segments on in GHL, so it needs agreeing with him first. The likely
+   answer is a neutral key for evergreen traffic — the funnel already carries
+   its own attribution in utm_source, so the event key could simply become
+   something like 'gwop-evergreen' for anyone not at a physical event.
+
+   Overridable by NEXT_PUBLIC_EVENT_KEY, so a real future event can set its own
+   without a deploy. */
 export const EVENT_KEY =
   process.env.NEXT_PUBLIC_EVENT_KEY ?? 'egc-2026-08-30'
 

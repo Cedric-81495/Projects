@@ -46,8 +46,11 @@ export default function Thanks() {
               must match event.thanks.next.length. Cut to two on 2026-08-27
               when Felicia removed the founding-member item and the
               text-delivery promise for Sunday. */}
+          {/* ⚠ "Before you leave the table" removed 2026-09-01 — no table.
+              Count hardcoded here AND in Assessment.tsx; both must match
+              event.thanks.next.length. */}
           <h2>Two things.</h2>
-          <p className="evlede">Before you leave the table.</p>
+          <p className="evlede">What to do with this.</p>
 
           <div className="evgifts">
             {event.thanks.next.map((n, i) => (

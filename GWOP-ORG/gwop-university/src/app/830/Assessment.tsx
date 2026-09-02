@@ -506,9 +506,12 @@ function NextSteps() {
           "Three things" until 2026-08-27, when Felicia cut the founding-member
           item and the text-delivery promise for Sunday. If that array changes
           again, change this line in the same edit. */}
+      {/* ⚠ "Before you leave the table" removed 2026-09-01 — there is no
+          table. The count is still hardcoded and must match
+          event.thanks.next.length. */}
       <h4>Two things.</h4>
       <p className="evas-lead">
-        Before you leave the table.
+        What to do with this.
       </p>
 
       <ol className="evas-steps">

@@ -1,22 +1,38 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   8/30 EVENT PAGE COPY  —  OWNER: SURPAUL (offer)  ·  SUPPORT: MAUI
+   /830 BLUEPRINT PAGE COPY  —  OWNER: SURPAUL
    Source: Visual Build Package p.7 + Tracker "8-30 SIGNUP FUNNEL" tab
+
+   ⚠ NO LONGER AN EVENT PAGE. Rewritten 2026-09-01, after 8/30.
+
+   This started as signage for one afternoon in Cambridge and is now the
+   permanent lead-capture and assessment flow. Every reference to a date, a
+   venue, a table, or "today" has been removed — those lines were true on the
+   30th and are actively confusing now. Someone scanning Surpaul's printed
+   cards next March should not read that the offer expires today or be told to
+   find someone at a table that is not there.
+
+   The route stays /830 because the printed QR codes encode it and cannot be
+   reprinted. The name is now just a name.
+
+   ⚠ WHAT THIS MEANS FOR NEW COPY: nothing here may assume the reader is
+   standing in a room with us, or that the offer is time-limited. If a
+   time-bound campaign is wanted later, it belongs on its own funnel page —
+   see /credit for the pattern — not here.
    ═══════════════════════════════════════════════════════════════════════════ */
 export const event = {
-  /* Felicia §3: "Exact event time/location details can be inserted once
-     confirmed." Editable placeholders so a late answer costs a one-line edit,
-     not a layout change. Anything still `pending` is highlighted in DRAFT and
-     is simply not rendered — a blank beats a wrong time on the signage page. */
-  details: {
-    name: 'Everybody Gotta Eat',
-    date: 'August 30, 2026',
-    /* ✅ CONFIRMED — Felicia, Aug 19: "The event is August 30, 2026, Central
-       Square, Cambridge, MA, 12–6 PM. Please use that for the event page."
-       The en-dash in "12–6 PM" is typographic and matches the rest of the copy.
-       Do not "fix" it to a hyphen. */
-    time:     { text: '12–6 PM', pending: false },
-    location: { text: 'Central Square, Cambridge, MA', pending: false },
-  },
+  /* ⚠ EVENT DETAILS REMOVED 2026-09-01.
+
+     This block carried the name, date, time and venue of the 8/30 activation,
+     and the hero rendered "12–6 PM · Central Square, Cambridge, MA" beneath the
+     CTA. All of it is now false.
+
+     Deleted rather than blanked. An empty `details` object would leave the
+     rendering condition in page.tsx alive, and the next person to add a value
+     there would silently reintroduce a line nobody asked for. The condition is
+     gone too.
+
+     If a future event needs a date and venue on a landing page, build it as its
+     own funnel page rather than making this one time-bound again. */
 
   // Prescribed by Visual Build Package p.7 + Felicia §2 — DO NOT REWORD
   h1a: 'BUILD YOUR',
@@ -77,8 +93,12 @@ export const event = {
 
   // Offer — Surpaul approves (Tracker: due Aug 17)
   incentives: {
-    h2: 'Three benefits. Yours today.',
-    lede: 'Sign up at the table and all three are yours.',
+    /* ⚠ DE-EVENTED 2026-09-01. Was "Three benefits. Yours today." with
+       "Sign up at the table and all three are yours." Both assumed the reader
+       was standing at the stand on the day. "Today" also implied an expiry that
+       was never real — the blueprint is free permanently. */
+    h2: 'Three things you get.',
+    lede: 'Free, and yours as soon as you finish the questions.',
     items: [
       /* Wording supplied verbatim by Felicia, 2026-08-27 §3. `pending` flipped
          to false: she is the approver, and these are now her words. */
@@ -200,7 +220,14 @@ export const event = {
        ⚠ NextSteps hardcodes the count in its heading. If this array changes
        length again, fix the heading in Assessment.tsx too. */
     next: [
-      { h: 'Talk to Surpaul', p: 'Come find him at the table — he’ll walk you through what your blueprint means.' },
+      /* ⚠ "Talk to Surpaul — come find him at the table" was removed on
+         2026-09-01. There is no table. It was the single most misleading line
+         left on the page: it told someone reading at home to go and find a
+         person in a room that does not exist.
+
+         Replaced with the thing that is true and available at any hour — the
+         roadmap they are looking at, and the booking. */
+      { h: 'Read your next moves', p: 'Your roadmap is above. Start with the first move and work down.' },
       { h: 'Book your session', p: 'One hour with Beast to walk through your roadmap. Pick a time below.' },
     ],
   },

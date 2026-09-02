@@ -9,9 +9,19 @@ import { BrandBar, Tbc } from '@/components/Chrome'
 import { InterestForm } from './InterestForm'
 import { NoThirdPartyWidgets } from '@/components/integrations/NoThirdPartyWidgets'
 
-/* Event page must never be indexed — CLAUDE.md invariant 11 */
+/* ⚠ TITLE DE-DATED 2026-09-01. Was "Build Your GWOP Blueprint — Aug 30".
+   The title is what shows in the browser tab, in a shared link preview, and in
+   a bookmark — so the stalest copy on the page was also the most portable.
+   Someone opening a printed QR card in March would have seen a date five
+   months gone before the page even painted.
+
+   ⚠ STILL NOT INDEXED. Invariant 11 stands. The page is reached by scanning a
+   card or by a funnel handing off to it, never by search, and it has no
+   context of its own for a cold search visitor — /credit is the page built to
+   be found. Do not flip this without deciding what a search result for it
+   should actually promise. */
 export const metadata: Metadata = {
-  title: 'Build Your GWOP Blueprint — Aug 30',
+  title: 'Build Your GWOP Blueprint',
   description: event.kicker,
   robots: { index: false, follow: false },
 }
@@ -90,14 +100,16 @@ export default function EventPage() {
             {event.cta}
           </a>
 
-          {/* Felicia §3 — renders only once she confirms time/location.
-              Empty values render nothing rather than an empty label. */}
-          {(event.details.time.text || event.details.location.text) && (
-            <p className="evmeta">
-              {[event.details.time.text, event.details.location.text]
-                .filter(Boolean).join(' · ')}
-            </p>
-          )}
+          {/* ⚠ EVENT META LINE REMOVED 2026-09-01. This rendered
+              "12–6 PM · Central Square, Cambridge, MA" beneath the CTA. The
+              event has passed, so the line was telling every visitor about a
+              date and a room that no longer exist — and Surpaul's printed QR
+              cards point here permanently, so it would have kept doing that
+              indefinitely.
+
+              The `event.details` object was deleted with it rather than
+              blanked, so this condition cannot be quietly revived by someone
+              filling a value back in. */}
         </div>
 
         {/* p.7: the artwork sits in its own panel to the right of the card */}

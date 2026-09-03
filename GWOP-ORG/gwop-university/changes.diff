@@ -1,202 +1,205 @@
-diff -ru /tmp/src-before-evergreen/app/830/Assessment.tsx src/app/830/Assessment.tsx
---- /tmp/src-before-evergreen/app/830/Assessment.tsx	2026-09-02 02:03:18.563947471 +0000
-+++ src/app/830/Assessment.tsx	2026-09-02 02:05:15.694852592 +0000
-@@ -506,9 +506,12 @@
-           "Three things" until 2026-08-27, when Felicia cut the founding-member
-           item and the text-delivery promise for Sunday. If that array changes
-           again, change this line in the same edit. */}
-+      {/* ⚠ "Before you leave the table" removed 2026-09-01 — there is no
-+          table. The count is still hardcoded and must match
-+          event.thanks.next.length. */}
-       <h4>Two things.</h4>
-       <p className="evas-lead">
--        Before you leave the table.
-+        What to do with this.
+diff -ru /tmp/src-live-before/app/(marketing)/membership/PlanCard.tsx src/app/(marketing)/membership/PlanCard.tsx
+--- /tmp/src-live-before/app/(marketing)/membership/PlanCard.tsx	2026-09-03 14:50:32.754778558 +0000
++++ src/app/(marketing)/membership/PlanCard.tsx	2026-09-03 14:51:47.726251244 +0000
+@@ -1,6 +1,7 @@
+ 'use client'
+ 
+ import { useState } from 'react'
++import { PATHWAY } from '@/content/pathway'
+ import { useRouter } from 'next/navigation'
+ 
+ interface Plan {
+@@ -90,7 +91,12 @@
        </p>
  
-       <ol className="evas-steps">
-diff -ru /tmp/src-before-evergreen/app/830/page.tsx src/app/830/page.tsx
---- /tmp/src-before-evergreen/app/830/page.tsx	2026-09-02 02:03:18.564479476 +0000
-+++ src/app/830/page.tsx	2026-09-02 02:05:37.213628338 +0000
-@@ -9,9 +9,19 @@
- import { InterestForm } from './InterestForm'
- import { NoThirdPartyWidgets } from '@/components/integrations/NoThirdPartyWidgets'
+       <p className="mbincl">
+-        Includes {plan.grants_level === 1 ? 'Freshman' : `levels 1–${plan.grants_level}`}
++        {/* ⚠ DE-LEVELLED 2026-09-03. Hardcoded 'Freshman' for the single-stage
++            plan and "levels 1–N" for bundles. Reads from PATHWAY now so a future
++            rename reaches here too. */}
++        Includes {plan.grants_level === 1
++          ? PATHWAY[0].label
++          : `stages 1\u2013${plan.grants_level}`}
+       </p>
  
--/* Event page must never be indexed — CLAUDE.md invariant 11 */
-+/* ⚠ TITLE DE-DATED 2026-09-01. Was "Build Your GWOP Blueprint — Aug 30".
-+   The title is what shows in the browser tab, in a shared link preview, and in
-+   a bookmark — so the stalest copy on the page was also the most portable.
-+   Someone opening a printed QR card in March would have seen a date five
-+   months gone before the page even painted.
-+
-+   ⚠ STILL NOT INDEXED. Invariant 11 stands. The page is reached by scanning a
-+   card or by a funnel handing off to it, never by search, and it has no
-+   context of its own for a cold search visitor — /credit is the page built to
-+   be found. Do not flip this without deciding what a search result for it
-+   should actually promise. */
+       {error && (
+diff -ru /tmp/src-live-before/app/(marketing)/membership/page.tsx src/app/(marketing)/membership/page.tsx
+--- /tmp/src-live-before/app/(marketing)/membership/page.tsx	2026-09-03 14:50:32.754765411 +0000
++++ src/app/(marketing)/membership/page.tsx	2026-09-03 14:51:47.725928625 +0000
+@@ -1,4 +1,5 @@
+ import type { Metadata } from 'next'
++import { PATHWAY_HEADING } from '@/content/pathway'
+ import Link from 'next/link'
+ import { createServerSupabase } from '@/lib/supabase/server'
+ import { BrandBar, Footer } from '@/components/Chrome'
+@@ -6,7 +7,7 @@
+ 
  export const metadata: Metadata = {
--  title: 'Build Your GWOP Blueprint — Aug 30',
-+  title: 'Build Your GWOP Blueprint',
-   description: event.kicker,
-   robots: { index: false, follow: false },
+   title: 'Membership · GWOP University',
+-  description: 'Four levels. One blueprint. Study in order, at your own pace.',
++  description: 'Four stages. One plan. Work through them in order, at your own pace.',
  }
-@@ -90,14 +100,16 @@
-             {event.cta}
-           </a>
  
--          {/* Felicia §3 — renders only once she confirms time/location.
--              Empty values render nothing rather than an empty label. */}
--          {(event.details.time.text || event.details.location.text) && (
--            <p className="evmeta">
--              {[event.details.time.text, event.details.location.text]
--                .filter(Boolean).join(' · ')}
--            </p>
--          )}
-+          {/* ⚠ EVENT META LINE REMOVED 2026-09-01. This rendered
-+              "12–6 PM · Central Square, Cambridge, MA" beneath the CTA. The
-+              event has passed, so the line was telling every visitor about a
-+              date and a room that no longer exist — and Surpaul's printed QR
-+              cards point here permanently, so it would have kept doing that
-+              indefinitely.
-+
-+              The `event.details` object was deleted with it rather than
-+              blanked, so this condition cannot be quietly revived by someone
-+              filling a value back in. */}
+ export const dynamic = 'force-dynamic' // reflects enrollment, so never cached
+@@ -51,7 +52,11 @@
+           <Link href={back.href}>‹ {back.label}</Link>
+         </p>
+         <p className="tag">Membership</p>
+-        <h1 className="h2">Four levels. One blueprint.</h1>
++        {/* ⚠ CHANGED 2026-09-03 with the stages rename. Was Felicia's approved
++            "Four levels. One blueprint." — kept in step because leaving it while
++            every other surface says stages would read as an oversight rather
++            than a choice. Flag to Surpaul; trivial to revert. */}
++        <h1 className="h2">{PATHWAY_HEADING}</h1>
+         {/* Felicia §8, 2026-08-27, verbatim. */}
+         <p className="lede">
+           Build the foundation. Become capital-ready. Build and scale. Protect what you create.
+diff -ru /tmp/src-live-before/app/(portal)/dashboard/page.tsx src/app/(portal)/dashboard/page.tsx
+--- /tmp/src-live-before/app/(portal)/dashboard/page.tsx	2026-09-03 14:50:32.754856915 +0000
++++ src/app/(portal)/dashboard/page.tsx	2026-09-03 14:51:47.726599443 +0000
+@@ -1,4 +1,5 @@
+ import Link from 'next/link'
++import { PATHWAY } from '@/content/pathway'
+ import type { Metadata } from 'next'
+ import { createServerSupabase } from '@/lib/supabase/server'
+ import { LEVELS, canAccessLevel, type AccessState } from '@/lib/access/policy'
+@@ -54,9 +55,12 @@
+       {enrolledLevel === 0 && (
+         <div className="poempty">
+           <h2>You&rsquo;re not enrolled yet</h2>
+-          <p>Freshman builds the foundation: credit, cash flow, banking and debt.</p>
++          {/* Built from PATHWAY rather than naming a stage in prose — this
++              string named "Freshman" and described its contents, so it needed
++              editing in two ways on every rename. */}
++          <p>{PATHWAY[0].label} is {PATHWAY[0].goal.toLowerCase()}: {PATHWAY[0].detail.replace(/ · /g, ', ')}.</p>
+           <Link className="btn btn-e" href="/membership">
+-            See the levels
++            See the stages
+           </Link>
          </div>
+       )}
+diff -ru /tmp/src-live-before/app/830/page.tsx src/app/830/page.tsx
+--- /tmp/src-live-before/app/830/page.tsx	2026-09-03 14:50:32.755278486 +0000
++++ src/app/830/page.tsx	2026-09-03 14:51:18.733633400 +0000
+@@ -3,7 +3,7 @@
+ import Link from 'next/link'
+ import { event } from '@/content/event'
+ import { site, legal } from '@/content/site'
+-import { PATHWAY, CAPSTONE } from '@/content/pathway'
++import { PATHWAY, CAPSTONE, PATHWAY_HEADING, PATHWAY_LEDE } from '@/content/pathway'
  
-         {/* p.7: the artwork sits in its own panel to the right of the card */}
-diff -ru /tmp/src-before-evergreen/app/thanks/page.tsx src/app/thanks/page.tsx
---- /tmp/src-before-evergreen/app/thanks/page.tsx	2026-09-02 02:03:18.571674555 +0000
-+++ src/app/thanks/page.tsx	2026-09-02 02:05:15.695539046 +0000
-@@ -46,8 +46,11 @@
-               must match event.thanks.next.length. Cut to two on 2026-08-27
-               when Felicia removed the founding-member item and the
-               text-delivery promise for Sunday. */}
-+          {/* ⚠ "Before you leave the table" removed 2026-09-01 — no table.
-+              Count hardcoded here AND in Assessment.tsx; both must match
-+              event.thanks.next.length. */}
-           <h2>Two things.</h2>
--          <p className="evlede">Before you leave the table.</p>
-+          <p className="evlede">What to do with this.</p>
+ import { BrandBar, Tbc } from '@/components/Chrome'
+ import { InterestForm } from './InterestForm'
+@@ -164,11 +164,15 @@
+           <InterestForm />
+         </section>
  
-           <div className="evgifts">
-             {event.thanks.next.map((n, i) => (
-diff -ru /tmp/src-before-evergreen/config/assessment.ts src/config/assessment.ts
---- /tmp/src-before-evergreen/config/assessment.ts	2026-09-02 02:03:18.573269205 +0000
-+++ src/config/assessment.ts	2026-09-02 02:06:19.096840684 +0000
-@@ -129,6 +129,27 @@
-  * touching real ones. Anything that reaches his live workflow by accident during
-  * testing is a real person receiving a real text.
-  */
-+/* ⚠ LEFT UNCHANGED AFTER THE 8/30 DE-EVENTING — DELIBERATELY, BUT IT NEEDS A
-+   DECISION.
-+
-+   This value is stamped on every assessment row. It was not changed with the
-+   rest of the event references because it is DATA, not copy: the six existing
-+   rows carry it, Jake's reporting groups on it, and rewriting it would break
-+   continuity with what has already been captured and delivered to his CRM.
-+
-+   But it is now wrong going forward. The four leads captured on 31 Aug did not
-+   attend the event, and neither will anyone arriving from /credit — yet all of
-+   them are stamped as if they had. Every future lead inherits an event key for
-+   an afternoon in Cambridge they were never at.
-+
-+   ⚠ THE FIX IS NOT A CODE CHANGE ALONE. Whatever replaces it has to match what
-+   Jake segments on in GHL, so it needs agreeing with him first. The likely
-+   answer is a neutral key for evergreen traffic — the funnel already carries
-+   its own attribution in utm_source, so the event key could simply become
-+   something like 'gwop-evergreen' for anyone not at a physical event.
-+
-+   Overridable by NEXT_PUBLIC_EVENT_KEY, so a real future event can set its own
-+   without a deploy. */
- export const EVENT_KEY =
-   process.env.NEXT_PUBLIC_EVENT_KEY ?? 'egc-2026-08-30'
+-        {/* ═══ FOUR LEVELS · Felicia §2 "show the four levels" ═══ */}
++        {/* ═══ FOUR STAGES · Felicia §2 "show the four levels", renamed to
++             stages 2026-09-03 per Surpaul's mockup ═══════════════════════════
++             Heading and lede now come from content/pathway.ts rather than being
++             hardcoded here, so a future rename lands on every surface at once
++             instead of leaving this one behind. */}
+         <section className="evsect pb">
+           <p className="tag">The pathway</p>
+-          <h2>Four levels, in order.</h2>
+-          <p className="evlede">Each one has a clear purpose and a clear outcome.</p>
++          <h2>{PATHWAY_HEADING}</h2>
++          <p className="evlede">{PATHWAY_LEDE}</p>
  
-diff -ru /tmp/src-before-evergreen/content/event.ts src/content/event.ts
---- /tmp/src-before-evergreen/content/event.ts	2026-09-02 02:03:18.574116451 +0000
-+++ src/content/event.ts	2026-09-02 02:03:55.881754072 +0000
-@@ -1,22 +1,38 @@
+           <div className="evlevels">
+             {PATHWAY.map(l => (
+diff -ru /tmp/src-live-before/app/admin/page.tsx src/app/admin/page.tsx
+--- /tmp/src-live-before/app/admin/page.tsx	2026-09-03 14:50:32.755410562 +0000
++++ src/app/admin/page.tsx	2026-09-03 14:51:47.726856112 +0000
+@@ -32,10 +32,12 @@
+         <div className="wrap">
+           <div className="head">
+             <p className="tag">Content status</p>
+-            <h2 className="h2">Freshman–Senior Map</h2>
++            <h2 className="h2">Stage 01\u2013Stage 04 Map</h2>
+             <p className="lede">
+-              Every module the app expects, by level. Anything not marked ready needs
+-              chasing before the Aug 22 content deadline.
++              {/* Aug 22 deadline removed 2026-09-03 — it has passed and the
++                  content is still outstanding. */}
++              Every module the app expects, by stage. Anything not marked ready
++              is still to be written.
+             </p>
+           </div>
+ 
+diff -ru /tmp/src-live-before/content/pathway.ts src/content/pathway.ts
+--- /tmp/src-live-before/content/pathway.ts	2026-09-03 14:50:32.766052842 +0000
++++ src/content/pathway.ts	2026-09-03 14:51:05.376764101 +0000
+@@ -1,29 +1,52 @@
  /* ═══════════════════════════════════════════════════════════════════════════
--   8/30 EVENT PAGE COPY  —  OWNER: SURPAUL (offer)  ·  SUPPORT: MAUI
-+   /830 BLUEPRINT PAGE COPY  —  OWNER: SURPAUL
-    Source: Visual Build Package p.7 + Tracker "8-30 SIGNUP FUNNEL" tab
+-   THE 4-LEVEL PATHWAY  —  OWNER: MAUI  ·  APPROVED BY: SURPAUL
+-   Source: GWOP_Visual_Build_Package.pdf p.4 + p.5
+-   Safe to edit: label, goal, detail, role. Do not change `slug` or order.
++   THE 4-STAGE PATHWAY  —  OWNER: MAUI  ·  APPROVED BY: SURPAUL
++   Source: GWOP_Visual_Build_Package.pdf p.4 + p.5, superseded 2026-09-03 by
++   Surpaul's stage mockup.
 +
-+   ⚠ NO LONGER AN EVENT PAGE. Rewritten 2026-09-01, after 8/30.
++   ⚠ RENAMED FROM LEVELS TO STAGES, 2026-09-03. Freshman / Sophomore / Junior /
++   Senior became Stage 01–04, with new goal lines. The academic naming implied a
++   cohort and a calendar; stages describe a sequence someone works through at
++   their own pace, which is what the product actually is.
 +
-+   This started as signage for one afternoon in Cambridge and is now the
-+   permanent lead-capture and assessment flow. Every reference to a date, a
-+   venue, a table, or "today" has been removed — those lines were true on the
-+   30th and are actively confusing now. Someone scanning Surpaul's printed
-+   cards next March should not read that the offer expires today or be told to
-+   find someone at a table that is not there.
++   ⚠ THESE NAMES EXIST IN TWO PLACES. This file feeds the marketing surfaces —
++   homepage cards, /830, the footer, the membership plan cards. The student
++   portal reads them from the `university_levels` table via /api/v1/catalog.
++   Both were changed together (see migration 0012). Edit one without the other
++   and the public site and the student area will disagree about what the stages
++   are called.
 +
-+   The route stays /830 because the printed QR codes encode it and cannot be
-+   reprinted. The name is now just a name.
-+
-+   ⚠ WHAT THIS MEANS FOR NEW COPY: nothing here may assume the reader is
-+   standing in a room with us, or that the offer is time-limited. If a
-+   time-bound campaign is wanted later, it belongs on its own funnel page —
-+   see /credit for the pattern — not here.
++   ⚠ DO NOT CHANGE `slug` OR ORDER. The slugs are load-bearing in four places:
++   the `level_slug` Postgres enum, the /app/[level] URLs, the course slugs
++   seeded in migration 0007 (freshman-foundation, sophomore-readiness, …), and
++   the SKUs (GWOPU-FRESHMAN). Renaming them is an enum migration plus a URL
++   break plus a commerce change — not a copy edit. A display name and a slug are
++   allowed to differ; that is what `label` is for.
     ═══════════════════════════════════════════════════════════════════════════ */
- export const event = {
--  /* Felicia §3: "Exact event time/location details can be inserted once
--     confirmed." Editable placeholders so a late answer costs a one-line edit,
--     not a layout change. Anything still `pending` is highlighted in DRAFT and
--     is simply not rendered — a blank beats a wrong time on the signage page. */
--  details: {
--    name: 'Everybody Gotta Eat',
--    date: 'August 30, 2026',
--    /* ✅ CONFIRMED — Felicia, Aug 19: "The event is August 30, 2026, Central
--       Square, Cambridge, MA, 12–6 PM. Please use that for the event page."
--       The en-dash in "12–6 PM" is typographic and matches the rest of the copy.
--       Do not "fix" it to a hyphen. */
--    time:     { text: '12–6 PM', pending: false },
--    location: { text: 'Central Square, Cambridge, MA', pending: false },
--  },
-+  /* ⚠ EVENT DETAILS REMOVED 2026-09-01.
-+
-+     This block carried the name, date, time and venue of the 8/30 activation,
-+     and the hero rendered "12–6 PM · Central Square, Cambridge, MA" beneath the
-+     CTA. All of it is now false.
-+
-+     Deleted rather than blanked. An empty `details` object would leave the
-+     rendering condition in page.tsx alive, and the next person to add a value
-+     there would silently reintroduce a line nobody asked for. The condition is
-+     gone too.
-+
-+     If a future event needs a date and venue on a landing page, build it as its
-+     own funnel page rather than making this one time-bound again. */
+ export const PATHWAY = [
+-  /* `role` is the second half of the card label, e.g. FRESHMAN · FOUNDATION.
+-     Wording is Felicia's polish pass §1, which matches each `goal` below.
+-     ⚠ Her 27 Aug message proposed Foundation / Build / Scale / Wealth instead.
+-     NOT applied: three of the four would sit above a goal line that says
+-     something else (BUILD above "Become capital-ready", SCALE above "Build +
+-     scale"), and the role also renders on /830, which she asked to keep stable.
+-     Flagged with her; change these only on her confirmation, and update the
+-     `goal` lines in the same edit if she wants them. */
+-  { slug: 'freshman',  n: 1, label: 'Freshman',  role: 'Foundation',
+-    goal: 'Build the foundation',
++  /* `label · role` is what renders on the card, e.g. STAGE 01 · FOUNDATION.
++     The `role` values are unchanged — Foundation, Readiness, Build + Scale and
++     Legacy were already right and the mockup keeps them. Only `label` and
++     `goal` moved. `detail` is unchanged too. */
++  { slug: 'freshman',  n: 1, label: 'Stage 01', role: 'Foundation',
++    goal: 'Earn the Game',
+     detail: 'Credit · cash flow · banking · debt' },
+-  { slug: 'sophomore', n: 2, label: 'Sophomore', role: 'Readiness',
+-    goal: 'Become capital-ready',
++  { slug: 'sophomore', n: 2, label: 'Stage 02', role: 'Readiness',
++    goal: 'Get in Position',
+     detail: 'Business setup · records · funding readiness' },
+-  { slug: 'junior',    n: 3, label: 'Junior',    role: 'Build + Scale',
+-    goal: 'Build + scale',
++  { slug: 'junior',    n: 3, label: 'Stage 03', role: 'Build + Scale',
++    goal: 'Get Funded & Build',
+     detail: 'Revenue · capital · systems · protection' },
+-  { slug: 'senior',    n: 4, label: 'Senior',    role: 'Legacy',
+-    goal: 'Protect + legacy',
++  { slug: 'senior',    n: 4, label: 'Stage 04', role: 'Legacy',
++    goal: 'Get with GWOP Plan',
+     detail: 'Assets · investing · estate · long-term wealth' },
+ ] as const
  
-   // Prescribed by Visual Build Package p.7 + Felicia §2 — DO NOT REWORD
-   h1a: 'BUILD YOUR',
-@@ -77,8 +93,12 @@
- 
-   // Offer — Surpaul approves (Tracker: due Aug 17)
-   incentives: {
--    h2: 'Three benefits. Yours today.',
--    lede: 'Sign up at the table and all three are yours.',
-+    /* ⚠ DE-EVENTED 2026-09-01. Was "Three benefits. Yours today." with
-+       "Sign up at the table and all three are yours." Both assumed the reader
-+       was standing at the stand on the day. "Today" also implied an expiry that
-+       was never real — the blueprint is free permanently. */
-+    h2: 'Three things you get.',
-+    lede: 'Free, and yours as soon as you finish the questions.',
-     items: [
-       /* Wording supplied verbatim by Felicia, 2026-08-27 §3. `pending` flipped
-          to false: she is the approver, and these are now her words. */
-@@ -200,7 +220,14 @@
-        ⚠ NextSteps hardcodes the count in its heading. If this array changes
-        length again, fix the heading in Assessment.tsx too. */
-     next: [
--      { h: 'Talk to Surpaul', p: 'Come find him at the table — he’ll walk you through what your blueprint means.' },
-+      /* ⚠ "Talk to Surpaul — come find him at the table" was removed on
-+         2026-09-01. There is no table. It was the single most misleading line
-+         left on the page: it told someone reading at home to go and find a
-+         person in a room that does not exist.
+ export const CAPSTONE = 'Capstone: The Completed GWOP Blueprint'
 +
-+         Replaced with the thing that is true and available at any hour — the
-+         roadmap they are looking at, and the booking. */
-+      { h: 'Read your next moves', p: 'Your roadmap is above. Start with the first move and work down.' },
-       { h: 'Book your session', p: 'One hour with Beast to walk through your roadmap. Pick a time below.' },
-     ],
-   },
++/* Section heading and lede for the pathway block, from the same mockup.
++   Previously hardcoded inside /830 as "Four levels, in order." with "Each one
++   has a clear purpose and a clear outcome." Sourced here because the copy is
++   rendered on more than one surface and drifted once already. */
++export const PATHWAY_HEADING = 'Four stages. One plan.'
++export const PATHWAY_LEDE =
++  "The order isn't arbitrary — each stage has to hold before the next one works."

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { PATHWAY } from '@/content/pathway'
 import { useRouter } from 'next/navigation'
 
 interface Plan {
@@ -90,7 +91,12 @@ export function PlanCard({
       </p>
 
       <p className="mbincl">
-        Includes {plan.grants_level === 1 ? 'Freshman' : `levels 1–${plan.grants_level}`}
+        {/* ⚠ DE-LEVELLED 2026-09-03. Hardcoded 'Freshman' for the single-stage
+            plan and "levels 1–N" for bundles. Reads from PATHWAY now so a future
+            rename reaches here too. */}
+        Includes {plan.grants_level === 1
+          ? PATHWAY[0].label
+          : `stages 1\u2013${plan.grants_level}`}
       </p>
 
       {error && (

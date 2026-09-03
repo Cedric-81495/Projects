@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { event } from '@/content/event'
 import { site, legal } from '@/content/site'
-import { PATHWAY, CAPSTONE } from '@/content/pathway'
+import { PATHWAY, CAPSTONE, PATHWAY_HEADING, PATHWAY_LEDE } from '@/content/pathway'
 
 import { BrandBar, Tbc } from '@/components/Chrome'
 import { InterestForm } from './InterestForm'
@@ -164,11 +164,15 @@ export default function EventPage() {
           <InterestForm />
         </section>
 
-        {/* ═══ FOUR LEVELS · Felicia §2 "show the four levels" ═══ */}
+        {/* ═══ FOUR STAGES · Felicia §2 "show the four levels", renamed to
+             stages 2026-09-03 per Surpaul's mockup ═══════════════════════════
+             Heading and lede now come from content/pathway.ts rather than being
+             hardcoded here, so a future rename lands on every surface at once
+             instead of leaving this one behind. */}
         <section className="evsect pb">
           <p className="tag">The pathway</p>
-          <h2>Four levels, in order.</h2>
-          <p className="evlede">Each one has a clear purpose and a clear outcome.</p>
+          <h2>{PATHWAY_HEADING}</h2>
+          <p className="evlede">{PATHWAY_LEDE}</p>
 
           <div className="evlevels">
             {PATHWAY.map(l => (

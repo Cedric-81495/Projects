@@ -32,10 +32,12 @@ export default function Admin() {
         <div className="wrap">
           <div className="head">
             <p className="tag">Content status</p>
-            <h2 className="h2">Freshman–Senior Map</h2>
+            <h2 className="h2">Stage 01\u2013Stage 04 Map</h2>
             <p className="lede">
-              Every module the app expects, by level. Anything not marked ready needs
-              chasing before the Aug 22 content deadline.
+              {/* Aug 22 deadline removed 2026-09-03 — it has passed and the
+                  content is still outstanding. */}
+              Every module the app expects, by stage. Anything not marked ready
+              is still to be written.
             </p>
           </div>
 

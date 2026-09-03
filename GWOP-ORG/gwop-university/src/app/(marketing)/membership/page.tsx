@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { PATHWAY_HEADING } from '@/content/pathway'
 import Link from 'next/link'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { BrandBar, Footer } from '@/components/Chrome'
@@ -6,7 +7,7 @@ import { PlanCard } from './PlanCard'
 
 export const metadata: Metadata = {
   title: 'Membership · GWOP University',
-  description: 'Four levels. One blueprint. Study in order, at your own pace.',
+  description: 'Four stages. One plan. Work through them in order, at your own pace.',
 }
 
 export const dynamic = 'force-dynamic' // reflects enrollment, so never cached
@@ -51,7 +52,11 @@ export default async function MembershipPage() {
           <Link href={back.href}>‹ {back.label}</Link>
         </p>
         <p className="tag">Membership</p>
-        <h1 className="h2">Four levels. One blueprint.</h1>
+        {/* ⚠ CHANGED 2026-09-03 with the stages rename. Was Felicia's approved
+            "Four levels. One blueprint." — kept in step because leaving it while
+            every other surface says stages would read as an oversight rather
+            than a choice. Flag to Surpaul; trivial to revert. */}
+        <h1 className="h2">{PATHWAY_HEADING}</h1>
         {/* Felicia §8, 2026-08-27, verbatim. */}
         <p className="lede">
           Build the foundation. Become capital-ready. Build and scale. Protect what you create.

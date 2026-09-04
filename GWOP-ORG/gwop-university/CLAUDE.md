@@ -1,5 +1,37 @@
 # CLAUDE.md — GWOP University
 
+> ## ⚠️ READ THIS FIRST — STATUS AS OF 2026-09-04
+>
+> **The Aug 30 event has happened. Much of this document describes a future that
+> is now the past.** It was written on Aug 14 as a build constitution for a
+> one-day activation. It has not been rewritten wholesale because most of the
+> engineering rules in it are still correct — but the framing and several
+> specific invariants are not.
+>
+> **What has actually changed:**
+>
+> | Then | Now |
+> |---|---|
+> | `/830` is event signage for one afternoon | `/830` is the **permanent lead-capture and assessment flow** |
+> | Reached only by QR at a booth | Reached by printed QR cards **and** by anyone sent a link |
+> | Jake's iframe collects the data | **We collect it.** Native form, our database, our consent records |
+> | Felicia owns copy and decisions | **Felicia is no longer on the team. Surpaul owns all decisions.** |
+> | Freeze after Aug 27, no build changes | **Freeze lifted.** Active development continues |
+> | Four levels: Freshman → Senior | **Four stages: Stage 01 → Stage 04** |
+>
+> **The route is still `/830` and cannot change.** The printed QR codes encode
+> it and cannot be reprinted. The name is now just a name — do not read it as
+> meaning the page is about an event, and do not put a date, venue or "today" in
+> any copy on it. All such references were removed on 2026-09-01.
+>
+> **Invariants 1, 3, 5 and 13 below are superseded.** They are struck through
+> rather than deleted so the reasoning stays visible. Every other invariant
+> still holds.
+>
+> **19 real leads exist in production**, with consent records. Anything touching
+> `leads`, `assessments`, or the GHL sync is live data — not a greenfield.
+
+
 Project constitution. Read fully before writing code. Place at repo root — loaded
 automatically every session. **These rules override default behaviour and general best
 practice. Follow them exactly.**
@@ -144,19 +176,33 @@ Violating any of these is a bug even if the feature works. If a request would br
 
 ### Scope
 
-1. **We never build a form that collects personal data.** No name, email, phone or consent
-   field in this repo. Jake's iframe handles all of it. If asked, refuse and escalate.
+1. ~~**We never build a form that collects personal data.** No name, email, phone or
+   consent field in this repo. Jake's iframe handles all of it.~~
+   **⚠️ SUPERSEDED 2026-08-18** by Felicia's approval of write-first capture, and now the
+   core of the product. This repo **does** collect first name, last name, email, phone and
+   SMS consent, in `src/app/830/InterestForm.tsx` → `/api/lead` → Supabase → GHL.
+   **Do not remove or refuse to work on that form.** What still holds is the rule below it:
+   the consent record — exact wording shown, timestamp, IP, user agent — is captured with
+   every lead and is legally load-bearing. Never weaken it.
 2. **Never collect SSN, date of birth, address, credit report data or payment details**
    anywhere, in any phase, on any page.
-3. No analytics, chat widget, or third-party script on `/830` before Aug 27. Nothing goes
-   in front of the form.
+3. ~~No analytics, chat widget, or third-party script on `/830` before Aug 27.~~
+   **⚠️ PARTLY SUPERSEDED.** The date has passed, and Cloudflare Turnstile is now on `/830`
+   deliberately — it is the bot protection on the form, and the form cannot be submitted
+   without it. What still holds absolutely: **no chat widget on `/830`.** Its bubble sits
+   where the mobile CTA sits, and it loads its own copy of Turnstile, which makes the
+   second load bail and every submission fail with no way for the visitor to recover.
 
 ### Copy
 
 4. **Hero copy on `/` is prescribed by the Visual Build Package p.5** — "Knowledge Pays.",
    the sub-line, and "Start your blueprint". **Do not reword, improve, or shorten it.**
-5. **Event hero copy is prescribed by p.7** — "BUILD YOUR GWOP BLUEPRINT" / "Credit.
-   Funding. Business. Wealth." Same rule.
+5. ~~**Event hero copy is prescribed by p.7.**~~
+   **⚠️ SUPERSEDED 2026-08-27** by Felicia's polish pass, and again 2026-09-01 by the
+   de-eventing. The headline and kicker survive; the supporting paragraph, the date and
+   venue line, and every "today" / "at the table" phrasing are gone. Copy now lives in
+   `src/content/event.ts` with the reason for each change recorded beside it.
+   **Surpaul approves copy now, not Felicia.**
 6. **Legal copy is attorney-supplied only.** Never draft, paraphrase, or tidy it. It lives
    in `src/content/site.ts` under `legal` and is marked `pending` until it arrives.
 7. **Never write credit-outcome claims** — no score numbers, no "remove negative items", no
@@ -183,7 +229,11 @@ Violating any of these is a bug even if the feature works. If a request would br
     an arbitrary field into his form.
 13. Interest values come from `INTERESTS` in the config. Jake builds one nurture branch per
     value — **adding or removing one silently breaks his automation.** Changes require
-    Felicia's decision and a message to Jake.
+    ~~Felicia's decision~~ **Surpaul's decision** and a message to Jake.
+    Same rule now applies to the six assessment answer sets in `src/config/assessment.ts`:
+    the underscored machine values are what his conditions match on and what 19 existing
+    rows already contain. **Never rename them to read nicely** — send a `_label` field
+    alongside instead.
 14. There is always a "not sure yet" path submitting `INTEREST_FALLBACK`. Without it,
     anyone who won't categorise themselves is a lost lead.
 

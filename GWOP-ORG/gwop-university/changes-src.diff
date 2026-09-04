@@ -1,0 +1,188 @@
+diff -ru /tmp/src-live2/app/830/page.tsx src/app/830/page.tsx
+--- /tmp/src-live2/app/830/page.tsx	2026-09-04 11:46:12.909957164 +0000
++++ src/app/830/page.tsx	2026-09-04 11:48:02.785323298 +0000
+@@ -9,6 +9,33 @@
+ import { InterestForm } from './InterestForm'
+ import { NoThirdPartyWidgets } from '@/components/integrations/NoThirdPartyWidgets'
+ 
++/* ═══════════════════════════════════════════════════════════════════════════
++   ⚠ THIS IS NOT AN EVENT PAGE ANY MORE. READ BEFORE EDITING COPY.
++
++   The route is /830 because the 8/30 activation is what it was built for, and
++   because the printed QR cards encode it and cannot be reprinted. The name is
++   now just a name.
++
++   Since 2026-09-01 this is the PERMANENT lead-capture and assessment flow. It
++   is reached by those printed cards indefinitely, and by anyone sent a link.
++   Somebody will open it months from now.
++
++   ⚠ SO: NO COPY ON THIS PAGE MAY ASSUME
++   · a date — the event has passed
++   · a venue — "Central Square, Cambridge, MA" was removed
++   · that the reader is in a room with us — "at the table", "come find Surpaul"
++   · that the offer expires — "today", "yours today", "before you leave"
++
++   All of the above were live on this page and all were removed. If a
++   time-bound campaign is wanted, it belongs on its own landing page.
++
++   ⚠ WHAT DID NOT CHANGE, AND WHY IT LOOKS LIKE IT SHOULD HAVE
++   EVENT_KEY still stamps every assessment `egc-2026-08-30`, and EVENT_TAG still
++   carries the event name to GHL. Those are DATA, not copy: 19 rows already hold
++   them and Jake's reporting groups on them. Changing them needs his agreement
++   first — see the note in config/assessment.ts.
++   ═══════════════════════════════════════════════════════════════════════════ */
++
+ /* ⚠ TITLE DE-DATED 2026-09-01. Was "Build Your GWOP Blueprint — Aug 30".
+    The title is what shows in the browser tab, in a shared link preview, and in
+    a bookmark — so the stalest copy on the page was also the most portable.
+@@ -133,7 +160,10 @@
+       <div className="wrap">
+         {/* ═══ INCENTIVE · Felicia §2 "explain the event incentive" ═══ */}
+         <section className="evsect" id="gifts">
+-          <p className="tag">What you get today</p>
++          {/* ⚠ "today" removed 2026-09-04. Missed in the 09-01 de-eventing
++              sweep. This page is reached by printed cards indefinitely — a
++              visitor next March should not read that the offer is same-day. */}
++          <p className="tag">What you get</p>
+           <h2>{event.incentives.h2}</h2>
+           <p className="evlede">{event.incentives.lede}</p>
+ 
+diff -ru /tmp/src-live2/config/integrations.ts src/config/integrations.ts
+--- /tmp/src-live2/config/integrations.ts	2026-09-04 11:46:12.921088277 +0000
++++ src/config/integrations.ts	2026-09-04 11:53:35.592279725 +0000
+@@ -50,8 +50,23 @@
+ /** Sent when someone taps "not sure yet". Jake needs a default branch for it. */
+ export const INTEREST_FALLBACK = 'unspecified'
+ 
+-/** GHL source/tag for this event. Must match Jake's tag exactly. */
+-export const EVENT_TAG = 'EVENT - Everybody Gotta Eat - 08/30/26'
++/* ⚠ ALIGNED TO JAKE'S TAG, 2026-09-04. Was
++   'EVENT - Everybody Gotta Eat - 08/30/26'.
++
++   Jake changed his GHL tag to `gwopsignup` on 2026-09-03. Ours still carried
++   the event name, so two tag values were in circulation — his applied by his
++   workflow, ours sitting unused in the payload. That is exactly how a condition
++   quietly stops matching months later, so they are now one value.
++
++   ⚠ MUST MATCH JAKE'S TAG CHARACTER FOR CHARACTER. Lower case, one word, no
++   spaces, no hyphen. If he renames it again, this changes in the same breath —
++   and he updates his condition FIRST, then we change the value, or new leads
++   stop entering the nurture with no error anywhere.
++
++   ⚠ NOT THE SAME THING AS EVENT_KEY. That still stamps `egc-2026-08-30` on
++   every assessment and has NOT been changed — 19 rows hold it and his reporting
++   groups on it. See the note in config/assessment.ts. */
++export const EVENT_TAG = 'gwopsignup'
+ 
+ /* Jake's trained GHL chat widget, supplied 2026-08-19.
+    Rendered ONLY on marketing pages — see ChatWidget.tsx. Empty string disables
+diff -ru /tmp/src-live2/content/event.ts src/content/event.ts
+--- /tmp/src-live2/content/event.ts	2026-09-04 11:46:12.921484388 +0000
++++ src/content/event.ts	2026-09-04 11:47:48.529323411 +0000
+@@ -109,7 +109,13 @@
+         p: 'Get early access to GWOP University.',
+         pending: false },
+       { h: 'Scholarship Opportunity',
+-        p: 'Sign up today to be entered.',
++        /* ⚠ "today" removed 2026-09-04, missed in the 09-01 sweep.
++           ⚠ AND THE OFFER ITSELF IS UNDEFINED. Nobody has said what the
++           scholarship is worth, who draws it, when, or how a winner is told.
++           One person signed up on event day under the original "sign up today
++           to be entered" wording, so there is at least one outstanding promise.
++           Raised with Surpaul; do not add detail here without his answer. */
++        p: 'Sign up to be entered.',
+         pending: false },
+     ],
+   },
+diff -ru /tmp/src-live2/lib/ghl/sync-assessment.ts src/lib/ghl/sync-assessment.ts
+--- /tmp/src-live2/lib/ghl/sync-assessment.ts	2026-09-04 11:46:12.922950096 +0000
++++ src/lib/ghl/sync-assessment.ts	2026-09-04 11:52:50.442603482 +0000
+@@ -2,6 +2,8 @@
+ import { env } from '@/lib/env'
+ import { admin } from '@/lib/supabase/admin'
+ import { logger } from '@/lib/observability/logger'
++import { labelFor } from '@/config/assessment'
++import { blueprints } from '@/content/blueprints'
+ 
+ /**
+  * ═══════════════════════════════════════════════════════════════════════════
+@@ -61,6 +63,16 @@
+   leads: { phone: string; email: string } | null
+ }
+ 
++/* Slug → the headline shown on the Blueprint screen. Returns an empty string
++   rather than the slug for an unknown value: printing a raw slug in a message
++   is the problem these labels exist to avoid, so falling back to one would
++   defeat the purpose. */
++function blueprintTitle(slug: string | null): string {
++  if (!slug) return ''
++  const bp = (blueprints as Record<string, { headline: string } | undefined>)[slug]
++  return bp?.headline ?? ''
++}
++
+ function buildPayload(a: AssessmentRow) {
+   return {
+     /* Flat keys, matching the lead payload convention. GHL maps top-level
+@@ -84,6 +96,23 @@
+     /* Machine values, not display labels. These are what his workflow
+        conditions match on, and they come from the same config that renders the
+        buttons — so the two cannot drift apart. */
++    /* ── MACHINE VALUES — MATCH CONDITIONS ON THESE ──────────────────────
++       Underscored, stable, and identical to what renders the buttons on screen.
++
++       ⚠ DO NOT RENAME THESE TO READ NICELY. Jake asked on 2026-09-03 whether
++       the underscores could go. They cannot, for three reasons:
++
++       · They are the stored values in `assessments`. Renaming is a migration
++         across every existing row, not a payload change.
++       · 19 leads already carry them. Mid-migration half the corpus would say
++         `580_649` and half `580–649`, and a condition matching one would
++         silently miss the other.
++       · The dash in a label like `580–649` is an EN-DASH, not a hyphen. A
++         condition typed with a hyphen would never match, and the failure is
++         invisible — the workflow simply does not fire, with no error.
++
++       His underlying point was right though: `under_1_month` reads badly in a
++       notification. Hence the labels below. */
+     financial_stage: a.financial_stage ?? '',
+     credit_range: a.credit_range ?? '',
+     emergency_fund: a.emergency_fund ?? '',
+@@ -91,6 +120,25 @@
+     currently_building: a.currently_building ?? '',
+     biggest_blocker: a.biggest_blocker ?? '',
+ 
++    /* ── DISPLAY LABELS — PRINT THESE IN MESSAGES ────────────────────────
++       Added 2026-09-04 at Jake's request. Same answers, written the way a
++       person reads them: `580–649` not `580_649`, `Less Than 1 Month` not
++       `under_1_month`.
++
++       Resolved through labelFor() from the same option list that renders the
++       buttons, so what the attendee tapped and what Jake prints are guaranteed
++       to be the same words. A new option gets a label automatically.
++
++       Empty string when the question was skipped, matching the machine fields
++       above — a missing key would look like a delivery fault, an empty one is
++       a skip, which is a legitimate answer. */
++    financial_stage_label: labelFor('financial_stage', a.financial_stage) ?? '',
++    credit_range_label: labelFor('credit_range', a.credit_range) ?? '',
++    emergency_fund_label: labelFor('emergency_fund', a.emergency_fund) ?? '',
++    budget_status_label: labelFor('budget_status', a.budget_status) ?? '',
++    currently_building_label: labelFor('currently_building', a.currently_building) ?? '',
++    biggest_blocker_label: labelFor('biggest_blocker', a.biggest_blocker) ?? '',
++
+     /* An unanswered question sends an empty value rather than being omitted.
+        A missing key looks like a delivery problem; an empty one is a skip,
+        which is a legitimate and expected answer. */
+@@ -99,6 +147,12 @@
+        right one rather than sending something generic. */
+     blueprint_slug: a.blueprint_slug ?? '',
+ 
++    /* Readable name of that roadmap, added 2026-09-04 with the labels above.
++       The slug is `foundation` or `credit-established`; this is the headline the
++       attendee actually read on screen. Same rule — match on the slug, print
++       this. */
++    blueprint_title: blueprintTitle(a.blueprint_slug),
++
+     assessment_status: a.status,
+     event_key: a.event_key,
+     completed_at: a.completed_at ?? '',

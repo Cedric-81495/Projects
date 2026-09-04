@@ -109,7 +109,13 @@ export const event = {
         p: 'Get early access to GWOP University.',
         pending: false },
       { h: 'Scholarship Opportunity',
-        p: 'Sign up today to be entered.',
+        /* ⚠ "today" removed 2026-09-04, missed in the 09-01 sweep.
+           ⚠ AND THE OFFER ITSELF IS UNDEFINED. Nobody has said what the
+           scholarship is worth, who draws it, when, or how a winner is told.
+           One person signed up on event day under the original "sign up today
+           to be entered" wording, so there is at least one outstanding promise.
+           Raised with Surpaul; do not add detail here without his answer. */
+        p: 'Sign up to be entered.',
         pending: false },
     ],
   },

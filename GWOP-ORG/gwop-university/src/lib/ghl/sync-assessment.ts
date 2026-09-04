@@ -2,6 +2,8 @@ import 'server-only'
 import { env } from '@/lib/env'
 import { admin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/observability/logger'
+import { labelFor } from '@/config/assessment'
+import { blueprints } from '@/content/blueprints'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -61,6 +63,16 @@ interface AssessmentRow {
   leads: { phone: string; email: string } | null
 }
 
+/* Slug → the headline shown on the Blueprint screen. Returns an empty string
+   rather than the slug for an unknown value: printing a raw slug in a message
+   is the problem these labels exist to avoid, so falling back to one would
+   defeat the purpose. */
+function blueprintTitle(slug: string | null): string {
+  if (!slug) return ''
+  const bp = (blueprints as Record<string, { headline: string } | undefined>)[slug]
+  return bp?.headline ?? ''
+}
+
 function buildPayload(a: AssessmentRow) {
   return {
     /* Flat keys, matching the lead payload convention. GHL maps top-level
@@ -84,12 +96,48 @@ function buildPayload(a: AssessmentRow) {
     /* Machine values, not display labels. These are what his workflow
        conditions match on, and they come from the same config that renders the
        buttons — so the two cannot drift apart. */
+    /* ── MACHINE VALUES — MATCH CONDITIONS ON THESE ──────────────────────
+       Underscored, stable, and identical to what renders the buttons on screen.
+
+       ⚠ DO NOT RENAME THESE TO READ NICELY. Jake asked on 2026-09-03 whether
+       the underscores could go. They cannot, for three reasons:
+
+       · They are the stored values in `assessments`. Renaming is a migration
+         across every existing row, not a payload change.
+       · 19 leads already carry them. Mid-migration half the corpus would say
+         `580_649` and half `580–649`, and a condition matching one would
+         silently miss the other.
+       · The dash in a label like `580–649` is an EN-DASH, not a hyphen. A
+         condition typed with a hyphen would never match, and the failure is
+         invisible — the workflow simply does not fire, with no error.
+
+       His underlying point was right though: `under_1_month` reads badly in a
+       notification. Hence the labels below. */
     financial_stage: a.financial_stage ?? '',
     credit_range: a.credit_range ?? '',
     emergency_fund: a.emergency_fund ?? '',
     budget_status: a.budget_status ?? '',
     currently_building: a.currently_building ?? '',
     biggest_blocker: a.biggest_blocker ?? '',
+
+    /* ── DISPLAY LABELS — PRINT THESE IN MESSAGES ────────────────────────
+       Added 2026-09-04 at Jake's request. Same answers, written the way a
+       person reads them: `580–649` not `580_649`, `Less Than 1 Month` not
+       `under_1_month`.
+
+       Resolved through labelFor() from the same option list that renders the
+       buttons, so what the attendee tapped and what Jake prints are guaranteed
+       to be the same words. A new option gets a label automatically.
+
+       Empty string when the question was skipped, matching the machine fields
+       above — a missing key would look like a delivery fault, an empty one is
+       a skip, which is a legitimate answer. */
+    financial_stage_label: labelFor('financial_stage', a.financial_stage) ?? '',
+    credit_range_label: labelFor('credit_range', a.credit_range) ?? '',
+    emergency_fund_label: labelFor('emergency_fund', a.emergency_fund) ?? '',
+    budget_status_label: labelFor('budget_status', a.budget_status) ?? '',
+    currently_building_label: labelFor('currently_building', a.currently_building) ?? '',
+    biggest_blocker_label: labelFor('biggest_blocker', a.biggest_blocker) ?? '',
 
     /* An unanswered question sends an empty value rather than being omitted.
        A missing key looks like a delivery problem; an empty one is a skip,
@@ -98,6 +146,12 @@ function buildPayload(a: AssessmentRow) {
     /* Which roadmap they were actually shown. Lets his follow-up reference the
        right one rather than sending something generic. */
     blueprint_slug: a.blueprint_slug ?? '',
+
+    /* Readable name of that roadmap, added 2026-09-04 with the labels above.
+       The slug is `foundation` or `credit-established`; this is the headline the
+       attendee actually read on screen. Same rule — match on the slug, print
+       this. */
+    blueprint_title: blueprintTitle(a.blueprint_slug),
 
     assessment_status: a.status,
     event_key: a.event_key,

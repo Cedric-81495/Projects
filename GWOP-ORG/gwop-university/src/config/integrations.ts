@@ -50,8 +50,23 @@ export const INTERESTS = [
 /** Sent when someone taps "not sure yet". Jake needs a default branch for it. */
 export const INTEREST_FALLBACK = 'unspecified'
 
-/** GHL source/tag for this event. Must match Jake's tag exactly. */
-export const EVENT_TAG = 'EVENT - Everybody Gotta Eat - 08/30/26'
+/* ⚠ ALIGNED TO JAKE'S TAG, 2026-09-04. Was
+   'EVENT - Everybody Gotta Eat - 08/30/26'.
+
+   Jake changed his GHL tag to `gwopsignup` on 2026-09-03. Ours still carried
+   the event name, so two tag values were in circulation — his applied by his
+   workflow, ours sitting unused in the payload. That is exactly how a condition
+   quietly stops matching months later, so they are now one value.
+
+   ⚠ MUST MATCH JAKE'S TAG CHARACTER FOR CHARACTER. Lower case, one word, no
+   spaces, no hyphen. If he renames it again, this changes in the same breath —
+   and he updates his condition FIRST, then we change the value, or new leads
+   stop entering the nurture with no error anywhere.
+
+   ⚠ NOT THE SAME THING AS EVENT_KEY. That still stamps `egc-2026-08-30` on
+   every assessment and has NOT been changed — 19 rows hold it and his reporting
+   groups on it. See the note in config/assessment.ts. */
+export const EVENT_TAG = 'gwopsignup'
 
 /* Jake's trained GHL chat widget, supplied 2026-08-19.
    Rendered ONLY on marketing pages — see ChatWidget.tsx. Empty string disables

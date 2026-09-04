@@ -3,11 +3,38 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { event } from '@/content/event'
 import { site, legal } from '@/content/site'
-import { PATHWAY, CAPSTONE, PATHWAY_HEADING, PATHWAY_LEDE } from '@/content/pathway'
+import { PATHWAY, CAPSTONE } from '@/content/pathway'
 
 import { BrandBar, Tbc } from '@/components/Chrome'
 import { InterestForm } from './InterestForm'
 import { NoThirdPartyWidgets } from '@/components/integrations/NoThirdPartyWidgets'
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚠ THIS IS NOT AN EVENT PAGE ANY MORE. READ BEFORE EDITING COPY.
+
+   The route is /830 because the 8/30 activation is what it was built for, and
+   because the printed QR cards encode it and cannot be reprinted. The name is
+   now just a name.
+
+   Since 2026-09-01 this is the PERMANENT lead-capture and assessment flow. It
+   is reached by those printed cards indefinitely, and by anyone sent a link.
+   Somebody will open it months from now.
+
+   ⚠ SO: NO COPY ON THIS PAGE MAY ASSUME
+   · a date — the event has passed
+   · a venue — "Central Square, Cambridge, MA" was removed
+   · that the reader is in a room with us — "at the table", "come find Surpaul"
+   · that the offer expires — "today", "yours today", "before you leave"
+
+   All of the above were live on this page and all were removed. If a
+   time-bound campaign is wanted, it belongs on its own landing page.
+
+   ⚠ WHAT DID NOT CHANGE, AND WHY IT LOOKS LIKE IT SHOULD HAVE
+   EVENT_KEY still stamps every assessment `egc-2026-08-30`, and EVENT_TAG still
+   carries the event name to GHL. Those are DATA, not copy: 19 rows already hold
+   them and Jake's reporting groups on them. Changing them needs his agreement
+   first — see the note in config/assessment.ts.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ⚠ TITLE DE-DATED 2026-09-01. Was "Build Your GWOP Blueprint — Aug 30".
    The title is what shows in the browser tab, in a shared link preview, and in
@@ -133,7 +160,10 @@ export default function EventPage() {
       <div className="wrap">
         {/* ═══ INCENTIVE · Felicia §2 "explain the event incentive" ═══ */}
         <section className="evsect" id="gifts">
-          <p className="tag">What you get today</p>
+          {/* ⚠ "today" removed 2026-09-04. Missed in the 09-01 de-eventing
+              sweep. This page is reached by printed cards indefinitely — a
+              visitor next March should not read that the offer is same-day. */}
+          <p className="tag">What you get</p>
           <h2>{event.incentives.h2}</h2>
           <p className="evlede">{event.incentives.lede}</p>
 
@@ -164,15 +194,11 @@ export default function EventPage() {
           <InterestForm />
         </section>
 
-        {/* ═══ FOUR STAGES · Felicia §2 "show the four levels", renamed to
-             stages 2026-09-03 per Surpaul's mockup ═══════════════════════════
-             Heading and lede now come from content/pathway.ts rather than being
-             hardcoded here, so a future rename lands on every surface at once
-             instead of leaving this one behind. */}
+        {/* ═══ FOUR LEVELS · Felicia §2 "show the four levels" ═══ */}
         <section className="evsect pb">
           <p className="tag">The pathway</p>
-          <h2>{PATHWAY_HEADING}</h2>
-          <p className="evlede">{PATHWAY_LEDE}</p>
+          <h2>Four levels, in order.</h2>
+          <p className="evlede">Each one has a clear purpose and a clear outcome.</p>
 
           <div className="evlevels">
             {PATHWAY.map(l => (

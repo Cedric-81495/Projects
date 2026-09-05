@@ -3,7 +3,6 @@ import { env } from '@/lib/env'
 import { admin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/observability/logger'
 import { labelFor } from '@/config/assessment'
-import { blueprints } from '@/content/blueprints'
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -63,14 +62,32 @@ interface AssessmentRow {
   leads: { phone: string; email: string } | null
 }
 
-/* Slug → the headline shown on the Blueprint screen. Returns an empty string
-   rather than the slug for an unknown value: printing a raw slug in a message
-   is the problem these labels exist to avoid, so falling back to one would
-   defeat the purpose. */
+/* Slug → a short, scannable name for the roadmap.
+
+   ⚠ NOT THE HEADLINE. This sent `headline` until 2026-09-04 — "Start with a
+   clear picture" for `foundation`. That reads as marketing copy in an internal
+   notification, where what you want at a glance is which roadmap they landed
+   on. Jake asked for "Foundation" instead, and he is right: the headline
+   belongs on the Blueprint screen the attendee reads, not in an alert.
+
+   Derived from the slug rather than added as a tenth content field, so a new
+   blueprint gets a name automatically and there is nothing to keep in sync:
+
+     foundation            → Foundation
+     credit-early          → Credit — Early
+     credit-established    → Credit — Established
+     funding-early         → Funding — Early
+     wealth-established    → Wealth — Established
+
+   Returns an empty string for an unknown or missing slug. Printing a raw slug
+   in a message is what these fields exist to avoid, so falling back to one
+   would defeat the purpose. */
 function blueprintTitle(slug: string | null): string {
   if (!slug) return ''
-  const bp = (blueprints as Record<string, { headline: string } | undefined>)[slug]
-  return bp?.headline ?? ''
+  return slug
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' \u2014 ')
 }
 
 function buildPayload(a: AssessmentRow) {

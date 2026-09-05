@@ -51,6 +51,16 @@ export interface Blueprint {
   readonly path: string
 }
 
+/* ⚠ `path` NAMES A STAGE AND MUST TRACK THE RENAME.
+   These read "Freshman — Foundation" until 2026-09-04 — missed when the levels
+   became stages on 09-03. The blueprint screen sat directly below pathway cards
+   saying "Stage 01 · Foundation", so the same page named the same thing two
+   ways for a day.
+
+   It is written as prose rather than read from PATHWAY because the values are
+   not all single stages — some are transitions ("Stage 01 → Stage 02") and one
+   is a full route. So a rename cannot reach here automatically: if the stages
+   are renamed again, these nine strings change by hand in the same commit. */
 export const blueprints = {
   foundation: {
     pending: false,
@@ -68,7 +78,7 @@ export const blueprints = {
       { title: 'Don\'t apply blindly', detail: 'Understand your profile and possible credit impact first.' },
       { title: 'Don\'t pay for a quick fix', detail: 'Know what actually needs attention first.' },
     ],
-    path: 'Freshman — Foundation',
+    path: 'Stage 01 — Foundation',
   },
 
   'credit-early': {
@@ -87,7 +97,7 @@ export const blueprints = {
       { title: 'Don\'t open accounts just because you can', detail: 'New credit should have a purpose.' },
       { title: 'Don\'t chase guaranteed fixes', detail: 'Be cautious of promised scores or timelines.' },
     ],
-    path: 'Freshman — Foundation',
+    path: 'Stage 01 — Foundation',
   },
 
   'credit-established': {
@@ -106,7 +116,7 @@ export const blueprints = {
       { title: 'Don\'t apply everywhere', detail: 'Unnecessary applications may add inquiries or accounts.' },
       { title: 'Don\'t add unnecessary obligations', detail: 'Keep your profile stable while preparing.' },
     ],
-    path: 'Sophomore — Readiness',
+    path: 'Stage 02 — Readiness',
   },
 
   'funding-early': {
@@ -125,7 +135,7 @@ export const blueprints = {
       { title: 'Don\'t apply without a strategy', detail: 'Know the requirements and possible credit impact.' },
       { title: 'Don\'t chase guaranteed approvals', detail: 'Legitimate funding still requires evaluation.' },
     ],
-    path: 'Freshman → Sophomore',
+    path: 'Stage 01 → Stage 02',
   },
 
   'funding-established': {
@@ -144,7 +154,7 @@ export const blueprints = {
       { title: 'Don\'t take money just because it\'s available', detail: 'Understand cost and repayment terms.' },
       { title: 'Don\'t stack unnecessary applications', detail: 'Protect the profile you\'ve built.' },
     ],
-    path: 'Junior — Build + Scale',
+    path: 'Stage 03 — Build + Scale',
   },
 
   'business-early': {
@@ -163,7 +173,7 @@ export const blueprints = {
       { title: 'Don\'t mix money by default', detail: 'Document personal contributions properly.' },
       { title: 'Don\'t buy every business tool', detail: 'Start with what you actually need.' },
     ],
-    path: 'Sophomore — Readiness',
+    path: 'Stage 02 — Readiness',
   },
 
   'business-established': {
@@ -182,7 +192,7 @@ export const blueprints = {
       { title: 'Don\'t let spending outrun your records', detail: 'Keep documentation current.' },
       { title: 'Don\'t personally guarantee automatically', detail: 'Understand the obligation first.' },
     ],
-    path: 'Junior → Senior',
+    path: 'Stage 03 → Stage 04',
   },
 
   'wealth-early': {
@@ -201,7 +211,7 @@ export const blueprints = {
       { title: 'Don\'t invest money you may need soon', detail: 'Match decisions to your timeline.' },
       { title: 'Don\'t follow what you can\'t explain', detail: 'Know where your money is going and why.' },
     ],
-    path: 'Freshman — Foundation → Full GWOP Pathway',
+    path: 'Stage 01 — Foundation → Full GWOP Pathway',
   },
 
   'wealth-established': {
@@ -220,7 +230,7 @@ export const blueprints = {
       { title: 'Don\'t add complexity for appearance', detail: 'Understand the purpose and cost first.' },
       { title: 'Don\'t ignore protection while growing', detail: 'Build and protect together.' },
     ],
-    path: 'Senior — Legacy',
+    path: 'Stage 04 — Legacy',
   },
 
 } as const satisfies Record<BlueprintSlug, Blueprint>

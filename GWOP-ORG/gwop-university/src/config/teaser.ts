@@ -17,6 +17,15 @@
 export const teaser = {
   /* ✅ LIVE — file supplied 2026-08-27. 720×1280 portrait, 29 seconds, under
      1 MB after compression. */
+  /* ⚠ NO LONGER READ — 2026-09-08. Kept only so an older deploy of
+     Assessment.tsx does not fail on a missing key.
+
+     It used to gate the whole section: `!teaser.pending && teaser.src`. But
+     `src` already answers "is there a file", so this was a second switch that
+     could hide the teaser by itself. Setting it true now does nothing.
+
+     To hide the teaser deliberately, empty `src`. One switch, and it is the
+     one that describes the actual condition. */
   pending: false,
 
   /* Two shapes are supported, decided by the extension:

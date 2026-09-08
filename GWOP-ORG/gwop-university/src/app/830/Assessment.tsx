@@ -467,10 +467,18 @@ function Teaser() {
     void v.play().catch(() => {})
   }, [])
 
-  const ready = !teaser.pending && teaser.src
+  /* ⚠ ALWAYS RENDERS — the only condition left is whether a file exists.
 
-  /* Nothing at all for attendees until there is a file. An empty frame reads as
-     broken, which is worse than an absence nobody notices. */
+     This was `!teaser.pending && teaser.src`. `pending` was a second flag for
+     the same thing `src` already says, and Teaser() was its only reader, so it
+     could hide the section on its own with nothing else changing. That is the
+     same shape of failure as the IdentityIQ card looking broken during
+     testing, and it is not worth keeping for a video that is now shipped.
+
+     The `src` check stays, and it is not a policy decision — a <video> with no
+     source renders a broken frame. There is nothing to display. */
+  const ready = Boolean(teaser.src)
+
   if (!ready) {
     if (process.env.NODE_ENV === 'production') return null
     return (

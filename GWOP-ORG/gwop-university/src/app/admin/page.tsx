@@ -32,11 +32,11 @@ export default function Admin() {
         <div className="wrap">
           <div className="head">
             <p className="tag">Content status</p>
-            <h2 className="h2">Stage 01\u2013Stage 04 Map</h2>
+            <h2 className="h2">Level 1\u2013Level 4 Map</h2>
             <p className="lede">
               {/* Aug 22 deadline removed 2026-09-03 — it has passed and the
                   content is still outstanding. */}
-              Every module the app expects, by stage. Anything not marked ready
+              Every module the app expects, by level. Anything not marked ready
               is still to be written.
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function Admin() {
               <div className="lvlblock" key={l.slug}>
                 <div className="lvlhead">
                   <h3>{l.label}</h3>
-                  <span className="chip ok">{l.role}</span>
+                  <span className="chip ok">{l.title}</span>
                   <span className="cnt">{done}/{mods.length} ready</span>
                 </div>
 

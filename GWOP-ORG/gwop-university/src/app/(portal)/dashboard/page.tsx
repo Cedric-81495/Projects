@@ -55,12 +55,12 @@ export default async function DashboardPage() {
       {enrolledLevel === 0 && (
         <div className="poempty">
           <h2>You&rsquo;re not enrolled yet</h2>
-          {/* Built from PATHWAY rather than naming a stage in prose — this
+          {/* Built from PATHWAY rather than naming a level in prose — this
               string named "Freshman" and described its contents, so it needed
               editing in two ways on every rename. */}
           <p>{PATHWAY[0].label} is {PATHWAY[0].goal.toLowerCase()}: {PATHWAY[0].detail.replace(/ · /g, ', ')}.</p>
           <Link className="btn btn-e" href="/membership">
-            See the stages
+            See the levels
           </Link>
         </div>
       )}

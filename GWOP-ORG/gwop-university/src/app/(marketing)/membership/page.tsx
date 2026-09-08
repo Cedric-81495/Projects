@@ -7,7 +7,7 @@ import { PlanCard } from './PlanCard'
 
 export const metadata: Metadata = {
   title: 'Membership · GWOP University',
-  description: 'Four stages. One plan. Work through them in order, at your own pace.',
+  description: 'Four levels. One plan. Work through them in order, at your own pace.',
 }
 
 export const dynamic = 'force-dynamic' // reflects enrollment, so never cached
@@ -52,9 +52,9 @@ export default async function MembershipPage() {
           <Link href={back.href}>‹ {back.label}</Link>
         </p>
         <p className="tag">Membership</p>
-        {/* ⚠ CHANGED 2026-09-03 with the stages rename. Was Felicia's approved
+        {/* ⚠ CHANGED 2026-09-03 with the levels rename. Was Felicia's approved
             "Four levels. One blueprint." — kept in step because leaving it while
-            every other surface says stages would read as an oversight rather
+            every other surface says levels would read as an oversight rather
             than a choice. Flag to Surpaul; trivial to revert. */}
         <h1 className="h2">{PATHWAY_HEADING}</h1>
         {/* Felicia §8, 2026-08-27, verbatim. */}

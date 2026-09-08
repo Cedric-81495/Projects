@@ -91,12 +91,12 @@ export function PlanCard({
       </p>
 
       <p className="mbincl">
-        {/* ⚠ DE-LEVELLED 2026-09-03. Hardcoded 'Freshman' for the single-stage
+        {/* ⚠ DE-LEVELLED 2026-09-03. Hardcoded 'Freshman' for the single-level
             plan and "levels 1–N" for bundles. Reads from PATHWAY now so a future
             rename reaches here too. */}
         Includes {plan.grants_level === 1
           ? PATHWAY[0].label
-          : `stages 1\u2013${plan.grants_level}`}
+          : `levels 1\u2013${plan.grants_level}`}
       </p>
 
       {error && (

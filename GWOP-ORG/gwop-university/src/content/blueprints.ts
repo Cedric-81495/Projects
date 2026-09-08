@@ -53,14 +53,16 @@ export interface Blueprint {
 
 /* ⚠ `path` NAMES A STAGE AND MUST TRACK THE RENAME.
    These read "Freshman — Foundation" until 2026-09-04 — missed when the levels
-   became stages on 09-03. The blueprint screen sat directly below pathway cards
-   saying "Stage 01 · Foundation", so the same page named the same thing two
-   ways for a day.
+   ⚠ UPDATED AGAIN 2026-09-08 when stages were removed for levels. These read
+   "Stage 01 — Foundation" until then, and before that "Freshman — Foundation".
+   The blueprint screen sits directly below the pathway cards, so a mismatch
+   here means the same page names the same thing two ways — which has now
+   happened twice.
 
    It is written as prose rather than read from PATHWAY because the values are
-   not all single stages — some are transitions ("Stage 01 → Stage 02") and one
-   is a full route. So a rename cannot reach here automatically: if the stages
-   are renamed again, these nine strings change by hand in the same commit. */
+   not all single levels — some are transitions ("Level 1 → Level 2") and one is
+   a full route. So a rename cannot reach here automatically: if the levels are
+   renamed again, these nine strings change by hand in the same commit. */
 export const blueprints = {
   foundation: {
     pending: false,
@@ -78,7 +80,7 @@ export const blueprints = {
       { title: 'Don\'t apply blindly', detail: 'Understand your profile and possible credit impact first.' },
       { title: 'Don\'t pay for a quick fix', detail: 'Know what actually needs attention first.' },
     ],
-    path: 'Stage 01 — Foundation',
+    path: 'Level 1 — Personal Credit',
   },
 
   'credit-early': {
@@ -97,7 +99,7 @@ export const blueprints = {
       { title: 'Don\'t open accounts just because you can', detail: 'New credit should have a purpose.' },
       { title: 'Don\'t chase guaranteed fixes', detail: 'Be cautious of promised scores or timelines.' },
     ],
-    path: 'Stage 01 — Foundation',
+    path: 'Level 1 — Personal Credit',
   },
 
   'credit-established': {
@@ -116,7 +118,7 @@ export const blueprints = {
       { title: 'Don\'t apply everywhere', detail: 'Unnecessary applications may add inquiries or accounts.' },
       { title: 'Don\'t add unnecessary obligations', detail: 'Keep your profile stable while preparing.' },
     ],
-    path: 'Stage 02 — Readiness',
+    path: 'Level 2 — Business Foundation',
   },
 
   'funding-early': {
@@ -135,7 +137,7 @@ export const blueprints = {
       { title: 'Don\'t apply without a strategy', detail: 'Know the requirements and possible credit impact.' },
       { title: 'Don\'t chase guaranteed approvals', detail: 'Legitimate funding still requires evaluation.' },
     ],
-    path: 'Stage 01 → Stage 02',
+    path: 'Level 1 → Level 2',
   },
 
   'funding-established': {
@@ -154,7 +156,7 @@ export const blueprints = {
       { title: 'Don\'t take money just because it\'s available', detail: 'Understand cost and repayment terms.' },
       { title: 'Don\'t stack unnecessary applications', detail: 'Protect the profile you\'ve built.' },
     ],
-    path: 'Stage 03 — Build + Scale',
+    path: 'Level 3 — Funding & Banking',
   },
 
   'business-early': {
@@ -173,7 +175,7 @@ export const blueprints = {
       { title: 'Don\'t mix money by default', detail: 'Document personal contributions properly.' },
       { title: 'Don\'t buy every business tool', detail: 'Start with what you actually need.' },
     ],
-    path: 'Stage 02 — Readiness',
+    path: 'Level 2 — Business Foundation',
   },
 
   'business-established': {
@@ -192,7 +194,7 @@ export const blueprints = {
       { title: 'Don\'t let spending outrun your records', detail: 'Keep documentation current.' },
       { title: 'Don\'t personally guarantee automatically', detail: 'Understand the obligation first.' },
     ],
-    path: 'Stage 03 → Stage 04',
+    path: 'Level 3 → Level 4',
   },
 
   'wealth-early': {
@@ -211,7 +213,7 @@ export const blueprints = {
       { title: 'Don\'t invest money you may need soon', detail: 'Match decisions to your timeline.' },
       { title: 'Don\'t follow what you can\'t explain', detail: 'Know where your money is going and why.' },
     ],
-    path: 'Stage 01 — Foundation → Full GWOP Pathway',
+    path: 'Level 1 → Full GWOP Pathway',
   },
 
   'wealth-established': {
@@ -230,7 +232,7 @@ export const blueprints = {
       { title: 'Don\'t add complexity for appearance', detail: 'Understand the purpose and cost first.' },
       { title: 'Don\'t ignore protection while growing', detail: 'Build and protect together.' },
     ],
-    path: 'Stage 04 — Legacy',
+    path: 'Level 4 — Execution & Wealth',
   },
 
 } as const satisfies Record<BlueprintSlug, Blueprint>

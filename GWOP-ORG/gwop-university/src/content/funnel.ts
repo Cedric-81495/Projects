@@ -85,19 +85,19 @@ export const funnel = {
      Heading and lede are PATHWAY_HEADING / PATHWAY_LEDE in content/pathway.ts.
 
      ⚠ THE MOCKUP CARRIES BOTH NAMING SYSTEMS AND THAT IS DELIBERATE.
-     Each card shows "Stage 01 · Foundation" AND "Level 1 — Personal Credit".
-     Surpaul's 09-03 mockup introduced the stage names; his final-direction memo
-     introduced the level titles. The approved layout keeps both, so the
-     `levelTitle` field was added to content/pathway.ts rather than replacing
-     `label`. Nothing was renamed and no slug moved — see the warnings in that
-     file for why slugs are load-bearing. */
+     ⚠ STAGES REMOVED 2026-09-08. The approved layout showed "Stage 01 ·
+     Foundation" above "Level 1 — Personal Credit"; Surpaul's memo then removed
+     stages entirely, so the cards now render `label` + `title` — "Level 1" and
+     "Personal Credit". The mockup's stage row is gone from every surface. See
+     content/pathway.ts for the full history and for why the slugs did NOT
+     move. */
 
   /* ── BUNDLE ────────────────────────────────────────────────────────────── */
   bundle: {
     eyebrow: 'Best value — the primary offer',
     h: 'GWOP University — All 4 Levels',
     body:
-      'All four stages, in your account from day one — the platform shows the '
+      'All four levels, in your account from day one — the platform shows the '
       + 'recommended order, but nothing is locked behind the level before it.',
     /* ⚠ REFUND SENTENCE. Rendered from REFUND_POLICY in config/membership.ts,
        not from this file, so the funnel and /refunds cannot disagree about the
@@ -266,13 +266,13 @@ export const funnel = {
         a: 'We collect only what the assessment needs, and Beast is the one '
          + 'reviewing it with you — not a call center or a shared database.' },
       { q: 'Can this help with business funding, not just personal credit?',
-        /* ⚠ "Junior and Senior" is verbatim from the approved layout, and it
-           is the one place the page still uses the old academic names — the
-           pathway cards above it say Stage 03 / Level 3. Left as approved
-           rather than silently reworded. Worth raising with Surpaul in the
-           same pass that settles stages-vs-levels. */
-        a: 'Yes. The Junior and Senior levels focus specifically on funding and '
-         + 'scaling once your foundation is solid.' },
+        /* ⚠ WAS "The Junior and Senior levels" — the last academic naming on
+           the page, and the pass that settled stages-vs-levels on 2026-09-08
+           is that pass. Now names the levels the cards name. Approved copy was
+           reworded here deliberately rather than left to contradict the four
+           cards directly above it. */
+        a: 'Yes. Levels 3 and 4 focus specifically on funding and scaling once '
+         + 'your foundation is solid.' },
       { q: "I've tried credit repair before and it didn't work. Is this different?",
         a: 'If "credit repair" meant a company disputing items on your behalf, '
          + 'this is a different approach — education and a plan you execute, not '

@@ -166,10 +166,10 @@ const LEVEL_PRICE: Record<string, number | null> = Object.fromEntries(
 /* ══ PATHWAY + BUNDLE ══════════════════════════════════════════════════════
    Four cards on a gold connector line, then the offer card.
 
-   Both naming systems render — "Stage 01 · Foundation" above "Level 1 —
-   Personal Credit" — because the approved layout has both. `levelTitle` was
-   added to content/pathway.ts rather than replacing `label`; nothing renamed,
-   no slug moved.
+   ⚠ STAGES REMOVED 2026-09-08. The approved layout drew a stage row above the
+   level title; Surpaul's memo then removed stages entirely, so each card is
+   now `label` + `title` — "Level 1" over "Personal Credit". No slug moved; see
+   content/pathway.ts.
 
    Prices go through oneTimeLabel() / priceLabel(), so PRICING_PUBLISHED is
    still the single switch that governs whether a number can appear anywhere on
@@ -189,9 +189,9 @@ export function PathwayAndBundle() {
         {PATHWAY.map(l => (
           <div className="fn-path-card" key={l.slug}>
             <div className="fn-dot" />
-            <p className="fn-class">{l.label} &middot; {l.role}</p>
+            <p className="fn-class">{l.label}</p>
             <h3>{l.goal}</h3>
-            <p className="fn-lvl">{l.levelTitle}</p>
+            <p className="fn-lvl">{l.title}</p>
             <p>{l.detail}</p>
             <p className="fn-price">{oneTimeLabel(LEVEL_PRICE[l.slug])}</p>
           </div>

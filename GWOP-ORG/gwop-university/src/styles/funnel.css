@@ -982,3 +982,38 @@
 }
 .fn-form-card .evstage > .tag,
 .fn-form-card .evstage > .evlede { text-align: left; }
+
+/* ── CHROME AUTOFILL ──────────────────────────────────────────────────────
+   ⚠ background-color DOES NOTHING on an autofilled input. Chrome paints
+   :-webkit-autofill with its own hardcoded fill — white, or yellow while the
+   suggestion dropdown is open — and it wins over any author background. So a
+   dark form with autofill enabled shows white boxes for exactly the fields the
+   browser filled in, which reads as half the form being broken.
+
+   A 1000px inset box-shadow is the standard way round it: Chrome does honour
+   box-shadow on autofilled inputs, and an inset spread that large covers the
+   whole field. text-fill-color is the matching override for the text, which
+   `color` also cannot set here.
+
+   transition-delay on background-color stops the brief white flash some
+   Chrome versions paint before the autofill style settles.
+
+   Also covers :hover, :focus and :active — Chrome re-applies the autofill
+   style on each of those states independently, so omitting any one of them
+   makes the field flash white when touched. */
+.fn-form-card .evnf input:-webkit-autofill,
+.fn-form-card .evnf input:-webkit-autofill:hover,
+.fn-form-card .evnf input:-webkit-autofill:focus,
+.fn-form-card .evnf input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--black) inset !important;
+          box-shadow: 0 0 0 1000px var(--black) inset !important;
+  -webkit-text-fill-color: var(--ivory) !important;
+  caret-color: var(--ivory);
+  border: 1px solid rgba(156, 149, 135, .35);
+  transition: background-color 9999s ease-in-out 0s;
+}
+.fn-form-card .evnf input:-webkit-autofill:focus {
+  border-color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

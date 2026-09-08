@@ -1042,6 +1042,11 @@
   border: 1px solid rgba(212, 175, 55, .28);
   border-radius: 2px;
   color: rgba(247, 243, 233, .86);
+  /* globals gives this margin-bottom only — no padding, because on the ivory
+     page it was a paragraph, not a box. Adding a border without padding put
+     the affiliate disclosure hard against its own edge. Same mistake as the
+     Blueprint cards. */
+  padding: 14px 16px;
 }
 .fn-form-card .evas-next-note { color: var(--stone); }
 
@@ -1290,4 +1295,12 @@
      390px screen. The inputs still clear 16px, so tapping does not zoom. */
   .fn-form-card { padding: 24px 20px; }
   .fn-offer-card { padding: 24px 20px; }
+
+  /* The #choose section's bottom padding is the only gap between the form card
+     and the footer. 72px from the 860px rule is generous on desktop and reads
+     as dead space on a phone, but dropping it entirely puts the legal block
+     directly under the submit button — where it looks like part of the form.
+     40px keeps them separate without the void. */
+  .fn-final-cta { padding-block: 64px 40px; }
+  .fn-foot { padding: 32px 0 36px; }
 }

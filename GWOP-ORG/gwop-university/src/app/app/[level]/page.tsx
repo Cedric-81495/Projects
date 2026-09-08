@@ -48,7 +48,10 @@ export default async function LevelPage(
           <p className="crumb"><Link href="/app">Student area</Link> › {meta.label}</p>
 
           <div className="head">
-            <p className="tag">{meta.label} · {meta.role}</p>
+            {/* ⚠ `role` BECAME `title` 2026-09-08 with the stage removal —
+                "Level 1 · Personal Credit". This is the student area, so it
+                must match what the marketing pathway cards say. */}
+            <p className="tag">{meta.label} · {meta.title}</p>
             <h2 className="h2">{meta.goal}</h2>
             <p className="lede">{meta.detail}</p>
           </div>

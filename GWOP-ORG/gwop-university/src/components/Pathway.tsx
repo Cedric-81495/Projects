@@ -120,11 +120,16 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
             Restore the Link when the university opens. */}
         {PATHWAY.map(l => (
           <div className="course course-off" key={l.slug}>
-            {/* Felicia 2026-08-27: the card label carries the role as a second
-                half, e.g. FRESHMAN · FOUNDATION. Appended inside the existing
-                .nm span rather than as a new element — .nm already uppercases
-                and tracks the text, so no CSS changes and no new component. */}
-            <span className="nm">{l.label} · {l.role}</span>
+            {/* Felicia 2026-08-27: the card label carries a second half inside
+                the existing .nm span rather than as a new element — .nm already
+                uppercases and tracks the text, so no CSS changes and no new
+                component.
+
+                ⚠ `role` BECAME `title` 2026-09-08 when stages were removed.
+                It read FRESHMAN · FOUNDATION, then STAGE 01 · FOUNDATION, and
+                now LEVEL 1 · PERSONAL CREDIT. The second half is the subject
+                now, not a role word. See content/pathway.ts. */}
+            <span className="nm">{l.label} · {l.title}</span>
             <span className="goal">{l.goal}</span>
           </div>
         ))}

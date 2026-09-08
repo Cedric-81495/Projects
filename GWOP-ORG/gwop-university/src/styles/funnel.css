@@ -1201,51 +1201,6 @@
   border: 1px solid var(--gold); color: var(--gold);
   font-family: var(--ui); font-size: 10px; font-weight: 600; letter-spacing: .06em;
 }
-
-/* Full-frame tap target. Covers the whole frame on purpose: this is the one
-   gesture that can unmute, and a small button on a phone is a missed tap. It
-   is a real <button>, so it is keyboard-reachable and announced — an overlay
-   <div> with onClick would be neither. */
-.fn-form-card .evas-teaser-sound {
-  position: absolute; inset: 0; z-index: 4;
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-  gap: 14px; padding: 0 20px 42px;
-  cursor: pointer; border: 0;
-  /* Gradient, not a flat scrim: the video stays visible while the label
-     remains readable over whatever is on screen. */
-  background: linear-gradient(to top,
-    rgba(6, 20, 14, .78) 0%, rgba(6, 20, 14, .25) 45%, rgba(6, 20, 14, 0) 75%);
-  font-family: var(--ui);
-  -webkit-tap-highlight-color: transparent;
-}
-.fn-form-card .evas-teaser-sound-disc {
-  position: relative; flex: none;
-  width: 64px; height: 64px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--gold); color: var(--black); font-size: 22px;
-}
-.fn-form-card .evas-teaser-sound-disc::after {
-  content: ''; position: absolute; inset: -6px; border-radius: 50%;
-  border: 2px solid var(--gold);
-  animation: fnCtaPulse 2s ease-out infinite;
-}
-@keyframes fnCtaPulse {
-  0%   { transform: scale(1);    opacity: .7; }
-  70%  { transform: scale(1.45); opacity: 0; }
-  100% { transform: scale(1.45); opacity: 0; }
-}
-/* The pulse is an attention cue, not information — the label says the same
-   thing. Safe to stop entirely. */
-@media (prefers-reduced-motion: reduce) {
-  .fn-form-card .evas-teaser-sound-disc::after { animation: none; }
-}
-.fn-form-card .evas-teaser-sound-label {
-  color: var(--ivory); font-size: 12.5px; font-weight: 600;
-  letter-spacing: .16em; text-transform: uppercase;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, .6);
-}
-
 /* #start alias for the #choose section — see page.tsx. A bare inline span
    would let the sticky header cover the heading when a fragment lands on it,
    so both targets get the same offset the browser uses for #choose. */

@@ -438,43 +438,32 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
    tap it if they want it.
    ───────────────────────────────────────────────────────────────────────── */
 function Teaser() {
-  /* Starts muted because that is the only way autoplay is permitted. Flipping
-     this to false is the one thing that stops the video playing at all. */
-  const [muted, setMuted] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   /* Unmute from the top. `play()` returns a promise that rejects if the
      browser declines — caught rather than ignored, because an unhandled
      rejection here surfaces as a console error on a page where the console
      should be clean. */
-  /* ⚠ muted SET IMPERATIVELY, NOT LEFT TO THE ATTRIBUTE ALONE.
+  /* ⚠ THE CLIP IS SILENT BY DESIGN — 2026-09-08. No sound gate, no mute
+     state, no unmute handler. Do not add one back without checking whether the
+     source file actually has an audio track.
 
+     The earlier build had a full-frame "Tap for sound" overlay that restarted
+     playback from 0. Removed: the video is intended to play without audio, so
+     the overlay promised something that does not exist, covered the frame, and
+     made a silent loop look broken.
+
+     muted is still set on the NODE rather than relying on the attribute alone.
      React does not render `muted` into the initial HTML — it applies it as a
-     DOM property after mount. So there is a window where the element exists
-     with autoPlay and WITHOUT muted, and a browser that evaluates autoplay in
-     that window refuses it: autoplay with sound is blocked everywhere. The
-     video then sits on frame one with no error, which is the single most
-     reported React video bug and looks exactly like a broken file.
-
-     Setting it on the node before asking it to play closes the window. The
-     `muted` prop stays on the element too — it is what keeps React's view of
-     the DOM in step once the sound gate flips it. */
+     DOM property after mount — so there is a window where the element exists
+     with autoPlay and without muted, and a browser evaluating autoplay in that
+     window refuses it outright. The video then sits on frame one with no
+     error, which is the most-reported React video bug and looks exactly like a
+     missing file. */
   useEffect(() => {
     const v = videoRef.current
     if (!v) return
     v.muted = true
-    void v.play().catch(() => {})
-  }, [])
-
-  const enableSound = useCallback(() => {
-    setMuted(false)
-    const v = videoRef.current
-    if (!v) return
-    /* Property, not just state — same reason as the effect above. Waiting for
-       React to re-render before unmuting loses the user gesture, and the
-       gesture is the only thing that authorises audio. */
-    v.muted = false
-    v.currentTime = 0
     void v.play().catch(() => {})
   }, [])
 
@@ -537,39 +526,26 @@ function Teaser() {
             <video
               ref={videoRef}
               autoPlay
-              muted={muted}
+              muted
               loop
               playsInline
               preload="metadata"
-              controls={!muted}
+              /* ⚠ controls STAYS ON even though the clip is silent, and this
+                 is an accessibility requirement rather than a preference.
+                 WCAG 2.2.2: content that moves for more than five seconds must
+                 be pausable. A looping video with no pause control fails that,
+                 and it is also simply irritating beside a plan somebody is
+                 trying to read. */
+              controls
               poster={teaser.poster || undefined}
               src={teaser.src}
             />
 
-            {/* The design's "Loops" badge. Hidden once sound is on, because at
-                that point the person is watching deliberately and a loop
-                label stops being reassurance and becomes clutter. */}
-            {muted && (
-              <span className="evas-teaser-badge" aria-hidden="true">Loops</span>
-            )}
-
-            {/* Tap-for-sound gate. The ONLY gesture that can legally unmute —
-                browsers require a user action, so this cannot be done on
-                scroll or on a timer.
-
-                Restarts from 0 rather than unmuting mid-clip: someone who has
-                just decided to listen should hear the opening line, not walk
-                in halfway. */}
-            {muted && (
-              <button
-                type="button"
-                className="evas-teaser-sound"
-                onClick={enableSound}
-              >
-                <span className="evas-teaser-sound-disc" aria-hidden="true">▶</span>
-                <span className="evas-teaser-sound-label">Tap for sound</span>
-              </button>
-            )}
+            {/* The design's "Loops" badge. Kept — it tells somebody the clip
+                repeats, which is the difference between "short video" and
+                "this seems stuck". The sound gate that used to sit beside it
+                is gone; see the note above. */}
+            <span className="evas-teaser-badge" aria-hidden="true">Loops</span>
           </>
         ) : (
           <iframe
@@ -679,6 +655,17 @@ function NextStep({
      Felicia, 2026-08-22: don't force every person into this simply because
      they finished the assessment. It should follow from their path.
 
+     ⚠ RE-CONFIRMED 2026-09-08 after Surpaul asked for it on every path. The
+     gate stayed, for a reason worth keeping written down: showing a $27.99/mo
+     third-party credit product to somebody who came for wealth-building and
+     already knows their score attaches a paid offer to a free gift. That is
+     the shape of thing that draws a complaint in a credit-adjacent category,
+     and it costs us the trust the free Blueprint just bought.
+
+     ⚠ IF THE CARD SEEMS "MISSING" WHILE TESTING, THIS IS WHY. Pick Credit or
+     Business Funding at step 0, or answer "I don't know" to the score-range
+     question, and it appears. It is not a rendering bug.
+
      So it appears when credit is genuinely part of what they came for:
      they picked a credit or funding goal, or they told us they don't know
      their range — in which case reading the report IS the honest first move
@@ -749,6 +736,8 @@ function BlueprintView({
   headingRef,
 }: {
   slug: BlueprintSlug
+  /* Threaded through to NextStep's gate — see the note there. Not read by the
+     Blueprint itself, which is chosen by `slug`. */
   interest: string
   creditRange: string | null
   sectionRef: React.RefObject<HTMLElement | null>

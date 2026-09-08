@@ -39,7 +39,15 @@
   --emerald: #1E6B45;
   --gold:    #D4AF37;
   --ivory:   #F6F2E9;
-  --stone:   #9C9587;
+  /* ⚠ RAISED FROM THE MOCKUP'S #9C9587 — 2026-09-08. Measured, not eyeballed.
+     Secondary text on this page sits on two backgrounds: --black #0D281E and
+     --forest #163A29. The mockup value gave 5.27:1 on black but only 4.23:1 on
+     forest, which is below the 4.5:1 WCAG AA floor for body text — and forest
+     is the band sections AND the form card, so it failed across most of the
+     page. #B5B0A5 is that colour with 25% white mixed in: 7.26 on black,
+     5.81 on forest. Passes both with headroom and still reads as muted grey
+     rather than competing with --ivory. */
+  --stone:   #B5B0A5;
   --serif:   var(--fn-serif), 'Playfair Display', Georgia, serif;
   --sans:    var(--fn-ui), 'Montserrat', -apple-system, sans-serif;
   --ui:      var(--fn-ui), 'Montserrat', -apple-system, sans-serif;
@@ -73,7 +81,44 @@
    Excluding buttons here fixes it at the source. The rule below also raises
    the button selectors to (0,2,0) as a second guard, so neither change alone
    is doing all the work. */
-.fn a:not(.fn-btn):not(.btn) { color: inherit; }
+/* ── INLINE LINKS ────────────────────────────────────────────────────────────
+   ⚠ GOLD BY DEFAULT, WITH EXEMPTIONS — NOT A PER-CONTAINER LIST.
+
+   The mockup had `a { color: inherit }`, which is right for the two anchors
+   that are not really links — the brand block and the CTAs, both of which get
+   their colour from the thing they sit in. But it means every genuine inline
+   link inherits body text and is distinguishable only by an underline, and
+   these are the links that matter most on this page: the privacy policy, the
+   terms, the disclosures, the SMS consent terms.
+
+   Written as a default plus exemptions so a link added to any future section
+   is visible without someone remembering to add its container here. The
+   earlier version listed .fn-legal-box, .evnf-legal and .fn-foot-links
+   individually, and anything outside those three was invisible.
+
+   ⚠ THE :not() LIST IS LOAD-BEARING. Without .fn-btn and .btn the gold buttons
+   get gold labels on a gold fill. Without .fn-brand the wordmark turns gold.
+   And this rule must stay at (0,2,1) or higher — see the note on the buttons,
+   where an earlier `.fn a` at (0,1,1) beat `.fn-btn` at (0,1,0) and turned
+   every button label ivory. */
+.fn a:not(.fn-btn):not(.btn):not(.fn-brand) {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.fn a:not(.fn-btn):not(.btn):not(.fn-brand):hover {
+  color: var(--ivory);
+}
+/* Focus ring, since the underline alone does not indicate keyboard position. */
+.fn a:not(.fn-btn):not(.btn):not(.fn-brand):focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 1px;
+}
+
+/* The brand and the CTAs keep the mockup's inherit — their colour comes from
+   the block they sit in. */
+.fn a.fn-brand { color: inherit; text-decoration: none; }
 
 .fn-wrap { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
 
@@ -373,7 +418,9 @@
 .fn-diff-list li { font-size: 15.5px; padding-left: 20px; position: relative; color: var(--stone); }
 .fn-diff-col.fn-gwop .fn-diff-list li { color: var(--ivory); }
 .fn-diff-col.fn-typical .fn-diff-list li::before {
-  content: '\00D7'; position: absolute; left: 0; color: #6b6258;
+  /* Was #6b6258 — the same failing grey. The x is decorative, but at 2.1:1 it
+     read as a rendering artefact rather than a mark. */
+  content: '\00D7'; position: absolute; left: 0; color: var(--stone);
 }
 .fn-diff-col.fn-gwop .fn-diff-list li::before {
   content: '\2713'; position: absolute; left: 0; color: var(--emerald);
@@ -416,7 +463,7 @@
   border: 1px solid rgba(198, 162, 77, .25); padding: 28px 32px;
   font-size: 14px; color: var(--stone); line-height: 1.7;
 }
-.fn-legal-box a { color: var(--gold); text-decoration: underline; }
+/* .fn-legal-box a — covered by the inline-link default above. */
 
 /* ── TESTIMONIALS ──────────────────────────────────────────────────────────
    Dashed border. The mockup chose dashed because the slots are placeholders —
@@ -582,7 +629,6 @@
 /* interactive / accent — gold is the funnel's interactive colour */
 .fn-form-card .chosen,
 .fn-form-card .fh .chosen,
-.fn-form-card .evnf-legal a { color: var(--gold); }
 
 /* The 1 · 2 · 3 markers keep var(--white) — they sit on a filled disc, so
    white is correct there and --white is deliberately not remapped. */
@@ -796,7 +842,6 @@
 }
 .fn-form-card .evnf-err { color: #E0A090; }
 .fn-form-card .evnf-fine { color: rgba(156, 149, 135, .8); }
-.fn-form-card .evnf-legal a { color: var(--gold); }
 
 /* ── SUBMIT ── the mockup's gold button, inverting on hover ────────────── */
 .fn-form-card .evgold,
@@ -921,9 +966,18 @@
    visitor has no account for, and the Pathway column was four non-links.
 
    Colour matches the screenshot: entity and links brighter than the body
-   copy, which sits at #6b6258 the way the mockup's .foot-legal did. */
+   copy. Both now derive from --stone rather than a one-off hex — see the
+   contrast note on .fn-foot-legal below. */
 .fn-foot { border-top: 1px solid rgba(198, 162, 77, .18); padding: 44px 0 40px; }
-.fn-foot-legal { font-size: 12.5px; line-height: 1.7; color: #6b6258; }
+/* ⚠ WAS #6b6258, THE MOCKUP'S VALUE — 2.10:1 on forest and 2.62:1 on black.
+   Roughly half the AA floor, on the disclosure that states we do not guarantee
+   an outcome. A legal notice nobody can read is the shape of one written not to
+   be read.
+
+   Uses --stone now, so it tracks the rest of the page rather than being a
+   one-off hex. 12.5px also bumped to 13px: this is dense legal prose at the
+   very bottom of a long page. */
+.fn-foot-legal { font-size: 13px; line-height: 1.7; color: var(--stone); }
 .fn-foot-legal .fn-foot-entity {
   font-family: var(--ui); font-weight: 700; font-size: 15px;
   color: var(--ivory); margin-bottom: 16px;
@@ -932,7 +986,9 @@
 .fn-foot-links {
   list-style: none; display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 20px;
 }
-.fn-foot-links a { color: var(--gold); text-decoration: none; font-size: 14px; }
+/* Colour comes from the inline-link default; these only need their size and
+   to sit unlined until hover, since they are a list rather than prose. */
+.fn-foot-links a { text-decoration: none; font-size: 14px; }
 /* ⚠ `color` REPEATED ON :hover ON PURPOSE. globals.css has a bare
    `footer a:hover{color:var(--gold-lt)}` rule, and --gold-lt is the APP's
    lighter gold (#D9BD6B), not the mockup's #D4AF37. Without restating the

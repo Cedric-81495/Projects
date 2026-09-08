@@ -429,18 +429,41 @@
 /* ── PERSON (founder) ──────────────────────────────────────────────────────
    The mockup's .people grid is 1fr 1fr for two cards; there is one founder
    card, so the grid is not used and the card stands alone at the same width. */
+/* ⚠ WIDENED 2026-09-08. Was max-width: 536px — the mockup's `.people` grid
+   was `1fr 1fr` for two profile cards, and 536px is one column of that. There
+   is one founder, so the card sat at half width with the rest of the section
+   empty beside it.
+
+   ⚠ BUT A FULL-WIDTH CARD IS THE WRONG FIX. At 1120px this text would run to
+   roughly 120 characters a line, and anything past ~75 is measurably harder to
+   read — the eye loses its place on the return sweep. So the CARD spans the
+   section while the PROSE inside keeps a measure. Two different constraints,
+   which is why they are two rules rather than one width.
+
+   Padding scales with the viewport instead of stepping at a breakpoint: 36px
+   inside a 20px wrap on a 390px phone left the text in a ~278px column.
+   clamp() handles every width between, so this needs no media query of its
+   own. */
 .fn-person {
-  padding: 36px; background: rgba(198, 162, 77, .05);
-  border: 1px solid rgba(198, 162, 77, .18); max-width: 536px;
+  width: 100%;
+  padding: clamp(24px, 3.6vw, 44px);
+  background: rgba(198, 162, 77, .05);
+  border: 1px solid rgba(198, 162, 77, .18);
 }
 .fn-person .fn-role {
   font-family: var(--ui); font-size: 11.5px; letter-spacing: .06em;
   color: var(--gold); margin-bottom: 10px; font-weight: 600;
 }
 .fn-person h3 { font-size: 24px; margin-bottom: 12px; color: var(--ivory); }
-.fn-person p { color: var(--stone); font-size: 15px; }
+/* The measure. 66ch is inside the comfortable range for body text and is what
+   keeps the wider card readable — remove this and the card's new width becomes
+   a liability rather than a gain. */
+.fn-person p { color: var(--stone); font-size: 15px; max-width: 66ch; }
 .fn-person .fn-person-close {
   margin-top: 20px; padding-top: 18px;
+  /* Rule stops at the measure rather than crossing the whole card — a hairline
+     running past the text it divides reads as an unfinished table. */
+  max-width: 66ch;
   border-top: 1px solid rgba(198, 162, 77, .22);
   font-family: var(--ui); font-weight: 600; font-size: 14px;
   letter-spacing: .03em; color: var(--gold);

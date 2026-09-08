@@ -103,7 +103,23 @@
   font-family: var(--serif); font-weight: 500; line-height: 1.08; letter-spacing: .2px;
 }
 
-.fn-section { padding: 104px 0; }
+/* ⚠ padding-block, NOT the `padding: 104px 0` shorthand. THIS WAS THE BUG
+   THAT PUT TEXT AGAINST THE SCREEN EDGE.
+
+   Seven elements carry both classes — `class="fn-section fn-wrap"` — and
+   `.fn-wrap` sets `padding: 0 28px`. The shorthand here is a full reset, so it
+   overwrote the left and right values with 0. Both rules are one class, so
+   whichever appears later in the file wins, and .fn-section is 28 lines below
+   .fn-wrap.
+
+   It looked like a mobile problem because 28px is barely noticeable at 1440px
+   and unmissable at 390px, but it was wrong at every width. Affected the
+   problem section, pathway + bundle, difference, trust, FAQ, the hero and the
+   #choose section — i.e. most of the page.
+
+   padding-block only touches top and bottom, so .fn-wrap's horizontal padding
+   survives. Same fix applied to .fn-hero, .fn-final-cta and the 860px rule. */
+.fn-section { padding-block: 104px; }
 .fn-section--forest { background: var(--forest); }
 
 .fn-eyebrow {
@@ -228,7 +244,7 @@
    reduced-motion query is ported with it: without that, the animation starts
    at opacity 0, so anyone who has motion turned off would see no crest at all
    rather than a still one. */
-.fn-hero { padding: 96px 0 64px; text-align: center; position: relative; }
+.fn-hero { padding-block: 96px 64px; text-align: center; position: relative; }
 /* ⚠ THE CREST IS VISIBLE BY DEFAULT AND THE ANIMATION IS AN ENHANCEMENT.
    INVERTED FROM THE MOCKUP ON PURPOSE — this is why it was missing from the
    PDF render.
@@ -307,7 +323,13 @@
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .fn-path-card { padding: 0 20px; position: relative; }
-.fn-path-card:first-child { padding-left: 0; }
+/* Only correct while all four sit on one row — it pulls card 1 flush with the
+   section edge. Below 860px the grid is 2x2, so card 3 starts a new left
+   column and would keep its 20px while card 1 has none. Reset per breakpoint
+   instead; see the 860px block. */
+@media (min-width: 861px) {
+  .fn-path-card:first-child { padding-left: 0; }
+}
 .fn-path-card .fn-dot {
   width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
   margin-bottom: 22px; position: relative; z-index: 2;
@@ -457,7 +479,7 @@
    assessment sits in the same forest panel the mockup drew, and the input
    rules are kept because the assessment's name / email / phone step renders
    real inputs into it. */
-.fn-final-cta { text-align: center; padding: 110px 0; }
+.fn-final-cta { text-align: center; padding-block: 110px; }
 .fn-final-cta h2 { font-size: clamp(34px, 5vw, 58px); margin-bottom: 20px; }
 .fn-final-cta .fn-lede { margin: 0 auto 40px; text-align: center; }
 
@@ -791,12 +813,16 @@
    The mockup has exactly one, at 860px. Ported as-is: no extra breakpoints
    invented, and none of the mockup's collapses dropped. */
 @media (max-width: 860px) {
-  .fn-path-row { grid-template-columns: 1fr 1fr; gap: 32px 0; }
+  .fn-path-row { grid-template-columns: 1fr 1fr; gap: 32px 20px; }
   .fn-path-row::before { display: none; }
+  /* No horizontal padding on the cards at this width: .fn-wrap already gives
+     the section 28px, and 20px more on each card left the copy in a ~130px
+     column on a 390px phone. The grid `gap` above separates them instead. */
+  .fn-path-card { padding: 0; }
   .fn-diff-grid,
   .fn-trust-icons,
   .fn-testi-row { grid-template-columns: 1fr; gap: 28px; }
-  .fn-section { padding: 72px 0; }
+  .fn-section { padding-block: 72px; }
   .fn-offer-card { padding: 30px; }
   .fn-offer-card__aside { min-width: 0; width: 100%; text-align: left; }
 }
@@ -1121,4 +1147,35 @@
   border-color: var(--gold);
   outline: 2px solid var(--gold);
   outline-offset: 2px;
+}
+
+/* ══ NARROW PHONES ═════════════════════════════════════════════════════════
+   The mockup has one breakpoint, at 860px, which is correct for the desktop
+   collapses. It does not address 390px and below, where two things break.
+
+   Kept as an addition below the mockup's own rules rather than edited into
+   them, so the ported stylesheet stays comparable to its source. */
+@media (max-width: 430px) {
+  /* The brand wrapped to "GWOP / UNIVERSITY" and the button to "Start My /
+     Blueprint", so the sticky bar was three lines tall on a phone. Both are
+     unnecessary: the wordmark fits on one line at 14px, and the button reads
+     fine shorter. Tightening the nav padding buys the rest. */
+  .fn-nav { padding: 12px 20px; gap: 12px; }
+  .fn-brand-text { font-size: 14px; line-height: 1.15; white-space: nowrap; }
+  .fn-nav .fn-btn,
+  .fn-nav .btn { padding: 10px 16px; font-size: 12.5px; white-space: nowrap; }
+
+  /* .fn-wrap's 28px is generous at this width — 20px gives the copy back
+     16px of measure without letting it touch the edge. */
+  .fn-wrap { padding: 0 20px; }
+
+  /* Single column: two 165px columns wrapped nearly every card title. */
+  .fn-path-row { grid-template-columns: 1fr; gap: 26px; }
+  .fn-honest .fn-wrap { padding-block: 18px; }
+  .fn-honest-item { padding: 5px 0; border-left: 0; }
+
+  /* The card's 36px padding inside a 20px wrap left ~278px for the form on a
+     390px screen. The inputs still clear 16px, so tapping does not zoom. */
+  .fn-form-card { padding: 24px 20px; }
+  .fn-offer-card { padding: 24px 20px; }
 }

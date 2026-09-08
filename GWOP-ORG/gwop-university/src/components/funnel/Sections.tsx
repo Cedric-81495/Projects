@@ -219,10 +219,40 @@ export function PathwayAndBundle() {
         </div>
 
         <div className="fn-offer-card__aside">
+          {/* ⚠ NOT STRUCK THROUGH. Changed 2026-09-08 — this is a departure
+              from the approved mockup, which had it line-through.
+
+              A strikethrough means "this was the price, and now it is lower".
+              $1,388 was never a price for the bundle; it is the sum of four
+              other products. Reference-pricing guidance is that a struck
+              figure should be a price the item was genuinely offered at, and
+              this one never was — so the strike states something untrue about
+              a real number.
+
+              It also does not need the help. $391 off is a strong comparison
+              on its own, and stating it as a comparison is both accurate and
+              clearer than asking someone to subtract. */}
           {sep !== null && (
-            <p className="fn-offer-was">{fmtMoney(sep)} separately</p>
+            <p className="fn-offer-was">All four separately: {fmtMoney(sep)}</p>
           )}
           <p className="fn-offer-price">{priceLabel(BLUEPRINT_BUNDLE.oneTime)}</p>
+          {/* The $997 had no label, so the $1,191 below it floated with nothing
+              to be an alternative TO. Naming both as payment methods is what
+              makes the pair legible at a glance. */}
+          <p className="fn-offer-terms">one payment · all four levels</p>
+          {/* The saving, computed — the reason the bundle is the better deal,
+              stated rather than implied. */}
+          {sep !== null && BLUEPRINT_BUNDLE.oneTime !== null && (
+            <p className="fn-offer-save">
+              {/* ⚠ "vs buying separately" is the load-bearing half. Three
+                  figures sit on this card — $1,388, $997 and $1,191 — so an
+                  unqualified "Save $391" invites the reader to guess which
+                  comparison it refers to, and the wrong guess is that the plan
+                  saves money. It costs $194 more. */}
+              Save {fmtMoney(sep - BLUEPRINT_BUNDLE.oneTime)} vs buying separately
+            </p>
+          )}
+
           {BLUEPRINT_BUNDLE.monthly !== null && (
             <p className="fn-offer-note">
               {/* ⚠ "monthly" is from the memo — "3 monthly payments of $397".
@@ -230,7 +260,7 @@ export function PathwayAndBundle() {
                   his final direction. Without the cadence a reader does not
                   know whether that is three weeks or three months, on a plan
                   that totals $1,191. */}
-              or {BLUEPRINT_BUNDLE.planMonths} monthly payments of{' '}
+              or spread it: {BLUEPRINT_BUNDLE.planMonths} monthly payments of{' '}
               {fmtMoney(BLUEPRINT_BUNDLE.monthly)}
               {/* ⚠ THE PLAN TOTAL IS STATED, per Surpaul's memo §1 — "Total on
                   payment plan: $1,191". The plan costs $194 more than paying

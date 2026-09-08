@@ -385,8 +385,39 @@
 .fn-offer-card__body p { color: var(--stone); font-size: 15px; }
 .fn-offer-card__body .fn-eyebrow { margin-bottom: 10px; }
 .fn-offer-refund { color: var(--stone); font-size: 13px; margin-top: 12px; }
-.fn-offer-card__aside { min-width: 232px; text-align: center; }
-.fn-offer-was { color: var(--stone); font-size: 15px; text-decoration: line-through; }
+/* ⚠ max-width IS WHAT KEEPS THIS A TWO-COLUMN CARD.
+
+   The mockup set only min-width: 232px, which was fine when the aside held
+   three short lines. It now also holds the payment-plan condition — "Access
+   continues while payments are current and pauses if they stop." — and with no
+   upper bound a flex item grows to fit its longest line. The aside stretched to
+   roughly 700px, took the whole row, and pushed the body above it. The card
+   read as three stacked bands instead of copy-left / price-right.
+
+   Capped so the note wraps inside the column rather than deciding its width. */
+.fn-offer-card__aside {
+  flex: 0 1 auto;
+  min-width: 232px;
+  max-width: 300px;
+  text-align: center;
+}
+/* ⚠ NO line-through. Removed 2026-09-08 — see the note in Sections.tsx. A
+   strike means "this was the price"; $1,388 was never a price for the bundle,
+   it is the sum of four other products. Set as plain secondary text above the
+   actual figure, which is what it is: a comparison. */
+.fn-offer-was { color: var(--stone); font-size: 14.5px; }
+
+/* The saving. Gold, because it is the reason the bundle is the offer — but
+   smaller than the price so it supports rather than competes. */
+.fn-offer-save {
+  margin-top: 6px;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
 .fn-offer-price { font-family: var(--serif); font-size: 40px; color: var(--gold); margin: 4px 0; }
 .fn-offer-note { color: var(--stone); font-size: 13px; margin-bottom: 18px; }
 
@@ -1039,7 +1070,10 @@
   .fn-testi-row { grid-template-columns: 1fr; gap: 28px; }
   .fn-section { padding-block: 72px; }
   .fn-offer-card { padding: 30px; }
-  .fn-offer-card__aside { min-width: 0; width: 100%; text-align: left; }
+  /* max-width cleared too — below 860px the card is one column, so the aside
+     should fill it. Leaving the 300px cap here would strand the price block in
+     a narrow strip on the left of a full-width card. */
+  .fn-offer-card__aside { min-width: 0; max-width: none; width: 100%; text-align: left; }
 }
 
 /* ══ THE POST-SUBMIT STRETCH ════════════════════════════════════════════════
@@ -1405,7 +1439,11 @@
 /* Payment-plan condition, under the price. Quieter than the price but at full
    secondary contrast — it is a term of the offer, not a footnote. */
 .fn-offer-plannote {
+  /* Wraps to 2–3 lines inside the 300px column. Without this it is one long
+     line and the column has to be as wide as the sentence. */
+  max-width: 30ch;
   margin-top: 10px;
+  margin-inline: auto;
   font-family: var(--ui);
   font-size: 12.5px;
   line-height: 1.5;
@@ -1419,5 +1457,14 @@
   margin-top: 20px;
   font-family: var(--ui);
   font-size: 13px;
+  color: var(--stone);
+}
+
+/* "one payment · all four levels" — sits directly under the $997 so the
+   payment plan below reads as an alternative to it rather than a rival price. */
+.fn-offer-terms {
+  font-family: var(--ui);
+  font-size: 12px;
+  letter-spacing: .04em;
   color: var(--stone);
 }

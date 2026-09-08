@@ -245,44 +245,24 @@
    at opacity 0, so anyone who has motion turned off would see no crest at all
    rather than a still one. */
 .fn-hero { padding-block: 96px 64px; text-align: center; position: relative; }
-/* ⚠ THE CREST IS VISIBLE BY DEFAULT AND THE ANIMATION IS AN ENHANCEMENT.
-   INVERTED FROM THE MOCKUP ON PURPOSE — this is why it was missing from the
-   PDF render.
+/* ⚠ NO ENTRANCE ANIMATION, DELIBERATELY REMOVED 2026-09-08.
 
-   The mockup wrote `opacity: 0` on the element and relied on the animation's
-   `forwards` fill to bring it back. That makes the animation the ONLY path to
-   a visible crest, so anything that does not run animations shows a blank gap
-   where the seal should be: print and PDF capture, headless screenshot tools,
-   a paint that happens before the .15s delay elapses, and any future
-   content-visibility optimisation.
+   The mockup settled the crest in over 1.1s — scale 1.4 and -6deg to rest.
+   Removed because it fires on every page load, and the crest sits directly
+   above the h1: the movement pulls the eye to a logo at the exact moment
+   somebody is trying to read "Knowledge Pays." It also shifts layout while
+   the fonts are still swapping in, which reads as the page struggling rather
+   than as polish.
 
-   Same 1.1s settle, same easing, same delay — but the still state is visible,
-   so failing to animate degrades to a static crest instead of no crest. */
-/* 120px wide as the mockup specifies; height follows the 116 × 128 source
-   rather than the height attribute, so the crest cannot be squashed. */
+   The earlier version had a worse problem — `opacity: 0` on the element with
+   the animation as the only path back to visible, so anything that did not run
+   animations showed no crest at all: print, PDF capture, headless screenshots,
+   a paint landing before the delay. That is why it was missing from the first
+   PDF review.
+
+   A static crest has neither failure mode. If an entrance is wanted later, it
+   belongs behind prefers-reduced-motion AND must start from opacity 1. */
 .fn-seal { width: 120px; height: auto; margin: 0 auto 32px; }
-
-@media (prefers-reduced-motion: no-preference) {
-  .fn-seal { animation: fnSettle 1.1s ease-out .15s both; }
-}
-@keyframes fnSettle {
-  0%   { opacity: 0; transform: scale(1.4) rotate(-6deg); }
-  70%  { opacity: 1; }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-/* Print/PDF: no animation, and never mid-transform. */
-@media print {
-  .fn-seal { animation: none !important; opacity: 1 !important; transform: none !important; }
-}
-.fn-hero h1 { font-size: clamp(44px, 7vw, 84px); margin-bottom: 18px; }
-.fn-hero .fn-sub {
-  font-family: var(--serif); font-style: italic;
-  font-size: clamp(19px, 2.4vw, 25px); color: var(--stone); margin-bottom: 26px;
-}
-.fn-tagrow {
-  font-family: var(--ui); font-size: 13.5px; letter-spacing: .05em;
-  color: var(--gold); margin-bottom: 44px;
-}
 
 /* ── HONEST BAR ────────────────────────────────────────────────────────────
    Centred row, hairline dividers between items, none before the first. */
@@ -690,15 +670,45 @@
 /* ── TEXT INPUTS ── mockup .form-card input, exactly ───────────────────── */
 .fn-form-card .evnf label { color: var(--stone); font-family: var(--ui); }
 .fn-form-card .evnf label em { color: #E0A090; }
-.fn-form-card .evnf input[type="text"],
-.fn-form-card .evnf input[type="email"],
-.fn-form-card .evnf input[type="tel"] {
+/* ⚠ :not([type="checkbox"]), NOT input[type="text"]. THIS IS WHY FIRST NAME
+   AND LAST NAME RENDERED WHITE WHILE MOBILE AND EMAIL DID NOT.
+
+   InterestForm declares `<input name="last_name" … />` with no type attribute.
+   The default IS text, but an attribute selector requires the attribute to be
+   PRESENT — `input[type="text"]` never matches a field that simply omits it.
+   Mobile is type="tel" and Email is type="email", so those two matched and
+   went dark while the two name fields fell through to globals'
+   `.evnf input { background: var(--white) }`.
+
+   Two white boxes beside two dark ones, in the same form, with nothing in the
+   markup to suggest why.
+
+   Matching every input except the consent checkbox is both correct and
+   future-proof: a field added later without a type attribute inherits the
+   right styling instead of silently reverting to white. */
+.fn-form-card .evnf input:not([type="checkbox"]) {
   background: var(--black);
   border: 1px solid rgba(156, 149, 135, .35);
   border-radius: 2px;
   color: var(--ivory);
+  /* Explicit so the two-column name row and the full-width fields below it
+     have identical box metrics — globals sizes them per field, and any
+     difference shows as a step in the left edge. */
+  width: 100%;
+  box-sizing: border-box;
 }
 .fn-form-card .evnf input::placeholder { color: rgba(156, 149, 135, .7); }
+/* Focus and invalid states also keyed off the attribute selector before, so
+   the name fields had no focus ring at all. */
+.fn-form-card .evnf input:not([type="checkbox"]):focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-color: var(--gold);
+  box-shadow: none;
+}
+.fn-form-card .evnf input:not([type="checkbox"])[aria-invalid="true"] {
+  border-color: #C4614B;
+}
 .fn-form-card .evnf input:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
@@ -1132,10 +1142,11 @@
    Also covers :hover, :focus and :active — Chrome re-applies the autofill
    style on each of those states independently, so omitting any one of them
    makes the field flash white when touched. */
-.fn-form-card .evnf input:-webkit-autofill,
-.fn-form-card .evnf input:-webkit-autofill:hover,
-.fn-form-card .evnf input:-webkit-autofill:focus,
-.fn-form-card .evnf input:-webkit-autofill:active {
+/* Same selector correction as above — these must match untyped inputs too. */
+.fn-form-card .evnf input:not([type="checkbox"]):-webkit-autofill,
+.fn-form-card .evnf input:not([type="checkbox"]):-webkit-autofill:hover,
+.fn-form-card .evnf input:not([type="checkbox"]):-webkit-autofill:focus,
+.fn-form-card .evnf input:not([type="checkbox"]):-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px var(--black) inset !important;
           box-shadow: 0 0 0 1000px var(--black) inset !important;
   -webkit-text-fill-color: var(--ivory) !important;

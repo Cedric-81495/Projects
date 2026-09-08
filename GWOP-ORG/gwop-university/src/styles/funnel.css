@@ -720,10 +720,80 @@
   outline-color: #C4614B; box-shadow: none;
 }
 
-/* consent — the one legally meaningful control. Contrast raised rather than
-   dimmed to match the surrounding muted text: it has to stay readable. */
-.fn-form-card .evnf-consent { color: var(--stone); }
-.fn-form-card .evnf-consent input { accent-color: var(--gold); }
+/* ══ CONSENT BLOCK ═════════════════════════════════════════════════════════
+   ⚠ THE ONE LEGALLY MEANINGFUL CONTROL ON THE PAGE. Treated accordingly.
+
+   globals sets `background: var(--ivory)`, which was a subtle same-colour tint
+   on the ivory page. `--ivory` is one of the six tokens .fn redefines, so in
+   here it became a bright cream slab — and the token remap then made the text
+   var(--stone). Pale grey on cream is the worst place on the page to have a
+   contrast problem: this is the sentence somebody is agreeing to.
+
+   Surface brought onto the card's palette, and the text raised to near-full
+   ivory rather than the muted grey used for secondary copy. It is dense 12.5px
+   legal wording; it does not also need to be dim.
+
+   The block stays visually distinct from the fields above it — a gold hairline
+   and a faint gold wash — because consent should read as its own decision, not
+   as another form row. */
+.fn-form-card .evnf-consent {
+  background: rgba(212, 175, 55, .06);
+  border: 1px solid rgba(212, 175, 55, .32);
+  border-radius: 2px;
+  color: rgba(247, 243, 233, .88);
+}
+
+/* ── THE CHECKBOX ─────────────────────────────────────────────────────────
+   Custom-drawn, because `accent-color` only tints the CHECKED state — an
+   unchecked box still renders as Chrome's white square, which is what looked
+   wrong against the dark card.
+
+   ⚠ 22px IS KEPT FROM globals AND IS NOT A STYLE CHOICE. Its comment there:
+   "Deliberately larger than default. A missed tap on the one legally
+   meaningful control is worse than a slightly heavy checkbox." That reasoning
+   holds more on a phone at a booth, not less.
+
+   appearance:none removes the native control, so everything it provided has to
+   be replaced explicitly — the checked mark, the focus ring, and the cursor.
+   Omitting the focus ring would make this unreachable by keyboard, which on a
+   consent control is not a cosmetic failure. */
+.fn-form-card .evnf-consent input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  margin-top: 1px;
+  border: 1.5px solid rgba(156, 149, 135, .7);
+  border-radius: 2px;
+  background: var(--black);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: background .15s ease, border-color .15s ease;
+}
+.fn-form-card .evnf-consent input[type="checkbox"]:hover {
+  border-color: var(--gold);
+}
+.fn-form-card .evnf-consent input[type="checkbox"]:checked {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+/* The tick, drawn with a rotated border — no icon font, no SVG request, and
+   it scales with the box. Dark on gold, matching the buttons. */
+.fn-form-card .evnf-consent input[type="checkbox"]:checked::after {
+  content: '';
+  width: 10px;
+  height: 5px;
+  margin-top: -3px;
+  border-left: 2.5px solid var(--black);
+  border-bottom: 2.5px solid var(--black);
+  transform: rotate(-45deg);
+}
+.fn-form-card .evnf-consent input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
 .fn-form-card .evnf-err { color: #E0A090; }
 .fn-form-card .evnf-fine { color: rgba(156, 149, 135, .8); }
 .fn-form-card .evnf-legal a { color: var(--gold); }
@@ -779,11 +849,63 @@
 .fn-form-card .evas p, .fn-form-card .evas-lead { color: var(--stone); }
 .fn-form-card .evas-eyebrow,
 .fn-form-card .evas-booking-eyebrow { color: var(--gold); }
+/* ⚠ PADDING IS REQUIRED HERE AND IT IS NOT COSMETIC.
+
+   globals defines these as SPACING wrappers, not boxes:
+     .evas-sec         { margin-top: 26px }                  — no padding
+     .evas-next        { margin-top: 34px; padding-top: 26px; border-top: … }
+     .evas-next-steps  { margin-top: 36px; padding-top: 30px; border-top: … }
+
+   On the ivory page they separated sections with whitespace and a hairline. I
+   gave them a background and a full border, which turned each into a visible
+   card — with zero horizontal padding, so the copy sat hard against the border
+   and the eyebrow straddled the top edge.
+
+   Boxes are right for this layout: the approved design draws the Blueprint
+   sections as cards. They just need the padding a card implies. */
 .fn-form-card .evas-sec,
-.fn-form-card .evas-next-steps,
-.fn-form-card .evas-booking {
+.fn-form-card .evas-sec-not {
   background: rgba(198, 162, 77, .05);
   border: 1px solid rgba(198, 162, 77, .18);
+  border-radius: 2px;
+  padding: 18px 20px;
+}
+
+/* ⚠ .evas-next-steps GETS NO BOX — THIS IS THE "TWO BOXES" IN THE BOOKING
+   BLOCK.
+
+   It is a WRAPPER whose only child is now the booking card, because the
+   approved design deleted the "Two things." list that used to sit inside it.
+   Bordering both meant an outer ring drawn around an inner card, with the
+   wrapper's leftover 30px padding-top showing as empty space above and below
+   — two boxes where the design has one.
+
+   So the wrapper keeps its role as a divider and nothing else. The hairline is
+   restyled from var(--stone) to gold-alpha to match the card, and the
+   padding-top is reduced because the heading it was spacing for is gone. */
+.fn-form-card .evas-next-steps {
+  background: none;
+  border: 0;
+  border-top: 1px solid rgba(198, 162, 77, .18);
+  border-radius: 0;
+  padding-top: 8px;
+}
+
+/* Same wrapper problem on the IdentityIQ section — border-top only, no box.
+   The card inside it (.evas-next) is where the surface belongs. */
+.fn-form-card .evas-next {
+  border-top: 1px solid rgba(198, 162, 77, .18);
+  padding: 26px 20px 20px;
+}
+
+/* ⚠ border-left RESTATED AFTER the shorthand. globals gives the booking card
+   `border-left: 3px solid var(--gold)` as its accent; my `border: 1px …`
+   shorthand overwrote all four sides and silently removed it. Order matters —
+   the shorthand must come first. */
+.fn-form-card .evas-booking {
+  background: rgba(212, 175, 55, .05);
+  border: 1px solid rgba(198, 162, 77, .22);
+  border-left: 3px solid var(--gold);
   border-radius: 2px;
 }
 .fn-form-card .evas-step-n { color: var(--gold); }
@@ -858,7 +980,20 @@
 
 /* ── question screens ───────────────────────────────────────────────────── */
 .fn-form-card .evas-q { color: var(--ivory); }
-.fn-form-card .evas-back,
+/* ⚠ BACKGROUND, not just colour. globals gives .evas-back
+   `background: var(--white)` — a white Back button on the dark card, and only
+   its hover state had been overridden here, so it was white at rest and
+   correct only once you pointed at it.
+
+   Ghost treatment: transparent with a stone hairline, going gold on hover.
+   Matches .fn-btn--ghost, and keeps Back visibly secondary to the gold Next
+   without making it look disabled — somebody who mis-tapped question three
+   needs to find this. */
+.fn-form-card .evas-back {
+  background: transparent;
+  border: 1px solid rgba(156, 149, 135, .45);
+  color: var(--stone);
+}
 .fn-form-card .evas-skip { color: var(--stone); }
 .fn-form-card .evas-review-row {
   border-color: rgba(198, 162, 77, .18);
@@ -894,12 +1029,23 @@
 }
 /* The affiliate disclosure. Muted but not faint — it has to be readable to do
    its job. */
-.fn-form-card .evas-next-disclosure { color: var(--stone); }
+/* ⚠ THE AFFILIATE DISCLOSURE. globals gives it `background: var(--ivory)`,
+   which .fn redefines — so it rendered as a cream slab inside the IdentityIQ
+   card, same failure as the consent block.
+
+   Text is raised above the surrounding muted grey for the same reason as
+   consent: this is the sentence that says GWOP may earn a commission, sitting
+   on a screen where "free" also appears. A disclosure that is technically
+   present but hard to read is the shape of one written not to be read. */
+.fn-form-card .evas-next-disclosure {
+  background: rgba(212, 175, 55, .06);
+  border: 1px solid rgba(212, 175, 55, .28);
+  border-radius: 2px;
+  color: rgba(247, 243, 233, .86);
+}
 .fn-form-card .evas-next-note { color: var(--stone); }
 
 /* ── booking card (design: "Book your 1:1 with Beast.") ─────────────────── */
-.fn-form-card .evas-booking { border-radius: 2px; }
-.fn-form-card .evas-booking h5 { color: var(--ivory); }
 
 /* ── teaser (design: "Your Blueprint Is Just the Beginning.") ────────────── */
 .fn-form-card .evas-teaser { background: transparent; }

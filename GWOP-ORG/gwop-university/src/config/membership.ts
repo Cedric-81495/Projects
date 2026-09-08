@@ -93,6 +93,29 @@ export const BLUEPRINT_BUNDLE = {
   oneTime: 997 as number | null,
   monthly: 397 as number | null,
   planMonths: 3,
+  /* ⚠ ADDED 2026-09-08 from Surpaul's memo §1. He states the plan total
+     explicitly — "Total on payment plan: $1,191" — and the funnel was showing
+     "or 3 payments of $397" without it. Three times a number is arithmetic
+     somebody has to do while deciding whether to buy, and the plan costs $194
+     more than the one-time price. Stating it is his instruction and it is also
+     the honest version.
+
+     Computed rather than typed so it cannot drift from `monthly` × the months
+     above it — see planTotal() below. */
+
+  /* ⚠ HIS WORDS, §1: "People on the payment plan receive access according to
+     their payment status. If payments stop, access pauses."
+
+     This is the cancellation half of the Refund & Cancellation policy, and it
+     was living only in the memo. Anyone choosing the plan over the one-time
+     price is choosing it because of cash flow, so this is the condition most
+     relevant to them.
+
+     ⚠ NOT BUILT YET. This is subscription logic — see `subscriptions` in
+     0004_commerce.sql for the table it will use. Stating it on the page is
+     correct now; enforcing it is work that has to exist before the first plan
+     payment is taken. */
+  planNote: 'Access continues while payments are current and pauses if they stop.',
 } as const
 
 /* ── WHAT THE PLATFORM MUST SUPPORT (Felicia §1) ───────────────────────────
@@ -124,6 +147,31 @@ export const OFFERS = {
     priceOverride: 0,
     approved: false,
   },
+  /* ⚠ THE WORDING THAT WAS BLOCKING THIS NOW EXISTS — but the decision does
+     not. Read before flipping `approved`.
+
+     Surpaul's memo §4 defines it fully for the first time: who qualifies
+     (anyone registered at the 8/30 event, automatically), the five benefits
+     (badge/status, first access to new releases, special pricing on eligible
+     new products, invitations to selected private sessions, status does not
+     expire), the limit (it does NOT mean future products are free), and the
+     window — 2026-08-30 to 2026-09-30.
+
+     ⚠ THE WINDOW CLOSES IN THREE WEEKS AND THE FUNNEL DOES NOT MENTION IT.
+     That is the open question, and it is Surpaul's rather than mine: is
+     Founding Member a funnel offer or an account status?
+
+       · As an account STATUS it needs nothing on /830 — event registrants
+         already qualify automatically and it shows in their dashboard.
+       · As a funnel OFFER it is the only genuine deadline on the page, and
+         "eligibility closes September 30" is a real reason to act now rather
+         than a manufactured one. But it also means every new lead between now
+         and the 30th becomes a Founding Member, which is a larger cohort than
+         "people who came to the launch event" and dilutes what the status
+         means.
+
+     `approved` stays false until he answers, because approving it is what puts
+     it on the page. The structure is ready either way. */
   foundingMember: {
     id: 'FOUNDING-MEMBER',
     label: 'Founding Member Access',
@@ -167,31 +215,41 @@ export const PROMO_CODES: Array<{
 ]
 
 /* ── REFUND / CANCELLATION ─────────────────────────────────────────────────
-   ⚠ READ BEFORE EDITING. THIS IS THE MOST EXPOSED STRING IN THE REPO.
+   ⚠ APPROVED 2026-09-08. SURPAUL, DIRECTLY: "REFUND POLICY - no refund."
 
-   The approved funnel layout renders "No refunds once purchased — know what
-   you're getting before you buy." in the bundle card, and states it again in
-   the FAQ. So the sentence is here, and both surfaces plus /refunds now read
-   from this one value — a refund policy stated in three places from three
-   sources is a policy that will eventually contradict itself, and a
-   contradiction is worse than either version.
+   His memo previously recorded this as "no refund (TBD)", which is why
+   `approved` was false and /refunds published a holding line instead. He has
+   now confirmed the position, and per GWOP-CONTEXT §1 legal wording is his
+   call, so the flag is true and the sentence publishes.
 
-   ⚠ `approved` IS STILL FALSE, ON PURPOSE. Surpaul's final-direction memo
-   records this as "REFUND POLICY - no refund (TBD)". TBD is his word. Felicia's
-   §1 is explicit: "Do not publish a final policy until approved." While
-   `approved` is false the string still renders on the funnel — because the
-   approved layout renders it — but it goes through <Tbc>, so DRAFT mode flags
-   it, and /refunds continues to say no policy is in force rather than
-   publishing an unapproved one.
+   ONE STRING, THREE SURFACES. The funnel's bundle card, the funnel FAQ's cost
+   answer, and /refunds all read this value. That is deliberate: a refund
+   position stated in three places from three sources will eventually
+   contradict itself, and a contradiction is worse than either version.
 
-   A no-refund position on a digital product sold to consumers is a decision an
-   attorney should sign, not a copy choice. Some card networks and some state
-   rules do not care what the page says. Flip `approved` when somebody
-   qualified has said the words, and not before.
+   ⚠ WHAT APPROVING THIS DOES NOT DO, and Surpaul should hear it once.
+   A no-refund policy is a statement of our position, not a shield:
+
+     · Card networks allow chargebacks regardless of what the page says. Visa
+       and Mastercard rules govern that, not our terms. A customer who disputes
+       a charge can win it, and repeated disputes affect the Stripe account
+       standing rather than just the individual sale.
+     · Some consumer-protection rules override a blanket no-refund term. Which
+       ones apply depends on where the buyer is, not where we are.
+
+   So the sentence can publish now. But the day checkout opens, the practical
+   question is how we HANDLE a dispute, and that is a decision nobody has made
+   yet. It is not blocking — nothing can be charged today — and it is worth
+   deciding before the first payment rather than during the first dispute.
+
+   ⚠ TREAT THE WORDING AS FIXED. It publishes on three surfaces and it is now
+   an approved legal statement. Change it with Surpaul, in one edit, here.
    ────────────────────────────────────────────────────────────────────────── */
 export const REFUND_POLICY = {
   text: "No refunds once purchased — know what you're getting before you buy.",
-  approved: false,
+  /* true = the sentence renders plainly and /refunds publishes it. false =
+     /refunds shows a holding line and the funnel marks the sentence as draft. */
+  approved: true,
 }
 
 /* ── PAYMENT BOUNDARY (Felicia §10) ────────────────────────────────────────
@@ -252,6 +310,14 @@ export function bundleSavings(): number | null {
   const sep = separateTotal()
   if (sep === null || BLUEPRINT_BUNDLE.oneTime === null) return null
   return sep - BLUEPRINT_BUNDLE.oneTime
+}
+
+/** Total across the payment plan — $1,191 with today's numbers. Computed from
+    `monthly` × `planMonths`, never typed, so it cannot disagree with the
+    per-payment figure shown beside it. */
+export function planTotal(): number | null {
+  if (!PRICING_PUBLISHED || BLUEPRINT_BUNDLE.monthly === null) return null
+  return BLUEPRINT_BUNDLE.monthly * BLUEPRINT_BUNDLE.planMonths
 }
 
 /** "$197–$497" — the range the FAQ quotes. */

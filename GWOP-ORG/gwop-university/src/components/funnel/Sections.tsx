@@ -27,7 +27,7 @@ import { RESULTS, resultsPublishable } from '@/content/results'
 import { PATHWAY, PATHWAY_HEADING, PATHWAY_LEDE } from '@/content/pathway'
 import {
   LEVELS, BLUEPRINT_BUNDLE, REFUND_POLICY,
-  oneTimeLabel, priceLabel, separateTotal, fmtMoney,
+  oneTimeLabel, priceLabel, separateTotal, planTotal, fmtMoney,
 } from '@/config/membership'
 import { Tbc } from '@/components/Chrome'
 
@@ -206,12 +206,14 @@ export function PathwayAndBundle() {
           <p>{funnel.bundle.body}</p>
 
           {/* ⚠ THE REFUND SENTENCE. One source — REFUND_POLICY in
-              config/membership.ts — shared with the FAQ and /refunds, so the
-              three cannot disagree. Rendered through <Tbc> because `approved`
-              is still false: Surpaul's memo records the policy as "no refund
-              (TBD)", so DRAFT mode flags it until somebody qualified signs the
-              wording. */}
-          <p className="fn-offer-refund"><Tbc>{REFUND_POLICY.text}</Tbc></p>
+              config/membership.ts — shared with the FAQ's cost answer and with
+              /refunds, so the three cannot disagree.
+
+              <Tbc> REMOVED 2026-09-08: Surpaul approved the position ("REFUND
+              POLICY - no refund"), so this is settled copy rather than a
+              placeholder. Leaving the draft marker on approved legal wording
+              teaches everyone to ignore the marker. */}
+          <p className="fn-offer-refund">{REFUND_POLICY.text}</p>
         </div>
 
         <div className="fn-offer-card__aside">
@@ -223,8 +225,18 @@ export function PathwayAndBundle() {
             <p className="fn-offer-note">
               or {BLUEPRINT_BUNDLE.planMonths} payments of{' '}
               {fmtMoney(BLUEPRINT_BUNDLE.monthly)}
+              {/* ⚠ THE PLAN TOTAL IS STATED, per Surpaul's memo §1 — "Total on
+                  payment plan: $1,191". The plan costs $194 more than paying
+                  once, and leaving that as arithmetic for the reader is the
+                  kind of omission that reads as a trick when they notice.
+                  Computed, so it cannot drift from the figure beside it. */}
+              {planTotal() !== null && <> &middot; {fmtMoney(planTotal()!)} total</>}
             </p>
           )}
+
+          {/* His words, §1. The condition that matters most to whoever picks
+              the plan, and it was only in the memo. */}
+          <p className="fn-offer-plannote">{BLUEPRINT_BUNDLE.planNote}</p>
 
           {/* ⚠ POINTS AT #choose, NOT AT A CHECKOUT — which is what the mockup
               does, and the only honest destination today. Checkout is gated
@@ -524,9 +536,9 @@ export function Faq() {
         {funnel.faq.items.map(item => (
           <details key={item.q}>
             <summary>{item.q}</summary>
-            {/* The cost answer restates the refund position, so it carries the
-                same DRAFT marker as the offer card. */}
-            <p>{item.a ?? <Tbc>{costAnswer}</Tbc>}</p>
+            {/* The cost answer restates the refund position. Draft marker
+                removed with the offer card's — the policy is approved. */}
+            <p>{item.a ?? costAnswer}</p>
           </details>
         ))}
       </div>

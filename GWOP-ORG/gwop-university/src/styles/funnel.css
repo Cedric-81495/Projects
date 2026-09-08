@@ -1356,22 +1356,36 @@
      Blueprint", so the sticky bar was three lines tall on a phone. Both are
      unnecessary: the wordmark fits on one line at 14px, and the button reads
      fine shorter. Tightening the nav padding buys the rest. */
-  .fn-nav { padding: 12px 20px; gap: 12px; }
+  /* ⚠ HORIZONTAL MUST MATCH .fn-wrap's 28px, or the brand in the sticky bar
+     sits 8px left of every heading below it — a misalignment you see on every
+     scroll because the bar never leaves the screen. Only the vertical padding
+     is reduced here. */
+  .fn-nav { padding: 12px 28px; gap: 12px; }
   .fn-brand-text { font-size: 14px; line-height: 1.15; white-space: nowrap; }
   .fn-nav .fn-btn,
   .fn-nav .btn { padding: 10px 16px; font-size: 12.5px; white-space: nowrap; }
 
-  /* .fn-wrap's 28px is generous at this width — 20px gives the copy back
-     16px of measure without letting it touch the edge. */
-  .fn-wrap { padding: 0 20px; }
+  /* ⚠ NO WRAP OVERRIDE HERE. Reverted 2026-09-08.
+
+     This block used to drop .fn-wrap from the mockup's 28px to 20px, on the
+     reasoning that 28 was generous on a phone and 20 gave the copy back 16px
+     of measure. Wrong trade: 20px on a 360px screen is 5.5% of the viewport,
+     and against a 12.5px uppercase eyebrow starting at that edge it reads as
+     text falling off the page rather than as a comfortable margin. The eight
+     pixels bought nothing anyone noticed and cost the thing everyone noticed.
+
+     The mockup's 28px holds at every width. Do not reduce it again — if a
+     specific block needs more room on a phone, give that block negative
+     margin rather than thinning the page gutter for everything. */
 
   /* Single column: two 165px columns wrapped nearly every card title. */
   .fn-path-row { grid-template-columns: 1fr; gap: 26px; }
   .fn-honest .fn-wrap { padding-block: 18px; }
   .fn-honest-item { padding: 5px 0; border-left: 0; }
 
-  /* The card's 36px padding inside a 20px wrap left ~278px for the form on a
-     390px screen. The inputs still clear 16px, so tapping does not zoom. */
+  /* The card's own padding, INSIDE the wrap's 28px. 36 + 28 each side left
+     ~262px for the form on a 390px screen; 20 + 28 leaves ~294px. The inputs
+     still clear the 16px floor, so tapping does not zoom. */
   .fn-form-card { padding: 24px 20px; }
   .fn-offer-card { padding: 24px 20px; }
 

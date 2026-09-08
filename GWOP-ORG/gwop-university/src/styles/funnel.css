@@ -462,8 +462,39 @@
 .fn-final-cta .fn-lede { margin: 0 auto 40px; text-align: center; }
 
 .fn-form-card {
-  max-width: 480px; margin: 48px auto 0; background: var(--forest);
-  border: 1px solid rgba(198, 162, 77, .25); padding: 36px; text-align: left;
+  /* Mockup .form-card was 480px for three fields. Widened because the
+     Blueprint that renders in the same card afterwards is far taller — at 480
+     it became a column of slivers. */
+  max-width: 560px;
+  margin: 48px auto 0;
+  background: var(--forest);
+  border: 1px solid rgba(198, 162, 77, .25);
+  padding: 36px;
+  text-align: left;
+
+  /* ── TOKEN REMAP — THE FIX FOR EVERY DARK-ON-DARK STRING AT ONCE ────────
+     ⚠ READ THIS BEFORE ADDING ANOTHER COLOUR OVERRIDE BELOW.
+
+     `.fn` redefines six tokens to the mockup's palette. But globals.css also
+     colours text with --ink, --muted, --gold-ink and --emerald-lt, and those
+     still hold their LIGHT-PAGE values in here. So every legacy rule using one
+     resolved to near-black or mid-grey on a dark green panel.
+
+     That is why this surfaced one string at a time: .evas-lead, .evas-next p,
+     .evas-booking p, .evas-prog-text, .evas-review-q, .evas-skip, .evnf label,
+     .evph span, .evas-teaser-cap and .evas-sec > p are ten rules with one
+     cause. Remapping fixes all of them here, and covers rules on screens
+     nobody has rendered yet.
+
+     Text tokens ONLY. --white and --forest are deliberately not remapped:
+     globals uses both as backgrounds as well as foregrounds, so remapping
+     either repaints surfaces instead of text. Those are named explicitly
+     further down. */
+  --ink: var(--ivory);          /* body text: was near-black */
+  --muted: var(--stone);        /* secondary text: was mid-grey */
+  --gold-ink: var(--gold);      /* was the darker gold for light backgrounds */
+  --gold-lt: var(--gold);       /* was the lighter gold, now one value */
+  --emerald-lt: rgba(212, 175, 55, .1);   /* tint fills */
 }
 .fn-form-card label {
   display: block; font-family: var(--ui); font-size: 12px;
@@ -502,6 +533,80 @@
 
    Scoped under .fn-form-card, so /thanks and any other surface using these
    same classes is untouched. */
+
+/* ⚠ EVERY PLACE globals COLOURS TEXT WITH var(--forest) OR var(--emerald).
+   THIS LIST IS COMPLETE — it came from grepping globals.css for colour
+   declarations on every class the assessment renders. Do not add to it
+   one selector at a time; re-run that grep instead.
+
+   .fn redefines --forest to #163A29, which is the card's own background. So
+   these strings are present, selectable, copyable — and completely invisible.
+   That is what made the "YOUR NEXT 3 MOVES" titles vanish while their
+   descriptions read fine, and it is why the fix kept looking finished and then
+   wasn't: each screen of the flow surfaced a different rule with the same
+   cause.
+
+   ⚠ THE TWO THAT MATTER MOST are .evas-q — the QUESTION TEXT for all seven
+   questions — and .evas-review-a, the answers on the review screen. Somebody
+   would have reached question two and found a numbered progress bar above an
+   empty card.
+
+   Cannot be fixed by remapping --forest: globals uses it for panel backgrounds
+   too, so the card would repaint itself. Named explicitly.
+
+   ⚠ THE h4/h5 RULES ARE HERE FOR SPECIFICITY, NOT JUST COLOUR. globals'
+   `.evas-next h4` is (0,1,1) and so is my `.fn h1…h5`, so that pair was a tie
+   broken by stylesheet order — and page-CSS versus layout-CSS order is not
+   guaranteed across a production build. Prefixing with .fn-form-card makes
+   them (0,2,1) and removes the coin flip. */
+
+/* primary text — headings, questions, answers, emphasised labels */
+.fn-form-card .evas-q,
+.fn-form-card .evas-review-a,
+.fn-form-card .evas-bp-h,
+.fn-form-card .evas-next h4,
+.fn-form-card .evas-next-steps h4,
+.fn-form-card .evas-teaser h4,
+.fn-form-card .evas-booking h5,
+.fn-form-card .evas-steps b,
+.fn-form-card .evas-not b,
+.fn-form-card .evas-teaser-ph b,
+.fn-form-card .evph b,
+.fn-form-card .evas-building .evas-lead { color: var(--ivory); }
+
+/* secondary text */
+.fn-form-card .evas-lead { color: var(--stone); }
+
+/* interactive / accent — gold is the funnel's interactive colour */
+.fn-form-card .chosen,
+.fn-form-card .fh .chosen,
+.fn-form-card .evnf-legal a { color: var(--gold); }
+
+/* The 1 · 2 · 3 markers keep var(--white) — they sit on a filled disc, so
+   white is correct there and --white is deliberately not remapped. */
+
+/* ── INTERACTIVE STATES ───────────────────────────────────────────────────
+   globals sends every hover to var(--emerald) — right on an ivory page, but
+   #1E6B45 against #163A29 is a barely visible shift, so the controls read as
+   dead. Gold is the funnel's interactive colour and it is what the buttons
+   already use.
+
+   These are the controls for moving BACK through the seven questions and for
+   changing an answer on the review screen. If they do not look tappable,
+   somebody who mis-taps question three has no visible way to correct it. */
+.fn-form-card .evas-back:hover,
+.fn-form-card .evas-back:focus-visible {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.fn-form-card .evas-review-edit {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.fn-form-card .evas-review-edit:hover { color: var(--ivory); }
+.fn-form-card .evas-skip:hover,
+.fn-form-card .evskip:focus-visible { color: var(--gold); }
 
 /* the card itself — mockup .form-card, so the outer chrome is already right;
    these rules strip the app card's competing chrome from inside it */
@@ -796,12 +901,12 @@
    the old one. Deleted rather than kept in sync. */
 
 /* ── the stage floor ──────────────────────────────────────────────────────
-   .evstage holds a min-height so a shorter state cannot pull the page up
-   mid-flow. Kept — it is the reason the top edge stays put while somebody
-   moves through seven questions. Only the width is constrained here, because
-   the Blueprint is much taller than the three fields that precede it and the
-   design's 480px card would make it a column of slivers. */
-.fn-form-card { max-width: 560px; }
+   .evstage keeps its min-height from globals so a shorter state cannot pull
+   the page up mid-flow — that is what holds the top edge still while somebody
+   moves through seven questions. Nothing to override; the card width that used
+   to be set here is now on the .fn-form-card rule above, where the rest of the
+   card's box lives. */
+
 
 /* Blueprint closing instruction — the line the design moves off the old "Two
    things" block and onto the end of the plan. Ruled off above so it reads as a

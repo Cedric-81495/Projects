@@ -1,0 +1,984 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FUNNEL — EXACT PORT OF THE APPROVED MOCKUP
+   Source: gwopfunnel-recommended-sequence_2.html <style> block
+
+   Ported rule for rule. Same palette, same type scale, same spacing, same
+   button behaviour, same borders, same breakpoint. Where a value looks odd it
+   is because the mockup had it that way.
+
+   ── ONE STRUCTURAL CHANGE, AND ONLY ONE ───────────────────────────────────
+   The mockup declared its palette on :root, which would collide with
+   globals.css — the app already has --gold, --ivory, --emerald, --forest,
+   --stone and --black at different values, so a :root block here would
+   silently repaint the homepage, the portal, /thanks and the /830 assessment
+   itself, and the loser of that cascade would be whichever component happened
+   to be styled last.
+
+   So the mockup's palette is declared on .fn instead. Identical values,
+   identical result on this page, zero reach beyond it. Every selector below is
+   also prefixed .fn- for the same reason: the mockup used bare .btn, .wrap,
+   .section, details and summary, all of which already mean something else in
+   globals.css.
+
+   That is a scoping change, not a design change. Nothing was substituted for
+   an existing token — the funnel's #D4AF37 gold is used, not the app's
+   #C8A34A.
+
+   ── FONTS ─────────────────────────────────────────────────────────────────
+   The mockup calls for Playfair Display and Montserrat. The app self-hosts
+   Cormorant Garamond and Poppins via next/font. Both mockup faces are loaded
+   the same way in app/830/page.tsx and bound to --fn-serif / --fn-ui there —
+   NOT with an @import or a <link>, because layout.tsx records that a
+   fonts.googleapis.com <link> was removed for painting the page twice.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.fn {
+  /* Mockup :root, verbatim */
+  --black:   #0D281E;
+  --forest:  #163A29;
+  --emerald: #1E6B45;
+  --gold:    #D4AF37;
+  --ivory:   #F6F2E9;
+  --stone:   #9C9587;
+  --serif:   var(--fn-serif), 'Playfair Display', Georgia, serif;
+  --sans:    var(--fn-ui), 'Montserrat', -apple-system, sans-serif;
+  --ui:      var(--fn-ui), 'Montserrat', -apple-system, sans-serif;
+  --max:     1120px;
+
+  /* Mockup body */
+  background: var(--black);
+  color: var(--ivory);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.fn img { max-width: 100%; display: block; }
+/* ⚠ :not(.fn-btn) IS LOAD-BEARING. THIS RULE WAS TURNING BUTTON LABELS IVORY.
+
+   The mockup has `a{color:inherit}` at (0,0,1) and `.btn{color:var(--black)}`
+   at (0,1,0), so the class won and gold buttons got dark labels.
+
+   Namespacing added `.fn` to both — but asymmetrically. The anchor rule became
+   `.fn a` = one class plus one element = (0,1,1), while the button rule stayed
+   `.fn-btn` = one class = (0,1,0). (0,1,1) beats (0,1,0), so the cascade
+   inverted and every button that is an <a> inherited ivory: gold fill, near
+   white text.
+
+   All three funnel buttons are anchors — header, hero, "Get GWOP University" —
+   which is why the form's <button> submit was correct throughout: it carries
+   .evgold and is governed by `.fn-form-card .evgold` at (0,2,0).
+
+   Excluding buttons here fixes it at the source. The rule below also raises
+   the button selectors to (0,2,0) as a second guard, so neither change alone
+   is doing all the work. */
+.fn a:not(.fn-btn):not(.btn) { color: inherit; }
+
+.fn-wrap { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
+
+/* ── HEADINGS ──────────────────────────────────────────────────────────────
+   ⚠ `color` HERE IS LOAD-BEARING. DO NOT REMOVE IT.
+
+   globals.css lines 56–58:
+       h1,h2{font-family:var(--display);font-weight:700;color:var(--emerald);…}
+       h3,h4{font-family:var(--body);font-weight:600;color:var(--emerald);…}
+
+   Those are bare element selectors, so they apply inside .fn too. The mockup
+   never colours a heading — it sets `color: var(--ivory)` on body and lets
+   every heading inherit. Inheritance loses to a direct element rule, so
+   without an explicit colour every heading on this page rendered
+   var(--emerald), which .fn redefines to the mockup's #1E6B45: mid-green
+   headings on a dark-green background, close enough in value to look like a
+   rendering fault rather than a colour mistake.
+
+   h4 and h5 are included even though the mockup styles them only through
+   .trust-icon h4 and .evas h5, because globals hands h3 and h4 the BODY font
+   as well as the colour. Restating the serif family for h4/h5 would be wrong
+   — the mockup's h4s are UI-font — so family stays per-section and only the
+   colour is set globally here. */
+.fn h1, .fn h2, .fn h3, .fn h4, .fn h5 { color: var(--ivory); }
+
+.fn h1, .fn h2, .fn h3 {
+  font-family: var(--serif); font-weight: 500; line-height: 1.08; letter-spacing: .2px;
+}
+
+.fn-section { padding: 104px 0; }
+.fn-section--forest { background: var(--forest); }
+
+.fn-eyebrow {
+  font-family: var(--ui); font-size: 13px; letter-spacing: .06em;
+  color: var(--gold); font-weight: 600;
+}
+.fn-lede { max-width: 640px; color: var(--stone); font-size: 18px; line-height: 1.65; }
+.fn-micro {
+  font-family: var(--ui); font-size: 12.5px; color: var(--stone);
+  margin-top: 14px; letter-spacing: .02em;
+}
+
+/* ── BUTTON ────────────────────────────────────────────────────────────────
+   Gold fill, 2px radius, inverting to outline on hover. Not the app's .btn —
+   that one is pill-shaped with a different gold. Ported exactly. */
+.fn-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--ui); font-weight: 600; font-size: 15px;
+  /* ⚠ THE LABEL IS NOT BLACK. var(--black) is the mockup's #0D281E — a very
+     dark green, the same value as the page background. It reads as black at a
+     glance, which is why it is easy to "correct" to #000 or var(--ink), and
+     both are wrong: #000 is colder than anything else on the page, and
+     var(--ink) is the app's near-black from globals, a different hue again.
+
+     Every gold button on this page takes its label colour from here or from
+     the .fn-form-card .evgold rule further down. Those two are the only
+     places. */
+  background: var(--gold); color: var(--black);
+  padding: 16px 30px; border-radius: 2px; text-decoration: none;
+  border: 1px solid var(--gold); cursor: pointer;
+  transition: background .25s ease, color .25s ease;
+}
+.fn-btn:hover { background: transparent; color: var(--gold); }
+
+/* ⚠ ALSO MATCHES .btn, AND THIS IS NOT BELT-AND-BRACES — IT IS THE FIX FOR
+   WHITE BUTTONS.
+
+   globals.css line 69 defines the base .btn with NO background and
+   border-radius:999px. Colour lives only on the modifiers — .btn-g, .btn-e,
+   .btn-o. So any element carrying .btn without a modifier renders as an
+   unstyled white pill, which is what "the buttons are still white" was.
+
+   That happens whenever a component renders `btn` or `btn btn-g` instead of
+   `fn-btn` — earlier revisions of Sections.tsx did exactly that, and a single
+   stale file is enough to produce it on one button and not the others.
+
+   Matching both class names means the funnel's buttons are correct regardless
+   of which name the markup uses, and .btn-g's app-gold (#C8A34A) plus
+   forest-dk label can no longer show through either.
+
+   Specificity is deliberate: `.fn .btn` is (0,2,0), which beats globals'
+   `.btn-g` and `.evgold` at (0,1,0). The hover rule below carries
+   :not(:disabled) to reach (0,4,0) and beat globals'
+   `.evgold:hover:not(:disabled)` at (0,3,0) — without that, hover reverted to
+   the app's dark-button-with-gold-text and the win depended on file order,
+   which is not something to rely on across a production build. */
+.fn .btn,
+.fn .fn-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--ui); font-weight: 600; font-size: 15px;
+  background: var(--gold); color: var(--black);
+  padding: 16px 30px; border-radius: 2px; text-decoration: none;
+  border: 1px solid var(--gold); cursor: pointer;
+  transition: background .25s ease, color .25s ease;
+}
+.fn .btn:hover:not(:disabled),
+.fn .fn-btn:hover:not(:disabled) {
+  background: transparent; color: var(--gold); border-color: var(--gold);
+}
+.fn .btn:focus-visible,
+.fn .fn-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.fn .btn:disabled,
+.fn .fn-btn:disabled { opacity: .55; cursor: default; }
+
+/* .btn-g only. The funnel renders no .btn-e / .btn-o / .btn-ol, and covering
+   classes nothing uses is dead CSS that reads as though those variants are
+   supported here. .btn-g is kept because earlier revisions of Sections.tsx
+   emitted `btn btn-g`, so a stale component would otherwise show the app's
+   gold. */
+.fn .btn-g { background: var(--gold); color: var(--black); border-color: var(--gold); }
+.fn .btn-g:hover { background: transparent; color: var(--gold); border-color: var(--gold); }
+.fn .fn-btn--ghost { background: transparent; color: var(--ivory); border: 1px solid var(--stone); }
+.fn .fn-btn--ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── HEADER ────────────────────────────────────────────────────────────────
+   ⚠ backdrop-filter is NOT ported, and that is deliberate — the one visual
+   rule dropped from the mockup. It creates a containing block, which is what
+   clipped the fixed drawer to 64px during the August responsive audit. The
+   background is already 92% opaque, so the blur is close to invisible; a
+   layout bug that took a day to find is not worth it. */
+.fn-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(11, 15, 13, .92);
+  border-bottom: 1px solid rgba(198, 162, 77, .18);
+}
+.fn-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px; max-width: var(--max); margin: 0 auto;
+}
+.fn-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+/* ⚠ HEIGHT-DRIVEN, NOT A FORCED SQUARE. The mockup wrote
+   width:36px;height:36px;object-fit:contain on a crest that is 116 × 128 —
+   object-fit hid the distortion by letterboxing it inside a square box, so the
+   mark rendered smaller than 36px with dead space either side. Pinning the
+   height and letting width follow gives a 33 × 36 mark at full size. */
+.fn-brand img { height: 36px; width: auto; }
+.fn-brand-text {
+  font-family: var(--serif); font-size: 16px; letter-spacing: .03em; color: var(--ivory);
+}
+.fn-brand-text small {
+  display: block; font-family: var(--ui); font-size: 9.5px; letter-spacing: .14em;
+  color: var(--gold); font-weight: 600;
+}
+/* Mockup .nav .btn — smaller in the sticky bar. Both names, and .btn-sm too,
+   whose globals rule sets its own padding and would otherwise win. */
+.fn-nav .fn-btn,
+.fn-nav .btn,
+.fn .btn-sm { padding: 11px 22px; font-size: 13.5px; min-height: 0; }
+
+/* ── HERO ──────────────────────────────────────────────────────────────────
+   Centred. The crest settles in over 1.1s — scale 1.4 and −6° to rest. The
+   reduced-motion query is ported with it: without that, the animation starts
+   at opacity 0, so anyone who has motion turned off would see no crest at all
+   rather than a still one. */
+.fn-hero { padding: 96px 0 64px; text-align: center; position: relative; }
+/* ⚠ THE CREST IS VISIBLE BY DEFAULT AND THE ANIMATION IS AN ENHANCEMENT.
+   INVERTED FROM THE MOCKUP ON PURPOSE — this is why it was missing from the
+   PDF render.
+
+   The mockup wrote `opacity: 0` on the element and relied on the animation's
+   `forwards` fill to bring it back. That makes the animation the ONLY path to
+   a visible crest, so anything that does not run animations shows a blank gap
+   where the seal should be: print and PDF capture, headless screenshot tools,
+   a paint that happens before the .15s delay elapses, and any future
+   content-visibility optimisation.
+
+   Same 1.1s settle, same easing, same delay — but the still state is visible,
+   so failing to animate degrades to a static crest instead of no crest. */
+/* 120px wide as the mockup specifies; height follows the 116 × 128 source
+   rather than the height attribute, so the crest cannot be squashed. */
+.fn-seal { width: 120px; height: auto; margin: 0 auto 32px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .fn-seal { animation: fnSettle 1.1s ease-out .15s both; }
+}
+@keyframes fnSettle {
+  0%   { opacity: 0; transform: scale(1.4) rotate(-6deg); }
+  70%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+/* Print/PDF: no animation, and never mid-transform. */
+@media print {
+  .fn-seal { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+.fn-hero h1 { font-size: clamp(44px, 7vw, 84px); margin-bottom: 18px; }
+.fn-hero .fn-sub {
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(19px, 2.4vw, 25px); color: var(--stone); margin-bottom: 26px;
+}
+.fn-tagrow {
+  font-family: var(--ui); font-size: 13.5px; letter-spacing: .05em;
+  color: var(--gold); margin-bottom: 44px;
+}
+
+/* ── HONEST BAR ────────────────────────────────────────────────────────────
+   Centred row, hairline dividers between items, none before the first. */
+.fn-honest {
+  border-top: 1px solid rgba(198, 162, 77, .2);
+  border-bottom: 1px solid rgba(198, 162, 77, .2);
+}
+.fn-honest .fn-wrap {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 0; padding: 26px 28px;
+}
+.fn-honest-item {
+  font-family: var(--ui); font-size: 12.5px; color: var(--stone);
+  padding: 6px 26px; border-left: 1px solid rgba(156, 149, 135, .3);
+}
+.fn-honest-item:first-child { border-left: none; }
+
+/* ── PROBLEM / EDITORIAL ───────────────────────────────────────────────────
+   Em-dash bullets in gold. */
+.fn-editorial { max-width: 700px; }
+.fn-editorial h2 { font-size: clamp(30px, 4vw, 42px); margin-bottom: 24px; }
+.fn-editorial p { color: var(--stone); font-size: 17.5px; margin-bottom: 18px; max-width: 640px; }
+.fn-painlist { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
+.fn-painlist li { display: flex; gap: 14px; align-items: baseline; font-size: 16px; color: var(--ivory); }
+.fn-painlist li::before { content: '—'; color: var(--gold); }
+
+/* ── PATHWAY ───────────────────────────────────────────────────────────────
+   Four columns joined by a gold gradient hairline at 14px, with a dot on each
+   card sitting on top of it. The line is hidden below 860px, where the grid
+   becomes 2×2 and a horizontal connector would be wrong. */
+.fn-pathway-head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  flex-wrap: wrap; gap: 24px; margin-bottom: 56px;
+}
+.fn-pathway-head h2 { font-size: clamp(30px, 4vw, 42px); max-width: 520px; }
+.fn-path-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+.fn-path-row::before {
+  content: ''; position: absolute; top: 14px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.fn-path-card { padding: 0 20px; position: relative; }
+.fn-path-card:first-child { padding-left: 0; }
+.fn-path-card .fn-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+  margin-bottom: 22px; position: relative; z-index: 2;
+}
+.fn-path-card .fn-class {
+  font-family: var(--ui); font-size: 11.5px; letter-spacing: .08em;
+  color: var(--gold); font-weight: 600; margin-bottom: 6px;
+}
+.fn-path-card h3 { font-size: 23px; margin-bottom: 8px; color: var(--ivory); }
+.fn-path-card p { color: var(--stone); font-size: 14.5px; }
+/* The mockup set these two inline; they are classes here so the level title
+   and the price cannot drift apart across four cards. */
+.fn-path-card .fn-lvl { margin-bottom: 4px; }
+.fn-path-card .fn-price {
+  color: var(--gold); font-family: var(--ui); font-weight: 700; margin-top: 10px;
+}
+
+/* ── OFFER CARD (bundle) ───────────────────────────────────────────────────
+   Mockup had this inline on a div; the same values as a class. */
+.fn-offer-card {
+  margin-top: 56px; background: var(--forest);
+  border: 1px solid rgba(212, 175, 55, .3); padding: 40px;
+  display: flex; flex-wrap: wrap; gap: 32px;
+  justify-content: space-between; align-items: center;
+}
+.fn-offer-card__body { max-width: 520px; }
+.fn-offer-card__body h3 { font-size: 26px; margin-bottom: 10px; color: var(--ivory); }
+.fn-offer-card__body p { color: var(--stone); font-size: 15px; }
+.fn-offer-card__body .fn-eyebrow { margin-bottom: 10px; }
+.fn-offer-refund { color: var(--stone); font-size: 13px; margin-top: 12px; }
+.fn-offer-card__aside { min-width: 232px; text-align: center; }
+.fn-offer-was { color: var(--stone); font-size: 15px; text-decoration: line-through; }
+.fn-offer-price { font-family: var(--serif); font-size: 40px; color: var(--gold); margin: 4px 0; }
+.fn-offer-note { color: var(--stone); font-size: 13px; margin-bottom: 18px; }
+
+/* ── STEPS (the process) ───────────────────────────────────────────────────
+   Serif numerals, hairline rules top and bottom of the list. */
+.fn-steps { display: flex; flex-direction: column; max-width: 760px; }
+.fn-step { display: flex; gap: 28px; padding: 28px 0; border-top: 1px solid rgba(198, 162, 77, .18); }
+.fn-step:last-child { border-bottom: 1px solid rgba(198, 162, 77, .18); }
+.fn-step .fn-num { font-family: var(--serif); font-size: 34px; color: var(--gold); min-width: 56px; }
+.fn-step h3 {
+  font-size: 20px; margin-bottom: 6px;
+  font-family: var(--ui); font-weight: 600; color: var(--ivory);
+}
+.fn-step p { color: var(--stone); font-size: 15.5px; max-width: 520px; }
+/* The qualifier on steps 3 and 5 — what makes an optional step read as
+   optional rather than as something owed. */
+.fn-step h3 .fn-q { color: var(--stone); font-weight: 400; font-size: 14px; }
+
+/* ── DIFFERENTIATION ───────────────────────────────────────────────────────
+   × in grey on the left, ✓ in emerald on the right. */
+.fn-diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.fn-diff-col h3 {
+  font-family: var(--ui); font-size: 12.5px; letter-spacing: .06em;
+  margin-bottom: 20px; font-weight: 600;
+}
+.fn-diff-col.fn-typical h3 { color: var(--stone); }
+.fn-diff-col.fn-gwop h3 { color: var(--gold); }
+.fn-diff-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+.fn-diff-list li { font-size: 15.5px; padding-left: 20px; position: relative; color: var(--stone); }
+.fn-diff-col.fn-gwop .fn-diff-list li { color: var(--ivory); }
+.fn-diff-col.fn-typical .fn-diff-list li::before {
+  content: '\00D7'; position: absolute; left: 0; color: #6b6258;
+}
+.fn-diff-col.fn-gwop .fn-diff-list li::before {
+  content: '\2713'; position: absolute; left: 0; color: var(--emerald);
+}
+
+/* ── PERSON (founder) ──────────────────────────────────────────────────────
+   The mockup's .people grid is 1fr 1fr for two cards; there is one founder
+   card, so the grid is not used and the card stands alone at the same width. */
+.fn-person {
+  padding: 36px; background: rgba(198, 162, 77, .05);
+  border: 1px solid rgba(198, 162, 77, .18); max-width: 536px;
+}
+.fn-person .fn-role {
+  font-family: var(--ui); font-size: 11.5px; letter-spacing: .06em;
+  color: var(--gold); margin-bottom: 10px; font-weight: 600;
+}
+.fn-person h3 { font-size: 24px; margin-bottom: 12px; color: var(--ivory); }
+.fn-person p { color: var(--stone); font-size: 15px; }
+.fn-person .fn-person-close {
+  margin-top: 20px; padding-top: 18px;
+  border-top: 1px solid rgba(198, 162, 77, .22);
+  font-family: var(--ui); font-weight: 600; font-size: 14px;
+  letter-spacing: .03em; color: var(--gold);
+}
+
+/* ── TRUST ─────────────────────────────────────────────────────────────────
+   Icons inherit `color`, so stroke="currentColor" in the markup is what makes
+   them gold. */
+.fn-trust-icons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-bottom: 48px; }
+.fn-trust-icon { text-align: left; }
+.fn-trust-icon svg { width: 26px; height: 26px; margin-bottom: 14px; color: var(--gold); }
+/* UI font, ivory. globals gives h4 the body font AND emerald; the family is
+   restated because var(--body) is Poppins here, not Montserrat. */
+.fn-trust-icon h4 {
+  font-family: var(--ui); font-size: 15px; font-weight: 600;
+  color: var(--ivory); margin-bottom: 8px;
+}
+.fn-trust-icon p { font-size: 14px; color: var(--stone); }
+.fn-legal-box {
+  border: 1px solid rgba(198, 162, 77, .25); padding: 28px 32px;
+  font-size: 14px; color: var(--stone); line-height: 1.7;
+}
+.fn-legal-box a { color: var(--gold); text-decoration: underline; }
+
+/* ── TESTIMONIALS ──────────────────────────────────────────────────────────
+   Dashed border. The mockup chose dashed because the slots are placeholders —
+   it reads as unfinished on purpose. Kept. */
+.fn-testi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.fn-testi { padding: 30px; border: 1px dashed rgba(156, 149, 135, .4); }
+.fn-testi p {
+  font-family: var(--serif); font-style: italic; font-size: 18px;
+  color: var(--stone); margin-bottom: 16px;
+}
+.fn-testi .fn-who { font-family: var(--ui); font-size: 12px; color: var(--gold); }
+.fn-placeholder-tag {
+  display: inline-block; margin-top: 14px; font-family: var(--ui); font-size: 11px;
+  color: var(--stone); border: 1px dashed var(--stone); padding: 4px 10px;
+}
+
+/* ── FAQ ───────────────────────────────────────────────────────────────────
+   + / – marker in serif gold. No JavaScript. */
+.fn-faq { max-width: 760px; }
+.fn-faq details { border-top: 1px solid rgba(198, 162, 77, .2); padding: 22px 0; }
+.fn-faq details:last-child { border-bottom: 1px solid rgba(198, 162, 77, .2); }
+.fn-faq summary {
+  cursor: pointer; font-family: var(--ui); font-weight: 600; font-size: 16px;
+  color: var(--ivory);
+  list-style: none; display: flex; justify-content: space-between; align-items: center;
+  gap: 20px;
+}
+.fn-faq summary::-webkit-details-marker { display: none; }
+.fn-faq summary::after {
+  content: '+'; font-family: var(--serif); font-size: 26px; color: var(--gold);
+  transition: transform .2s ease;
+}
+.fn-faq details[open] summary::after { content: '\2013'; }
+.fn-faq details p { color: var(--stone); font-size: 15px; margin-top: 14px; max-width: 640px; }
+
+/* ── FINAL CTA + FORM ──────────────────────────────────────────────────────
+   The mockup's .form-card styles the three raw inputs it shipped. Those inputs
+   are not used — <InterestForm /> is, because it carries Turnstile, consent
+   capture and the POST to /api/lead. The card chrome is ported so the
+   assessment sits in the same forest panel the mockup drew, and the input
+   rules are kept because the assessment's name / email / phone step renders
+   real inputs into it. */
+.fn-final-cta { text-align: center; padding: 110px 0; }
+.fn-final-cta h2 { font-size: clamp(34px, 5vw, 58px); margin-bottom: 20px; }
+.fn-final-cta .fn-lede { margin: 0 auto 40px; text-align: center; }
+
+.fn-form-card {
+  max-width: 480px; margin: 48px auto 0; background: var(--forest);
+  border: 1px solid rgba(198, 162, 77, .25); padding: 36px; text-align: left;
+}
+.fn-form-card label {
+  display: block; font-family: var(--ui); font-size: 12px;
+  color: var(--stone); margin-bottom: 6px; text-align: left;
+}
+.fn-form-card input {
+  width: 100%; background: var(--black); border: 1px solid rgba(156, 149, 135, .35);
+  color: var(--ivory); padding: 13px 14px; font-family: var(--sans); font-size: 15px;
+  margin-bottom: 18px; border-radius: 2px;
+}
+.fn-form-card input:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
+.fn-form-card .fn-btn { width: 100%; justify-content: center; }
+
+/* ══ THE ASSESSMENT INSIDE THE MOCKUP'S FORM CARD ═══════════════════════════
+   ⚠ THIS BLOCK IS WHY THE FORM LOOKED WRONG IN THE PDF, AND IT NEEDED MORE
+   THAN A COLOUR PASS.
+
+   The assessment renders with .evform / .evpick / .evnf / .evgold from
+   globals.css — 88 rules already tuned across seven viewports. Those were
+   built for an ivory page: white card, white pick buttons, stone borders,
+   rounded 20px corners, a drop shadow. Dropped onto the mockup's forest panel
+   that reads as white chips floating on dark green, which is exactly what the
+   render shows.
+
+   It is worse than a mismatch, because .fn redefines --stone, --emerald and
+   --ivory to the mockup's values while --white, --ink and --muted still hold
+   the app's. So those legacy rules were resolving a MIX of two palettes —
+   half-overridden, which is the hardest kind of wrong to eyeball.
+
+   Fixed by mapping each rule onto the mockup's form-card design: black inputs,
+   2px radius, gold hairline borders, gold submit. Colour, border, radius and
+   shadow only — NO spacing, NO font sizes, NO layout, NO min-heights. Nothing
+   that was tested across seven viewports moves, and the 16px input floor stays
+   (below it iOS Safari zooms on focus, which on a phone reads as the page
+   breaking).
+
+   Scoped under .fn-form-card, so /thanks and any other surface using these
+   same classes is untouched. */
+
+/* the card itself — mockup .form-card, so the outer chrome is already right;
+   these rules strip the app card's competing chrome from inside it */
+.fn-form-card .evform {
+  margin-top: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/* form header ("What do you want help with?") */
+.fn-form-card .evform .fh {
+  background: rgba(198, 162, 77, .05);
+  border-bottom: 1px solid rgba(198, 162, 77, .18);
+  border-radius: 2px;
+}
+.fn-form-card .evform .fh h3 { color: var(--ivory); font-family: var(--ui); }
+.fn-form-card .evform .fh p { color: var(--stone); }
+.fn-form-card .evform .fh .chosen { color: var(--gold); }
+
+.fn-form-card .evnf { padding-left: 0; padding-right: 0; }
+
+/* ── INTEREST PICKS (Step 1 of 2) ─────────────────────────────────────────
+   Capped at TWO columns. globals.css takes .evpicks to 2 and then 3 at wider
+   viewports, which is right on the full-width ivory page but not inside a
+   560px card — at 3 across, each of the five options gets about 170px, and
+   "Business / Entrepreneurship" wraps to three lines while "Credit" sits in a
+   third of the space.
+
+   Two columns keeps the touch targets wide, which is what the work order asks
+   for: large targets, one tap, on a phone at a booth. The fifth option takes
+   the full row on its own, and that reads fine — it is a list, not a grid that
+   has to fill. */
+@media (min-width: 520px) {
+  .fn-form-card .evpicks { grid-template-columns: repeat(2, 1fr); }
+}
+
+.fn-form-card .evpick {
+  background: var(--black);
+  border: 1px solid rgba(156, 149, 135, .35);
+  border-radius: 2px;
+  color: var(--ivory);
+  font-family: var(--ui);
+}
+.fn-form-card .evpick:hover { border-color: var(--gold); }
+.fn-form-card .evpick[aria-pressed="true"] {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, .08);
+}
+.fn-form-card .evpick .dot { border-color: rgba(156, 149, 135, .55); }
+.fn-form-card .evpick[aria-pressed="true"] .dot {
+  border-color: var(--gold);
+  background: var(--gold);
+  box-shadow: inset 0 0 0 3px var(--black);
+}
+
+/* ── TEXT INPUTS ── mockup .form-card input, exactly ───────────────────── */
+.fn-form-card .evnf label { color: var(--stone); font-family: var(--ui); }
+.fn-form-card .evnf label em { color: #E0A090; }
+.fn-form-card .evnf input[type="text"],
+.fn-form-card .evnf input[type="email"],
+.fn-form-card .evnf input[type="tel"] {
+  background: var(--black);
+  border: 1px solid rgba(156, 149, 135, .35);
+  border-radius: 2px;
+  color: var(--ivory);
+}
+.fn-form-card .evnf input::placeholder { color: rgba(156, 149, 135, .7); }
+.fn-form-card .evnf input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-color: var(--gold);
+  box-shadow: none;
+}
+.fn-form-card .evnf input[aria-invalid="true"] { border-color: #C4614B; }
+.fn-form-card .evnf input[aria-invalid="true"]:focus-visible {
+  outline-color: #C4614B; box-shadow: none;
+}
+
+/* consent — the one legally meaningful control. Contrast raised rather than
+   dimmed to match the surrounding muted text: it has to stay readable. */
+.fn-form-card .evnf-consent { color: var(--stone); }
+.fn-form-card .evnf-consent input { accent-color: var(--gold); }
+.fn-form-card .evnf-err { color: #E0A090; }
+.fn-form-card .evnf-fine { color: rgba(156, 149, 135, .8); }
+.fn-form-card .evnf-legal a { color: var(--gold); }
+
+/* ── SUBMIT ── the mockup's gold button, inverting on hover ────────────── */
+.fn-form-card .evgold,
+.fn-form-card .btn.evgold {
+  background: var(--gold);
+  color: var(--black);
+  border: 1px solid var(--gold);
+  border-radius: 2px;
+  font-family: var(--ui);
+}
+.fn-form-card .evgold:hover:not(:disabled) {
+  background: transparent;
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.fn-form-card .evgold:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.fn-form-card .evgold:disabled { opacity: .55; }
+/* "Not sure yet — just sign me up". Underlined and left at stone rather than
+   dimmed further: without it, anyone who will not categorise themselves is a
+   lost lead, so it has to be findable. Jake's INTEREST_FALLBACK branch exists
+   for exactly these people. */
+.fn-form-card .evskip {
+  color: var(--stone);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.fn-form-card .evskip:hover { color: var(--gold); }
+
+/* eyebrow + lede inside the card */
+.fn-form-card .tag { color: var(--gold); }
+.fn-form-card .evlede { color: var(--stone); }
+
+/* DRAFT-mode placeholder box */
+.fn-form-card .evph {
+  background: rgba(212, 175, 55, .05);
+  border: 2px dashed rgba(212, 175, 55, .45);
+  border-radius: 2px;
+}
+.fn-form-card .evph b { color: var(--gold); }
+.fn-form-card .evph span { color: var(--stone); }
+.fn-form-card .evph code { background: rgba(212, 175, 55, .12); color: var(--ivory); }
+
+/* ── THE BLUEPRINT + POST-SUBMIT SECTIONS ─────────────────────────────────
+   Blueprint, IdentityIQ card, booking CTA and teaser all render here after a
+   successful submit, so they inherit the same treatment. */
+.fn-form-card .evas,
+.fn-form-card .evas-bp { background: transparent; color: var(--ivory); }
+.fn-form-card .evas h3, .fn-form-card .evas h4, .fn-form-card .evas h5,
+.fn-form-card .evas-bp h3, .fn-form-card .evas-bp h4 { color: var(--ivory); }
+.fn-form-card .evas p, .fn-form-card .evas-lead { color: var(--stone); }
+.fn-form-card .evas-eyebrow,
+.fn-form-card .evas-booking-eyebrow { color: var(--gold); }
+.fn-form-card .evas-sec,
+.fn-form-card .evas-next-steps,
+.fn-form-card .evas-booking {
+  background: rgba(198, 162, 77, .05);
+  border: 1px solid rgba(198, 162, 77, .18);
+  border-radius: 2px;
+}
+.fn-form-card .evas-step-n { color: var(--gold); }
+.fn-form-card .evas-booking-note { color: var(--stone); }
+
+/* ── FOOTER ────────────────────────────────────────────────────────────────
+   ⚠ LEGAL BLOCK ONLY, per the approved screenshot: entity in bold, the
+   disclosure, the SMS line, then the five legal links in gold.
+
+   The mockup's four-column .foot-grid — brand, socials, Pathway, University —
+   is NOT ported. It was cut deliberately, and it also removes the two links
+   that went nowhere useful: "Student area" lands on a login wall a first-time
+   visitor has no account for, and the Pathway column was four non-links.
+
+   Colour matches the screenshot: entity and links brighter than the body
+   copy, which sits at #6b6258 the way the mockup's .foot-legal did. */
+.fn-foot { border-top: 1px solid rgba(198, 162, 77, .18); padding: 44px 0 40px; }
+.fn-foot-legal { font-size: 12.5px; line-height: 1.7; color: #6b6258; }
+.fn-foot-legal .fn-foot-entity {
+  font-family: var(--ui); font-weight: 700; font-size: 15px;
+  color: var(--ivory); margin-bottom: 16px;
+}
+.fn-foot-legal p { margin-bottom: 10px; max-width: 96ch; font-size: 14px; }
+.fn-foot-links {
+  list-style: none; display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 20px;
+}
+.fn-foot-links a { color: var(--gold); text-decoration: none; font-size: 14px; }
+/* ⚠ `color` REPEATED ON :hover ON PURPOSE. globals.css has a bare
+   `footer a:hover{color:var(--gold-lt)}` rule, and --gold-lt is the APP's
+   lighter gold (#D9BD6B), not the mockup's #D4AF37. Without restating the
+   colour here the footer links changed to the wrong gold on hover — visible
+   only while the cursor was on them, which is why it survives a screenshot
+   review. */
+.fn-foot-links a:hover { color: var(--gold); text-decoration: underline; }
+
+/* ── BREAKPOINT ────────────────────────────────────────────────────────────
+   The mockup has exactly one, at 860px. Ported as-is: no extra breakpoints
+   invented, and none of the mockup's collapses dropped. */
+@media (max-width: 860px) {
+  .fn-path-row { grid-template-columns: 1fr 1fr; gap: 32px 0; }
+  .fn-path-row::before { display: none; }
+  .fn-diff-grid,
+  .fn-trust-icons,
+  .fn-testi-row { grid-template-columns: 1fr; gap: 28px; }
+  .fn-section { padding: 72px 0; }
+  .fn-offer-card { padding: 30px; }
+  .fn-offer-card__aside { min-width: 0; width: 100%; text-align: left; }
+}
+
+/* ══ THE POST-SUBMIT STRETCH ════════════════════════════════════════════════
+   Blueprint → IdentityIQ → booking → teaser, all rendered by Assessment.tsx
+   after a successful capture, and all styled here to match the design's lower
+   half.
+
+   Same discipline as the form card above: colour, border, radius and shadow
+   only. No spacing, no font sizes, no min-heights, nothing that was tuned
+   across seven viewports.
+
+   ⚠ These sections exist ONLY on the native capture path. They are downstream
+   of the signed token /api/lead returns, so setting
+   NEXT_PUBLIC_LEAD_CAPTURE_MODE=iframe deletes every one of them with no error
+   anywhere. See CONTACT-FIRST-PATCH.md §2. */
+
+/* ── progress bar through the seven questions ───────────────────────────── */
+.fn-form-card .evas-prog-track { background: rgba(156, 149, 135, .25); }
+.fn-form-card .evas-prog-fill { background: var(--gold); }
+.fn-form-card .evas-prog-text { color: var(--stone); }
+
+/* ── question screens ───────────────────────────────────────────────────── */
+.fn-form-card .evas-q { color: var(--ivory); }
+.fn-form-card .evas-back,
+.fn-form-card .evas-skip { color: var(--stone); }
+.fn-form-card .evas-review-row {
+  border-color: rgba(198, 162, 77, .18);
+}
+.fn-form-card .evas-review-q { color: var(--stone); }
+.fn-form-card .evas-review-edit { color: var(--gold); }
+.fn-form-card .evas-spin { border-top-color: var(--gold); }
+
+/* ── the Blueprint ──────────────────────────────────────────────────────── */
+.fn-form-card .evas-bp-h { color: var(--ivory); }
+/* "What NOT to Do Yet" — the section nobody else gives them. Kept visually
+   distinct from the moves above it, as it is on the ivory page. */
+.fn-form-card .evas-sec-not {
+  background: rgba(212, 175, 55, .06);
+  border-color: rgba(212, 175, 55, .3);
+}
+.fn-form-card .evas-not li { color: var(--stone); }
+.fn-form-card .evas-not b { color: var(--ivory); }
+
+/* ── IdentityIQ card (design: "Know what's actually on your report.") ───── */
+.fn-form-card .evas-next {
+  background: rgba(198, 162, 77, .05);
+  border: 1px solid rgba(212, 175, 55, .3);
+  border-radius: 2px;
+}
+/* ⚠ THE PRICE. This figure sits on the same screen as the word "free" and it
+   is the difference between an offer and an ambush. Gold and full size on
+   purpose — never dim it to tidy up the card. Verified $27.99/month, no trial,
+   2026-08-25; the offer changed once already, so re-verify before launch. */
+.fn-form-card .evas-next-cost {
+  color: var(--gold);
+  font-family: var(--serif);
+}
+/* The affiliate disclosure. Muted but not faint — it has to be readable to do
+   its job. */
+.fn-form-card .evas-next-disclosure { color: var(--stone); }
+.fn-form-card .evas-next-note { color: var(--stone); }
+
+/* ── booking card (design: "Book your 1:1 with Beast.") ─────────────────── */
+.fn-form-card .evas-booking { border-radius: 2px; }
+.fn-form-card .evas-booking h5 { color: var(--ivory); }
+
+/* ── teaser (design: "Your Blueprint Is Just the Beginning.") ────────────── */
+.fn-form-card .evas-teaser { background: transparent; }
+/* Vertical frame, gold border, 20px radius — the design's .video-frame. The
+   9/16 ratio and the depth shadow are what stop a portrait video reading as a
+   broken embed on desktop. */
+/* ⚠ NO aspect-ratio, max-height OR object-fit HERE, ON PURPOSE.
+   globals.css line 1317 already sets aspect-ratio:9/16, max-height:66vh,
+   width:auto and object-fit:contain on this frame — the portrait ratio the
+   design draws, with `contain` so the video is never cropped to fit. Those are
+   correct and tested; restating them here would fork the geometry into two
+   files that will disagree after the next edit.
+
+   Only the design's surface treatment is added: gold border, 20px radius, the
+   depth shadow. The gradient shows through wherever `contain` letterboxes a
+   video whose ratio is not exactly 9/16, which is why it is a gradient rather
+   than flat black — an off-ratio video reads as intentional framing instead of
+   a rendering fault. It is also what shows while the poster is empty. */
+.fn-form-card .evas-teaser-frame {
+  border: 2px solid var(--gold);
+  border-radius: 20px;
+  background: linear-gradient(165deg, var(--black), var(--forest));
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+}
+.fn-form-card .evas-teaser-cap { color: var(--stone); }
+
+/* ── the gold CTAs on all three cards ─────────────────────────────────────
+   Nothing needed here. All three — evas-next-cta, evas-booking-cta,
+   evas-submit — are rendered as `btn evgold evas-*`, so the single
+   .fn-form-card .evgold rule above already governs them.
+
+   This block used to restate background, colour, border and radius. Two rules
+   setting the same four values is how one of them ends up stale: someone
+   changes the button colour in the obvious place and three CTAs quietly keep
+   the old one. Deleted rather than kept in sync. */
+
+/* ── the stage floor ──────────────────────────────────────────────────────
+   .evstage holds a min-height so a shorter state cannot pull the page up
+   mid-flow. Kept — it is the reason the top edge stays put while somebody
+   moves through seven questions. Only the width is constrained here, because
+   the Blueprint is much taller than the three fields that precede it and the
+   design's 480px card would make it a column of slivers. */
+.fn-form-card { max-width: 560px; }
+
+/* Blueprint closing instruction — the line the design moves off the old "Two
+   things" block and onto the end of the plan. Ruled off above so it reads as a
+   hand-off to the cards below rather than another Blueprint section. */
+.fn-form-card .evas-bp-close {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(198, 162, 77, .18);
+  color: var(--ivory);
+}
+.fn-form-card .evas-bp-close b { color: var(--gold); font-weight: 600; }
+
+/* Turnstile renders in an iframe we cannot style, so the widget carries
+   data-theme="dark" in InterestForm.tsx instead. This only centres it in the
+   card — the light-themed white box that used to sit here was the theme
+   attribute, not a CSS problem. */
+.fn-form-card .cf-turnstile { display: flex; justify-content: center; }
+
+/* ══ VERIFIED RESULTS — score cards ════════════════════════════════════════
+   Rebuilt as native markup rather than the source CRM screenshots. Those
+   carried full names, live email addresses and bureau logos, and their
+   blue-and-white chrome fought this palette — a leaked back-office screen
+   rather than a brand asset. Same data, our typography, no logos, no names.
+
+   ⚠ Bureau names are TEXT. If anyone reaches for an <img> here, read the
+   header of content/results.ts first. */
+.fn-results { display: grid; gap: 18px; }
+@media (min-width: 700px) { .fn-results { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1040px) { .fn-results { grid-template-columns: repeat(3, 1fr); } }
+
+.fn-result {
+  padding: 26px 24px;
+  background: rgba(198, 162, 77, .05);
+  border: 1px solid rgba(198, 162, 77, .22);
+}
+.fn-result-who {
+  font-family: var(--ui); font-size: 13px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--gold);
+}
+.fn-result-when {
+  font-weight: 500; letter-spacing: .04em; text-transform: none; color: var(--stone);
+}
+
+.fn-result-rows {
+  width: 100%; margin-top: 18px;
+  border-collapse: collapse; font-family: var(--ui);
+}
+.fn-result-rows th[scope="row"] {
+  text-align: left; font-size: 11px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--stone);
+  padding: 9px 0; white-space: nowrap;
+}
+.fn-result-rows td { padding: 9px 0; text-align: right; }
+.fn-result-rows tr + tr th,
+.fn-result-rows tr + tr td { border-top: 1px solid rgba(198, 162, 77, .14); }
+
+/* Tabular figures so the columns line up down the card. Without this the
+   digits are proportional and three rows of scores look ragged. */
+.fn-result-from,
+.fn-result-to,
+.fn-result-nospan,
+.fn-result-delta { font-variant-numeric: tabular-nums; font-size: 15px; }
+
+.fn-result-from { color: var(--stone); padding-left: 10px; }
+.fn-result-to { color: var(--ivory); font-weight: 600; }
+.fn-result-arrow { color: var(--gold); margin-right: 7px; }
+/* The delta-only state, for rows whose before/after was never recorded. */
+.fn-result-nospan { color: var(--stone); }
+.fn-result-delta {
+  color: var(--gold); font-weight: 700; padding-left: 14px; white-space: nowrap;
+}
+
+/* Deletions chip. */
+.fn-result-chip {
+  display: inline-block; margin-top: 16px; padding: 5px 12px;
+  border: 1px solid rgba(212, 175, 55, .4); border-radius: 999px;
+  background: rgba(212, 175, 55, .1);
+  font-family: var(--ui); font-size: 11.5px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--gold);
+}
+
+/* Results disclaimer. Muted but NOT faint — it has a job to do, and 12.5px at
+   low contrast in a regulated category is the shape of a disclaimer designed
+   not to be read. */
+.fn-result-disclaimer {
+  margin-top: 34px; max-width: 78ch;
+  font-family: var(--ui); font-size: 13px; line-height: 1.65;
+  color: var(--stone);
+}
+
+/* Visually hidden, still announced. Used for the table caption and header row.
+   Not display:none — that removes it from the accessibility tree too, which
+   would leave the numbers with no labels at all. */
+.fn-sr {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* ══ TEASER — badge + tap-for-sound gate ═══════════════════════════════════
+   The frame itself keeps globals.css's geometry (9/16, contain, max-height
+   66vh). These two overlays are the design's, and both sit inside it. */
+
+/* "Loops" badge, top-right. */
+.fn-form-card .evas-teaser-badge {
+  position: absolute; top: 14px; right: 14px; z-index: 3;
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 20px;
+  background: rgba(13, 40, 30, .8);
+  border: 1px solid var(--gold); color: var(--gold);
+  font-family: var(--ui); font-size: 10px; font-weight: 600; letter-spacing: .06em;
+}
+
+/* Full-frame tap target. Covers the whole frame on purpose: this is the one
+   gesture that can unmute, and a small button on a phone is a missed tap. It
+   is a real <button>, so it is keyboard-reachable and announced — an overlay
+   <div> with onClick would be neither. */
+.fn-form-card .evas-teaser-sound {
+  position: absolute; inset: 0; z-index: 4;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: 14px; padding: 0 20px 42px;
+  cursor: pointer; border: 0;
+  /* Gradient, not a flat scrim: the video stays visible while the label
+     remains readable over whatever is on screen. */
+  background: linear-gradient(to top,
+    rgba(6, 20, 14, .78) 0%, rgba(6, 20, 14, .25) 45%, rgba(6, 20, 14, 0) 75%);
+  font-family: var(--ui);
+  -webkit-tap-highlight-color: transparent;
+}
+.fn-form-card .evas-teaser-sound-disc {
+  position: relative; flex: none;
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--gold); color: var(--black); font-size: 22px;
+}
+.fn-form-card .evas-teaser-sound-disc::after {
+  content: ''; position: absolute; inset: -6px; border-radius: 50%;
+  border: 2px solid var(--gold);
+  animation: fnCtaPulse 2s ease-out infinite;
+}
+@keyframes fnCtaPulse {
+  0%   { transform: scale(1);    opacity: .7; }
+  70%  { transform: scale(1.45); opacity: 0; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+/* The pulse is an attention cue, not information — the label says the same
+   thing. Safe to stop entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .fn-form-card .evas-teaser-sound-disc::after { animation: none; }
+}
+.fn-form-card .evas-teaser-sound-label {
+  color: var(--ivory); font-size: 12.5px; font-weight: 600;
+  letter-spacing: .16em; text-transform: uppercase;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .6);
+}
+
+/* #start alias for the #choose section — see page.tsx. A bare inline span
+   would let the sticky header cover the heading when a fragment lands on it,
+   so both targets get the same offset the browser uses for #choose. */
+.fn [id="start"],
+.fn [id="choose"] { scroll-margin-top: 84px; }
+
+/* ── STEP 1 HEADING, INSIDE THE CARD ──────────────────────────────────────
+   With the interest picker restored, InterestForm renders its own
+   tag / h2 / lede ("STEP 1 OF 2" · "What do you want help with?") inside the
+   card — below the section's own "Build your Blueprint." heading.
+
+   Two heading stacks in a row is correct here rather than redundant: the outer
+   one names the section, the inner one asks step 1's question. But they must
+   not compete, so the inner h2 is stepped down and left-aligned against the
+   card while the section heading stays centred. Without this it inherits the
+   section scale and reads as a second page title. */
+.fn-form-card .evstage > h2 {
+  font-size: clamp(21px, 3.4vw, 27px);
+  text-align: left;
+  margin-top: 4px;
+}
+.fn-form-card .evstage > .tag,
+.fn-form-card .evstage > .evlede { text-align: left; }

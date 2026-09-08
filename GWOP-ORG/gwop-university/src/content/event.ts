@@ -201,7 +201,12 @@ export const event = {
        attendee does not tap "Blueprint session" and land on a page titled
        something else. Duration is his: 1 hr. */
     booking: {
-      h: 'Book your 1:1 Blueprint / Roadmap session',
+      /* ⚠ WORDING FROM THE APPROVED DESIGN, 2026-09-08. Was "Book your 1:1
+         Blueprint / Roadmap session" — accurate but it named the artefact
+         twice and never said who they would be sitting with. The design says
+         "Book your 1:1 with Beast.", and Beast is the reason somebody books.
+         Also read on /thanks, which is the same offer, so both move together. */
+      h: 'Book your 1:1 with Beast.',
       p: 'One hour with Beast, walking through your roadmap. Mon–Fri, 11 AM–1 PM.',
       label: 'Pick a time',
       pending: false,

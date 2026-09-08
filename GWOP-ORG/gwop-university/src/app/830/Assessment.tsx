@@ -9,7 +9,9 @@ import {
 } from '@/config/assessment'
 import { blueprints, BLUEPRINTS_APPROVED, type BlueprintSlug } from '@/content/blueprints'
 import { event } from '@/content/event'
-import { Tbc } from '@/components/Chrome'
+/* Tbc dropped 2026-09-08 — its only use here was the founding-member line in
+   the removed "Two things" list. Chrome.tsx still exports it; the funnel
+   sections and /thanks use it. */
 import { INTERESTS, INTEREST_FALLBACK } from '@/config/integrations'
 import { identityiq } from '@/config/identityiq'
 import { BOOKING_URL } from '@/config/integrations'
@@ -436,6 +438,46 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
    tap it if they want it.
    ───────────────────────────────────────────────────────────────────────── */
 function Teaser() {
+  /* Starts muted because that is the only way autoplay is permitted. Flipping
+     this to false is the one thing that stops the video playing at all. */
+  const [muted, setMuted] = useState(true)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  /* Unmute from the top. `play()` returns a promise that rejects if the
+     browser declines — caught rather than ignored, because an unhandled
+     rejection here surfaces as a console error on a page where the console
+     should be clean. */
+  /* ⚠ muted SET IMPERATIVELY, NOT LEFT TO THE ATTRIBUTE ALONE.
+
+     React does not render `muted` into the initial HTML — it applies it as a
+     DOM property after mount. So there is a window where the element exists
+     with autoPlay and WITHOUT muted, and a browser that evaluates autoplay in
+     that window refuses it: autoplay with sound is blocked everywhere. The
+     video then sits on frame one with no error, which is the single most
+     reported React video bug and looks exactly like a broken file.
+
+     Setting it on the node before asking it to play closes the window. The
+     `muted` prop stays on the element too — it is what keeps React's view of
+     the DOM in step once the sound gate flips it. */
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    v.muted = true
+    void v.play().catch(() => {})
+  }, [])
+
+  const enableSound = useCallback(() => {
+    setMuted(false)
+    const v = videoRef.current
+    if (!v) return
+    /* Property, not just state — same reason as the effect above. Waiting for
+       React to re-render before unmuting loses the user gesture, and the
+       gesture is the only thing that authorises audio. */
+    v.muted = false
+    v.currentTime = 0
+    void v.play().catch(() => {})
+  }, [])
+
   const ready = !teaser.pending && teaser.src
 
   /* Nothing at all for attendees until there is a file. An empty frame reads as
@@ -462,16 +504,73 @@ function Teaser() {
 
   return (
     <div className="evas-teaser">
+      {/* ⚠ ADDED 2026-09-08 — the approved design labels this block "A word
+          from Surpaul" above the heading. Without it the video sat under a
+          bare title with nothing saying who is in it, which is the whole
+          reason it is worth pressing play. */}
+      <span className="evas-eyebrow">A word from Surpaul</span>
       <h4>{teaser.heading}</h4>
       <div className="evas-teaser-frame">
         {isFile ? (
-          <video
-            controls
-            playsInline
-            preload="none"
-            poster={teaser.poster || undefined}
-            src={teaser.src}
-          />
+          <>
+            {/* ⚠ MUTED AUTOPLAY + LOOP, per the approved design. Four
+                attributes here are load-bearing and none is decoration:
+
+                muted + playsInline — every mobile browser blocks autoplay
+                WITH sound, and iOS additionally blocks any autoplay that is
+                not inline. Drop either one and the video silently does not
+                start; there is no error, it just sits on the first frame.
+
+                loop — the design labels this block "Loops" and the clip is
+                short. Without it the frame ends on a freeze-frame.
+
+                preload="metadata" — was "none", which is incompatible with
+                autoplay: the browser cannot start something it has not begun
+                fetching. "metadata" gets dimensions and the first frame
+                without pulling the whole 1.2 MB, and playback then streams.
+
+                ⚠ DATA COST, KNOWN AND ACCEPTED. This autoplays for everyone
+                who reaches their Blueprint, and it loops, so on cellular it
+                keeps spending. 1.2 MB per pass. If that becomes a problem the
+                fix is a shorter clip, not removing playsInline/muted — those
+                are what make it start at all. */}
+            <video
+              ref={videoRef}
+              autoPlay
+              muted={muted}
+              loop
+              playsInline
+              preload="metadata"
+              controls={!muted}
+              poster={teaser.poster || undefined}
+              src={teaser.src}
+            />
+
+            {/* The design's "Loops" badge. Hidden once sound is on, because at
+                that point the person is watching deliberately and a loop
+                label stops being reassurance and becomes clutter. */}
+            {muted && (
+              <span className="evas-teaser-badge" aria-hidden="true">Loops</span>
+            )}
+
+            {/* Tap-for-sound gate. The ONLY gesture that can legally unmute —
+                browsers require a user action, so this cannot be done on
+                scroll or on a timer.
+
+                Restarts from 0 rather than unmuting mid-clip: someone who has
+                just decided to listen should hear the opening line, not walk
+                in halfway. */}
+            {muted && (
+              <button
+                type="button"
+                className="evas-teaser-sound"
+                onClick={enableSound}
+              >
+                <span className="evas-teaser-sound-disc" aria-hidden="true">▶</span>
+                <span className="evas-teaser-sound-label">Tap for sound</span>
+              </button>
+            )}
+          </>
         ) : (
           <iframe
             src={teaser.src}
@@ -492,8 +591,11 @@ function Teaser() {
    only a fallback — which left Beast's calendar live with nothing leading to
    it. This is the route to it.
 
-   Sits ABOVE the IdentityIQ card: booking a session is GWOP's own next step,
-   the affiliate offer is secondary.
+   ⚠ SUPERSEDED 2026-09-08. This used to read "Sits ABOVE the IdentityIQ card:
+   booking a session is GWOP's own next step, the affiliate offer is
+   secondary." The approved design puts IdentityIQ first — pull your report,
+   then book the session to discuss it, which is the order the call actually
+   works in. Do not reorder these back without checking the design.
 
    Copy comes from event.thanks so it stays the same wording Felicia approved
    for /thanks and cannot drift between the two.
@@ -501,39 +603,35 @@ function Teaser() {
 function NextSteps() {
   return (
     <section className="evas-next-steps">
-      <span className="evas-eyebrow">What happens next</span>
-      {/* ⚠ Count is hardcoded and MUST match event.thanks.next.length. It was
-          "Three things" until 2026-08-27, when Felicia cut the founding-member
-          item and the text-delivery promise for Sunday. If that array changes
-          again, change this line in the same edit. */}
-      {/* ⚠ "Before you leave the table" removed 2026-09-01 — there is no
-          table. The count is still hardcoded and must match
-          event.thanks.next.length. */}
-      <h4>Two things.</h4>
-      <p className="evas-lead">
-        What to do with this.
-      </p>
+      {/* ⚠ THE "TWO THINGS." LIST WAS REMOVED HERE, 2026-09-08.
+          The approved design deletes it, and the mockup states why in its own
+          comment: "The old 'Two things' block is gone; its instruction now
+          closes the Blueprint section so nothing sits between the plan and the
+          first action."
 
-      <ol className="evas-steps">
-        {event.thanks.next.map((n, i) => (
-          <li key={n.h}>
-            <span className="evas-step-n">{i + 1}</span>
-            <div>
-              <b>{n.h}</b>
-              {/* Unapproved copy stays behind the DRAFT marker, same as
-                  everywhere else — the founding-member wording is still
-                  pending. */}
-              <p>{'pending' in n ? <Tbc>{n.p}</Tbc> : n.p}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+          That is the right call. The list said "read your moves, then book
+          your session" — an instruction about the two blocks immediately
+          around it. Sitting between them, it delayed the thing it was pointing
+          at. Its sentence now closes the Blueprint, where it is read in the
+          same breath as the moves it refers to.
+
+          `event.thanks.next` is no longer rendered on this page. It is NOT
+          deleted from content/event.ts, because /thanks still uses it as the
+          fallback path. If nothing else consumes it later, retire it there
+          rather than here.
+
+          What is left in this section is booking, and only booking — "Step
+          two" in the design's numbering. */}
 
       {/* Hidden if the booking link is unset. A dead button at a booth is
           worse than no button. */}
       {BOOKING_URL && (
         <div className="evas-booking">
-          <span className="evas-booking-eyebrow">Your next step</span>
+          {/* ⚠ DESIGN WORDING, 2026-09-08. Eyebrow was "Your next step" —
+              now "Step two", which pairs with "Step one" on the Blueprint and
+              makes the IdentityIQ card between them read as the unnumbered
+              optional it is. */}
+          <span className="evas-booking-eyebrow">Step two</span>
           <h5>{event.thanks.booking.h}</h5>
           <p>{event.thanks.booking.p}</p>
           {/* New tab, deliberately. Booking inside the page would replace the
@@ -687,9 +785,12 @@ function BlueprintView({
         <p className="evas-bp-h">{event.thanks.h2}</p>
         <p className="evas-lead">{event.thanks.lede}</p>
 
-        <Teaser />
-        <NextSteps />
+        {/* Approved design order: their Blueprint, then the optional
+            IdentityIQ step, then booking, then the teaser. Reordered
+            2026-09-08 — see the note above NextSteps(). */}
         <NextStep interest={interest} creditRange={creditRange} />
+        <NextSteps />
+        <Teaser />
 
         {/* Development only. A note to whoever is building, not to an attendee —
             it was appearing on the deployed preview where testers and the client
@@ -713,10 +814,25 @@ function BlueprintView({
 
   return (
     <section className="evas evas-bp" ref={sectionRef}>
-      <span className="evas-eyebrow">Your GWOP Blueprint</span>
+      {/* ⚠ HEADINGS FROM THE APPROVED DESIGN, 2026-09-08.
+          Was: eyebrow "Your GWOP Blueprint", h3 = plan.headline.
+          Design: eyebrow "Step one", h3 "Here's where you stand."
+
+          plan.headline is NOT dropped — it moves to the line below. It is the
+          per-path personalised sentence from content/blueprints.ts, and it is
+          the first thing that tells somebody this was built from their own
+          answers rather than printed for everyone. Losing it to match a
+          heading would trade the most valuable line on the page for a label.
+
+          The design numbers this "Step one" and booking "Step two", with the
+          IdentityIQ card sitting between them as an unnumbered optional. That
+          numbering is what keeps the paid third-party step from reading as
+          something they owe. */}
+      <span className="evas-eyebrow">Step one</span>
       <h3 className="evas-bp-h" ref={headingRef} tabIndex={-1}>
-        {plan.headline}
+        Here&rsquo;s where you stand.
       </h3>
+      <p className="evas-lead">{plan.headline}</p>
 
       {/* Five sections, same five every time, in the same order. The
           consistency is the product: an attendee comparing notes with the
@@ -766,9 +882,33 @@ function BlueprintView({
         <p>{plan.path}</p>
       </div>
 
-      <Teaser />
-      <NextSteps />
+      {/* ⚠ MOVED HERE FROM THE "TWO THINGS" BLOCK, 2026-09-08, per the
+          approved design and the mockup's own note: "its instruction now
+          closes the Blueprint section so nothing sits between the plan and the
+          first action."
+
+          It is an instruction about the two blocks either side of it, so it
+          belongs at the end of the first one — read in the same breath as the
+          moves it refers to, rather than as a section that delays them.
+
+          Kept conditional on BOOKING_URL for the same reason the booking card
+          is: if the calendar link is unset the card does not render, and
+          telling somebody to book a session that has no button is worse than
+          saying nothing. */}
+      {BOOKING_URL && (
+        <p className="evas-bp-close">
+          Two things from here — read your moves, then{' '}
+          <b>book your session</b>. Everything below is in the order we&rsquo;d
+          do it.
+        </p>
+      )}
+
+      {/* Approved design order: their Blueprint, then the optional IdentityIQ
+          step, then booking, then the teaser. Reordered 2026-09-08 — see the
+          note above NextSteps(). Must match the DRAFT branch above. */}
       <NextStep interest={interest} creditRange={creditRange} />
+      <NextSteps />
+      <Teaser />
     </section>
   )
 }

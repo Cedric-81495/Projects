@@ -25,7 +25,12 @@ export const identityiq = {
   href: 'https://www.identityiq.com/sc-securepreferred.aspx?offercode=43129179',
 
   eyebrow: 'Optional next step',
-  heading: 'Know what your report actually says',
+  /* ⚠ WORDING FROM THE APPROVED DESIGN, 2026-09-08. Was "Know what your
+     report actually says". The design says "Know what's actually on your
+     report." — same promise, and "on your report" is the phrase people use
+     when they mean the document rather than its verdict. `eyebrow` above
+     already matched. */
+  heading: "Know what's actually on your report.",
 
   /* ── BLUEPRINT TEASER VIDEO ─────────────────────────────────────────────
      A short piece from Surpaul, above the CTA, framing why reading your report

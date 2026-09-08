@@ -593,7 +593,11 @@ function NativeForm({
       {siteKey && (
         <>
           <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
-          <div className="cf-turnstile" data-sitekey={siteKey} data-theme="light" />
+          {/* ⚠ dark, not light — the ONLY change to this file. The widget renders
+              in an iframe we cannot style, so the theme has to be set here;
+              "light" put a white Turnstile box on the funnel's forest form
+              card. Correct when this form sat on the ivory page. */}
+          <div className="cf-turnstile" data-sitekey={siteKey} data-theme="dark" />
         </>
       )}
 

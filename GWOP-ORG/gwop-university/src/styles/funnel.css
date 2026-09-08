@@ -450,11 +450,15 @@
   background: rgba(198, 162, 77, .05);
   border: 1px solid rgba(198, 162, 77, .18);
 }
-.fn-person .fn-role {
-  font-family: var(--ui); font-size: 11.5px; letter-spacing: .06em;
-  color: var(--gold); margin-bottom: 10px; font-weight: 600;
-}
-.fn-person h3 { font-size: 24px; margin-bottom: 12px; color: var(--ivory); }
+/* .fn-person .fn-role and .fn-person h3 removed 2026-09-08 with the markup
+   they styled — the card no longer carries a "Founder" label or a second
+   "Surpaul Cottrell" heading, since the section h2 above already names him.
+   Deleted rather than left behind: CSS for markup that does not exist reads as
+   though the element is still supported, and the next person adds an h3 back
+   because the styling is there for it.
+
+   The card now opens with the bio, so its first line needs no top offset. */
+.fn-person > p:first-child { margin-top: 0; }
 /* The measure. 66ch is inside the comfortable range for body text and is what
    keeps the wider card readable — remove this and the card's new width becomes
    a liability rather than a gain. */

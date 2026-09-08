@@ -329,8 +329,9 @@ export function Founder() {
           {funnel.founder.h2}
         </h2>
         <div className="fn-person">
-          <p className="fn-role">Founder</p>
-          <h3>Surpaul Cottrell</h3>
+          {/* No role label and no name heading — see content/funnel.ts. The
+              section h2 above already names him, and "Founder" is the first
+              word of the bio. */}
           {funnel.founder.lines.map(l => <p key={l}>{l}</p>)}
           <p className="fn-person-close">{funnel.founder.close}</p>
         </div>
@@ -527,7 +528,12 @@ export function Faq() {
 
   return (
     <section className="fn-section fn-wrap">
-      <p className="fn-eyebrow" style={{ marginBottom: 14 }}>{funnel.faq.tag}</p>
+      {/* Conditional: `tag` is null now that the heading is "Frequently Asked
+          Questions". Rendering the <p> anyway would leave a 14px gap above the
+          heading and break its alignment with the sections either side. */}
+      {funnel.faq.tag && (
+        <p className="fn-eyebrow" style={{ marginBottom: 14 }}>{funnel.faq.tag}</p>
+      )}
       <h2 style={{ fontSize: 'clamp(30px,4vw,42px)', marginBottom: 44, maxWidth: 560 }}>
         {funnel.faq.h2}
       </h2>

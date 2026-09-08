@@ -178,6 +178,16 @@ export const funnel = {
 
   /* ── FOUNDER ───────────────────────────────────────────────────────────── */
   founder: {
+    /* ⚠ NO `role` OR NAME FIELD HERE. Removed 2026-09-08.
+
+       The card used to open with a "Founder" label and "Surpaul Cottrell" as
+       its own heading — directly under the section h2, which already reads
+       "Surpaul Cottrell — also known as Beast." His name appeared twice within
+       about forty pixels, and "Founder" is the first word of the paragraph
+       underneath it.
+
+       The card is now the bio and the closing line. The section heading names
+       him; the card says what he does. */
     tag: "Who's behind it",
     h2: 'Surpaul Cottrell — also known as Beast.',
     lines: [
@@ -235,8 +245,16 @@ export const funnel = {
      itself. `costAnswer` below is the shape; `{levels}`, `{bundle}`,
      `{savings}` and `{refund}` are substituted at render time. */
   faq: {
-    tag: 'Before you start',
-    h2: 'Questions people ask.',
+    /* ⚠ null, not a string. Changed 2026-09-08 — the section is now titled
+       "Frequently Asked Questions", which already says what the eyebrow said.
+       "Before you start" above "Frequently Asked Questions" is two labels for
+       one thing.
+
+       The component skips the eyebrow when this is null rather than rendering
+       an empty <p>, so the heading sits at the top of the section with no gap
+       where a label used to be. */
+    tag: null as string | null,
+    h2: 'Frequently Asked Questions',
     items: [
       { q: 'Is GWOP University a credit repair company?',
         a: "No. We're a financial education platform. We teach you how credit "

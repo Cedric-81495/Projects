@@ -81,6 +81,25 @@ export const funnel = {
     ],
   },
 
+  /* ⚠ WHAT ONE LEVEL BUYS. Added 2026-09-08 with per-level entitlement
+     (0014_per_level_access.sql).
+
+     Each level now grants that level only — which is what makes the memo's
+     "I want the full GWOP University bundle to clearly be the best deal" true.
+     Before, Level 4 at $497 unlocked all four and the $997 bundle had nothing
+     to sell.
+
+     But that is a material term of a $197–$497 purchase and the page said
+     nothing about it. A reader looking at four priced cards has no way to know
+     whether buying Level 3 also opens 1 and 2 — and the natural assumption is
+     that it does, since the pathway is presented in order.
+
+     Sits under the four cards rather than on each one: it applies to all of
+     them, and repeating it four times reads as a warning rather than a term. */
+  levelNote:
+    'Each level is sold on its own — buying one level opens that level. '
+    + 'The bundle opens all four.',
+
   /* ── PATHWAY ───────────────────────────────────────────────────────────────
      Heading and lede are PATHWAY_HEADING / PATHWAY_LEDE in content/pathway.ts.
 

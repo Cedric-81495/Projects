@@ -1411,3 +1411,13 @@
   line-height: 1.5;
   color: var(--stone);
 }
+
+/* What a single level buys — sits between the four cards and the bundle, which
+   is the order a reader meets the two options in. Secondary contrast: it is a
+   term, not a warning. */
+.fn-levelnote {
+  margin-top: 20px;
+  font-family: var(--ui);
+  font-size: 13px;
+  color: var(--stone);
+}

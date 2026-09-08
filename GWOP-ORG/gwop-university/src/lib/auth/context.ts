@@ -18,7 +18,8 @@ export interface AuthContext {
   email: string
   roles: AppRole[]
   role: AppRole // highest held
-  enrolledLevel: number // 0–4
+  enrolledLevel: number // 0–4, display only — see policy.ts
+  enrolledLevels: readonly number[] // the access decision
   db: SupabaseClient<Database> // RLS-bound, use this for all queries
   channel: 'web' | 'mobile'
 }
@@ -50,9 +51,15 @@ export async function getAuthContext(req: Request): Promise<AuthContext | null> 
   const { data: userData, error } = await db.auth.getUser()
   if (error || !userData.user) return null
 
-  const [{ data: roleRows }, { data: level }] = await Promise.all([
+  /* ⚠ BOTH RPCs, and they answer different questions. Added enrolled_levels
+     2026-09-08 — max_enrolled_level is "how far have they got" and is still
+     right for display, but it cannot express Level 1 + Level 3 with no Level
+     2, which per-level entitlement makes possible. In parallel, so this costs
+     one round trip rather than two on venue cellular. */
+  const [{ data: roleRows }, { data: level }, { data: levels }] = await Promise.all([
     db.from('user_roles').select('role').eq('user_id', userData.user.id),
     db.rpc('max_enrolled_level', { uid: userData.user.id }),
+    db.rpc('enrolled_levels', { uid: userData.user.id }),
   ])
 
   const roles = (roleRows?.map((r) => r.role) ?? ['student']) as AppRole[]
@@ -67,6 +74,10 @@ export async function getAuthContext(req: Request): Promise<AuthContext | null> 
     roles,
     role,
     enrolledLevel: typeof level === 'number' ? level : 0,
+    /* Empty array, never undefined. requireLevel() calls .includes() on it, so
+       an undefined here would throw a TypeError inside an auth check — which
+       fails as a 500 rather than a clean 403 and tells the caller nothing. */
+    enrolledLevels: Array.isArray(levels) ? (levels as number[]) : [],
     db,
     channel,
   }
@@ -98,10 +109,15 @@ export async function requireRole(req: Request, minimum: AppRole): Promise<AuthC
  */
 export async function requireLevel(req: Request, level: number): Promise<AuthContext> {
   const ctx = await requireAuth(req)
-  if (ctx.enrolledLevel < level) {
+  /* ⚠ SET MEMBERSHIP. Was `ctx.enrolledLevel < level`, which granted every
+     level below the highest one held. Access is per-level now — see
+     0014_per_level_access.sql and canAccessLevel() in access/policy.ts. All
+     three layers use the same rule so the API, the UI and RLS cannot
+     disagree. */
+  if (!ctx.enrolledLevels.includes(level)) {
     throw new ApiError(403, 'not_enrolled', 'This level is not part of your enrollment yet.', {
       requiredLevel: level,
-      currentLevel: ctx.enrolledLevel,
+      enrolledLevels: ctx.enrolledLevels,
     })
   }
   return ctx

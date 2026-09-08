@@ -51,6 +51,14 @@ export async function GET(req: Request) {
   const { data: userData } = await supabase.auth.getUser()
   if (!userData.user) return new NextResponse('Not found', { status: 404 })
 
+  /* ⚠ enrolled_levels, not max_enrolled_level. This route signs download URLs
+     for lesson worksheets, so it is an access decision, not a display value.
+     Under per-level entitlement (0014) a student holding Level 3 has no claim
+     on the Level 1 workbook — and with the old `>= level` check they could
+     have downloaded it. */
+  const { data: levels } = await supabase.rpc('enrolled_levels', {
+    uid: userData.user.id,
+  })
   const { data: enrolled } = await supabase.rpc('max_enrolled_level', {
     uid: userData.user.id,
   })
@@ -60,6 +68,7 @@ export async function GET(req: Request) {
     userId: userData.user.id,
     role: 'student',
     enrolledLevel: typeof enrolled === 'number' ? enrolled : 0,
+    enrolledLevels: Array.isArray(levels) ? (levels as number[]) : [],
   }
 
   /* `free` is belt and braces. A free module should never carry a bucket key in

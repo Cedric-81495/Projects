@@ -31,13 +31,19 @@ export default async function LevelPage(
   const supabase = await createServerSupabase()
   const { data: userData } = await supabase.auth.getUser()
   const userId = userData.user?.id ?? ''
-  const { data: enrolled } = await supabase.rpc('max_enrolled_level', { uid: userId })
+  /* Both: max for the "you have reached" copy, the array for the gate. See
+     0014_per_level_access.sql. */
+  const [{ data: enrolled }, { data: levels }] = await Promise.all([
+    supabase.rpc('max_enrolled_level', { uid: userId }),
+    supabase.rpc('enrolled_levels', { uid: userId }),
+  ])
 
   const levelNumber = LEVELS.find(l => l.slug === level)?.level ?? 99
   const access: AccessState = {
     userId,
     role: 'student',
     enrolledLevel: typeof enrolled === 'number' ? enrolled : 0,
+    enrolledLevels: Array.isArray(levels) ? (levels as number[]) : [],
   }
   const unlocked = canAccessLevel(access, levelNumber)
 

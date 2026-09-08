@@ -198,6 +198,8 @@ export function PathwayAndBundle() {
         ))}
       </div>
 
+      <p className="fn-levelnote">{funnel.levelNote}</p>
+
       {/* ── THE BUNDLE — the primary offer, per Surpaul's memo ───────────── */}
       <div className="fn-offer-card">
         <div className="fn-offer-card__body">
@@ -223,7 +225,12 @@ export function PathwayAndBundle() {
           <p className="fn-offer-price">{priceLabel(BLUEPRINT_BUNDLE.oneTime)}</p>
           {BLUEPRINT_BUNDLE.monthly !== null && (
             <p className="fn-offer-note">
-              or {BLUEPRINT_BUNDLE.planMonths} payments of{' '}
+              {/* ⚠ "monthly" is from the memo — "3 monthly payments of $397".
+                  The approved mockup said "3 payments of $397", written before
+                  his final direction. Without the cadence a reader does not
+                  know whether that is three weeks or three months, on a plan
+                  that totals $1,191. */}
+              or {BLUEPRINT_BUNDLE.planMonths} monthly payments of{' '}
               {fmtMoney(BLUEPRINT_BUNDLE.monthly)}
               {/* ⚠ THE PLAN TOTAL IS STATED, per Surpaul's memo §1 — "Total on
                   payment plan: $1,191". The plan costs $194 more than paying

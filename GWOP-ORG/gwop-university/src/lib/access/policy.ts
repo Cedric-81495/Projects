@@ -21,11 +21,26 @@ export type AppRole = (typeof ROLES)[number]
 
 const ROLE_RANK: Record<AppRole, number> = { student: 10, staff: 20, admin: 30, owner: 40 }
 
+/* ⚠ `label` IS WHAT THE PORTAL NAV AND PathwayRail RENDER, and it was missed
+   by 0013. That migration renamed university_levels, courses and (in 0016)
+   membership_plans — but this constant is hardcoded, so the student area kept
+   showing FRESHMAN / SOPHOMORE / JUNIOR / SENIOR while every other surface
+   said Level 1-4.
+
+   ⚠ `slug` AND `sku` DO NOT CHANGE. The slugs are the level_slug enum, the
+   /app/[level] URLs students have bookmarked, and the 0007 course slugs. The
+   SKUs are matched by seed-stripe.mts and by Stripe product metadata already
+   created against them. A display name and an identifier are allowed to
+   differ — that is what `label` is for.
+
+   Kept short here on purpose: this renders in a horizontal nav bar and a
+   compact rail, so "Level 1" fits where "Level 1 — Personal Credit" would
+   wrap. The full title lives in content/pathway.ts as `title`. */
 export const LEVELS = [
-  { level: 1, slug: 'freshman', label: 'Freshman', sku: 'GWOPU-FRESHMAN' },
-  { level: 2, slug: 'sophomore', label: 'Sophomore', sku: 'GWOPU-SOPHOMORE' },
-  { level: 3, slug: 'junior', label: 'Junior', sku: 'GWOPU-JUNIOR' },
-  { level: 4, slug: 'senior', label: 'Senior', sku: 'GWOPU-SENIOR' },
+  { level: 1, slug: 'freshman', label: 'Level 1', sku: 'GWOPU-FRESHMAN' },
+  { level: 2, slug: 'sophomore', label: 'Level 2', sku: 'GWOPU-SOPHOMORE' },
+  { level: 3, slug: 'junior', label: 'Level 3', sku: 'GWOPU-JUNIOR' },
+  { level: 4, slug: 'senior', label: 'Level 4', sku: 'GWOPU-SENIOR' },
 ] as const
 
 export type LevelSlug = (typeof LEVELS)[number]['slug']

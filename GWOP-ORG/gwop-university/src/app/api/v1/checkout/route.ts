@@ -1,18 +1,46 @@
+import { headers } from 'next/headers'
 import { route } from '@/lib/http/handler'
 import { createCheckoutSchema } from '@/lib/validation/schemas'
 import { createCheckoutSession } from '@/lib/stripe/checkout'
+import { currentAck } from '@/config/purchase'
+import { ApiError } from '@/lib/http/errors'
 
-/**
- * POST /api/v1/checkout — returns a Stripe Checkout URL.
- *
- * Both clients open this URL in a browser (mobile uses an in-app browser /
- * ASWebAuthenticationSession rather than a webview, which is both an App Store
- * requirement and better for the customer's saved-card autofill).
- *
- * Access is NOT granted here. This endpoint's only job is to start a payment.
- * The webhook decides whether anything was bought.
- */
 export const POST = route(
   { auth: 'student', limit: 'checkout', body: createCheckoutSchema },
-  async ({ ctx, body }) => createCheckoutSession(ctx!, body),
+  async ({ ctx, body }) => {
+    const ack = currentAck()
+
+    /* ⚠ THE VERSION MUST MATCH WHAT THE SERVER IS CURRENTLY SHOWING.
+
+       The browser tells us which wording it rendered. If it does not match the
+       current one, the tab is stale — the wording changed after the page
+       loaded. Recording agreement to a superseded sentence is worse than
+       failing: it produces a record that looks valid and is not.
+
+       409 rather than 422: nothing the buyer typed is wrong, the page is out
+       of date. The client reloads and they see the current wording. */
+    if (body.ack_version !== ack.version) {
+      throw new ApiError(
+        409,
+        'stale_acknowledgement',
+        'The purchase terms have been updated. Please reload the page and review them again.',
+        { expected: ack.version },
+      )
+    }
+
+    /* Captured here rather than in checkout.ts because request headers are
+       only available in the route. Same shape as the SMS consent record on
+       `leads`, deliberately — one pattern for both, so a dispute and a consent
+       query read alike. */
+    const h = await headers()
+    const ip =
+      h.get('x-real-ip') ?? h.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null
+
+    return createCheckoutSession(ctx!, body, {
+      text: ack.text,
+      version: ack.version,
+      ip: ip && ip !== '0.0.0.0' ? ip : null,
+      userAgent: h.get('user-agent')?.slice(0, 500) ?? null,
+    })
+  },
 )

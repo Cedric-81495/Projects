@@ -20,6 +20,15 @@ import { logger } from '@/lib/observability/logger'
 export async function createCheckoutSession(
   ctx: AuthContext,
   input: { plan_sku: string; idempotency_key: string; return_path: string },
+  /* What the buyer was shown and agreed to, resolved server-side in the route.
+     Passed in rather than read here so this function stays free of request
+     context and remains callable from a job or a test. */
+  ack: {
+    text: string
+    version: string
+    ip: string | null
+    userAgent: string | null
+  },
 ) {
   const { data: plan } = await admin
     .from('membership_plans')
@@ -63,6 +72,21 @@ export async function createCheckoutSession(
       status: 'pending',
       idempotency_key: input.idempotency_key,
       stripe_customer_id: customerId,
+
+      /* ⚠ WRITTEN BEFORE STRIPE IS CALLED, ON PURPOSE.
+
+         The acknowledgement is recorded at the moment they agreed, not when
+         the payment settled. If they tick the box and then abandon Stripe
+         Checkout, the row stays `pending` and carries the acknowledgement —
+         which is correct: they did agree, they just did not pay.
+
+         Recording it after payment would mean a disputed charge where the
+         acknowledgement is missing because the webhook failed. */
+      ack_text: ack.text,
+      ack_version: ack.version,
+      ack_at: new Date().toISOString(),
+      ack_ip: ack.ip,
+      ack_user_agent: ack.userAgent,
     })
     .select('id')
     .single()

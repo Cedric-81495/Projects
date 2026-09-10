@@ -83,6 +83,22 @@ export const createCheckoutSchema = z
       .startsWith('/', 'Relative paths only.')
       .max(200)
       .default('/dashboard'),
+
+    /* ── THE NO-REFUND ACKNOWLEDGEMENT ──────────────────────────────────────
+       ⚠ literal(true), NOT boolean(). A `boolean` would accept `false` and
+       silently create a purchase with no acknowledgement — exactly the record
+       we would need in a dispute and would not have. This makes an untickeded
+       box a 422 at the schema, before any Stripe call.
+
+       ⚠ THE VERSION IS SENT BY THE CLIENT AND RE-CHECKED SERVER-SIDE. It is
+       here so the server knows which wording the browser actually rendered —
+       if a stale tab shows v1 while the server has moved to v2, we would
+       otherwise record agreement to a sentence they never saw. The route
+       rejects a mismatch rather than trusting either side. */
+    ack_accepted: z.literal(true, {
+      errorMap: () => ({ message: 'You must acknowledge the terms to continue.' }),
+    }),
+    ack_version: z.string().trim().min(1).max(40),
   })
   .strict()
 

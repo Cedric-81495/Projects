@@ -329,7 +329,35 @@
 .mbprice{font-family:var(--display); font-size:30px; font-weight:700; color:var(--emerald); margin:12px 0 4px}
 .mbprice sub{font-family:var(--body); font-size:13px; font-weight:500; color:var(--muted); vertical-align:baseline}
 .mbincl{font-size:13px; color:var(--gold-ink); letter-spacing:.04em; margin:0 0 20px}
-.mbbtn{margin-top:auto; width:100%}
+/* ── PURCHASE ACKNOWLEDGEMENT ──────────────────────────────────────────────
+   The no-refund tick, sat directly above the enrol button.
+
+   ⚠ margin-top:auto MOVED HERE FROM .mbbtn. That property is what pushes the
+   action to the bottom of a flex card so buttons line up across a row of
+   plans of differing height. The acknowledgement is now the last block before
+   the button, so it has to carry the push — leaving it on .mbbtn would strand
+   the tick mid-card with the button below it.
+
+   Not dimmed. This is the sentence a buyer is agreeing to, and small grey
+   print above a payment button is the shape of something written not to be
+   read — the opposite of what it is for. */
+.mback{
+  margin-top:auto; display:flex; gap:10px; align-items:flex-start;
+  background:var(--sand,#F8F5EE); border:1px solid var(--line);
+  border-radius:9px; padding:12px 13px; margin-bottom:12px;
+  font-size:13px; line-height:1.5; color:var(--ink); cursor:pointer;
+}
+/* 20px and never smaller. A missed tap on the one control that has to be a
+   deliberate act is worse than a slightly heavy checkbox — the same reasoning
+   as the SMS consent box on the signup form. */
+.mback input{
+  width:20px; height:20px; min-width:20px; margin:1px 0 0;
+  accent-color:var(--emerald); cursor:pointer;
+}
+.mback:hover{border-color:var(--gold)}
+.mback:focus-within{outline:2px solid var(--gold); outline-offset:2px}
+
+.mbbtn{width:100%}
 .mbowned{
   margin-top:auto; text-align:center; font-size:13px; font-weight:700;
   letter-spacing:.12em; text-transform:uppercase; color:var(--emerald);

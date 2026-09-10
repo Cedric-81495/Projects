@@ -27,9 +27,19 @@ export default async function MembershipPage() {
     .select('id, sku, name, description, grants_level, amount_cents, currency, billing')
     .order('sort_order')
 
-  const enrolled = userData.user
-    ? ((await supabase.rpc('max_enrolled_level', { uid: userData.user.id })).data as number) ?? 0
-    : 0
+  /* ⚠ enrolled_levels, NOT max_enrolled_level. Changed 2026-09-10.
+
+     `owned` was computed as `enrolled >= plan.grants_level`, which is the same
+     ceiling assumption that 0014 removed from the access policies. Under
+     per-level entitlement it is wrong in a way that costs money: somebody who
+     buys Level 3 alone holds one enrollment at level 3, so the maximum is 3 —
+     and Levels 1 and 2 would render as "You're enrolled" when they own
+     neither. They cannot buy what they need and nothing reports an error.
+
+     The bundle still shows all four as owned, because it writes four rows. */
+  const enrolledLevels = userData.user
+    ? (((await supabase.rpc('enrolled_levels', { uid: userData.user.id })).data as number[]) ?? [])
+    : []
 
   /* This page had NO header and NO footer — no layout in the (marketing) group
      and none imported here. Someone arriving from a locked level in the portal
@@ -75,7 +85,9 @@ export default async function MembershipPage() {
               <PlanCard
                 key={plan.id}
                 plan={plan}
-                owned={enrolled >= plan.grants_level}
+                /* Set membership. A plan is owned when its granted level is
+                   actually held — not when a higher one is. */
+                owned={enrolledLevels.includes(plan.grants_level)}
                 signedIn={Boolean(userData.user)}
               />
             ))}

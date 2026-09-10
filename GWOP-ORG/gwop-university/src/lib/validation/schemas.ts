@@ -95,8 +95,10 @@ export const createCheckoutSchema = z
        if a stale tab shows v1 while the server has moved to v2, we would
        otherwise record agreement to a sentence they never saw. The route
        rejects a mismatch rather than trusting either side. */
+    /* ⚠ `message`, not `errorMap`. Zod 4 removed errorMap in favour of a plain
+       message or an `error` function — the project is on zod ^4.1.0. */
     ack_accepted: z.literal(true, {
-      errorMap: () => ({ message: 'You must acknowledge the terms to continue.' }),
+      message: 'You must acknowledge the terms to continue.',
     }),
     ack_version: z.string().trim().min(1).max(40),
   })

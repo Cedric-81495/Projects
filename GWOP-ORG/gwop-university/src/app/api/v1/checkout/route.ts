@@ -20,11 +20,17 @@ export const POST = route(
        409 rather than 422: nothing the buyer typed is wrong, the page is out
        of date. The client reloads and they see the current wording. */
     if (body.ack_version !== ack.version) {
+      /* ⚠ 'conflict', not a new code. ErrorCode in lib/http/errors.ts is a
+         closed union and 'conflict' is exactly what a 409 means here — the
+         request is well-formed, the client's view of the world is out of date.
+         Widening the union for one call site would make every consumer of
+         ErrorCode handle a case that means the same thing. The specifics go in
+         `details`, which is what it is for. */
       throw new ApiError(
         409,
-        'stale_acknowledgement',
+        'conflict',
         'The purchase terms have been updated. Please reload the page and review them again.',
-        { expected: ack.version },
+        { reason: 'stale_acknowledgement', expected: ack.version },
       )
     }
 

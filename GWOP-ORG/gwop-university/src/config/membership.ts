@@ -116,7 +116,24 @@ export const LEVELS = [
 export const BLUEPRINT_BUNDLE = {
   sku: 'GWOPU-BLUEPRINT-ALL',
   oneTime: 997 as number | null,
-  monthly: 397 as number | null,
+  /* ⚠ NULLED 2026-09-11 — THE PLAN IS TBD AND WAS BEING ADVERTISED.
+     Surpaul's memo §1 states it: "3 monthly payments of $397. Total on payment
+     plan: $1,191." The funnel was printing that, and there was no way to pay it.
+
+     Nothing exists behind the offer. seed-stripe.mts creates five ONE-TIME
+     prices and no recurring one; there is no membership_plans row with
+     billing = 'subscription'; nothing anywhere inserts into `subscriptions`.
+     A buyer could read a specific price and a specific access policy and find
+     no route to either — on the same card as the no-refund line.
+
+     ⚠ RESTORING IT IS NOT PUTTING 397 BACK. Read the build note under
+     `planNote` before you do. The memo rules out the thing a bare Stripe
+     subscription would give you.
+
+     Set to 397 again only when the plan can actually be bought. Every surface
+     reads this value, so one edit turns the offer on everywhere at once — which
+     is exactly why it must not be turned on ahead of the mechanism. */
+  monthly: null as number | null,
   planMonths: 3,
   /* ⚠ ADDED 2026-09-08 from Surpaul's memo §1. He states the plan total
      explicitly — "Total on payment plan: $1,191" — and the funnel was showing
@@ -142,6 +159,72 @@ export const BLUEPRINT_BUNDLE = {
      payment is taken. */
   planNote: 'Access continues while payments are current and pauses if they stop.',
 } as const
+
+/* ══ BEFORE YOU BUILD THE PAYMENT PLAN ══════════════════════════════════════
+   Written down because the memo and a default Stripe subscription look like
+   the same product and are not.
+
+   ── WHAT HE ASKED FOR ────────────────────────────────────────────────────
+   §1, both halves, and the second half is the one that gets missed:
+
+     "3 monthly payments of $397. Total on payment plan: $1,191."
+     "I do NOT want a traditional endless monthly subscription required just to
+      keep accessing the course right now. The core product should be a
+      purchase."
+
+   So it is a FIXED INSTALMENT — three charges and it is paid off — not a
+   recurring plan. Seed a $397 recurring price, point checkout at it, and you
+   have built the exact thing he ruled out. Payment four then lands on somebody
+   who has already paid in full.
+
+   Stripe's mechanism for stopping is a subscription schedule: one phase,
+   `iterations: 3`, `end_behavior: 'cancel'`, created in the
+   checkout.session.completed handler. Without it the subscription runs forever.
+
+   ── THE TRAP IN THE WEBHOOK ──────────────────────────────────────────────
+   ⚠ customer.subscription.deleted SETS expires_at ON THE BUYER'S ENROLLMENTS.
+
+   When the third payment completes and the schedule ends the subscription,
+   that branch fires and revokes access from the person who just finished
+   paying $1,191. Correct for a cancellation, catastrophic for a completion —
+   and today the two are indistinguishable to that code. Whatever tracks
+   payments made has to exist BEFORE the recurring price does.
+
+   ── THE DECISION THAT IS NOT A DEVELOPER'S ───────────────────────────────
+   "If payments stop, access pauses." A pause implies it can resume. The code
+   expires access at the end of the paid period, which is termination. They are
+   different products:
+
+     · PAUSE — miss payment two, pay a month later, access returns and one
+       payment is still owed. Needs a resume path, retry handling, dunning, and
+       a state that is neither active nor expired.
+     · EXPIRE — a missed payment ends it, they have paid $794 for nothing, and
+       the no-refund policy is what they meet when they complain. That is a
+       chargeback with a sympathetic story attached.
+
+   His word is "pauses". Put the second version in front of him before building
+   either, and put both in front of counsel with the CROA question — instalment
+   billing for credit-related services is squarely what CROA regulates.
+
+   ── WHAT IS ALREADY DONE, SO NOBODY REBUILDS IT ──────────────────────────
+   · lib/stripe/checkout.ts already branches on plan.billing and passes
+     mode: 'subscription'.
+   · grant_enrollments_for_payment already writes source = 'subscription' when
+     billing = 'subscription' — which is what the pause branch keys on.
+   · The `subscriptions` table exists (0004_commerce.sql).
+
+   ── WHAT IS MISSING ──────────────────────────────────────────────────────
+   · A membership_plans row with billing = 'subscription'. Suggest
+     GWOPU-BLUEPRINT-PLAN, grants_level 4, grants_cumulative true — a second
+     way to buy the bundle, not a fifth product, so the funnel still shows one
+     bundle card with two payment options.
+   · A recurring price in scripts/seed-stripe.mts.
+   · The subscription schedule that stops it at three.
+   · An INSERT into `subscriptions`. Nothing writes that table today, so the
+     pause branch updates zero rows and cannot fire at all.
+   · A completion branch that runs BEFORE the deletion branch: three paid means
+     permanent, expires_at = null, never touched again.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── WHAT THE PLATFORM MUST SUPPORT (Felicia §1) ───────────────────────────
    Flags, not features. Each one is off until the business decides to activate

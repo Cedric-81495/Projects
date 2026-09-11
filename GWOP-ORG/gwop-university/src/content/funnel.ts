@@ -320,10 +320,20 @@ export const funnel = {
   },
 
   /* Token-substituted so the numbers come from config/membership.ts. */
+  /* ⚠ `{plan}` REPLACED A HARDCODED ", with a 3-payment plan available" ON
+     2026-09-11. That clause was plain text in the middle of a token-substituted
+     sentence, so when the plan was withdrawn from the bundle card it stayed
+     here — the offer gone from one surface and still promised on another, in
+     the answer to the question "What does it cost?".
+
+     It now resolves from BLUEPRINT_BUNDLE.monthly like every other number on
+     this page, and renders as nothing while that is null. Do not write a price
+     or a payment term into this string directly; tokens are what keep the FAQ
+     from disagreeing with the card above it. */
   costAnswer:
     'Your first assessment and Blueprint are free. Each level runs {levels} '
     + 'depending on depth, or get all four for {bundle} as a bundle (a {savings} '
-    + 'savings), with a 3-payment plan available. {refund} so we\'ll walk through '
+    + 'savings){plan}. {refund} so we\'ll walk through '
     + 'which level actually fits before you decide — no pressure on the call.',
 
   /* ── FINAL CTA ─────────────────────────────────────────────────────────────

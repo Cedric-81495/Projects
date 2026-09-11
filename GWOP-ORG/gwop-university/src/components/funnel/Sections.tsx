@@ -395,7 +395,19 @@ export function Bundle() {
 
           {/* His words, §1. The condition that matters most to whoever picks
               the plan, and it was only in the memo. */}
-          <p className="fn-offer-plannote">{BLUEPRINT_BUNDLE.planNote}</p>
+          {/* ⚠ GATED ON `monthly`, NOT RENDERED UNCONDITIONALLY. Fixed
+              2026-09-11.
+
+              This sentence describes what happens to access when PLAN payments
+              stop. With the plan withdrawn there are no plan payments, so on
+              its own it reads as a condition attached to the $997 one-time
+              purchase — telling a buyer their access can pause when it cannot.
+
+              It sat outside the guard above it, so nulling the price removed
+              the offer and left its terms behind. Same value, same guard. */}
+          {BLUEPRINT_BUNDLE.monthly !== null && (
+            <p className="fn-offer-plannote">{BLUEPRINT_BUNDLE.planNote}</p>
+          )}
 
           {/* ⚠ POINTS AT #choose, NOT AT A CHECKOUT — which is what the mockup
               does, and the only honest destination today. Checkout is gated
@@ -684,6 +696,15 @@ export function Faq() {
     .replace('{levels}', range ?? 'a price announced soon')
     .replace('{bundle}', priceLabel(BLUEPRINT_BUNDLE.oneTime))
     .replace('{savings}', saving !== null ? fmtMoney(saving) : 'a')
+    /* Empty string while the plan is withdrawn, so the sentence closes cleanly
+       after the savings bracket. The comma lives in the token rather than the
+       template — leaving it in the template would strand ", ." mid-sentence. */
+    .replace(
+      '{plan}',
+      BLUEPRINT_BUNDLE.monthly !== null
+        ? `, with a ${BLUEPRINT_BUNDLE.planMonths}-payment plan available`
+        : '',
+    )
     .replace('{refund}', REFUND_POLICY.text)
 
   return (

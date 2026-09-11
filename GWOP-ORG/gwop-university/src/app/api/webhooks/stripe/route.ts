@@ -303,12 +303,48 @@ async function processEvent(event: Stripe.Event) {
         .eq('stripe_subscription_id', sub.id)
 
       // Access ends when the paid period ends, not the moment someone cancels.
+      /* ⚠ THIS BRANCH CANNOT TELL A CANCELLATION FROM A COMPLETED PLAN, AND
+         THE DIFFERENCE IS SOMEBODY'S $1,191.
+
+         Surpaul's memo §1 defines the plan as three payments, not a recurring
+         subscription. A fixed instalment ENDS by design — the schedule that
+         stops it at three emits customer.subscription.deleted with status
+         `canceled`, which is byte-for-byte what a genuine cancellation emits.
+         Reaching the code below in that case sets expires_at on the
+         enrollments of the buyer who just finished paying in full.
+
+         ⚠ THE GUARD IS A HOLD, NOT THE FIX. Nothing inserts into
+         `subscriptions` anywhere in this codebase, so `row` is always null
+         today and the update never runs — the path is dormant, not safe. The
+         moment somebody adds that insert to build the plan, this branch goes
+         live with the bug in it. So it refuses to act unless a row exists AND
+         that row records fewer payments than the plan required.
+
+         The real fix is a completion branch ahead of this one: three paid means
+         permanent, expires_at = null, never touched again. See the build note
+         under BLUEPRINT_BUNDLE in config/membership.ts. */
       if (['canceled', 'unpaid', 'incomplete_expired'].includes(sub.status)) {
         const { data: row } = await admin
           .from('subscriptions')
-          .select('user_id')
+          .select('user_id, payments_made, payments_required')
           .eq('stripe_subscription_id', sub.id)
           .maybeSingle()
+
+        const completed =
+          row?.payments_required != null &&
+          (row?.payments_made ?? 0) >= row.payments_required
+
+        if (completed) {
+          /* Paid in full. Access is theirs — say so in the log rather than
+             failing silently, because a plan completing is the event most
+             likely to be mistaken for this handler doing nothing. */
+          logger.info('subscription_plan_completed', {
+            subscriptionId: sub.id,
+            paymentsMade: row?.payments_made,
+          })
+          return
+        }
+
         if (row) {
           await admin
             .from('enrollments')

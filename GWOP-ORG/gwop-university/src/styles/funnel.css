@@ -348,13 +348,24 @@
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 .fn-path-card { padding: 0 20px; position: relative; }
-/* Only correct while all four sit on one row — it pulls card 1 flush with the
-   section edge. Below 860px the grid is 2x2, so card 3 starts a new left
-   column and would keep its 20px while card 1 has none. Reset per breakpoint
-   instead; see the 860px block. */
-@media (min-width: 861px) {
-  .fn-path-card:first-child { padding-left: 0; }
-}
+/* ⚠ REMOVED 2026-09-11. Kept as a comment because the reasoning below is still
+   correct for the layout it was written for, and someone reinstating the
+   timeline will want it.
+
+   It pulled card 1 flush with the section edge — right for bare columns under
+   one gold rule, wrong the moment the cards gained a border. The first card
+   had no left padding while its three siblings had 24px, so its copy sat on
+   its own border and only card 1 looked broken.
+
+   ⚠ AND IT COULD NOT BE FIXED BY EDITING .fn-path-card. `.fn-path-card:first-
+   child` is a more specific selector, so it won over the later padding
+   shorthand no matter where that rule appeared in the file. Raising the card
+   padding moved the other three and left this one exactly where it was, which
+   is why the first pass looked like it had done nothing.
+
+   @media (min-width: 861px) {
+     .fn-path-card:first-child { padding-left: 0; }
+   } */
 .fn-path-card .fn-dot {
   width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
   margin-bottom: 22px; position: relative; z-index: 2;

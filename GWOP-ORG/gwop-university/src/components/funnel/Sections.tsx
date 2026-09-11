@@ -24,10 +24,13 @@ import type { ReactNode } from 'react'
 import { site, legal } from '@/content/site'
 import { funnel } from '@/content/funnel'
 import { RESULTS, resultsPublishable } from '@/content/results'
-import { PATHWAY, PATHWAY_HEADING, PATHWAY_LEDE } from '@/content/pathway'
+import {
+  PATHWAY, PATHWAY_HEADING, PATHWAY_LEDE, CAPSTONE,
+  lessonsIn, TOTAL_MODULES, TOTAL_LESSONS, TOTAL_DOWNLOADS,
+} from '@/content/pathway'
 import {
   LEVELS, BLUEPRINT_BUNDLE, REFUND_POLICY,
-  oneTimeLabel, priceLabel, separateTotal, planTotal, fmtMoney,
+  oneTimeLabel, priceLabel, separateTotal, planTotal, fmtMoney, bundleSavings,
 } from '@/config/membership'
 import { Tbc } from '@/components/Chrome'
 
@@ -187,16 +190,70 @@ export function PathwayAndBundle() {
 
       <div className="fn-path-row">
         {PATHWAY.map(l => (
-          <div className="fn-path-card" key={l.slug}>
-            <div className="fn-dot" />
-            <p className="fn-class">{l.label}</p>
+          <article className="fn-path-card" key={l.slug}>
+            <p className="fn-class">{l.eyebrow}</p>
             <h3>{l.goal}</h3>
-            <p className="fn-lvl">{l.title}</p>
-            <p>{l.detail}</p>
-            <p className="fn-price">{oneTimeLabel(LEVEL_PRICE[l.slug])}</p>
-          </div>
+            <p className="fn-path-sub">{l.detail}</p>
+
+            <ul className="fn-path-mods">
+              {l.modules.map(m => (
+                <li key={m.title}>
+                  <span className="fn-mod-title">{m.title}</span>
+                  {/* Pluralised rather than "1 lessons". Cheap, and the kind
+                      of thing that reads as carelessness on a sales page. */}
+                  <span className="fn-mod-count">
+                    {m.lessons} {m.lessons === 1 ? 'lesson' : 'lessons'}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="fn-path-dlhead">Downloads</p>
+            <ul className="fn-path-dls">
+              {l.downloads.map(d => <li key={d}>{d}</li>)}
+            </ul>
+
+            {/* Memo §8 — the line that makes the capstone feel earned rather
+                than bolted on. Each level visibly completes a section. */}
+            <p className="fn-path-bp">
+              Completes <strong>{l.blueprintSection}</strong> in the GWOP Blueprint
+            </p>
+
+            <div className="fn-path-foot">
+              <p className="fn-price">{oneTimeLabel(LEVEL_PRICE[l.slug])}</p>
+              <p className="fn-path-counts">
+                {l.modules.length} modules
+                <br />
+                {lessonsIn(l)} lessons
+              </p>
+            </div>
+          </article>
         ))}
       </div>
+
+      {/* ── THE CAPSTONE BAR ────────────────────────────────────────────────
+          Under the four levels, not beside them: it is what they add up to.
+
+          ⚠ EVERY NUMBER HERE IS DERIVED. The saving comes from the same helper
+          the offer card uses, and the three counts are summed from the module
+          data. Nothing in this block can disagree with the cards above it. */}
+      {BLUEPRINT_BUNDLE.oneTime !== null && (
+        <div className="fn-capstone">
+          <div>
+            <p className="fn-capstone-eyebrow">{CAPSTONE.eyebrow}</p>
+            <h3>{CAPSTONE.title}</h3>
+          </div>
+          <div className="fn-capstone-price">
+            <p className="fn-capstone-amount">
+              {oneTimeLabel(BLUEPRINT_BUNDLE.oneTime)}
+            </p>
+            <p className="fn-capstone-meta">
+              {bundleSavings() !== null && <>Save {fmtMoney(bundleSavings()!)} · </>}
+              {TOTAL_MODULES} modules · {TOTAL_LESSONS} lessons · {TOTAL_DOWNLOADS} downloads
+            </p>
+          </div>
+        </div>
+      )}
 
       <p className="fn-levelnote">{funnel.levelNote}</p>
 

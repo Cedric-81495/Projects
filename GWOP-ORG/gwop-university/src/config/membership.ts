@@ -320,6 +320,69 @@ export function planTotal(): number | null {
   return BLUEPRINT_BUNDLE.monthly * BLUEPRINT_BUNDLE.planMonths
 }
 
+/* ══ IS THE BUNDLE STILL THE BEST DEAL? ══════════════════════════════════════
+   ⚠ NOT ALWAYS, AND THAT IS WHY THIS EXISTS.
+
+   Surpaul's memo §1: "I want the full GWOP University bundle to clearly be the
+   best deal." For a new buyer it is — $997 against $1,388 separately.
+
+   But once somebody already owns a level, the bundle re-charges for it. Run
+   the numbers across every combination and the bundle only wins for a buyer
+   who owns nothing, Level 1, or Level 2:
+
+     owns nothing    remaining $1,388   bundle wins
+     owns L1         remaining $1,191   bundle wins
+     owns L2         remaining $1,091   bundle wins
+     owns L3         remaining $  991   bundle LOSES by $6
+     owns L4         remaining $  891   bundle loses
+     owns L1+L2      remaining $  894   bundle loses
+     …and every other combination
+
+   Twelve of fifteen cases. So showing the bundle to an existing customer is
+   often showing them the worse option, which contradicts the instruction it
+   was priced to satisfy.
+
+   ⚠ THE FIX IS TO HIDE IT, NOT TO DISCOUNT IT. Crediting prior spend needs
+   Stripe coupons, a record of what each user has paid, and a decision about
+   whether credit expires — real work for a case that has not happened yet.
+   Hiding the bundle when it is not the best deal satisfies the memo exactly:
+   the bundle is never presented as anything other than the best offer
+   available, because when it is not, it is not presented.
+
+   ⚠ AND IT LEAVES THE BUYER BETTER OFF. Someone who owns Level 3 and buys the
+   remaining three levels separately pays $991 — six dollars less than the
+   bundle, and they are not paying twice for something they own.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Total to buy every level the user does not already hold. */
+export function remainingSeparateTotal(ownedLevels: readonly number[]): number | null {
+  if (!PRICING_PUBLISHED) return null
+  const rest = LEVELS.filter(l => !ownedLevels.includes(l.order))
+  if (rest.length === 0) return 0
+  /* If any remaining level has no price, the comparison cannot be trusted, so
+     it returns null and the caller falls back to showing the bundle. Better a
+     buyer sees one extra option than a comparison built on a missing number. */
+  if (rest.some(l => l.oneTime === null)) return null
+  return rest.reduce((sum, l) => sum + (l.oneTime ?? 0), 0)
+}
+
+/**
+ * Whether the bundle should be offered at all.
+ *
+ * True for a buyer who owns nothing — the normal case, and the one the memo's
+ * pricing table describes. False once buying the remaining levels separately
+ * would cost the same or less.
+ */
+export function bundleIsBestDeal(ownedLevels: readonly number[] = []): boolean {
+  if (BLUEPRINT_BUNDLE.oneTime === null) return false
+  /* Owns all four already — nothing to sell. */
+  if (ownedLevels.length >= LEVELS.length) return false
+  const remaining = remainingSeparateTotal(ownedLevels)
+  /* Unknown remaining total: show it. See the note in remainingSeparateTotal. */
+  if (remaining === null) return true
+  return BLUEPRINT_BUNDLE.oneTime < remaining
+}
+
 /** "$197–$497" — the range the FAQ quotes. */
 export function levelRange(): string | null {
   if (!PRICING_PUBLISHED) return null

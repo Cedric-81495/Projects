@@ -1468,3 +1468,114 @@
   letter-spacing: .04em;
   color: var(--stone);
 }
+/* ══ PATHWAY CARDS — the detailed layout ═══════════════════════════════════
+   Replaces the four short summary cards with module lists, downloads and the
+   Blueprint mapping.
+
+   ⚠ align-items: stretch AND flex on the card. Four cards of differing content
+   height would otherwise leave the price floating mid-card on the short ones.
+   The footer is pushed down with margin-top: auto so the four prices line up
+   across the row however uneven the lists above them are. */
+.fn-path-card {
+  display: flex; flex-direction: column;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(212,175,55,.22);
+  border-radius: 14px; padding: 22px 20px;
+}
+.fn-path-card h3 { font-size: 25px; margin: 2px 0 6px; line-height: 1.15; }
+
+/* The eyebrow carries a long level name, so it wraps rather than truncating —
+   "Level 2 · Business Foundation & Business Credit" on one line would either
+   overflow or force the card wider than its siblings. */
+.fn-path-card .fn-class {
+  font-size: 10.5px; letter-spacing: .1em; line-height: 1.5;
+  margin-bottom: 8px; min-height: 2.4em;
+}
+.fn-path-sub {
+  font-size: 13px; color: var(--stone); line-height: 1.5;
+  padding-bottom: 14px; margin-bottom: 14px;
+  border-bottom: 1px solid rgba(212,175,55,.14);
+}
+
+.fn-path-mods { list-style: none; margin: 0 0 16px; padding: 0; }
+.fn-path-mods li { margin-bottom: 10px; }
+/* Gold bullet drawn rather than list-style, so the title can wrap under itself
+   with a hanging indent instead of under the marker. */
+.fn-mod-title {
+  display: block; font-size: 13.5px; line-height: 1.4; color: var(--ivory);
+  padding-left: 14px; position: relative;
+}
+.fn-mod-title::before {
+  content: '•'; position: absolute; left: 0; color: var(--gold);
+}
+.fn-mod-count {
+  display: block; padding-left: 14px; margin-top: 2px;
+  font-family: var(--ui); font-size: 10.5px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--stone);
+}
+
+.fn-path-dlhead {
+  font-family: var(--ui); font-size: 10px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--stone);
+  padding-top: 12px; border-top: 1px solid rgba(212,175,55,.14); margin-bottom: 8px;
+}
+.fn-path-dls { list-style: none; margin: 0 0 16px; padding: 0; }
+.fn-path-dls li {
+  font-size: 12.5px; line-height: 1.65; color: var(--ivory);
+  padding-left: 14px; position: relative;
+}
+.fn-path-dls li::before {
+  content: '•'; position: absolute; left: 0; color: var(--gold);
+}
+
+.fn-path-bp {
+  font-size: 11.5px; line-height: 1.5; color: var(--stone); margin-bottom: 16px;
+}
+.fn-path-bp strong { color: var(--gold); font-weight: 700; }
+
+/* margin-top: auto is what aligns the prices across four uneven cards. */
+.fn-path-foot {
+  margin-top: auto; padding-top: 14px;
+  border-top: 1px solid rgba(212,175,55,.14);
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+}
+.fn-path-foot .fn-price { font-size: 34px; margin: 0; }
+.fn-path-counts {
+  font-family: var(--ui); font-size: 10.5px; line-height: 1.5;
+  text-align: right; color: var(--stone); margin: 0;
+}
+
+/* ══ CAPSTONE BAR ══════════════════════════════════════════════════════════
+   Gold, full width, under the four cards — it is what they add up to, not a
+   fifth product competing with them. */
+.fn-capstone {
+  margin-top: 26px; border-radius: 14px; padding: 22px 28px;
+  background: linear-gradient(100deg, #C9A227 0%, #E8C75A 45%, #C9A227 100%);
+  color: var(--black);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+}
+.fn-capstone h3 { font-size: 27px; margin: 2px 0 0; color: var(--black); }
+.fn-capstone-eyebrow {
+  font-family: var(--ui); font-size: 10.5px; letter-spacing: .12em;
+  text-transform: uppercase; font-weight: 700;
+  color: rgba(13,40,30,.72); margin: 0;
+}
+.fn-capstone-price { text-align: right; }
+.fn-capstone-amount {
+  font-family: var(--serif); font-size: 42px; line-height: 1;
+  color: var(--black); margin: 0;
+}
+.fn-capstone-meta {
+  font-family: var(--ui); font-size: 10.5px; letter-spacing: .06em;
+  text-transform: uppercase; font-weight: 700;
+  color: rgba(13,40,30,.72); margin: 4px 0 0;
+}
+
+@media (max-width: 860px) {
+  /* Left-aligned when stacked: a right-aligned price under a left-aligned
+     heading reads as a layout fault on a narrow screen. */
+  .fn-capstone { flex-direction: column; align-items: flex-start; }
+  .fn-capstone-price { text-align: left; }
+  .fn-path-card .fn-class { min-height: 0; }
+}

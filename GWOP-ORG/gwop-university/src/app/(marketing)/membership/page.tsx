@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { BrandBar, Footer } from '@/components/Chrome'
 import { PlanCard } from './PlanCard'
+import { BLUEPRINT_BUNDLE, bundleIsBestDeal } from '@/config/membership'
 
 export const metadata: Metadata = {
   title: 'Membership · GWOP University',
@@ -81,7 +82,29 @@ export default async function MembershipPage() {
           </div>
         ) : (
           <div className="mbgrid">
-            {plans.map((plan) => (
+            {plans
+              /* ⚠ HIDES THE BUNDLE WHEN IT IS NO LONGER THE BEST DEAL.
+
+                 Surpaul's memo §1 requires the bundle to "clearly be the best
+                 deal". For a new buyer it is — $997 against $1,388. But it
+                 re-charges for anything already owned, so once somebody holds
+                 Level 3 or higher, buying the remaining levels separately costs
+                 the same or less. In twelve of fifteen ownership combinations
+                 the bundle is the worse option.
+
+                 So it is offered only while it wins. Anyone past that point
+                 sees the individual levels they actually need, at a lower
+                 total. That satisfies the instruction rather than working
+                 around it: the bundle is never shown as the best deal when it
+                 is not one.
+
+                 See bundleIsBestDeal() in config/membership.ts for the
+                 arithmetic. */
+              .filter(
+                (plan) =>
+                  plan.sku !== BLUEPRINT_BUNDLE.sku || bundleIsBestDeal(enrolledLevels),
+              )
+              .map((plan) => (
               <PlanCard
                 key={plan.id}
                 plan={plan}

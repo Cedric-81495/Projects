@@ -5,6 +5,27 @@ import { createServerSupabase } from '@/lib/supabase/server'
 import { BrandBar, Footer } from '@/components/Chrome'
 import { PlanCard } from './PlanCard'
 import { BLUEPRINT_BUNDLE, bundleIsBestDeal } from '@/config/membership'
+/* ⚠ THIS IMPORT IS WHY THE PAGE HAS STYLES. DO NOT REMOVE IT AS UNUSED.
+   Added 2026-09-11.
+
+   Every class this page and PlanCard use — mbsect, mbgrid, mbcard, mbprice,
+   mbincl, mback, mbbtn, mbowned — is defined in portal.css. The (marketing)
+   route group has no layout.tsx, so nothing here ever imported it. The page
+   shipped with globals.css alone and none of its own rules.
+
+   ⚠ AND IT LOOKED FINE, WHICH IS WHY IT SURVIVED. Arriving from /dashboard is
+   a client-side navigation, and (portal)/layout.tsx has already put portal.css
+   in the document — so the styles are present for the one route people test.
+   Hard-refresh /membership, or open it from a link, an ad or a Stripe return,
+   and the stylesheet is never requested. The page renders as unstyled HTML.
+
+   That is the path a buyer arrives on. The comment below already noted this
+   group has no layout; the header and footer were fixed by importing the
+   components, and the stylesheet was missed.
+
+   A (marketing)/layout.tsx doing this import is the tidier fix once the group
+   holds more than one page. One import is enough for one page. */
+import '@/styles/portal.css'
 
 export const metadata: Metadata = {
   title: 'Membership · GWOP University',

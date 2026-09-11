@@ -35,6 +35,13 @@ const HANDLED = new Set<string>([
   'checkout.session.completed',
   'checkout.session.async_payment_failed',
   'payment_intent.payment_failed',
+  /* ⚠ ADDED so `processing` and `requires_action` are actually reachable.
+     0018 put both in the payment_status enum and nothing ever wrote them —
+     the state machine looked complete and had two states no code could enter.
+     A customer sitting in 3-D Secure appeared as `pending`, indistinguishable
+     from someone who had not started. */
+  'payment_intent.processing',
+  'payment_intent.requires_action',
   'charge.refunded',
   'customer.subscription.updated',
   'customer.subscription.deleted',
@@ -62,15 +69,64 @@ export async function POST(req: Request) {
     .from('stripe_events')
     .insert({ id: event.id, type: event.type, payload: event as unknown as Record<string, unknown> })
 
-  if (insertError) {
-    if (insertError.code === '23505') {
-      // Already recorded. Ack so Stripe stops retrying.
-      logger.info('stripe_event_replay', { eventId: event.id, type: event.type })
-      return NextResponse.json({ received: true, replay: true })
-    }
-    logger.error('stripe_event_persist_failed', { eventId: event.id, message: insertError.message })
-    // 500 → Stripe retries, which is correct: we have not durably recorded it.
+  /* ══ CLAIM THE EVENT ═══════════════════════════════════════════════════
+     ⚠ A CONDITIONAL UPDATE, NOT A READ THEN A DECISION.
+
+     The insert above records the event. This claims the right to PROCESS it,
+     and the two are deliberately separate concerns.
+
+     History of this gate, because it has been wrong twice:
+
+       v1  acked on any duplicate key. A handler that failed still left the
+           row behind, so every Stripe retry was dismissed as a replay. It
+           stranded a paid $197 purchase with no enrollment, unrecoverable.
+
+       v2  read `processed_at` and reprocessed when null. Correct for a retry
+           after failure — but two deliveries arriving together BOTH saw null
+           (neither had finished) and both processed. No duplicate enrollment
+           resulted, only because the grant's conflict clause absorbed it.
+
+       v3  this. claim_stripe_event() is a single UPDATE whose WHERE clause
+           picks the winner. Exactly one caller can move the row out of
+           `claimed_at is null`, at any concurrency. Everyone else acks.
+
+     The claim also expires after five minutes, so a function timeout mid-grant
+     does not strand the event the way v1 did. */
+  if (insertError && insertError.code !== '23505') {
+    logger.error('stripe_event_persist_failed', {
+      eventId: event.id,
+      message: insertError.message,
+    })
+    // 500 → Stripe retries, correct: we have not durably recorded it.
     return new NextResponse('Storage error', { status: 500 })
+  }
+
+  const { data: claimed } = await admin.rpc('claim_stripe_event', {
+    p_event_id: event.id,
+  })
+
+  if (!claimed) {
+    /* Either finished already, or another request is working on it right now.
+       Ack either way: if it is in flight, that request will report its own
+       failure and Stripe will retry then. */
+    logger.info('stripe_webhook_duplicate', { eventId: event.id, type: event.type })
+    return NextResponse.json({ received: true, duplicate: true })
+  }
+
+  /* ⚠ CIRCUIT BREAKER. claim_stripe_event increments `attempts`, so this reads
+     the value it just set. Stripe gives up after ~3 days; this stops us
+     burning function time on an event that needs a human. The row keeps
+     `error` and is findable:
+       select * from stripe_events where processed_at is null and attempts >= 6; */
+  const { data: evRow } = await admin
+    .from('stripe_events')
+    .select('attempts')
+    .eq('id', event.id)
+    .maybeSingle()
+
+  if ((evRow?.attempts ?? 0) > 6) {
+    logger.error('stripe_event_abandoned', { eventId: event.id, attempts: evRow?.attempts })
+    return NextResponse.json({ received: true, abandoned: true })
   }
 
   if (!HANDLED.has(event.type)) {
@@ -89,8 +145,9 @@ export async function POST(req: Request) {
       .from('stripe_events')
       .update({ error: message.slice(0, 500) })
       .eq('id', event.id)
-    // Non-2xx so Stripe retries. `processed_at` stays null, and the replay gate
-    // above is keyed on insertion, so the retry re-runs the handler body.
+    /* Non-2xx so Stripe retries. `processed_at` stays null, and the replay
+       gate above now checks it — so the retry genuinely re-runs the handler
+       instead of being acked as a duplicate. That was the bug. */
     return new NextResponse('Processing failed', { status: 500 })
   }
 }
@@ -147,6 +204,37 @@ async function processEvent(event: Stripe.Event) {
     }
 
     case 'checkout.session.async_payment_failed':
+    /* ══ INTERMEDIATE STATES ═════════════════════════════════════════════
+       Neither grants nor revokes anything. They exist so a retry from the
+       browser can tell "the bank is deciding" from "nothing has happened",
+       and return the right thing instead of starting a second checkout.
+
+       ⚠ NARROWED BY status, so a late-arriving intermediate event cannot pull
+       a completed payment backwards. The trigger in 0018 would reject it
+       anyway, but an exception raised inside the webhook means a 500 and a
+       pointless Stripe retry — better to filter it out here. Stripe does not
+       guarantee delivery order. */
+    case 'payment_intent.processing':
+    case 'payment_intent.requires_action': {
+      const intent = event.data.object as Stripe.PaymentIntent
+      const paymentId = intent.metadata?.payment_id
+      if (!paymentId) return
+
+      const next = event.type === 'payment_intent.processing'
+        ? 'processing'
+        : 'requires_action'
+
+      const { error } = await admin
+        .from('payment_references')
+        .update({ status: next, stripe_payment_intent_id: intent.id })
+        .eq('id', paymentId)
+        .in('status', ['pending', 'processing', 'requires_action'])
+
+      if (error) throw new Error(`intermediate state update failed: ${error.message}`)
+      logger.info('payment_state_advanced', { paymentId, status: next })
+      return
+    }
+
     case 'payment_intent.payment_failed': {
       const obj = event.data.object as { metadata?: Record<string, string> }
       const paymentId = obj.metadata?.payment_id

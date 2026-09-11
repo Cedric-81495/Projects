@@ -71,7 +71,9 @@ export function PlanCard({
           plan_sku: plan.sku,
           // Generated per attempt. A double-tap on a slow connection reuses the
           // same Checkout Session instead of creating a second one.
-          idempotency_key: crypto.randomUUID(),
+          /* ⚠ NO idempotency_key. The server derives it — see
+             lib/stripe/checkout.ts. Sending one from here was what allowed a
+             double-click to create two Stripe sessions. */
           return_path: '/dashboard',
           /* The server re-checks the version and refuses a mismatch, so a
              stale tab cannot record agreement to wording nobody saw. */
@@ -81,6 +83,19 @@ export function PlanCard({
       })
 
       const body = await res.json()
+      /* ⚠ 409 IS NOT AN ERROR TO SHOW AS RED TEXT. The server returns it when
+         the customer already owns the plan, or when their payment succeeded and
+         the webhook has not landed yet. Both mean "go to your dashboard", not
+         "something broke". Treating it as a failure would tell somebody who has
+         just paid that their purchase failed. */
+      if (res.status === 409) {
+        const body = await res.json().catch(() => null)
+        setError(body?.error?.message ?? 'You already have access. Check your dashboard.')
+        setPending(false)
+        router.push('/dashboard')
+        return
+      }
+
       if (!res.ok) {
         setError(body?.error?.message ?? 'Could not start checkout. Try again.')
         return

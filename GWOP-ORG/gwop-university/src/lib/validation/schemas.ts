@@ -76,7 +76,16 @@ export const createCheckoutSchema = z
       .trim()
       .regex(/^[A-Z0-9]+(-[A-Z0-9]+)*$/, 'Unknown plan.')
       .max(60),
-    idempotency_key: z.string().uuid(),
+    /* ⚠ idempotency_key REMOVED FROM THE CLIENT CONTRACT — 2026-09-10.
+
+       It was a uuid the browser generated per click, which meant a double-tap
+       or a refresh produced a different key each time and every duplicate-charge
+       protection was bypassed. The key is now derived server-side in
+       lib/stripe/checkout.ts from (user, plan, attempt).
+
+       Deliberately NOT kept as an optional field: an optional key the client
+       may still send is a key the client can use to force a second payment
+       row, which is the exact hole being closed. */
     /** Where to land afterwards. Validated against an allowlist in the route. */
     return_path: z
       .string()

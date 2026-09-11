@@ -1699,3 +1699,43 @@
   .fn-pathway-sect { padding-bottom: 44px; }
   .fn-bundle-sect > .fn-wrap { padding-top: 44px; }
 }
+
+/* ── CARD PADDING ──────────────────────────────────────────────────────────
+   Raised from 22px/20px on 2026-09-11. The copy was sitting on the border.
+
+   ⚠ THE RADIUS IS WHY 20px WAS NOT ENOUGH. A 14px corner curves inward
+   through the top and bottom of the padding box, so the first and last lines
+   of text have materially less clearance than the middle ones — the eyebrow
+   and the price are the two that looked wrong, and they are exactly the two
+   nearest a corner. Padding has to clear the radius, not match it.
+
+   Vertical is larger than horizontal, which is the usual ratio for a column of
+   stacked rules: the card already carries four hairline dividers, and equal
+   padding makes the top rule read as a continuation of the border rather than
+   a division of the content.
+
+   ⚠ THE DIVIDERS RUN TO THE PADDING EDGE ON PURPOSE. They are the card's own
+   internal structure, so they should align with the text they separate. Do not
+   bleed them to the border — that turns four products into one table, which is
+   what the removed `gap: 0` was already doing at the row level. */
+.fn-path-card { padding: 28px 24px 24px; }
+
+/* The level name wraps to two lines on Levels 2 and 4, and the second line was
+   running closer to the right edge than the first. A little extra room on the
+   right of the longest string in the card, rather than widening every line. */
+.fn-path-card .fn-class { padding-right: 6px; }
+
+/* Breathing room under the last download before the Blueprint line, which has
+   no rule above it and was reading as part of the list. */
+.fn-path-bp { margin-top: 2px; }
+
+/* The foot's rule needs the same clearance above it as the dividers above do.
+   14px put the price close enough to the line to read as underlined. */
+.fn-path-foot { padding-top: 18px; }
+
+@media (max-width: 430px) {
+  /* One column at this width, so the card is near full-bleed and the wrap's
+     own 28px is already doing most of the work. 24px here on top of that left
+     the text in a narrow ribbon on a 390px screen. */
+  .fn-path-card { padding: 24px 20px 20px; }
+}

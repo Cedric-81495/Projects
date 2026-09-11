@@ -456,7 +456,12 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
 
 **Waiting on others**
 - [ ] Offer + pricing approval (Surpaul, tracker due Aug 17)
-- [ ] Founding member wording + scholarship rules (Surpaul) — §9
+- [ ] Founding member public wording (Surpaul approves) — §4 of his memo defines
+      the five benefits; only the customer-facing copy is outstanding.
+- [x] ~~Scholarship rules~~ — REMOVED 2026-09-11. Surpaul did not originate it,
+      was not aware of it, and does not want it. Code deleted from
+      `config/membership.ts` and `content/event.ts`. One outstanding promise to
+      an individual from event day remains his to settle.
 - [ ] Refund / cancellation policy (Surpaul + attorney) — §1, must not be published early
 - [ ] Event time + location (the brand direction) — §3, placeholders already in `src/content/event.ts`
 - [ ] Official social accounts (the brand direction) — §12, slots reserved in `src/content/site.ts`

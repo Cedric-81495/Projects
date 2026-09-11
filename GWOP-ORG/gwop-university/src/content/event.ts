@@ -97,7 +97,9 @@ export const event = {
        "Sign up at the table and all three are yours." Both assumed the reader
        was standing at the stand on the day. "Today" also implied an expiry that
        was never real — the blueprint is free permanently. */
-    h2: 'Three things you get.',
+    /* Two, not three, since the scholarship item was removed below. The count
+       is in the heading, so it has to move with the list. */
+    h2: 'Two things you get.',
     lede: 'Free, and yours as soon as you finish the questions.',
     items: [
       /* Wording supplied verbatim by Brand direction, 2026-08-27 §3. `pending` flipped
@@ -108,15 +110,19 @@ export const event = {
       { h: 'Founding Member Access',
         p: 'Get early access to GWOP University.',
         pending: false },
-      { h: 'Scholarship Opportunity',
-        /* ⚠ "today" removed 2026-09-04, missed in the 09-01 sweep.
-           ⚠ AND THE OFFER ITSELF IS UNDEFINED. Nobody has said what the
-           scholarship is worth, who draws it, when, or how a winner is told.
-           One person signed up on event day under the original "sign up today
-           to be entered" wording, so there is at least one outstanding promise.
-           Raised with Surpaul; do not add detail here without his answer. */
-        p: 'Sign up to be entered.',
-        pending: false },
+      /* ⚠ THE THIRD ITEM — "Scholarship Opportunity / Sign up to be entered" —
+         WAS DELETED 2026-09-11 ON SURPAUL'S INSTRUCTION. He did not originate
+         it, was not aware of it, and does not want it offered.
+
+         It was never rendered: `incentives` has no reader anywhere in src/.
+         But every item here carries pending: false, which marks this block as
+         approved and ready to publish — so wiring `incentives` up would have
+         put an undefined giveaway on a live page with no terms behind it. That
+         is why it is deleted rather than left with a warning comment.
+
+         One person signed up on event day under the original wording and is
+         still owed an answer. That obligation sits with Surpaul; see the note
+         in config/membership.ts under OFFERS. */
     ],
   },
 

@@ -237,7 +237,10 @@ export const CAPABILITIES = {
   promoCodes:            true,   // discount codes
   eventOffers:           true,   // activation-specific pricing
   foundingMember:        true,   // §9
-  scholarshipGiveaway:   true,   // §9
+  /* ⚠ scholarshipGiveaway REMOVED 2026-09-11. Surpaul's instruction, directly:
+     he did not originate the scholarship, was not aware of it, and does not
+     want it. It came from the earlier brand direction and was never defined.
+     Do not reinstate this flag without him asking for it by name. */
   oneTimePayment:        true,
   monthlyPayment:        true,
 } as const
@@ -293,16 +296,20 @@ export const OFFERS = {
     windowCloses: '2026-09-30',
     approved: false,
   },
-  scholarship: {
-    id: 'SCHOLARSHIP-0830',
-    label: 'Scholarship / Giveaway',
-    /* ⚠ STILL UNDEFINED, AND THERE IS AN OUTSTANDING PROMISE. Nobody has said
-       what the scholarship is worth, who draws it, when, or how a winner is
-       told — but at least one person signed up on event day under wording that
-       entered them into it. Never invent giveaway terms. */
-    rules: null as string | null,
-    approved: false,
-  },
+  /* ⚠ THE SCHOLARSHIP OFFER WAS REMOVED 2026-09-11, ON SURPAUL'S INSTRUCTION.
+
+     He did not originate it, was not aware of it, and does not want it. It came
+     from the earlier brand direction, and it was never defined — nobody ever
+     said what it was worth, who drew it, when, or how a winner would be told.
+
+     ⚠ REMOVING THE CODE DOES NOT CLOSE THE ONE THING THAT WAS PROMISED.
+     At least one person signed up on event day under wording that said they
+     were entered into it. That is a promise made to a named individual, and it
+     is outstanding whether or not this file mentions it. It is Surpaul's to
+     settle — raised with him, recorded here so it is not lost when the last
+     line of scholarship code disappears.
+
+     Do not reinstate any of this without him asking for it by name. */
 } as const
 
 /* ── PROMO CODES ───────────────────────────────────────────────────────────

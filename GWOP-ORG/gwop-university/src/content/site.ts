@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   WEBSITE COPY  —  OWNER: SURPAUL / FELICIA  ·  EDITED BY: MAUI
+   WEBSITE COPY  —  OWNER: SURPAUL / BRAND DIRECTION  ·  EDITED BY: MAUI
    Only what the Visual Build Package specifies. Do not add sections.
    `pending: true` = unconfirmed; highlighted while DRAFT is on.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -9,7 +9,7 @@ export const site = {
   tagline: 'They never taught us the game — so we built the school.',
 
   /* Prescribed verbatim by Visual Build Package p.5. DO NOT REWORD.
-     Exception: `sub` / `subKicker` replaced 2026-08-27 on Felicia's written
+     Exception: `sub` / `subKicker` replaced 2026-08-27 on the brand direction's written
      instruction (§1 of her polish pass). She owns this copy and superseded
      p.5 explicitly, so the DO-NOT-REWORD note above still stands against
      anyone else editing it. */
@@ -22,7 +22,7 @@ export const site = {
   },
 
   /* p.5 build note: "consistent course cards" */
-  /* Felicia §12: leave space for the official social accounts.
+  /* Brand direction §12: leave space for the official social accounts.
      Paste the real URLs in. Any entry left empty is not rendered — we never
      ship a link to a handle that does not exist yet. */
   social: [
@@ -51,12 +51,12 @@ export const site = {
 
 /* ── LEGAL — ⚠️ ATTORNEY-SUPPLIED ONLY. Never draft or reword. ───────────── */
 export const legal = {
-  /* ✅ CONFIRMED — supplied 2026-08-27 in Felicia's polish pass §10: "replaced
+  /* ✅ CONFIRMED — supplied 2026-08-27 in the brand direction's polish pass §10: "replaced
      everywhere before launch with the exact registered legal entity name."
      ⚠ This string must match the entity registered for A2P exactly. If the A2P
      filing reads differently, the filing wins and this changes to match. */
   entity:  { text: 'Simple Strategy Consulting LLC', pending: false },
-  /* ✅ CONFIRMED — Surpaul proposed Boston, Felicia agreed Aug 18: "Boston, MA
+  /* ✅ CONFIRMED — Surpaul proposed Boston, the brand direction agreed Aug 18: "Boston, MA
      works for me. It keeps everything consistent with the launch and current
      activation. We can always update the primary location later as GWOP
      expands." Treated as revisable by design, not as a placeholder. */

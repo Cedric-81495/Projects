@@ -18,7 +18,7 @@ git remote add origin https://github.com/GWOP-ORG/gwop-university.git
 git push -u origin main
 ```
 
-Then create the staging branch, which is where everything runs until Felicia
+Then create the staging branch, which is where everything runs until the brand direction
 rules on the timeline conflict in `ARCHITECTURE.md` §13.1:
 
 ```bat
@@ -168,7 +168,7 @@ main     →  Production                →  prod Supabase + Stripe live
 Every pull request gets its own preview URL. That is what you send Jake, Maui and
 Surpaul to review, instead of describing changes in chat.
 
-Until Felicia rules on §13.1 of `ARCHITECTURE.md`, **keep the platform work on
+Until the brand direction rules on §13.1 of `ARCHITECTURE.md`, **keep the platform work on
 `develop`.** Production should receive nothing before Aug 30 except the extracted
 `GHLLeadForm` component.
 

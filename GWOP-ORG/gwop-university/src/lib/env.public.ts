@@ -26,10 +26,10 @@ const clientSchema = z.object({
   /* Which capture path /830 renders.
 
        'native' — our own form → POST /api/lead → Supabase → GHL webhook.
-                  Felicia approved 2026-08-18; Jake confirmed 08-19 that his
+                  Approved 2026-08-18; Jake confirmed 08-19 that his
                   GHL form is no longer needed and we should redirect to our
                   own thank-you page directly.
-       'iframe' — Jake's embedded GHL form. Retained as the fallback Felicia
+       'iframe' — Jake's embedded GHL form. Retained as the fallback the brand direction
                   asked to keep live until the native path is signed off.
 
      An env var deliberately, not a code branch: on event day a revert has to

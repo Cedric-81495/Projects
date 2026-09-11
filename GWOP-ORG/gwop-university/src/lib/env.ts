@@ -56,7 +56,7 @@ const serverSchema = z.object({
      URL: lib/ghl/sync.ts no-ops without it, leads accumulate as 'pending', and
      the cron drains them the moment it is configured.
 
-     SUPERSEDES the embed-only note that stood here. Felicia approved the
+     SUPERSEDES the embed-only note that stood here. Approved the
      write-first + forward design on 2026-08-18. See ARCHITECTURE.md §14.1. */
   GHL_WEBHOOK_URL: z.string().url().optional(),
 

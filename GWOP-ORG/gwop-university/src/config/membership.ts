@@ -1,10 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   MEMBERSHIP + PRICING  —  OWNER: SURPAUL (approves) · FELICIA (defines)
-   Source: Felicia's confirmed directions, Aug 14 — §1 Pricing + Membership
+   MEMBERSHIP + PRICING  —  OWNER: SURPAUL (approves) · BRAND DIRECTION (defines)
+   Source: the approved brand direction, Aug 14 — §1 Pricing + Membership
    Structure, §9 Event Incentive, §10 Account Creation + Payment.
    Amounts: Surpaul's final-direction memo (CEDRIC SIDE §1).
 
-   Felicia's requirement, verbatim: "Please build the system so pricing can be
+   the brand requirement, verbatim: "Please build the system so pricing can be
    changed easily without redesigning the website/app."
 
    That is what this file is. Every price, billing mode, promo and offer is a
@@ -82,7 +82,7 @@ export const levelHref = (slug: string) => `/levels/${slug}`
 /** Master gate. While false: cards show `tbdLabel`, never a number. */
 export const PRICING_PUBLISHED = true
 
-/** Felicia §1: "Currency: USD." */
+/** Brand direction §1: "Currency: USD." */
 export const CURRENCY = { code: 'USD', symbol: '$' } as const
 
 /* ── THE FOUR LEVELS ───────────────────────────────────────────────────────
@@ -226,7 +226,7 @@ export const BLUEPRINT_BUNDLE = {
      permanent, expires_at = null, never touched again.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── WHAT THE PLATFORM MUST SUPPORT (Felicia §1) ───────────────────────────
+/* ── WHAT THE PLATFORM MUST SUPPORT (Brand direction §1) ───────────────────────────
    Flags, not features. Each one is off until the business decides to activate
    it. They exist here so the answer to "can the system do X?" is a one-line
    change instead of a rebuild.
@@ -243,7 +243,7 @@ export const CAPABILITIES = {
 } as const
 
 /* ── OFFERS ────────────────────────────────────────────────────────────────
-   Felicia §9: "Please build the structure now using editable placeholders
+   Brand direction §9: "Please build the structure now using editable placeholders
    rather than waiting for final promotional wording."
    `approved: false` = wording is a placeholder; DRAFT mode highlights it and
    it must not appear in print or paid ads.
@@ -360,7 +360,7 @@ export const REFUND_POLICY = {
   approved: true,
 }
 
-/* ── PAYMENT BOUNDARY (Felicia §10) ────────────────────────────────────────
+/* ── PAYMENT BOUNDARY (Brand direction §10) ────────────────────────────────────────
    "Payment integration should be built as a separate but connected component
    so the event lead capture can still operate even while final pricing/payment
    offers are being approved."

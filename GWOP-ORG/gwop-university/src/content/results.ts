@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    VERIFIED RESULTS — the score cards for the testimonial section
-   Owner: SURPAUL (approves + holds consent) · FELICIA (disclaimer wording)
+   Owner: SURPAUL (approves + holds consent) · BRAND DIRECTION (disclaimer wording)
 
    ⚠ THIS IS THE MOST REGULATED DATA IN THE REPO. READ BEFORE EDITING.
 
@@ -76,7 +76,7 @@ export type ResultCard = {
 
 export const RESULTS = {
   /* ⚠ THE MASTER GATE. False = the whole section does not render, cards or
-     quotes. Flip only when every `consent` below is true AND Felicia has
+     quotes. Flip only when every `consent` below is true AND the brand direction has
      signed the disclaimer wording. */
   approved: false,
 
@@ -92,7 +92,7 @@ export const RESULTS = {
   /* ⚠ ATTORNEY-OWNED. Null on purpose — a developer must not draft the
      disclaimer for a regulated results claim, and the component refuses to
      render the section while it is null even if `approved` is somehow true.
-     Felicia writes this. It needs to cover, at minimum: results vary by
+     The brand direction writes this. It needs to cover, at minimum: results vary by
      individual, no specific score increase is guaranteed, and nothing shown is
      a promise of a particular outcome. */
   disclaimer: null as string | null,

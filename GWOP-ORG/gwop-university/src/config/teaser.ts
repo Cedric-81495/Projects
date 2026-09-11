@@ -1,7 +1,7 @@
 /**
  * BLUEPRINT TEASER VIDEO.
  *
- * Felicia's 3:01am flow: sign up → Blueprint teaser → IdentityIQ → next step.
+ * The approved flow: sign up → Blueprint teaser → IdentityIQ → next step.
  * The teaser sits between the roadmap and the IdentityIQ card.
  *
  * ── NOTHING SHIPS UNTIL THERE IS A FILE ──────────────────────────────────────
@@ -59,7 +59,7 @@ export const teaser = {
      /teaser-poster.webp and put that path here. */
   poster: '',
 
-  /* ✅ Felicia, 2026-08-27, verbatim. Replaced my placeholder "Watch this
+  /* ✅ Brand direction, 2026-08-27, verbatim. Replaced my placeholder "Watch this
      first". Sits between the roadmap someone has just been given and the
      booking CTA — do not reword. */
   heading: 'Your Blueprint Is Just the Beginning.',

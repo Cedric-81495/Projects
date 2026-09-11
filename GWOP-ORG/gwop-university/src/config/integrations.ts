@@ -30,12 +30,12 @@ export const QR_CODES = {
 export type QrCode = keyof typeof QR_CODES
 
 /* ── TASK 4: INTEREST OPTIONS ───────────────────────────────────────────────
-   ✅ RESOLVED — Felicia, Aug 14, 8:08 AM (directions §6 + §7).
+   ✅ RESOLVED — Brand direction, Aug 14, 8:08 AM (directions §6 + §7).
    FIVE options. The 5-vs-4 mismatch against Visual Build Package p.6 is closed:
    p.6 was shorthand for the four financial tracks; Wellness is in.
 
-   `label` = what the attendee taps (Felicia §6 wording, verbatim).
-   `tag`   = the exact GHL tag Jake creates (Felicia §7 wording, verbatim).
+   `label` = what the attendee taps (Brand direction §6 wording, verbatim).
+   `tag`   = the exact GHL tag Jake creates (Brand direction §7 wording, verbatim).
    They differ on purpose — do not "tidy" either one. Jake needs one nurture
    branch per `tag`; a mismatch here means a lead gets no follow-up at all.
    ────────────────────────────────────────────────────────────────────────── */
@@ -83,7 +83,7 @@ export const EVENT_TAG = 'gwopsignup'
 export const CHAT_WIDGET_ID = '6a903f99d45d62178f802e29'
 
 /* ── CAMPAIGN ATTRIBUTION ───────────────────────────────────────────────────
-   Felicia §7: "We do not necessarily need separate signup pages for every staff
+   Brand direction §7: "We do not necessarily need separate signup pages for every staff
    member... tracking attribution on the backend" and §3: "Tracking should happen
    through source/campaign parameters or GHL."
 

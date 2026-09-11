@@ -8,7 +8,7 @@ import { logger } from '@/lib/observability/logger'
  * ═══════════════════════════════════════════════════════════════════════════
  * Forward a captured lead to GoHighLevel's inbound webhook.
  *
- * Felicia, Aug 18: save server-side first, forward with retries, GHL remains
+ * Brand direction, Aug 18: save server-side first, forward with retries, GHL remains
  * the operational CRM and marketing source of truth. This file is the second
  * half of that — /api/lead is the first.
  *

@@ -18,7 +18,7 @@ import { BOOKING_URL } from '@/config/integrations'
 import { teaser } from '@/config/teaser'
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   THE SEVEN QUESTIONS — Felicia, 2026-08-21.
+   THE SEVEN QUESTIONS — Brand direction, 2026-08-21.
 
    Runs immediately after the contact form succeeds, on the same page. There is
    no navigation between questions and that is deliberate: a client-side route
@@ -430,7 +430,7 @@ export function Assessment({ token, firstName, initialInterest }: Props) {
 }
 
 /* ── BLUEPRINT TEASER ──────────────────────────────────────────────────────
-   Between the roadmap and the IdentityIQ card, per Felicia's sequence.
+   Between the roadmap and the IdentityIQ card, per the brand direction's sequence.
 
    Never autoplays and never preloads. At a booth, a video that starts talking
    by itself is startling in a quiet moment and inaudible in a loud one, and
@@ -581,7 +581,7 @@ function Teaser() {
    then book the session to discuss it, which is the order the call actually
    works in. Do not reorder these back without checking the design.
 
-   Copy comes from event.thanks so it stays the same wording Felicia approved
+   Copy comes from event.thanks so it stays the same wording Approved
    for /thanks and cannot drift between the two.
    ───────────────────────────────────────────────────────────────────────── */
 function NextSteps() {
@@ -641,7 +641,7 @@ function NextSteps() {
 
    Not before it and not inside it, deliberately. The Blueprint is what was
    promised free; anything between the attendee and that promise makes the free
-   thing feel conditional, which is the one thing Felicia said it must not be.
+   thing feel conditional, which is the one thing the brand direction said it must not be.
    By the time this appears the promise has already been kept, so it reads as a
    suggestion rather than a toll.
 
@@ -660,7 +660,7 @@ function NextStep({
   if (!identityiq.enabled) return null
 
   /* ── SHOWN WHEN IT FITS, NOT TO EVERYONE ────────────────────────────────
-     Felicia, 2026-08-22: don't force every person into this simply because
+     Brand direction, 2026-08-22: don't force every person into this simply because
      they finished the assessment. It should follow from their path.
 
      ⚠ RE-CONFIRMED 2026-09-08 after Surpaul asked for it on every path. The
@@ -732,7 +732,7 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
 }
 
 /* ── THE BLUEPRINT ─────────────────────────────────────────────────────────
-   Free, on screen, nothing held back. Felicia was explicit that this is not
+   Free, on screen, nothing held back. The brand direction was explicit that this is not
    gated behind anything.
    ───────────────────────────────────────────────────────────────────────── */
 
@@ -768,7 +768,7 @@ function BlueprintView({
   if (!BLUEPRINTS_APPROVED || plan.pending) {
     return (
       <section className="evas evas-done" ref={sectionRef}>
-        {/* Felicia §11 prescribes this exact hierarchy — "YOU'RE IN." then
+        {/* Brand direction §11 prescribes this exact hierarchy — "YOU'RE IN." then
             "Your GWOP Blueprint starts here." then confirm delivery. Pulled
             from content/event.ts rather than retyped, so this screen and
             /thanks can never drift apart and a reword lands in both at once.

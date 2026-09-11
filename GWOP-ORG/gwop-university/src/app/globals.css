@@ -10,7 +10,7 @@
   --emerald-lt:#E4EFE9;
   --forest:#1E3E2F;       /* Stability & Authority — secondary dark, bands + footer */
   --forest-dk:#152C21;
-  /* Felicia §4 lists "Black for premium contrast", and Visual Build Package p.5
+  /* Brand direction §4 lists "Black for premium contrast", and Visual Build Package p.5
      and p.7 both render the hero card in near-black, not forest. This is that
      black. Kept a touch off pure #000 so the gold rule and crest edges read as
      depth rather than a hard cut. White on it is 18.4:1. */
@@ -240,7 +240,7 @@ footer .logo b small{display:block;font-family:var(--body);font-size:8px;
   font-weight:600;letter-spacing:.24em;color:var(--gold-lt);margin-top:3px}
 footer .blurb{margin-top:14px;max-width:30ch;font-family:var(--display);
   font-size:17px;color:rgba(247,243,233,.78)}
-/* Felicia §12 — reserved space for the official accounts */
+/* Brand direction §12 — reserved space for the official accounts */
 footer .socials{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:18px;
   list-style:none;padding:0}
 footer .socials li{font-size:12.4px;font-weight:500}
@@ -324,13 +324,13 @@ a.evbar:hover{background:var(--forest-dk)}
   font-size:clamp(14.5px,3.6vw,18px);color:rgba(247,243,233,.9)}
 .evkw span{color:var(--gold-lt)}
 .evfine{margin-top:12px;font-size:12.5px;color:rgba(247,243,233,.55)}
-/* Felicia §2 supporting copy / §11 thank-you confirmation line */
+/* Brand direction §2 supporting copy / §11 thank-you confirmation line */
 .evsupport{margin-top:13px;max-width:44ch;font-size:14.6px;line-height:1.62;
   color:rgba(247,243,233,.78)}
-/* Felicia §3 event time + location, inserted once confirmed */
+/* Brand direction §3 event time + location, inserted once confirmed */
 .evmeta{margin-top:16px;padding-top:14px;border-top:1px solid rgba(200,163,74,.22);
   font-size:12.8px;font-weight:500;letter-spacing:.02em;color:var(--gold-lt)}
-/* Felicia §11 next-step CTAs on /thanks */
+/* Brand direction §11 next-step CTAs on /thanks */
 .evacts{display:flex;flex-wrap:wrap;gap:11px;margin-top:26px}
 @media(max-width:439px){.evacts .btn{width:100%}}
 /* MOBILE-FIRST: on a phone the crest is its own full-width band, centred, with
@@ -1130,7 +1130,7 @@ body>section:only-of-type{display:grid;align-content:center}
      it sits under. */
   display:inline-block;padding:3px 0;
 }
-/* ── ASSESSMENT (Felicia's beta brief, 2026-08-22) ─────────────────────────
+/* ── ASSESSMENT (the brand direction's beta brief, 2026-08-22) ─────────────────────────
    Reuses .evpicks / .evpick for the options, so tap targets and spacing stay
    identical to the interest step. Only the surrounding furniture is new. */
 .evas{max-width:640px;margin:0 auto;padding:4px 0 8px}
@@ -1382,7 +1382,7 @@ body>section:only-of-type{display:grid;align-content:center}
    Moved from /thanks onto the Blueprint screen. Reuses .evas-steps so the
    numbered list matches "Your Next 3 Moves" above it — same visual language,
    one less thing for an attendee to parse. */
-/* Felicia, 2026-08-27: one page, but visually segmented so it reads as a
+/* Brand direction, 2026-08-27: one page, but visually segmented so it reads as a
    progression rather than competing CTAs. Each block below the roadmap gets
    clear separation and a descending visual weight — roadmap is the reward,
    next steps is the instruction, booking is the ask, IdentityIQ is optional.
@@ -1422,7 +1422,7 @@ body>section:only-of-type{display:grid;align-content:center}
 .evas-next .evas-eyebrow{display:block;margin-bottom:4px}
 
 /* ── HERO OFFER BADGE + PROOF POINTS ──────────────────────────────────────
-   Felicia's 2026-08-26 mockup, icons from Shin. Replaces the plain text
+   The approved 2026-08-26 mockup, icons from Shin. Replaces the plain text
    treatment: same words, but the three proof points now carry their own
    weight instead of reading as one more paragraph in a dark card. */
 
@@ -1471,7 +1471,7 @@ body>section:only-of-type{display:grid;align-content:center}
 }
 
 /* ── MOCKUP MATCH · TOP BAR ────────────────────────────────────────────────
-   Felicia's 2026-08-26 mockup shows the motto flanked by short gold rules
+   The approved 2026-08-26 mockup shows the motto flanked by short gold rules
    rather than sitting alone. Larger brand text and a bigger crest too — the
    bar in the mockup reads as an institution, not a utility strip. */
 .evbar{padding-block:14px}
@@ -1491,7 +1491,7 @@ body>section:only-of-type{display:grid;align-content:center}
   text-transform:uppercase;font-weight:600}
 
 /* ── THE BUTTON, EVERYWHERE ────────────────────────────────────────────────
-   One treatment across the whole event flow, taken from Felicia's mockup:
+   One treatment across the whole event flow, taken from the brand direction's mockup:
    deep green fill, gold hairline border, gold uppercase text, and a chevron in
    a hairline circle on the left.
 

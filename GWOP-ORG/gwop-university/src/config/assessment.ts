@@ -1,19 +1,19 @@
 /**
- * THE SEVEN QUESTIONS — Felicia, 2026-08-21.
+ * THE SEVEN QUESTIONS — Brand direction, 2026-08-21.
  *
  * This file is the single source of truth. It renders the buttons, it validates
  * the API payload, and it is the list Jake builds his workflow conditions from.
  * Change an option here and all three follow. There is no second list to keep in
  * sync, which is the whole point.
  *
- * Wording is Felicia's, verbatim. Do not improve it.
+ * Wording is the brand direction's, verbatim. Do not improve it.
  *
  * ⚠ Q1 IS NOT IN THIS FILE. Q1 is the interest question and it already exists as
  * INTERESTS in config/integrations.ts, writing to leads.interest with the
  * verbatim tag contract Jake matches on. Adding it here would create two lists
  * for one answer, which is the exact failure this file prevents.
  *
- * ⚠ Q1's OPTIONS ARE STILL UNDER DECISION. Felicia's proposed list replaces the
+ * ⚠ Q1's OPTIONS ARE STILL UNDER DECISION. the proposed list replaces the
  * live five rather than extending it — only Credit and Business survive. Until
  * she confirms whether it applies everywhere or only at the event, INTERESTS
  * stays as it is. When the call comes it is a one-line edit there, because

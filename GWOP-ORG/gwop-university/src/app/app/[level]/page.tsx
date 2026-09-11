@@ -64,7 +64,7 @@ export default async function LevelPage(
 
           {!unlocked && (
             /* Wording matches the dashboard card exactly. Not a new pricing
-               claim — the free-vs-paid rule is still Felicia's to make, and this
+               claim — the free-vs-paid rule is still the brand direction's to make, and this
                says only what is already said elsewhere. */
             <div className="polocked" role="status">
               <p className="polocked-h">This level is not unlocked yet</p>

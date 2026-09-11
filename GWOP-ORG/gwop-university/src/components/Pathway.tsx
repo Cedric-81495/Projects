@@ -6,7 +6,7 @@ import { EVENT_PATH } from '@/config/integrations'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    VISUAL BUILD PACKAGE p.4 — "WEBSITE + APP VISUAL TARGET"
-   Felicia: "build from a visual hierarchy like this — not from scattered copy."
+   Brand direction: "build from a visual hierarchy like this — not from scattered copy."
 
    p.4 shows both uses at once: a marketing hero with START YOUR BLUEPRINT, and
    four cards with ENTER > that lead into levels. One design language, two
@@ -58,7 +58,7 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
           <p className="tag on-dark">{c.eyebrow}</p>
           <h1>{c.h1}</h1>
           <p className="sub">{c.sub}</p>
-          {/* Felicia §1, 2026-08-27: the hero carries two lines now. Reuses
+          {/* Brand direction §1, 2026-08-27: the hero carries two lines now. Reuses
               .sub rather than adding a class — same style, no new component. */}
           {c.subKicker && <p className="sub">{c.subKicker}</p>}
         </div>
@@ -120,7 +120,7 @@ export function PathwayTarget({ surface }: { surface: Surface }) {
             Restore the Link when the university opens. */}
         {PATHWAY.map(l => (
           <div className="course course-off" key={l.slug}>
-            {/* Felicia 2026-08-27: the card label carries a second half inside
+            {/* Brand direction, 2026-08-27: the card label carries a second half inside
                 the existing .nm span rather than as a new element — .nm already
                 uppercases and tracks the text, so no CSS changes and no new
                 component.

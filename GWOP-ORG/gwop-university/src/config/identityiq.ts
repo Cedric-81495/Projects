@@ -1,7 +1,7 @@
 /**
  * IDENTITYIQ — optional next step after the Blueprint.
  *
- * Felicia, 2026-08-22. Surpaul is an IdentityIQ affiliate and the link earns
+ * Brand direction, 2026-08-22. Surpaul is an IdentityIQ affiliate and the link earns
  * commission. Presented as an optional next step, never as a condition of
  * receiving the free Blueprint.
  *
@@ -17,7 +17,7 @@ export const identityiq = {
      hatch if anyone objects on the day, without a deploy. */
   enabled: true,
 
-  /* Surpaul's affiliate link. Felicia was explicit: use this, not the separate
+  /* Surpaul's affiliate link. The brand direction was explicit: use this, not the separate
      $1 / 7-day offer.
 
      ⚠ Nobody has confirmed this resolves and registers against his account.
@@ -85,7 +85,7 @@ export const identityiq = {
     'IdentityIQ costs $27.99 per month. They are a separate company with their '
     + 'own terms and pricing.',
 
-  /* Felicia's wording, verbatim.
+  /* The brand direction's wording, verbatim.
 
      ⚠ OPEN QUESTION: this names GWOP University as the affiliate, but the
      affiliate account is Surpaul's. If the compensation goes to him personally
@@ -96,7 +96,7 @@ export const identityiq = {
     'GWOP University is an IdentityIQ affiliate and may receive compensation if '
     + 'you enroll through this link.',
 
-  /* Felicia's label, verbatim. */
+  /* The brand direction's label, verbatim. */
   cta: 'Check My Credit Profile',
 
   /* Under the button. The promise was a free Blueprint and it has already been

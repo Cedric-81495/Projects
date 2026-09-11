@@ -20,7 +20,7 @@ import type { BlueprintSlug } from '@/content/blueprints'
 /**
  * Q1 interest → the family of roadmap they belong in.
  *
- * Keyed on the CURRENT interest values in config/integrations.ts. If Felicia
+ * Keyed on the CURRENT interest values in config/integrations.ts. If the brand direction
  * confirms her new seven-option list, add those keys here — the fallback below
  * means an unmapped value degrades to a sensible roadmap rather than an error,
  * so this file cannot break a signup at the booth even mid-change.
@@ -33,7 +33,7 @@ const FAMILY_BY_INTEREST: Record<string, BlueprintFamily> = {
   wellness: 'foundation',
   unspecified: 'foundation',
 
-  // Felicia's proposed list, mapped ahead of the decision so the switch is
+  // the proposed list, mapped ahead of the decision so the switch is
   // config-only when it comes. Harmless while these values are never sent.
   budgeting: 'foundation',
   business: 'business',

@@ -15,7 +15,7 @@ import parsePhoneNumber from 'libphonenumber-js'
  * ═══════════════════════════════════════════════════════════════════════════
  * POST /api/lead — event signup capture.
  *
- * Felicia approved this shape on Aug 18: write server-side first, forward to
+ * Approved this shape on Aug 18: write server-side first, forward to
  * GHL with retries, GHL stays the operational CRM.
  *
  * ORDER OF OPERATIONS IS THE WHOLE DESIGN:

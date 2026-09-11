@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- 0010_assessments.sql
 --
--- The seven-question needs assessment, per Felicia's 2026-08-21 brief. 8/30 is
+-- The seven-question needs assessment, per the brand direction's 2026-08-21 brief. 8/30 is
 -- a beta test and needs assessment: the point is to learn what attendees
 -- actually need, so these answers have to be QUERYABLE AS A SET.
 --
@@ -36,7 +36,7 @@ create table public.assessments (
   -- start, so someone who abandons at Q4 is a lead we can still follow up. A
   -- schema that refused a partial row would throw that away.
   --
-  -- text, not enums. Felicia may reword an option mid-week and a stale value
+  -- text, not enums. The brand direction may reword an option mid-week and a stale value
   -- must never cost us a submission at the table. The allowed set is enforced
   -- in src/config/assessment.ts, which is also what renders the buttons — so
   -- the two cannot drift.

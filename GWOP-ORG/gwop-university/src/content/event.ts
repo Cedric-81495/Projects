@@ -34,15 +34,15 @@ export const event = {
      If a future event needs a date and venue on a landing page, build it as its
      own funnel page rather than making this one time-bound again. */
 
-  // Prescribed by Visual Build Package p.7 + Felicia §2 — DO NOT REWORD
+  // Prescribed by Visual Build Package p.7 + Brand direction §2 — DO NOT REWORD
   h1a: 'BUILD YOUR',
   h1b: 'GWOP BLUEPRINT',
-  /* Dot separators per Felicia's 2026-08-26 mockup. Same four words as the
+  /* Dot separators per the brand direction's 2026-08-26 mockup. Same four words as the
      Visual Build Package, punctuation only — the signage kicker below is left
      exactly as approved, because that one goes to print. */
   kicker: 'CREDIT • FUNDING • BUSINESS • WEALTH',
 
-  /* Felicia §2 "Supporting copy", verbatim. Note the fourth sentence — the
+  /* Brand direction §2 "Supporting copy", verbatim. Note the fourth sentence — the
      event page carries it; the homepage hero (p.5) deliberately does not. */
   support:
     'Build your financial foundation. Strengthen your credit. Prepare your ' +
@@ -50,7 +50,7 @@ export const event = {
 
   cta: 'START YOUR BLUEPRINT',
 
-  /* Felicia, 2026-08-22: "keep the offer extremely simple — FREE GWOP
+  /* Brand direction, 2026-08-22: "keep the offer extremely simple — FREE GWOP
      BLUEPRINT™ / 60 seconds. 7 questions. Your next financial moves."
 
      Added BENEATH the prescribed headline rather than replacing it. Two
@@ -64,7 +64,7 @@ export const event = {
   offer: {
     badge: 'FREE GWOP BLUEPRINT™',
     line: '60 seconds. 7 questions. Your next financial moves.',
-    /* Felicia §2, 2026-08-27: this line now carries the hero on its own. The
+    /* Brand direction §2, 2026-08-27: this line now carries the hero on its own. The
        longer `support` paragraph above it is no longer rendered — her reason:
        "This page is being scanned in a live event environment, so I want the
        value understood immediately." `support` is kept in this file because
@@ -81,7 +81,7 @@ export const event = {
     ],
   },
 
-  /* Felicia §2: "For QR/event signage, we can also use: SCAN TO START."
+  /* Brand direction §2: "For QR/event signage, we can also use: SCAN TO START."
      Single approved source for Maui's print run — signage and screen must not
      drift apart. Maui pulls the wording from here, not from a chat message. */
   signage: {
@@ -100,7 +100,7 @@ export const event = {
     h2: 'Three things you get.',
     lede: 'Free, and yours as soon as you finish the questions.',
     items: [
-      /* Wording supplied verbatim by Felicia, 2026-08-27 §3. `pending` flipped
+      /* Wording supplied verbatim by Brand direction, 2026-08-27 §3. `pending` flipped
          to false: she is the approver, and these are now her words. */
       { h: 'Free GWOP Blueprint',
         p: 'Your personalized starting point based on where you are now.',
@@ -123,7 +123,7 @@ export const event = {
   about: {
     h2: 'What is GWOP University?',
     lines: [
-      /* Felicia §4, 2026-08-27, verbatim. */
+      /* Brand direction §4, 2026-08-27, verbatim. */
       'GWOP University teaches the money game most of us were never taught — credit, funding, business and wealth.',
       'Money doesn’t respond to emotion. It responds to structure.',
       'We teach you the structure.',
@@ -133,7 +133,7 @@ export const event = {
   choose: {
     /* ⚠ Says two; the flow is now seven questions plus a review screen. Left
        exactly as it was because nobody has approved replacement wording — not
-       a change to make unilaterally. Flagged with Felicia. */
+       a change to make unilaterally. Flagged with the brand direction. */
     step: 'Step 1 of 2',
     h2: 'What do you want help with?',
     lede: 'Choose where you need the most help right now.',
@@ -150,7 +150,7 @@ export const event = {
 
   /* SMS consent shown beside the checkbox on /830.
 
-     ⚠ OWNED BY JAKE, not us. Felicia 2026-08-18: "since this needs to align
+     ⚠ OWNED BY JAKE, not us. Brand direction, 2026-08-18: "since this needs to align
      with the A2P registration/use case, please confirm the final approved SMS
      consent language for Cedric to place beside the checkbox." Do NOT write
      this ourselves — it is the legal record behind every message he sends.
@@ -160,7 +160,7 @@ export const event = {
      `as boolean` widens the literal so either value type-checks. */
   consent: {
     /* APPROVED 2026-08-19. Wording supplied by Jake to match the A2P
-       registration; business name confirmed as "GWOP University" by Felicia.
+       registration; business name confirmed as "GWOP University" by the brand direction.
 
        Do not reword any part of this without going back to Jake — it is the
        legal record behind every message he sends, and the STOP/HELP keywords
@@ -175,20 +175,20 @@ export const event = {
     fine: 'Msg & data rates may apply. Reply STOP to opt out.',
   },
 
-  /* Felicia §11 prescribes this hierarchy: "YOU'RE IN." then "Your GWOP
+  /* Brand direction §11 prescribes this hierarchy: "YOU'RE IN." then "Your GWOP
      Blueprint starts here." then confirm delivery, then the next CTA. */
   thanks: {
     h1: 'You’re in.',
     h2: 'Your GWOP Blueprint starts here.',
     lede: 'Check your phone — your GWOP Blueprint is on its way by text and email.',
 
-    /* Felicia §11 names both of these as the next CTA "based on the final
+    /* Brand direction §11 names both of these as the next CTA "based on the final
        offer". Both render; the founding-member one is wording-pending. */
     ctas: {
       primary:   { label: 'Explore GWOP University', href: '/' },
-      /* Flip to `false` once Felicia confirms wording + destination (§11).
+      /* Flip to `false` once the brand direction confirms wording + destination (§11).
       Do NOT delete the key — `as const` makes its absence a type error. */
-      /* Flip `pending` to false once Felicia confirms wording + destination
+      /* Flip `pending` to false once the brand direction confirms wording + destination
          (§11). Do NOT delete the key — `as const` on this object makes its
          absence a type error in thanks/page.tsx. `as boolean` widens the
          literal so either value type-checks. */
@@ -213,7 +213,7 @@ export const event = {
     },
 
     /* ⚠ TWO ITEMS, NOT THREE, AND NEITHER PROMISES A DELIVERY.
-       Felicia, 2026-08-27, ruling on the 8/30 scope: the journey is lead
+       Brand direction, 2026-08-27, ruling on the 8/30 scope: the journey is lead
        capture → Blueprint → booking, with no account creation on the day.
 
        · "Watch for a text" is gone. It promised a Blueprint by text that no
@@ -226,7 +226,7 @@ export const event = {
        · The founding-member item is gone for Sunday. It was marked
          `pending: true`, but that flag never hid anything — Tbc renders its
          children plainly — so unapproved wording was live in front of every
-         attendee. Felicia: "hide it for Sunday."
+         attendee. Brand direction: "hide it for Sunday."
 
        ⚠ NextSteps hardcodes the count in its heading. If this array changes
        length again, fix the heading in Assessment.tsx too. */

@@ -1,6 +1,6 @@
 # Scheduled jobs
 
-**Updated 2026-08-27** — Felicia approved Vercel Pro, so the retry job is now
+**Updated 2026-08-27** — Approved Vercel Pro, so the retry job is now
 scheduled. This note previously explained why it wasn't.
 
 ## What runs

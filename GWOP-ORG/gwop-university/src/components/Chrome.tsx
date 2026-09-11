@@ -111,7 +111,7 @@ export function Footer({ legalOnly = false }: { legalOnly?: boolean }) {
             <Logo />
             <p className="blurb">{site.tagline}</p>
 
-            {/* Felicia §12 — official accounts. Empty URLs render a plain
+            {/* Brand direction §12 — official accounts. Empty URLs render a plain
                 label, so the slot is visibly reserved without a dead link. */}
             <ul className="socials">
               {site.social.map(s => {
@@ -169,7 +169,7 @@ export function Footer({ legalOnly = false }: { legalOnly?: boolean }) {
           </div>
           <div>
             <h4>Legal</h4>
-            {/* Felicia §13 — all four required routes, linked. */}
+            {/* Brand direction §13 — all four required routes, linked. */}
             <ul>
               <li><Link href="/privacy">Privacy Policy</Link></li>
               <li><Link href="/terms">Terms &amp; Conditions</Link></li>

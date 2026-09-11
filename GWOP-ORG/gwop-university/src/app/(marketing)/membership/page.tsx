@@ -89,19 +89,19 @@ export default async function MembershipPage() {
           <Link href={back.href}>‹ {back.label}</Link>
         </p>
         <p className="tag">Membership</p>
-        {/* ⚠ CHANGED 2026-09-03 with the levels rename. Was Felicia's approved
+        {/* ⚠ CHANGED 2026-09-03 with the levels rename. Was the approved
             "Four levels. One blueprint." — kept in step because leaving it while
             every other surface says levels would read as an oversight rather
             than a choice. Flag to Surpaul; trivial to revert. */}
         <h1 className="h2">{PATHWAY_HEADING}</h1>
-        {/* Felicia §8, 2026-08-27, verbatim. */}
+        {/* Brand direction §8, 2026-08-27, verbatim. */}
         <p className="lede">
           Build the foundation. Become capital-ready. Build and scale. Protect what you create.
         </p>
 
         {!plans?.length ? (
           <div className="mbempty">
-            {/* Felicia §8: "same meaning, but it reads intentionally rather
+            {/* Brand direction §8: "same meaning, but it reads intentionally rather
                 than like unfinished development." */}
             <h2>Founding Membership Coming Soon</h2>
             <p>Enrollment details are coming soon.</p>

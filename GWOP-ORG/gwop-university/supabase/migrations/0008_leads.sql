@@ -3,7 +3,7 @@
 --
 -- Event lead capture, written server-side before forwarding to GoHighLevel.
 --
--- SUPERSEDES the "no leads table" rule in ARCHITECTURE.md §14.1. Felicia
+-- SUPERSEDES the "no leads table" rule in ARCHITECTURE.md §14.1. The brand direction
 -- approved this on Aug 18: save the signup server-side first, forward to GHL
 -- with retries, GHL remains the operational CRM and marketing source of truth.
 --
@@ -33,7 +33,7 @@ create table public.leads (
   phone         text not null,
 
   -- ── What they asked for ─────────────────────────────────────────────────
-  -- Not a foreign key: INTERESTS lives in config/integrations.ts and Felicia
+  -- Not a foreign key: INTERESTS lives in config/integrations.ts and the brand direction
   -- may reword a tag mid-campaign. A stale value must not break a signup.
   interest      text not null default 'unspecified',
   -- Jake's tag text, verbatim, so his workflow matches on it directly rather
@@ -107,4 +107,4 @@ create policy leads_admin_read on public.leads
   for select using (public.has_role('admin'));
 
 comment on table public.leads is
-  'Record of event signup submissions. GHL remains the operational CRM (Felicia, Aug 18). Not a second CRM.';
+  'Record of event signup submissions. GHL remains the operational CRM (Brand direction, Aug 18). Not a second CRM.';

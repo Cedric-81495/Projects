@@ -559,7 +559,7 @@ export function Trust() {
    testimonial, and quotes alone are unverifiable.
 
    ⚠ THE WHOLE SECTION RETURNS null UNTIL resultsPublishable() PASSES, which
-   requires RESULTS.approved, Felicia's disclaimer written, and written consent
+   requires RESULTS.approved, the required disclaimer written, and written consent
    recorded PER INDIVIDUAL. Not a bulk flag — one person withholding consent
    holds the section, which is the correct failure direction for published
    credit results.

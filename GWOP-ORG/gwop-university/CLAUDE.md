@@ -15,7 +15,7 @@
 > | `/830` is event signage for one afternoon | `/830` is the **permanent lead-capture and assessment flow** |
 > | Reached only by QR at a booth | Reached by printed QR cards **and** by anyone sent a link |
 > | Jake's iframe collects the data | **We collect it.** Native form, our database, our consent records |
-> | Felicia owns copy and decisions | **Felicia is no longer on the team. Surpaul owns all decisions.** |
+> | the brand direction owns copy and decisions | **the brand direction is no longer on the team. Surpaul owns all decisions.** |
 > | Freeze after Aug 27, no build changes | **Freeze lifted.** Active development continues |
 > | Four levels: Freshman → Senior | **Four stages: Stage 01 → Stage 04** |
 >
@@ -36,7 +36,7 @@ Project constitution. Read fully before writing code. Place at repo root — loa
 automatically every session. **These rules override default behaviour and general best
 practice. Follow them exactly.**
 
-**Version 4 — Aug 14.** Supersedes v3. Updated against Felicia's confirmed directions
+**Version 4 — Aug 14.** Supersedes v3. Updated against the approved brand direction
 (Aug 14, 8:08 AM) and Jake's status update (Aug 14, 8:30 AM). **Three previously open
 questions are now closed — see §12.**
 
@@ -71,7 +71,7 @@ SMS/email follow-up and a call with the founder.
 | Person | Owns | Our interface |
 |---|---|---|
 | **Surpaul** | Founder. Credit repair specialist. Approves offer, pricing, brand, messaging | Approves; supplies copy |
-| **Felicia** | Right hand. Authored the workflow + tracker. Business context, scope, offer definition | Source of truth for decisions |
+| **the brand direction** | Right hand. Authored the workflow + tracker. Business context, scope, offer definition | Source of truth for decisions |
 | **Jake** | **Everything inside GoHighLevel** — the signup form itself, lead fields, tags, pipeline, SMS/email automation, AI chat. A2P 10DLC approved ✅ | **We embed his form. We never build one.** |
 | **Maui** | Module integration, website content/asset support, event signage, handoff folder | Consumes our content files + QR URL |
 | **Sheena** | Module production from Surpaul's material | Indirect, via Maui |
@@ -147,13 +147,13 @@ person and used, it is not finished."* This table is how we satisfy it.
 
 | File | Who edits it | Contains |
 |---|---|---|
-| `src/content/site.ts` | Surpaul / Felicia, applied by Maui | All website copy |
+| `src/content/site.ts` | Surpaul / Brand direction, applied by Maui | All website copy |
 | `src/content/event.ts` | Surpaul (offer), Maui | Event page copy, incentives, thank-you |
 | `src/content/pathway.ts` | Maui | Freshman–Senior labels and details |
 | `src/components/Chrome.tsx` | **Jhon** | `BrandBar` — the one header used by every page. `linked={false}` on `/830` only |
 | `src/components/Pathway.tsx` | **Jhon** | `PathwayTarget` — the whole p.4 layout, shared by `/` and `/app`. Structure is fixed; only the four strings in `SURFACES` differ per surface. Surfaces are a closed union, so a new one inherits the layout and cannot invent its own |
 | `src/config/integrations.ts` | **Jhon**, with input from Jake | Form URL, QR codes, interest list, campaign params, booking link, draft flag |
-| `src/config/membership.ts` | **Felicia defines, Surpaul approves** | Level pricing, billing modes, promo codes, offers, refund policy |
+| `src/config/membership.ts` | **the brand direction defines, Surpaul approves** | Level pricing, billing modes, promo codes, offers, refund policy |
 | `src/app/globals.css` | **Jhon only** | Design tokens + all styling |
 | `src/app/**/page.tsx` | **Jhon only** | Structure. **Never copy.** |
 
@@ -178,7 +178,7 @@ Violating any of these is a bug even if the feature works. If a request would br
 
 1. ~~**We never build a form that collects personal data.** No name, email, phone or
    consent field in this repo. Jake's iframe handles all of it.~~
-   **⚠️ SUPERSEDED 2026-08-18** by Felicia's approval of write-first capture, and now the
+   **⚠️ SUPERSEDED 2026-08-18** by the brand direction's approval of write-first capture, and now the
    core of the product. This repo **does** collect first name, last name, email, phone and
    SMS consent, in `src/app/830/InterestForm.tsx` → `/api/lead` → Supabase → GHL.
    **Do not remove or refuse to work on that form.** What still holds is the rule below it:
@@ -198,11 +198,11 @@ Violating any of these is a bug even if the feature works. If a request would br
 4. **Hero copy on `/` is prescribed by the Visual Build Package p.5** — "Knowledge Pays.",
    the sub-line, and "Start your blueprint". **Do not reword, improve, or shorten it.**
 5. ~~**Event hero copy is prescribed by p.7.**~~
-   **⚠️ SUPERSEDED 2026-08-27** by Felicia's polish pass, and again 2026-09-01 by the
+   **⚠️ SUPERSEDED 2026-08-27** by the brand direction's polish pass, and again 2026-09-01 by the
    de-eventing. The headline and kicker survive; the supporting paragraph, the date and
    venue line, and every "today" / "at the table" phrasing are gone. Copy now lives in
    `src/content/event.ts` with the reason for each change recorded beside it.
-   **Surpaul approves copy now, not Felicia.**
+   **Surpaul approves copy now, not the brand direction.**
 6. **Legal copy is attorney-supplied only.** Never draft, paraphrase, or tidy it. It lives
    in `src/content/site.ts` under `legal` and is marked `pending` until it arrives.
 7. **Never write credit-outcome claims** — no score numbers, no "remove negative items", no
@@ -229,7 +229,7 @@ Violating any of these is a bug even if the feature works. If a request would br
     an arbitrary field into his form.
 13. Interest values come from `INTERESTS` in the config. Jake builds one nurture branch per
     value — **adding or removing one silently breaks his automation.** Changes require
-    ~~Felicia's decision~~ **Surpaul's decision** and a message to Jake.
+    ~~the brand direction's decision~~ **Surpaul's decision** and a message to Jake.
     Same rule now applies to the six assessment answer sets in `src/config/assessment.ts`:
     the underscored machine values are what his conditions match on and what 19 existing
     rows already contain. **Never rename them to read nicely** — send a `_label` field
@@ -274,7 +274,7 @@ Never introduce `#000000` or the near-black from the Visual Build Package.
   labels, buttons or body copy.
 - **Secondary — Poppins (sans).** Everything else: `h3`, `h4`, body, UI, buttons, labels.
 
-### ⚠️ One deliberate accessibility deviation — flag to Felicia
+### ⚠️ One deliberate accessibility deviation — flag to the brand direction
 
 Brand gold `#C8A34A` on ivory is **2.2:1**, which fails WCAG for text. The brand sheet uses
 it for small labels; we use **`--gold-ink` `#8A6D1F`** (4.7:1) for small gold *text* on
@@ -286,7 +286,7 @@ gold is still used for rules, borders, numbers, and all gold on dark backgrounds
 
 ### Logos — `public/`
 
-Two assets, two jobs. **Do not swap them.** Updated Aug 14 with Felicia's supplied files.
+Two assets, two jobs. **Do not swap them.** Updated Aug 14 with the brand direction's supplied files.
 
 | Asset | Source | Use |
 |---|---|---|
@@ -309,7 +309,7 @@ variant is 88KB. On the event page's 1.5s LCP budget that difference matters.
 
 **Remaining asset gap:** both files are raster. The mark is 2779px so it is fine for
 screen and most print, but the ornate hero piece came from a 1024px JPEG — usable on
-screen, marginal for a large table sign. **Ask Maui/Felicia for vector (SVG/AI/EPS) before
+screen, marginal for a large table sign. **Ask Maui/the brand direction for vector (SVG/AI/EPS) before
 Maui's Aug 24 print run**, or confirm the print size stays small enough for raster.
 
 ### Prescribed components (Visual Build Package p.4, p.5)
@@ -405,28 +405,28 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
 - [x] Visual direction approved — Visual Build Package is the spec
 - [x] Pathway confirmed: Freshman → Sophomore → Junior → Senior + Capstone
 - [x] Form ownership settled: Jake builds it, we embed it
-- [x] **Interest list — CLOSED (Felicia, Aug 14).** Five options. Attendee-facing labels
+- [x] **Interest list — CLOSED (Brand direction, Aug 14).** Five options. Attendee-facing labels
       and Jake's GHL tag text are both in `src/config/integrations.ts` and differ on
       purpose: *Business Funding* → tag `Business Funding`, *Business / Entrepreneurship*
       → tag `Entrepreneurship`, *Wealth Building* → tag `Wealth Building`, plus *Credit*
       and *Wellness*. Jake needs six branches — five plus `Unspecified`.
-- [x] **No account creation in the event funnel (Felicia §10).** QR → landing → quick
+- [x] **No account creation in the event funnel (Brand direction §10).** QR → landing → quick
       signup → confirmation. Account creation belongs to membership, not lead capture.
-- [x] **Payment stays out of this repo (Felicia §10)** — "a separate but connected
+- [x] **Payment stays out of this repo (Brand direction §10)** — "a separate but connected
       component". The contract it must implement is written in `src/config/membership.ts`.
-- [x] **Pricing is configuration, not layout (Felicia §1)** — `src/config/membership.ts`,
+- [x] **Pricing is configuration, not layout (Brand direction §1)** — `src/config/membership.ts`,
       gated by `PRICING_PUBLISHED`. No number can render while that is false.
 - [x] One landing URL, one QR destination; attribution on allow-listed campaign params
-- [x] **Brand assets received (Felicia, Aug 14).** Ornate Blueprint artwork → hero on `/`
+- [x] **Brand assets received (Brand direction, Aug 14).** Ornate Blueprint artwork → hero on `/`
       and `/830`, white background cut. New shield mark → nav, footer, favicons. The old
       derived crest files are deleted; nothing references them.
 - [x] **Homepage hero reduced to ONE button**, as p.5 specifies. The previous "See the
       pathway" secondary CTA competed with "Start your blueprint".
-- [x] **Hero and event cards are now BLACK** (`--black: #0F1210`), not forest. Felicia §4
+- [x] **Hero and event cards are now BLACK** (`--black: #0F1210`), not forest. Brand direction §4
       lists "Black for premium contrast" and package p.5 and p.7 both render the card in
       near-black. Forest remains the secondary dark for bands and the footer.
 - [x] **All four §13 legal routes exist**: `/privacy`, `/terms`, `/sms-terms`, `/refunds`.
-      The last two were missing. `/refunds` renders a holding line only — Felicia §1: "Do
+      The last two were missing. `/refunds` renders a holding line only — Brand direction §1: "Do
       not publish a final policy until approved."
 - [x] **`/830` hero rebuilt to p.7.** The artwork is a SIBLING of the black card, not a
       child — the grid belongs on `.evhero`. My first attempt made `.evcard` itself the
@@ -434,7 +434,7 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
       Also removed, per review: the `Everybody Gotta Eat · Aug 30, 2026` badge and the
       `Free · Takes 2 minutes` line. Neither appears in p.7 and both pushed the CTA
       further down a phone screen. Time and location still render from
-      `event.details` once Felicia confirms them.
+      `event.details` once the brand direction confirms them.
 - [x] **Module asset slots added** (`note`, `video`, `thumb`, `workbook` on `Module`).
       Maui's task is "upload modules, organize by level" but there was previously
       nowhere to put a file. Accepts a `/public` path or a Drive link.
@@ -448,7 +448,7 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
 
 **🔴 Blocking, still unowned in the tracker**
 - [ ] **Domain + DNS access** — Aug 23 QR lock and Maui's Aug 24 print both depend on it,
-      and no tracker row assigns it. Escalate to Felicia. **Oldest open item.**
+      and no tracker row assigns it. Escalate to the brand direction. **Oldest open item.**
 - [ ] **Thank-you redirect** — can Jake's GHL form redirect to our `/thanks`? If not, the
       page is never seen and task 5 changes shape. One answer from Jake settles it.
 - [ ] **Jake's form embed URL.** His draft funnel is a `vibepreview.com` preview host —
@@ -458,11 +458,11 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
 - [ ] Offer + pricing approval (Surpaul, tracker due Aug 17)
 - [ ] Founding member wording + scholarship rules (Surpaul) — §9
 - [ ] Refund / cancellation policy (Surpaul + attorney) — §1, must not be published early
-- [ ] Event time + location (Felicia) — §3, placeholders already in `src/content/event.ts`
-- [ ] Official social accounts (Felicia) — §12, slots reserved in `src/content/site.ts`
+- [ ] Event time + location (the brand direction) — §3, placeholders already in `src/content/event.ts`
+- [ ] Official social accounts (the brand direction) — §12, slots reserved in `src/content/site.ts`
 - [ ] Beast's 1:1 booking link (Jake) — CTA on `/thanks` stays hidden until it arrives
 - [ ] Attorney legal copy for `legal` in `src/content/site.ts`
-- [ ] **Vector logo files (Maui / Felicia)** — both supplied assets are raster. The hero
+- [ ] **Vector logo files (Maui / the brand direction)** — both supplied assets are raster. The hero
       piece came from a 1024px JPEG, which is fine on screen but marginal for a large
       table sign. Needed before Maui's Aug 24 print run.
 
@@ -488,7 +488,7 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
       An intermediate version made the two pages byte-identical. That sent a
       paying student on `/app` back out to the event signup funnel, which is a
       stranger's page shown to a customer. Reverted.
-      ⚠️ Confirm the reading with Felicia — she wrote the note.
+      ⚠️ Confirm the reading with the brand direction — she wrote the note.
 - [x] **Responsive audit, 280-1920px — seven defects fixed.** See
       `RESPONSIVE-AUDIT.md`. Headlines: the breadcrumb overflowed at 320px; the
       module grid used `1fr` where only `minmax(0,1fr)` can shrink; the interest
@@ -546,14 +546,14 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
       smaller size, and the phone/airdrop graphic carries **no code** — it is a
       tappable link. So `pnpm qr` now emits ONE code at three sizes: one file for
       Maui to print, one code to field-test. Per-staff codes still exist but are
-      off by default (`ROLE_CODES=1 pnpm qr`) — Felicia §7 says separate signup
+      off by default (`ROLE_CODES=1 pnpm qr`) — Brand direction §7 says separate signup
       pages per staff member are not required, and five printed variants means
       five codes needing their own field test before Aug 23.
 - [x] **Fixed a print hazard in the generator.** It defaulted to
       `https://gwopu.com` when `NEXT_PUBLIC_SITE_URL` was unset, silently
       producing printable codes for a domain nobody has confirmed we own. It now
       exits with an error, and also rejects non-https origins — a cert warning
-      after a scan loses the signup. **Open question for Felicia: is gwopu.com
+      after a scan loses the signup. **Open question for Brand direction: is gwopu.com
       actually ours?**
 - [x] **Verified by decoding, not by eye.** All three sizes decode to the right
       URL, and the counter card still decodes at 150px, blurred, at 35% contrast,
@@ -582,11 +582,11 @@ Phase 1 has no backend and therefore nothing to keep secret. Never commit `.env*
       was hardcoded separately from the mobile drawer array, so fixing mobile left
       desktop broken. Both now render from the same `LINKS` array.
 - [x] `/830` closing CTA band removed — not in p.7. The page now holds only what
-      Felicia §2 lists: intro, four levels, incentive, signup.
-- [x] `/830` event page built to package p.7 + Felicia §2 spec
+      Brand direction §2 lists: intro, four levels, incentive, signup.
+- [x] `/830` event page built to package p.7 + Brand direction §2 spec
 - [x] Content + config extracted to `src/content` / `src/config`
 - [x] `/go/[code]` redirect + QR generator
-- [x] `/thanks` page built to Felicia §11 hierarchy
+- [x] `/thanks` page built to Brand direction §11 hierarchy
 - [x] Campaign parameter passthrough into Jake's form
 - [x] Membership + pricing configuration layer
 - [ ] Vercel project under client ownership, preview URL to Jake ← **next action**
@@ -605,12 +605,12 @@ only; accounts, dashboard and the student app come after.
       tells GHL when someone creates an account and Jake's Path 01 exit rule
       cannot fire. A booth lead who signs up later keeps getting "your access is
       waiting" messages.
-- [ ] **Free-vs-paid access rule (Felicia).** Blocks both of the above. Sheena's
+- [ ] **Free-vs-paid access rule (the brand direction).** Blocks both of the above. Sheena's
       "Free Guide" is 14 credit-basics lessons and her only fully edited set;
       prior notes say fully paid with only the credit review free. Cannot be
       guessed — it changes how access is built, not just what is displayed.
 - [ ] **Does `/thanks` invite account creation?** Today its CTA goes to `/`, so
       an attendee never learns an account exists. Either the page invites it or
       Jake's follow-up does — both work, they must agree.
-- [ ] **Event time + venue owner.** Felicia §3 permits inserting them once
+- [ ] **Event time + venue owner.** Brand direction §3 permits inserting them once
       confirmed, but no tracker row assigns producing them.

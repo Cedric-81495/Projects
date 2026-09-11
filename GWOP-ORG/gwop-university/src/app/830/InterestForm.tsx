@@ -16,7 +16,7 @@ import {
    Two capture paths live here, chosen by NEXT_PUBLIC_LEAD_CAPTURE_MODE:
 
      'native' (default) — our own form → POST /api/lead → Supabase → GHL.
-                          Felicia approved this on Aug 18.
+                          Approved this on Aug 18.
      'iframe'           — Jake's embedded GHL form. The fallback she asked to
                           keep live until the native path passes end-to-end.
 
@@ -32,7 +32,7 @@ import {
 
 const MODE = publicEnv.NEXT_PUBLIC_LEAD_CAPTURE_MODE ?? 'native'
 
-/* Felicia, Aug 20: "we'll have the website as the primary source, but we also
+/* Brand direction, Aug 20: "we'll have the website as the primary source, but we also
    need to account for event/QR leads... I'd like those sources identified
    separately in GHL so we can track where leads are coming from."
 
@@ -56,7 +56,7 @@ function readSource(): string {
   return s && known.includes(s) ? s : s === 'unknown' ? 'unknown' : 'website'
 }
 
-/* Felicia §3 + §7: one page, one QR destination, attribution on parameters.
+/* Brand direction §3 + §7: one page, one QR destination, attribution on parameters.
    Allow-listed only — an arbitrary ?field=value in a scanned link must never
    reach the payload. Values truncated; a pasted novel is not attribution. */
 function readCampaign(): Record<string, string> {
@@ -269,7 +269,7 @@ export function InterestForm() {
 }
 
 /* ── FALLBACK PATH ─────────────────────────────────────────────────────────
-   Unchanged behaviour, retained per Felicia's instruction. */
+   Unchanged behaviour, retained per the brand direction's instruction. */
 function IframeFallback({ src }: { src: string | null }) {
   return (
     <div className="evslot">
@@ -409,7 +409,7 @@ function NativeForm({
         throw new Error(body?.error?.message ?? 'Something went wrong. Please try again.')
       }
 
-      /* CHANGED 2026-08-22, Felicia's beta-assessment brief.
+      /* CHANGED 2026-08-22, the brand direction's beta-assessment brief.
          Was: hard navigation to /thanks.
          Now: the lead is saved, so the attendee is safe, and the seven
          questions run on this page.
@@ -470,7 +470,7 @@ function NativeForm({
   /* Consent wording is not approved yet. The mechanism is built and testable,
      but a placeholder must not reach an attendee — so the form refuses to
      render rather than shipping unapproved legal text.
-     Flip event.consent.pending to false once Felicia supplies the sentence. */
+     Flip event.consent.pending to false once the brand direction supplies the sentence. */
   if (consent.pending) {
     return (
       <div className="evph" role="status">

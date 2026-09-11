@@ -465,8 +465,8 @@ Playwright E2E for both journeys · load test · security audit against §19 · 
 
 | # | Item | Impact | Owner |
 |---|---|---|---|
-| 1 | 🔴 **Timeline conflict.** `CLAUDE.md` v3 §3 states *"No database. No Supabase. No API routes that accept data. No auth"* until after Aug 30, and freezes the build Aug 27. This spec asks for all of it now, 14 days before the event. | Building auth + payments during event-freeze week is how the event page breaks | **Felicia — needs an explicit decision** |
-| 2 | 🔴 **Domain + DNS access** still unowned. QR lock is Aug 23 | Blocks Maui's print run; unrecoverable once printed | Felicia / Surpaul |
+| 1 | 🔴 **Timeline conflict.** `CLAUDE.md` v3 §3 states *"No database. No Supabase. No API routes that accept data. No auth"* until after Aug 30, and freezes the build Aug 27. This spec asks for all of it now, 14 days before the event. | Building auth + payments during event-freeze week is how the event page breaks | **the brand direction — needs an explicit decision** |
+| 2 | 🔴 **Domain + DNS access** still unowned. QR lock is Aug 23 | Blocks Maui's print run; unrecoverable once printed | the brand direction / Surpaul |
 | 3 | 🔴 **Jake's form embed URL** not yet supplied | `GHLLeadForm` cannot be tested end to end | Jake |
 | 4 | 🟠 **Does Jake's form read `?interest=`?** | Determines whether §10 works or degrades to option (b) | Jake |
 | 5 | 🟠 **Can GHL redirect to our `/thanks`?** | Changes the shape of the confirmation step | Jake |
@@ -493,7 +493,7 @@ riding on top of a new auth system. This meets both documents.
    with no local copy, and there is no live signup counter for the booth. Accepted as a
    deliberate architectural decision, not an oversight.
 
-   > **SUPERSEDED 2026-08-18.** Felicia approved the write-first design after Jake
+   > **SUPERSEDED 2026-08-18.** Approved the write-first design after Jake
    > proposed replacing the embedded form with an inbound webhook: *"proceed with
    > saving the signup server-side first and forwarding to GHL with retries. GHL
    > remains the operational CRM/marketing source of truth. Keep the current form
@@ -508,7 +508,7 @@ riding on top of a new auth system. This meets both documents.
    > Implemented by migration `0008_leads.sql`, `POST /api/lead`,
    > `src/lib/ghl/sync.ts` and the `/api/v1/cron/lead-sync` retry job.
    > `GHLLeadForm.tsx` and `NEXT_PUBLIC_GHL_FORM_URL` are retained as the fallback
-   > path Felicia asked for, and must not be deleted until the new flow is signed
+   > path the brand direction asks for, and must not be deleted until the new flow is signed
    > off end to end.
 
 2. **§23 "do not add a footer where the hierarchy does not include one"** conflicts with

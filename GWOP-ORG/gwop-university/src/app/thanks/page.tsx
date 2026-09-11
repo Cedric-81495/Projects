@@ -17,7 +17,7 @@ export default function Thanks() {
     <div className="ev ev-thanks">
       <BrandBar />
 
-      {/* Hierarchy prescribed by Felicia §11: YOU'RE IN → Blueprint starts here
+      {/* Hierarchy prescribed by Brand direction §11: YOU'RE IN → Blueprint starts here
           → confirm delivery → next CTA. Do not reorder. */}
       <div className="evhero">
         <div className="evcard">
@@ -44,7 +44,7 @@ export default function Thanks() {
           <p className="tag">What happens next</p>
           {/* ⚠ Count hardcoded here AND in Assessment.tsx's NextSteps. Both
               must match event.thanks.next.length. Cut to two on 2026-08-27
-              when Felicia removed the founding-member item and the
+              when the brand direction removed the founding-member item and the
               text-delivery promise for Sunday. */}
           {/* ⚠ "Before you leave the table" removed 2026-09-01 — no table.
               Count hardcoded here AND in Assessment.tsx; both must match

@@ -13,13 +13,13 @@ import { buildGhlEmbedUrl, GHL_EMBED_MODE } from '@/lib/ghl/embed'
  *   · no validation of the lead's fields
  *
  * ⚠ STATUS 2026-08-18: this component is now the FALLBACK path, not the primary
- * one. Felicia approved capturing the signup ourselves and forwarding it to GHL
+ * one. Approved capturing the signup ourselves and forwarding it to GHL
  * with retries (ARCHITECTURE.md §14.1). That work lives in POST /api/lead and
  * src/lib/ghl/sync.ts.
  *
  * The "no local write" rule that stood here has been overturned by that
  * decision — do not cite it to revert the new flow. This file stays because
- * Felicia asked for the embed to remain live as a fallback until the new path
+ * The brand direction asks for the embed to remain live as a fallback until the new path
  * passes end-to-end testing. Do not delete it, and do not clear
  * NEXT_PUBLIC_GHL_FORM_URL, until that sign-off happens.
  * ═══════════════════════════════════════════════════════════════════════════

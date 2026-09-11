@@ -87,7 +87,7 @@ Levels 1–3 unlock, Senior stays locked. That is cumulative access working.
 
 `CLAUDE.md` §3 states no database, no auth and no API routes before Aug 30, with
 a build freeze on Aug 27. This package contains all three. That conflict is real
-and **Felicia has not ruled on it.**
+and **the brand direction has not ruled on it.**
 
 Recommended: run everything here on a `develop` branch against a separate
 Supabase project, and ship nothing new to production before the event except the

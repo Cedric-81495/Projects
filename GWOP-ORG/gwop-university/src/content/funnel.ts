@@ -29,7 +29,7 @@
 
    ── THE PRICES ────────────────────────────────────────────────────────────
    Not in this file. They are read from config/membership.ts through
-   priceLabel(), which is the design Felicia asked for: "build the system so
+   priceLabel(), which is the design the brand direction asks for: "build the system so
    pricing can be changed easily without redesigning the website/app." The
    numbers in the mockup ($197 / $297 / $397 / $497, $997, 3×$397, "$1,388
    separately") are Surpaul's from his final-direction memo and are now in that
@@ -248,7 +248,7 @@ export const funnel = {
      Why the placeholders were removed rather than kept: "Add a real student
      quote here." in a credit funnel persuades nobody and is still a claim on
      the page. The new section returns null until written consent is on file
-     per individual and Felicia's results disclaimer exists, so there is no
+     per individual and the brand direction's results disclaimer exists, so there is no
      half-state where a placeholder can be glimpsed.
 
      Quotes go in RESULTS.quotes, not here. Each needs a real attribution,

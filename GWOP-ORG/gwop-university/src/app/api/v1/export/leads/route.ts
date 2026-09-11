@@ -8,7 +8,7 @@ import { logger } from '@/lib/observability/logger'
  * ═══════════════════════════════════════════════════════════════════════════
  * GET /api/v1/export/leads  →  CSV of every lead and their assessment answers.
  *
- * Felicia, 2026-08-27: an end-of-day export as a second copy of the data.
+ * Brand direction, 2026-08-27: an end-of-day export as a second copy of the data.
  *
  * WHY THIS EXISTS: four hundred leads are the entire value of the activation,
  * and until the plan changes they live in one place with no point-in-time

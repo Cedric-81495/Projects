@@ -1,8 +1,8 @@
 import { BrandBar, Footer } from '@/components/Chrome'
 import { REFUND_POLICY } from '@/config/membership'
 
-/* Felicia §13 — a required placeholder route: "Refund / Cancellation Policy".
-   Felicia §1: "Do not publish a final policy until approved." So this route
+/* Brand direction §13 — a required placeholder route: "Refund / Cancellation Policy".
+   Brand direction §1: "Do not publish a final policy until approved." So this route
    exists and is linkable, but renders nothing but a holding line until
    REFUND_POLICY.approved is true. */
 export default function Page() {

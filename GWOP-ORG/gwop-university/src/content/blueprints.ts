@@ -1,7 +1,7 @@
 /**
  * THE BLUEPRINT ROADMAPS.
  *
- * ✅ APPROVED — Felicia, 2026-08-25. This is her Condensed Event Version,
+ * ✅ APPROVED — Brand direction, 2026-08-25. This is her Condensed Event Version,
  * applied verbatim. She reviewed all nine, kept the five-section structure and
  * the nine paths as built, and rewrote the copy shorter for someone reading on
  * a phone immediately after finishing the assessment.
@@ -9,7 +9,7 @@
  * Do not lengthen these. The brevity is the point — an attendee is standing at
  * a table with a queue behind them, not sitting down to read.
  *
- * ── STRUCTURE (Felicia, 2026-08-22) ─────────────────────────────────────────
+ * ── STRUCTURE (Brand direction, 2026-08-22) ─────────────────────────────────────────
  * Every roadmap answers the same five things in the same order:
  *   1. Where You Are
  *   2. What's Holding You Back
@@ -26,7 +26,7 @@
  *
  * ── RULES THAT ARE NOT STYLE PREFERENCES ────────────────────────────────────
  * No score numbers. No funding amounts. No timelines. No guarantees. Note how
- * carefully Felicia hedged the claims — "may evaluate", "possible credit
+ * carefully the brand direction hedged the claims — "may evaluate", "possible credit
  * impact", "appropriate for you". Keep that if anything is ever edited.
  */
 

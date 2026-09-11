@@ -1,100 +1,84 @@
-GWOP University — payment plan withdrawn + webhook guard, 2026-09-11
-====================================================================
+GWOP University — attribution removed + payment changes, 2026-09-11
+===================================================================
 
     cd /path/to/gwop-university
-    unzip -o ~/Downloads/gwop-university-payments.zip
+    unzip -o ~/Downloads/gwop-university-cleanup.zip
 
-CUMULATIVE. Contains every file changed in this session, so it supersedes
-the three earlier zips. Apply this one alone.
+CUMULATIVE. Supersedes every earlier zip this session. 48 files.
 
-FILES
------
-  src/config/membership.ts                     plan nulled + build note
-  src/content/funnel.ts                        FAQ plan clause tokenised
-  src/components/funnel/Sections.tsx           plan note gated, {plan} token
-  src/app/api/webhooks/stripe/route.ts         completion guard
-  supabase/migrations/0020_instalment_counters.sql   NEW — run this
-  src/styles/funnel.css                        (earlier: layout + padding)
-  src/app/830/page.tsx                         (earlier: section split)
-  src/app/(marketing)/membership/page.tsx      (earlier: access copy)
-  src/app/(marketing)/membership/PlanCard.tsx  (earlier: access copy)
+⚠ RUN MIGRATION 0020 BEFORE DEPLOYING (unchanged from the last zip; skip
+if you have already applied it).
 
-⚠ THERE IS A MIGRATION THIS TIME
---------------------------------
-0020 adds two nullable columns to `subscriptions` and one CHECK constraint.
-The table is empty — nothing in the codebase inserts into it — so there is
-no backfill and no lock of consequence.
+WHAT THIS ZIP DOES
+------------------
+1. Removes every reference to the former team member — 98 instances
+   across 28 source files, 2 migrations and 15 docs. Nothing remains:
+       grep -ri felicia .      returns nothing
 
-    supabase db push        (or paste 0020 into the SQL editor)
+2. Carries forward the payment changes from the previous zip (plan
+   withdrawn, webhook completion guard, 0020) and the funnel/membership
+   fixes before it.
 
-RUN IT BEFORE DEPLOYING. The webhook now selects payments_made and
-payments_required. Without the columns that select errors — on a dormant
-path today, but do not leave the two out of step.
+WHY THE COMMENTS WERE REWRITTEN, NOT DELETED
+--------------------------------------------
+Almost every reference was PROVENANCE, not credit. Things like:
 
-WHAT CHANGED AND WHY
---------------------
-1. The payment plan is withdrawn from every surface.
-   BLUEPRINT_BUNDLE.monthly = null. The funnel was printing "3 monthly
-   payments of $397 · $1,191 total" with nothing behind it: no recurring
-   Stripe price, no plan row, no subscription record. Per your call, TBD.
+    /* Wording is Felicia's, verbatim. Do not improve it. */
+    /* Felicia §7: "We do not necessarily need separate signup pages…" */
+    /* ✅ RESOLVED — Felicia, Aug 14 (directions §6 + §7). */
 
-   Two surfaces were NOT covered by the existing guard and would have kept
-   advertising it:
-     · the access-pause sentence, which sat outside the price guard and
-       would have attached plan terms to the $997 one-time purchase
-     · the FAQ cost answer, where ", with a 3-payment plan available" was
-       hardcoded in the middle of a token-substituted string
+Deleting those outright would have been worse than leaving them. The name
+is attribution; the sentence around it is the reason a piece of copy must
+not be reworded, or the record that a question is already settled. Strip
+the whole comment and the next person "improves" approved wording, or
+re-opens a decision that was closed in August.
 
-   Both read from the same value now. Setting monthly back to 397 turns the
-   offer on everywhere at once — which is why it must not be set until the
-   mechanism exists.
+So the person is gone and the requirement stays. The mapping used:
 
-2. The webhook can no longer revoke access from a completed plan.
-   customer.subscription.deleted set expires_at unconditionally. A three-
-   payment plan ENDS by design, and Stripe emits the same event for a
-   completed schedule as for a cancellation — so finishing the plan would
-   have revoked access from the buyer who just paid $1,191.
+    "Felicia §7"                 ->  "Brand direction §7"
+    "Felicia's wording, verbatim"->  "The brand direction's wording, verbatim"
+    "Felicia approved X"         ->  "Approved X"
+    "Felicia asked for X"        ->  "The brand direction asks for X"
+    "Source: Felicia's confirmed directions"
+                                 ->  "Source: the approved brand direction"
 
-   The branch now refuses to act unless a subscriptions row exists AND
-   records fewer payments than required. This is a HOLD, not the fix: the
-   path is dormant today because nothing writes that table. It goes live
-   the moment someone adds the insert, which is exactly when the bug would
-   otherwise have shipped.
+Section numbers (§1, §6, §7 …) are kept. They are the index into the
+original direction documents, which still exist outside the repo. Without
+them the requirements become unverifiable assertions.
 
-STILL TBD — READ BEFORE BUILDING THE PLAN
------------------------------------------
-The full build note is in config/membership.ts under BLUEPRINT_BUNDLE, and
-the remaining steps are listed at the foot of 0020. The short version:
+⚠ THIS WAS A SCRIPTED PASS AND IT NEEDS YOUR EYES
+--------------------------------------------------
+A regex cannot judge tone. I ran a second pass for capitalisation and
+awkward phrasing and re-read every changed line, but 98 rewrites across
+48 files is more than I can be certain of. Worth skimming:
 
-  · The memo asks for a FIXED INSTALMENT, not a subscription. Seeding a
-    $397 recurring price and pointing checkout at it builds the endless
-    subscription §1 explicitly rules out, and payment four lands on
-    somebody who has paid in full. Stripe stops it with a subscription
-    schedule: one phase, iterations 3, end_behavior 'cancel'.
+    git diff
 
-  · "If payments stop, access pauses" is not what the code does. It expires
-    access at period end, which is termination — a missed second payment
-    ends it, they have paid $794 for nothing, and the no-refund policy is
-    what they meet when they complain. Pause and expire are different
-    products. Surpaul picks; counsel should see both alongside the CROA
-    question, since instalment billing for credit-related services is
-    squarely what CROA regulates.
+Two spots I rewrote by hand rather than by rule, because the mechanical
+result read badly:
 
-NOT CHANGED, WORTH KNOWING
---------------------------
-  · The FAQ cost answer reads "…before you buy. so we'll walk through…" —
-    REFUND_POLICY.text ends in a full stop and the template continues in
-    lowercase. Pre-existing. Left alone because that string is approved
-    legal wording and rearranging it is a copy decision, not a fix.
+  src/config/teaser.ts     "Felicia's 3:01am flow" -> "The approved flow"
+                           (the timestamp was a reference to a message
+                           from a person, so it went with the name)
+  src/app/globals.css      "Felicia's 2026-08-26 mockup"
+                           -> "The approved 2026-08-26 mockup"
 
-  · PAYMENT.enabled is false and is never read anywhere in the codebase.
-    It is not a kill switch. The real gates are membership_plans.published
-    and the presence of a Stripe price ID.
+NOT CHANGED — DECIDE SEPARATELY
+-------------------------------
+  · Surpaul is still named throughout. He is the client and the approver,
+    and his memo is the live source of direction. Say the word if you want
+    the same treatment applied there.
+  · Jake, Maui and Shin are named in a few places. Untouched.
+  · git history still contains the original comments. This zip changes the
+    working tree only. Rewriting history on a pushed branch is a different
+    operation with real consequences — raise it if you need it.
+  · The .md files in the repo root (CLAUDE.md, ARCHITECTURE.md,
+    GWOP-CONTEXT.md and the CHANGES-* logs) were rewritten too. The
+    CHANGES-* files are dated historical records, so you may prefer those
+    left as they were. Easy to revert individually.
 
 CHECK
 -----
-    npm run typecheck     # passes here
-    npm run build         # could not run in the sandbox: no Google Fonts
-
-Then on /830: no "3 monthly payments" line, no access-pause sentence, and
-the FAQ cost answer ending "(a $391 savings)." with no plan clause.
+    grep -ri felicia .        # expect nothing
+    npm run typecheck         # passes here
+    npm run build             # could not run in sandbox: no Google Fonts

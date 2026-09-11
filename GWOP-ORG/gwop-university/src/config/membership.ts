@@ -54,6 +54,31 @@
    PURCHASE sequence, which is about buying order, not about access stacking.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── LEVEL DETAIL PAGES ────────────────────────────────────────────────────
+   ⚠ FALSE UNTIL CHECKOUT IS REAL. This is the single switch that turns the
+   four pathway cards from inert articles into links.
+
+   The cards are BUILT to navigate — markup, hover state and focus ring are all
+   in place — because the work of making them linkable later should be a flag,
+   not a rewrite. What is missing is the destination being worth arriving at:
+
+     · membership_plans.published is false and amount_cents is null
+     · STRIPE_MODE is test
+     · /api/v1/checkout is auth: 'student', so a visitor cannot reach it
+
+   A card that leads to a page whose only button dead-ends at a login wall is
+   worse than a card that does not lead anywhere. Flip this the same day the
+   level pages exist and checkout takes a card — not before, and not to preview
+   it in production.
+
+   ⚠ THE CARDS MUST NOT LOOK CLICKABLE WHILE THIS IS FALSE. Their hover state
+   is a readability lift, not an affordance: no pointer cursor, no underline, no
+   arrow. See .fn-path-card in funnel.css. */
+export const LEVEL_PAGES_OPEN = false
+
+/** Where a level card points once LEVEL_PAGES_OPEN is true. */
+export const levelHref = (slug: string) => `/levels/${slug}`
+
 /** Master gate. While false: cards show `tbdLabel`, never a number. */
 export const PRICING_PUBLISHED = true
 

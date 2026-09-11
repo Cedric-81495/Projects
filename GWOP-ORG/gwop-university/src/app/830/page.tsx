@@ -8,7 +8,7 @@ import { funnel } from '@/content/funnel'
 import { InterestForm } from './InterestForm'
 import { NoThirdPartyWidgets } from '@/components/integrations/NoThirdPartyWidgets'
 import {
-  FunnelHeader, Hero, HonestBar, Problem, PathwayAndBundle, Process,
+  FunnelHeader, Hero, HonestBar, Problem, Pathway, Bundle, Process,
   Difference, Founder, Trust, Testimonials, Faq, FunnelFooter,
 } from '@/components/funnel/Sections'
 
@@ -34,7 +34,7 @@ import {
    reason it ports cleanly.
 
    ── SECTION ORDER, AS APPROVED ────────────────────────────────────────────
-     Header · Hero · Honest bar · Problem · Pathway + bundle · Process ·
+     Header · Hero · Honest bar · Problem · Pathway · Bundle · Process ·
      Difference · Founder · Trust · Testimonials · FAQ · #choose · Footer
 
    ── WHERE THE MOCKUP'S POST-OPT-IN STRETCH WENT ═══════════════════════════
@@ -160,7 +160,8 @@ export default function FunnelPage() {
       <Hero />
       <HonestBar />
       <Problem />
-      <PathwayAndBundle />
+      <Pathway />
+      <Bundle />
       <Process />
       <Difference />
       <Founder />

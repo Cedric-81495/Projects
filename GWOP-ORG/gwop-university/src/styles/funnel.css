@@ -1579,3 +1579,123 @@
   .fn-capstone-price { text-align: left; }
   .fn-path-card .fn-class { min-height: 0; }
 }
+
+/* ══ PATHWAY AS ITS OWN SECTION ═════════════════════════════════════════════
+   Added 2026-09-11. The four detail cards and the bundle offer shared one
+   <section> on the standard 1120px wrap, and the cards did not fit: roughly
+   250px of usable width each, which broke "$197 one-time" across two lines and
+   squeezed "2 modules / 12 lessons" into a column one word wide.
+
+   ⚠ THE FIX IS A WIDER WRAP ON THIS SECTION ONLY, NOT A WIDER --max. Every
+   other section on the funnel is prose — the lede, the process, the FAQ, the
+   form — and they need the narrow measure. Widening --max would push all of
+   them past a comfortable line length to solve a problem that belongs to one
+   grid.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.fn-wrap--wide { max-width: 1280px; }
+
+/* The two sections sit directly on top of each other, so the pathway gives up
+   its bottom padding and the bundle takes the gap instead. Two full 104px
+   blocks meeting would put 208px of nothing between a price and the offer that
+   undercuts it. */
+.fn-pathway-sect { padding-bottom: 64px; }
+.fn-bundle-sect { padding-top: 0; }
+
+/* The boundary the shared <section> used to imply by proximity. A hairline at
+   the same gold tint as the card rules — the divider vocabulary already in use
+   on this page — rather than a new colour or a heavier rule. */
+.fn-bundle-sect > .fn-wrap {
+  border-top: 1px solid rgba(212, 175, 55, .14);
+  padding-top: 64px;
+}
+
+/* ── THE PRICE BLOCK ───────────────────────────────────────────────────────
+   Numeral and term stacked, not joined. `white-space: nowrap` is the actual
+   guarantee — the split alone stops today's wrap, but a future $1,197 would
+   reintroduce it at a width nobody is testing. */
+.fn-path-money { min-width: 0; }
+.fn-path-foot .fn-price { white-space: nowrap; }
+.fn-path-terms {
+  font-family: var(--ui); font-size: 10.5px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--stone); margin: 2px 0 0;
+}
+/* Stops the counts collapsing to one word per line when the numeral is long.
+   flex-shrink: 0 keeps them whole and lets the money column give way first. */
+.fn-path-counts { white-space: nowrap; flex-shrink: 0; }
+
+/* ── HOVER ─────────────────────────────────────────────────────────────────
+   ⚠ A READABILITY LIFT, NOT AN AFFORDANCE, WHILE LEVEL_PAGES_OPEN IS FALSE.
+
+   These cards do not navigate yet. So the hover state does the one thing that
+   is honest for a card that is going nowhere: it brings the card forward so
+   the column under the cursor is easier to read against three dark siblings.
+
+   No pointer cursor, no underline, no arrow, no shadow that reads as "press
+   me". Those are promises of a destination, and following them would land on
+   nothing. The pointer arrives with .fn-path-card--live, which is only
+   rendered once the flag is true.
+
+   One property doing the work — a 1px border brightening and a 1px rise.
+   Chanel's rule: the shadow and the scale were both drafted here and both
+   removed. */
+.fn-path-card {
+  transition: border-color .18s ease, background-color .18s ease, transform .18s ease;
+}
+.fn-path-card:hover {
+  border-color: rgba(212, 175, 55, .5);
+  background: rgba(255, 255, 255, .04);
+  transform: translateY(-1px);
+}
+
+/* Only a card that actually goes somewhere claims to. */
+.fn-path-card--live { cursor: pointer; text-decoration: none; display: flex; }
+.fn-path-card--live:hover { border-color: var(--gold); }
+.fn-path-card--live:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* Movement is the decorative half; the contrast change is the useful half. A
+   reduced-motion preference keeps the second and drops the first. */
+@media (prefers-reduced-motion: reduce) {
+  .fn-path-card { transition: border-color .18s ease, background-color .18s ease; }
+  .fn-path-card:hover { transform: none; }
+}
+
+/* Hover is a pointer idiom. On touch it resolves on tap and sticks until the
+   next tap elsewhere, which on an inert card is a highlight the visitor cannot
+   clear and did not ask for. */
+@media (hover: none) {
+  .fn-path-card:hover {
+    border-color: rgba(212, 175, 55, .22);
+    background: rgba(255, 255, 255, .02);
+    transform: none;
+  }
+}
+
+/* ── THE ROW ───────────────────────────────────────────────────────────────
+   ⚠ THE BASE RULE STILL SAYS `gap: 0`, AND IT IS NOT WRONG — it was written for
+   the old timeline layout, where the cards were bare columns under one gold
+   rule and a gap would have broken the line. The detailed cards have their own
+   border and radius, so at gap 0 they meet edge to edge and read as one table
+   rather than four products. The gap belongs to the card treatment, so it is
+   set here with it rather than by editing a rule the other layout still needs.
+
+   Same for the rule above them: .fn-path-row::before draws the timeline's
+   horizontal gold line at top:14px, which now runs behind four bordered cards.
+   It is a leftover from a layout that no longer renders here. */
+.fn-path-row { gap: 24px; }
+.fn-path-row::before { display: none; }
+
+/* ⚠ min-width: 431px IS LOAD-BEARING — DO NOT DROP IT. The 430px block earlier
+   in this file sets the row to a single column for phones. This block appears
+   after it, so an unbounded `max-width: 1180px` would win the cascade at 390px
+   and put two cards side by side on a phone. Bounding it below keeps the
+   existing phone rule intact without reordering the file. */
+@media (min-width: 431px) and (max-width: 1180px) {
+  /* Below the wide wrap the row goes 2x2 rather than squeezing four. This is
+     the width the single-section layout was already failing at. */
+  .fn-path-row { grid-template-columns: 1fr 1fr; gap: 24px; }
+}
+
+@media (max-width: 860px) {
+  .fn-pathway-sect { padding-bottom: 44px; }
+  .fn-bundle-sect > .fn-wrap { padding-top: 44px; }
+}

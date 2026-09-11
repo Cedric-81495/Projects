@@ -20,6 +20,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 
 import { site, legal } from '@/content/site'
 import { funnel } from '@/content/funnel'
@@ -29,7 +30,8 @@ import {
   lessonsIn, TOTAL_MODULES, TOTAL_LESSONS, TOTAL_DOWNLOADS,
 } from '@/content/pathway'
 import {
-  LEVELS, BLUEPRINT_BUNDLE, REFUND_POLICY,
+  LEVELS, BLUEPRINT_BUNDLE, REFUND_POLICY, PRICING_PUBLISHED,
+  LEVEL_PAGES_OPEN, levelHref,
   oneTimeLabel, priceLabel, separateTotal, planTotal, fmtMoney, bundleSavings,
 } from '@/config/membership'
 import { Tbc } from '@/components/Chrome'
@@ -178,19 +180,44 @@ const LEVEL_PRICE: Record<string, number | null> = Object.fromEntries(
    still the single switch that governs whether a number can appear anywhere on
    this page. "$1,388 separately" is computed from the four cards, never typed,
    so it cannot drift from them. */
-export function PathwayAndBundle() {
-  const sep = separateTotal()
+/* ══ THE PATHWAY ═══════════════════════════════════════════════════════════
+   ⚠ ITS OWN SECTION SINCE 2026-09-11. This and the bundle offer shared one
+   <section> on a 1120px wrap, and four detail-rich cards do not fit in it.
 
+   Each card carries an eyebrow, a headline, a summary, two modules with lesson
+   counts, three downloads, the Blueprint mapping and a price. At 1120px that
+   is roughly 250px of usable width per card — narrow enough that "$197
+   one-time" broke across two lines and "2 modules / 12 lessons" stacked one
+   word per line beside it. The content was right; the column was too tight to
+   hold it.
+
+   So the pathway gets a wider wrap of its own, and the bundle keeps the
+   reading measure it wants. They were only ever one section because they were
+   written in one pass.
+
+   ⚠ DO NOT WIDEN .fn-wrap TO FIX THIS. It sets the measure for every section
+   on the funnel — the lede, the process, the FAQ, the form. Those are prose
+   and they need the narrow column. Only this row wants the extra width. */
+export function Pathway() {
   return (
-    <section className="fn-section fn-wrap">
-      <div className="fn-pathway-head">
-        <h2>{PATHWAY_HEADING}</h2>
-        <p className="fn-lede">{PATHWAY_LEDE}</p>
-      </div>
+    <section className="fn-section fn-pathway-sect">
+      <div className="fn-wrap fn-wrap--wide">
+        <div className="fn-pathway-head">
+          <h2>{PATHWAY_HEADING}</h2>
+          <p className="fn-lede">{PATHWAY_LEDE}</p>
+        </div>
 
-      <div className="fn-path-row">
-        {PATHWAY.map(l => (
-          <article className="fn-path-card" key={l.slug}>
+        <div className="fn-path-row">
+        {PATHWAY.map(l => {
+          const price = LEVEL_PRICE[l.slug]
+          /* "one-time" only earns its line when there is a number above it to
+             qualify. Under an unpublished price the label reads "Pricing
+             announced soon · one-time", which states a billing term for a price
+             that does not exist yet. */
+          const hasPrice = PRICING_PUBLISHED && price !== null
+
+          const body = (
+            <>
             <p className="fn-class">{l.eyebrow}</p>
             <h3>{l.goal}</h3>
             <p className="fn-path-sub">{l.detail}</p>
@@ -219,16 +246,38 @@ export function PathwayAndBundle() {
               Completes <strong>{l.blueprintSection}</strong> in the GWOP Blueprint
             </p>
 
+            {/* ⚠ THE NUMERAL AND ITS TERM ARE TWO ELEMENTS, NOT ONE STRING.
+                oneTimeLabel() returns "$197 one-time", which at 34px serif is
+                wider than the card and broke as "$197 one-" / "time". Splitting
+                them lets the numeral stay big and unbreakable while the term
+                sits under it in UI type — and it matches the capstone bar,
+                where the amount and its meta line are already separate. */}
             <div className="fn-path-foot">
-              <p className="fn-price">{oneTimeLabel(LEVEL_PRICE[l.slug])}</p>
+              <div className="fn-path-money">
+                <p className="fn-price">{priceLabel(price)}</p>
+                {hasPrice && <p className="fn-path-terms">one-time</p>}
+              </div>
               <p className="fn-path-counts">
                 {l.modules.length} modules
                 <br />
                 {lessonsIn(l)} lessons
               </p>
             </div>
-          </article>
-        ))}
+            </>
+          )
+
+          /* ⚠ ARTICLE TODAY, LINK LATER — ONE FLAG, NO REWRITE.
+             See LEVEL_PAGES_OPEN in config/membership.ts for why it is false.
+             The markup, the hover lift and the focus ring are identical either
+             way, so turning these into real destinations is a boolean. */
+          return LEVEL_PAGES_OPEN ? (
+            <Link className="fn-path-card fn-path-card--live" href={levelHref(l.slug)} key={l.slug}>
+              {body}
+            </Link>
+          ) : (
+            <article className="fn-path-card" key={l.slug}>{body}</article>
+          )
+        })}
       </div>
 
       {/* ── THE CAPSTONE BAR ────────────────────────────────────────────────
@@ -255,9 +304,25 @@ export function PathwayAndBundle() {
         </div>
       )}
 
-      <p className="fn-levelnote">{funnel.levelNote}</p>
+        <p className="fn-levelnote">{funnel.levelNote}</p>
+      </div>
+    </section>
+  )
+}
 
-      {/* ── THE BUNDLE — the primary offer, per Surpaul's memo ───────────── */}
+/* ══ THE BUNDLE ════════════════════════════════════════════════════════════
+   Split out of PathwayAndBundle 2026-09-11 — see the note on <Pathway>.
+
+   It keeps the standard .fn-wrap measure because it is a two-column card of
+   prose and prices, not a four-across grid, and it reads better at the same
+   width as the rest of the page. The hairline above it is the section boundary
+   the shared <section> used to imply by proximity. */
+export function Bundle() {
+  const sep = separateTotal()
+
+  return (
+    <section className="fn-section fn-bundle-sect">
+      <div className="fn-wrap">
       <div className="fn-offer-card">
         <div className="fn-offer-card__body">
           <p className="fn-eyebrow">{funnel.bundle.eyebrow}</p>
@@ -340,6 +405,7 @@ export function PathwayAndBundle() {
               worse than one that leads to the free Blueprint. */}
           <a className="fn-btn" href="#choose">{funnel.bundle.cta}</a>
         </div>
+      </div>
       </div>
     </section>
   )

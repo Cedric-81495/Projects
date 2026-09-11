@@ -35,9 +35,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const { data: userData } = await supabase.auth.getUser()
   if (!userData.user) redirect('/login?next=/app')
 
-  const [{ data: roles }, { data: level }] = await Promise.all([
+  /* ⚠ enrolled_levels ALONGSIDE max_enrolled_level, not instead of it.
+
+     The max drives "how far have you got" copy. The array is the access
+     decision — without it canAccessLevel() falls back to
+     `enrolledLevel >= level`, and that fallback is deliberately permissive, so
+     a student holding only Level 3 saw Levels 1 and 2 unlocked in this nav.
+
+     In the same Promise.all so it costs no extra round trip. */
+  const [{ data: roles }, { data: level }, { data: levels }] = await Promise.all([
     supabase.from('user_roles').select('role').eq('user_id', userData.user.id),
     supabase.rpc('max_enrolled_level', { uid: userData.user.id }),
+    supabase.rpc('enrolled_levels', { uid: userData.user.id }),
   ])
 
   const rank = { student: 10, staff: 20, admin: 30, owner: 40 } as const
@@ -47,6 +56,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ) as AccessState['role']
 
   const access: AccessState = {
+    enrolledLevels: Array.isArray(levels) ? (levels as number[]) : [],
     userId: userData.user.id,
     role,
     enrolledLevel: typeof level === 'number' ? level : 0,

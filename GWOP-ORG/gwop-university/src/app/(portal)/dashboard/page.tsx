@@ -23,8 +23,17 @@ export default async function DashboardPage() {
   const { data: userData } = await supabase.auth.getUser()
   const userId = userData.user!.id
 
-  const [{ data: enrolled }, { data: profile }] = await Promise.all([
+  /* ⚠ BOTH RPCs. enrolled_levels is the access decision; max_enrolled_level is
+     only "how far have they got" for the copy below.
+
+     Without the array, canAccessLevel() falls back to `enrolledLevel >= level`
+     — and that fallback is deliberately permissive, so a student who bought
+     Level 3 alone saw Levels 1, 2 and 3 unlocked on this page while owning
+     only Level 3. The database still refused the lessons, so nothing leaked;
+     the dashboard simply told them they owned things they did not. */
+  const [{ data: enrolled }, { data: levels }, { data: profile }] = await Promise.all([
     supabase.rpc('max_enrolled_level', { uid: userId }),
+    supabase.rpc('enrolled_levels', { uid: userId }),
     supabase.from('profiles').select('full_name').eq('id', userId).single(),
   ])
 
@@ -36,7 +45,8 @@ export default async function DashboardPage() {
      through the RLS-bound client, so the real gate is the database. If a staff
      override is ever wanted on this page, fetch the role rather than widening
      the comparison. */
-  const access: AccessState = { userId, role: 'student', enrolledLevel }
+  const enrolledLevels = Array.isArray(levels) ? (levels as number[]) : []
+  const access: AccessState = { userId, role: 'student', enrolledLevel, enrolledLevels }
 
   const progress = await Promise.all(
     LEVELS.map(async (l) => {
@@ -52,7 +62,9 @@ export default async function DashboardPage() {
       <p className="tag">Your pathway</p>
       <h1 className="poh1">{firstName ? `Welcome back, ${firstName}.` : 'Welcome back.'}</h1>
 
-      {enrolledLevel === 0 && (
+      {/* Array length, not the max: both are 0 for a new student, but the array
+          is the thing that actually describes what they hold. */}
+      {enrolledLevels.length === 0 && (
         <div className="poempty">
           <h2>You&rsquo;re not enrolled yet</h2>
           {/* Built from PATHWAY rather than naming a level in prose — this

@@ -13,9 +13,53 @@ interface Plan {
   name: string
   description: string | null
   grants_level: number
+  /* ⚠ LOAD-BEARING FOR THE "Includes" LINE, NOT JUST FOR THE GRANT. 0014 made
+     the four individual levels non-cumulative; this is the only field that
+     distinguishes them from the bundle, which still grants 1–grants_level. */
+  grants_cumulative: boolean
   amount_cents: number | null
   currency: string
   billing: 'one_time' | 'subscription'
+}
+
+/* ══ WHAT THIS PLAN ACTUALLY UNLOCKS ═════════════════════════════════════════
+   ⚠ THIS LINE WAS WRONG FROM 0014 UNTIL 2026-09-11, AND IT WAS WRONG BESIDE A
+   BUY BUTTON.
+
+   It read `Includes stages 1–${plan.grants_level}` for every plan above Level
+   1 — so the $297 Level 2 card promised Levels 1 and 2, and the $497 Level 4
+   card promised all four. 0014 set grants_cumulative = false on all four
+   individual levels: each one now grants exactly itself. The copy was
+   describing the access model that migration removed.
+
+   That is not a stale label. It is a statement about what the buyer receives,
+   rendered directly above a checkbox they tick to acknowledge the terms, on
+   the page that takes their card. Somebody who bought Level 4 on the strength
+   of it would have paid $497 for a quarter of what the card said, and the
+   no-refund policy is what they would have hit on complaining.
+
+   ⚠ READ grants_cumulative, NEVER grants_level ALONE. The bundle and Level 4
+   both carry grants_level = 4 and always have — that ambiguity is exactly what
+   produced the bug. The flag is the only thing separating them.
+
+   ⚠ AND "only" IS DELIBERATE. A buyer arriving at Level 3 from a funnel that
+   recommends working in order will assume stacking unless told otherwise.
+   Saying "Includes Level 3" is true and still leaves them to discover the
+   limit after paying. Dropping the word is a copy decision with a refund
+   consequence — take it to Surpaul, not to a commit.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function includesLabel(plan: Pick<Plan, 'grants_level' | 'grants_cumulative'>): string {
+  /* Label comes from PATHWAY so a rename reaches here too. Falls back to the
+     plain number if grants_level ever points outside the four levels — a
+     missing label should not blank the sentence that says what you are buying. */
+  const labelFor = (n: number) => PATHWAY.find(p => p.n === n)?.label ?? `Level ${n}`
+
+  if (!plan.grants_cumulative) return `Includes ${labelFor(plan.grants_level)} only`
+  if (plan.grants_level === 1) return `Includes ${labelFor(1)}`
+  /* Plural noun, bare numbers: "Includes Levels 1–4". Interpolating labelFor(1)
+     here would render "Includes Level 1–4", which is the kind of small wrongness
+     that reads as carelessness on a page asking for $997. */
+  return `Includes Levels 1\u2013${plan.grants_level}`
 }
 
 /**
@@ -127,14 +171,7 @@ export function PlanCard({
         {plan.billing === 'subscription' && plan.amount_cents !== null && <sub>/month</sub>}
       </p>
 
-      <p className="mbincl">
-        {/* ⚠ DE-LEVELLED 2026-09-03. Hardcoded 'Freshman' for the single-stage
-            plan and "levels 1–N" for bundles. Reads from PATHWAY now so a future
-            rename reaches here too. */}
-        Includes {plan.grants_level === 1
-          ? PATHWAY[0].label
-          : `stages 1\u2013${plan.grants_level}`}
-      </p>
+      <p className="mbincl">{includesLabel(plan)}</p>
 
       {error && (
         <p className="mberr" role="alert">

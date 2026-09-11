@@ -25,7 +25,12 @@ export default async function MembershipPage() {
   const { data: userData } = await supabase.auth.getUser()
   const { data: plans } = await supabase
     .from('membership_plans')
-    .select('id, sku, name, description, grants_level, amount_cents, currency, billing')
+    /* grants_cumulative added 2026-09-11. Without it PlanCard cannot tell the
+       bundle from Level 4 — both are grants_level = 4 — and the "Includes" line
+       has to guess. It guessed cumulative, which stopped being true at 0014. */
+    .select(
+      'id, sku, name, description, grants_level, grants_cumulative, amount_cents, currency, billing',
+    )
     .order('sort_order')
 
   /* ⚠ enrolled_levels, NOT max_enrolled_level. Changed 2026-09-10.
@@ -108,9 +113,24 @@ export default async function MembershipPage() {
               <PlanCard
                 key={plan.id}
                 plan={plan}
-                /* Set membership. A plan is owned when its granted level is
-                   actually held — not when a higher one is. */
-                owned={enrolledLevels.includes(plan.grants_level)}
+                /* ⚠ THE BUNDLE NEEDS ALL FOUR, NOT JUST LEVEL 4. Same
+                   grants_level = 4 collision as the Includes line: a student
+                   who bought Level 4 alone held level 4, so `includes(4)` was
+                   true and the bundle rendered "You're enrolled" for three
+                   levels they had never paid for. They could not buy them, and
+                   nothing raised an error — the page simply told them they
+                   already had it.
+
+                   Masked today by bundleIsBestDeal(), which hides the bundle
+                   from anyone holding Level 4. Masked, not fixed: change a
+                   price so the bundle wins again and it returns silently. */
+                owned={
+                  plan.grants_cumulative
+                    ? Array.from({ length: plan.grants_level }, (_, i) => i + 1).every(l =>
+                        enrolledLevels.includes(l),
+                      )
+                    : enrolledLevels.includes(plan.grants_level)
+                }
                 signedIn={Boolean(userData.user)}
               />
             ))}

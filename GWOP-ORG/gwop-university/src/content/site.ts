@@ -33,15 +33,20 @@ export const site = {
     { name: 'Instagram', url: 'https://www.instagram.com/gwopuniversity', pending: false },
     { name: 'TikTok',    url: 'https://www.tiktok.com/@gwopuniversity',   pending: false },
     { name: 'YouTube',   url: 'https://youtube.com/@cottrellenterprises', pending: false },
-    /* ✅ CONFIRMED — supplied 2026-08-27.
-       ⚠ Left percent-encoded ON PURPOSE. The LinkedIn vanity slug ends in a
-       trademark symbol followed by an emoji variation selector (U+2122 U+FE0F).
-       Written as literal characters they are easy to strip, normalise away or
-       mangle in transit, and any of those produces a 404. %E2%84%A2%EF%B8%8F is
-       the same slug in a form that survives copy-paste. Do not "clean this up".
-       Worth asking LinkedIn admin to set a plain slug — the symbol buys nothing
-       in a URL and is a standing fragility. */
-    { name: 'LinkedIn',  url: 'https://www.linkedin.com/company/gwop-university-%E2%84%A2%EF%B8%8F/', pending: false },
+    /* ✅ CORRECTED 2026-09-11 — plain slug, confirmed by Cedric.
+       Previously pointed at a vanity slug ending in a trademark symbol plus an
+       emoji variation selector (U+2122 U+FE0F), percent-encoded as
+       gwop-university-%E2%84%A2%EF%B8%8F. That was supplied 2026-08-27 and was
+       either wrong from the start or changed since — the note kept alongside it
+       flagged the symbol as "a standing fragility" and suggested asking the
+       LinkedIn admin for a plain slug. This is that plain slug.
+
+       ⚠ NOTHING IN THE BUILD CATCHES A DEAD SOCIAL LINK. There is no link
+       check in CI, and a 404 on LinkedIn looks identical to a working link
+       until somebody clicks it. If this changes again, it will be silent.
+       Worth opening each of these four once after any deploy that touches this
+       file. */
+    { name: 'LinkedIn',  url: 'https://www.linkedin.com/company/gwop-university/', pending: false },
     /* Facebook removed rather than left empty — an unlinked label reads as
        "coming soon", which is a promise nobody has made. Add it back here when
        the account is confirmed. */

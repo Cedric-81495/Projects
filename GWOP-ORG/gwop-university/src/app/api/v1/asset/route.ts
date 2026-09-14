@@ -5,7 +5,7 @@ import { admin } from '@/lib/supabase/admin'
 import { env } from '@/lib/env'
 import { logger } from '@/lib/observability/logger'
 import { LEVELS, canAccessLevel, type AccessState } from '@/lib/access/policy'
-import { MODULES } from '@/content/modules'
+import { findAssetByKey } from '@/content/modules'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,8 +44,8 @@ export async function GET(req: Request) {
   /* The key must appear in the content file. This is the authorization lookup
      AND the traversal guard — no arrangement of `../` matches an entry in
      MODULES, so nothing unvalidated reaches storage. */
-  const mod = MODULES.find(m => m.note === key || m.workbook === key)
-  if (!mod) return new NextResponse('Not found', { status: 404 })
+  const asset = findAssetByKey(key)
+  if (!asset) return new NextResponse('Not found', { status: 404 })
 
   const supabase = await createServerSupabase()
   const { data: userData } = await supabase.auth.getUser()
@@ -63,7 +63,13 @@ export async function GET(req: Request) {
     uid: userData.user.id,
   })
 
-  const levelNumber = LEVELS.find(l => l.slug === mod.level)?.level ?? 99
+  /* ⚠ ANY of the asset's levels, not the first. Three paid PDFs ship in more
+     than one level (master doc, shared asset map). Gating on the originating
+     level would lock a Level 2 student out of Master the Money, which Level 2
+     is sold as including. 99 is the unreachable sentinel for an unknown slug. */
+  const levelNumbers = asset.levels.map(
+    slug => LEVELS.find(l => l.slug === slug)?.level ?? 99,
+  )
   const access: AccessState = {
     userId: userData.user.id,
     role: 'student',
@@ -71,10 +77,11 @@ export async function GET(req: Request) {
     enrolledLevels: Array.isArray(levels) ? (levels as number[]) : [],
   }
 
-  /* `free` is belt and braces. A free module should never carry a bucket key in
-     the first place, but if one ever does, it stays reachable rather than
-     locking content the client has said is open. */
-  if (!mod.free && !canAccessLevel(access, levelNumber)) {
+  /* `free` is belt and braces. A free asset should never carry a private bucket
+     key in the first place — it takes a public path with a leading slash and
+     never reaches this route — but if one ever does, it stays reachable rather
+     than locking content we have said is open. */
+  if (!asset.free && !levelNumbers.some(n => canAccessLevel(access, n))) {
     return new NextResponse('Not found', { status: 404 })
   }
 

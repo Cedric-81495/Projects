@@ -480,3 +480,22 @@
    the distinction drives /admin and is never spelled out to a student, so it
    lives in the attribute rather than in the copy. */
 .player-waiting[data-status="missing"]{}
+
+/* ── LESSON LIST ───────────────────────────────────────────────────────────
+   The contents of a module. Deliberately quiet: this is a table of contents,
+   not a set of controls, and nothing in it is clickable yet.
+
+   ⚠ NO LOCK ICONS, NO GREYING OUT. Every lesson here belongs to a level the
+   student has already unlocked — the level gate happens a page earlier. Dimming
+   them would imply a second paywall that does not exist. An unfilmed lesson
+   looks the same as a filmed one, because to the buyer it is the same purchase.
+   ────────────────────────────────────────────────────────────────────────── */
+.lessonlist{list-style:none;margin:26px 0 0;padding:0;max-width:640px;
+  border-top:1px solid var(--line)}
+.lessonlist li{display:flex;gap:14px;align-items:baseline;padding:13px 2px;
+  border-bottom:1px solid var(--line)}
+.lessonlist .ln{font-family:var(--body);font-size:12px;font-weight:700;
+  letter-spacing:.06em;color:var(--gold-ink);min-width:28px;flex:none}
+.lessonlist .lt{font-size:15px;line-height:1.45;color:var(--ink)}
+.lessonlist .lr{margin-left:auto;font-size:10.5px;font-weight:700;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--emerald);flex:none}

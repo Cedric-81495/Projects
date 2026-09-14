@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PATHWAY } from '@/content/pathway'
-import { MODULES, byLevel, STATUS_LABEL, missingAssets } from '@/content/modules'
+import { MODULES, byLevel, STATUS_LABEL, missingAssets, moduleStatus, moduleMinutes, TOTAL_LESSONS } from '@/content/modules'
 import { Crest } from '@/components/Chrome'
 
 export const metadata: Metadata = {
@@ -16,9 +16,14 @@ export const metadata: Metadata = {
    Read-only status view. No auth yet — Phase 2. Do not expose publicly.
    ═══════════════════════════════════════════════════════════════════════════ */
 export default function Admin() {
+  /* Derived, never stored — see moduleStatus(). A module is only as ready as
+     its weakest lesson, so these counts cannot flatter the pipeline. */
   const total = MODULES.length
-  const ready = MODULES.filter(m => m.status === 'ready').length
-  const missing = MODULES.filter(m => m.status === 'missing').length
+  const ready = MODULES.filter(m => moduleStatus(m) === 'ready').length
+  const missing = MODULES.filter(m => moduleStatus(m) === 'missing').length
+  const lessonsReady = MODULES.reduce(
+    (s, m) => s + m.lessons.filter(l => l.status === 'ready').length, 0,
+  )
 
   return (
     <>
@@ -36,8 +41,9 @@ export default function Admin() {
             <p className="lede">
               {/* Aug 22 deadline removed 2026-09-03 — it has passed and the
                   content is still outstanding. */}
-              Every module the app expects, by level. Anything not marked ready
-              is still to be written.
+              Every module the app expects, by level, from the Pricing, Payment
+              &amp; Package Master. Anything not marked ready is still to be
+              filmed or written.
             </p>
           </div>
 
@@ -45,11 +51,15 @@ export default function Admin() {
             <div className="stat"><b>{ready}/{total}</b><span>Ready to publish</span></div>
             <div className="stat"><b>{total - ready - missing}</b><span>In production</span></div>
             <div className="stat"><b>{missing}</b><span>Missing assets</span></div>
+            {/* The module counts round off how much is left; the lesson count is
+                the actual production backlog. 8 modules reads as nearly done;
+                47 lessons does not. */}
+            <div className="stat"><b>{lessonsReady}/{TOTAL_LESSONS}</b><span>Lessons filmed</span></div>
           </div>
 
           {PATHWAY.map(l => {
             const mods = byLevel(l.slug)
-            const done = mods.filter(m => m.status === 'ready').length
+            const done = mods.filter(m => moduleStatus(m) === 'ready').length
             return (
               <div className="lvlblock" key={l.slug}>
                 <div className="lvlhead">
@@ -65,7 +75,9 @@ export default function Admin() {
                       <span>
                         <h3>{m.title}</h3>
                         <span className="meta">
-                          {m.minutes} min · {m.slug}
+                          {m.lessons.length} lessons
+                          {moduleMinutes(m) !== null && <> · {moduleMinutes(m)} min</>}
+                          {' '}· {m.slug}
                           {/* Maui's tracker task is "report missing items" —
                               this names them instead of leaving her to guess. */}
                           {missingAssets(m).length > 0 && (
@@ -75,8 +87,9 @@ export default function Admin() {
                         </span>
                       </span>
                       <span className={`chip ${
-                        m.status === 'ready' ? 'ok' : m.status === 'pending' ? 'wait' : 'miss'
-                      }`}>{STATUS_LABEL[m.status]}</span>
+                        moduleStatus(m) === 'ready' ? 'ok'
+                          : moduleStatus(m) === 'pending' ? 'wait' : 'miss'
+                      }`}>{STATUS_LABEL[moduleStatus(m)]}</span>
                     </div>
                   ))}
                 </div>

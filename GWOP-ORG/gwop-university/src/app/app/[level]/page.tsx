@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PATHWAY } from '@/content/pathway'
-import { byLevel } from '@/content/modules'
+import { byLevel, moduleStatus, moduleMinutes } from '@/content/modules'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { LEVELS, canAccessLevel, type AccessState } from '@/lib/access/policy'
 
@@ -77,24 +77,39 @@ export default async function LevelPage(
           )}
 
           <div className="mods">
-            {mods.map(m => (
-              <Link
-                className="mod"
-                href={`/app/${level}/${m.slug}`}
-                key={m.slug}
-                data-locked={m.status !== 'ready'}
-              >
-                <span className="mn">{String(m.order).padStart(2, '0')}</span>
-                <span>
-                  <h3>{m.title}</h3>
-                  {/* Internal production status ("In production", "Missing
-                      assets") stays on /admin. A student sees the runtime and
-                      whether it is open yet — nothing about our pipeline. */}
-                  <span className="meta">{m.minutes} min</span>
-                </span>
-                <span className="go">{m.status === 'ready' ? 'Open ›' : 'Soon'}</span>
-              </Link>
-            ))}
+            {mods.map(m => {
+              const status = moduleStatus(m)
+              const mins = moduleMinutes(m)
+              return (
+                <Link
+                  className="mod"
+                  href={`/app/${level}/${m.slug}`}
+                  key={m.slug}
+                  data-locked={status !== 'ready'}
+                >
+                  <span className="mn">{String(m.order).padStart(2, '0')}</span>
+                  <span>
+                    <h3>{m.title}</h3>
+                    {/* Internal production status ("In production", "Missing
+                        assets") stays on /admin. A student sees what the module
+                        contains and whether it is open — nothing about our
+                        pipeline.
+
+                        ⚠ THE RUNTIME IS ONLY SHOWN WHEN IT IS KNOWN. It used to
+                        read "{m.minutes} min" from a number the scaffold
+                        invented; the master doc has no runtimes and nothing is
+                        filmed. A lesson count is true today, and the runtime
+                        appears beside it the moment moduleMinutes() can add one
+                        up from real files. */}
+                    <span className="meta">
+                      {m.lessons.length} lesson{m.lessons.length === 1 ? '' : 's'}
+                      {mins !== null && <> · {mins} min</>}
+                    </span>
+                  </span>
+                  <span className="go">{status === 'ready' ? 'Open ›' : 'Soon'}</span>
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>

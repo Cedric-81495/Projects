@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PATHWAY } from '@/content/pathway'
-import { MODULES, byLevel, assetHref } from '@/content/modules'
+import { MODULES, byLevel, assetHref, moduleStatus, moduleMinutes } from '@/content/modules'
 import { LessonPlayer } from '@/components/portal/LessonPlayer'
 
 export function generateStaticParams() {
@@ -29,7 +29,17 @@ export default async function ModulePage(
           <div className="head">
             <p className="tag">{meta.label} {String(mod.order).padStart(2, '0')}</p>
             <h2 className="h2">{mod.title}</h2>
-            <p className="lede">{mod.minutes} minutes · {meta.detail}</p>
+            {/* ⚠ WAS "{mod.minutes} minutes". That number was invented by the
+                scaffold and printed as fact next to a no-refund policy. The
+                master doc has no runtimes — item 9 is "resolve the video
+                runtime problem, then film" — so the lesson count is what we
+                can say truthfully, and the runtime joins it when real files
+                exist. */}
+            <p className="lede">
+              {mod.lessons.length} lesson{mod.lessons.length === 1 ? '' : 's'}
+              {moduleMinutes(mod) !== null && <> · {moduleMinutes(mod)} minutes</>}
+              {' '}· {meta.detail}
+            </p>
           </div>
 
           {/* ⚠ STATUS COMES FROM content/modules.ts, NOT FROM THE DATABASE.
@@ -40,7 +50,27 @@ export default async function ModulePage(
               When the player is wired up, fetch the ticket and spread it:
               <LessonPlayer {...ticket} title={mod.title} />. The props are
               deliberately the ticket's shape so that is the only edit here. */}
-          <LessonPlayer status={mod.status} title={mod.title} />
+          <LessonPlayer status={moduleStatus(mod)} title={mod.title} />
+
+          {/* ═══ LESSONS ═══════════════════════════════════════════════════
+              The module's contents, from Shin's master doc. Rendered whether
+              or not anything is filmed: a student who paid for this level is
+              entitled to know what it covers, and an empty module page reads
+              as a broken purchase.
+
+              ⚠ NOT LINKS. There is no per-lesson route and no per-lesson
+              video yet. A link that goes nowhere is worse than plain text —
+              it invites a click and answers with a 404. Make these links when
+              lessons become individually addressable, not before. */}
+          <ol className="lessonlist">
+            {mod.lessons.map(l => (
+              <li key={l.slug} data-status={l.status}>
+                <span className="ln">{l.n}</span>
+                <span className="lt">{l.title}</span>
+                {l.status === 'ready' && <span className="lr">Ready</span>}
+              </li>
+            ))}
+          </ol>
 
           {/* ═══ WORKBOOK · package p.3 ═══ */}
           <div className="wb" style={{ marginTop: 26, maxWidth: 460 }}>

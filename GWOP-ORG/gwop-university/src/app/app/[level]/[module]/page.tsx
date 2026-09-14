@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PATHWAY } from '@/content/pathway'
 import { MODULES, byLevel, assetHref } from '@/content/modules'
+import { LessonPlayer } from '@/components/portal/LessonPlayer'
 
 export function generateStaticParams() {
   return MODULES.map(m => ({ level: m.level, module: m.slug }))
@@ -31,9 +32,15 @@ export default async function ModulePage(
             <p className="lede">{mod.minutes} minutes · {meta.detail}</p>
           </div>
 
-          <div className="player">
-            Video loads here — awaiting Maui &amp; Sheena&rsquo;s upload
-          </div>
+          {/* ⚠ STATUS COMES FROM content/modules.ts, NOT FROM THE DATABASE.
+              Nothing fetches /api/v1/lessons/[id]/playback yet, so `url` is
+              never passed and every module renders the waiting state today.
+              That is accurate — no lesson video has been filmed.
+
+              When the player is wired up, fetch the ticket and spread it:
+              <LessonPlayer {...ticket} title={mod.title} />. The props are
+              deliberately the ticket's shape so that is the only edit here. */}
+          <LessonPlayer status={mod.status} title={mod.title} />
 
           {/* ═══ WORKBOOK · package p.3 ═══ */}
           <div className="wb" style={{ marginTop: 26, maxWidth: 460 }}>

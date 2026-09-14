@@ -457,3 +457,26 @@
 .polocked-h{margin:0; font-family:var(--display); font-size:19px;
   font-weight:700; color:var(--emerald)}
 .polocked-p{margin:8px 0 16px; font-size:14.5px; color:var(--muted)}
+
+/* ── LESSON PLAYER STATES ──────────────────────────────────────────────────
+   .player itself is defined in globals.css (forest panel, 16/9, centred).
+   These are the three states layered on top of it.
+
+   ⚠ THE WAITING STATE MUST NOT LOOK LIKE AN ERROR. No red, no warning glyph,
+   no border treatment that reads as a failure. A student who paid for this
+   level is entitled to the lesson and it is simply not filmed yet — the panel
+   should read as calm and expected, which is why it keeps the same forest
+   background as a loaded player rather than getting its own colour. */
+.player-live{padding:0;overflow:hidden}
+.player-live iframe{width:100%;height:100%;border:0;display:block}
+
+.player-waiting{cursor:default}
+.player-waiting > div{max-width:38ch}
+.player-eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold-lt);margin:0 0 10px}
+.player-note{font-size:13.5px;line-height:1.6;color:rgba(247,243,233,.62);margin:0}
+
+/* Internal only. 'pending' is in production, 'missing' has not been started —
+   the distinction drives /admin and is never spelled out to a student, so it
+   lives in the attribute rather than in the copy. */
+.player-waiting[data-status="missing"]{}

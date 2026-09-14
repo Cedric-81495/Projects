@@ -1,0 +1,188 @@
+/* ══ LEGAL PAGES ════════════════════════════════════════════════════════════
+   /privacy, /terms, /disclosures.
+
+   Long-form prose, which nothing else on this site is. The funnel and the
+   portal are scanned; these are read, sometimes under duress — by somebody
+   deciding whether to hand over a card, or working out what they agreed to
+   after the fact.
+
+   ⚠ THE MEASURE IS THE WHOLE DESIGN. --wrap is 1120px, set for a four-across
+   card grid. Legal text at that width runs past 150 characters a line and the
+   eye loses its place on the return sweep. .lgl-body caps at 68ch, which is
+   the readable range for continuous prose regardless of viewport.
+
+   Everything else here is restraint. No accent colours, no boxes competing
+   with the text, no decorative rules. A legal page that looks designed reads
+   as marketing, and the one thing these pages must not look like is
+   persuasion.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lgl-sect {
+  padding-block: clamp(48px, 7vw, 88px) clamp(64px, 9vw, 120px);
+}
+
+/* ── Masthead ─────────────────────────────────────────────────────────────── */
+
+.lgl-head {
+  max-width: 68ch;
+  padding-bottom: clamp(28px, 4vw, 40px);
+  margin-bottom: clamp(32px, 5vw, 48px);
+  border-bottom: 1px solid rgba(26, 29, 27, .12);
+}
+
+.lgl-title {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(30px, 5.4vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  color: var(--emerald);
+  margin: 10px 0 0;
+}
+
+.lgl-lede {
+  color: var(--muted);
+  font-size: clamp(15.5px, 1.1vw + 13px, 18px);
+  line-height: 1.55;
+  margin: 14px 0 0;
+  max-width: 58ch;
+}
+
+/* Small, muted, and above the rule rather than buried at the foot. Somebody
+   checking whether a policy changed since they agreed to it should not have to
+   scroll the whole document to find out. */
+.lgl-updated {
+  font-size: 12.5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: rgba(26, 29, 27, .45);
+  margin: 18px 0 0;
+}
+
+/* ── Body ─────────────────────────────────────────────────────────────────── */
+
+.lgl-body {
+  max-width: 68ch;
+}
+
+.lgl-block + .lgl-block {
+  margin-top: clamp(30px, 4vw, 42px);
+}
+
+.lgl-block h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: clamp(19px, 2.2vw, 23px);
+  line-height: 1.25;
+  color: var(--emerald);
+  margin: 0 0 12px;
+  /* No uppercase and no letter-spacing: .h2 elsewhere on the site is set in
+     caps, which is legible as a section label and tiring as a heading you meet
+     fifteen times down a page. */
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.lgl-body p {
+  font-size: 15.5px;
+  line-height: 1.72;
+  color: rgba(26, 29, 27, .84);
+  margin: 0 0 14px;
+}
+
+.lgl-body p:last-child { margin-bottom: 0; }
+
+.lgl-body ul {
+  margin: 0 0 14px;
+  padding-left: 20px;
+}
+
+.lgl-body li {
+  font-size: 15.5px;
+  line-height: 1.66;
+  color: rgba(26, 29, 27, .84);
+  margin-bottom: 7px;
+}
+
+.lgl-body li::marker { color: var(--gold-ink); }
+
+/* ── Emphasis block ───────────────────────────────────────────────────────── */
+
+/* For the handful of statements a reader most needs to not skim — that we hold
+   no credit report, that one level does not include the others. A left rule
+   and a tint, nothing louder. A yellow warning box on a privacy page reads as
+   a disclaimer someone is trying to get past. */
+.lgl-note {
+  border-left: 2px solid var(--gold);
+  background: rgba(200, 163, 74, .06);
+  padding: 14px 18px;
+  margin: 0 0 16px !important;
+  border-radius: 0 4px 4px 0;
+}
+
+/* ── Label / explanation pairs ────────────────────────────────────────────── */
+
+.lgl-dl { margin: 0 0 16px; }
+
+.lgl-row {
+  padding: 12px 0;
+  border-top: 1px solid rgba(26, 29, 27, .10);
+}
+
+.lgl-row:last-child { border-bottom: 1px solid rgba(26, 29, 27, .10); }
+
+.lgl-row dt {
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.lgl-row dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.66;
+  color: rgba(26, 29, 27, .76);
+}
+
+/* Two columns once there is room for the explanation to hold its own measure.
+   Below this the label sits above its explanation, which is the only honest
+   layout at phone width — a 2-column grid there gives the second column about
+   twelve characters. */
+@media (min-width: 720px) {
+  .lgl-row {
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .lgl-row dt { margin-bottom: 0; }
+}
+
+/* ── Footnote ─────────────────────────────────────────────────────────────── */
+
+/* What is still being settled with counsel. Small and last, but present — a
+   reader told nothing about retention has been misled; a reader told it is
+   being set has not. */
+.lgl-foot {
+  margin-top: clamp(36px, 5vw, 52px) !important;
+  padding-top: 20px;
+  border-top: 1px solid rgba(26, 29, 27, .12);
+  font-size: 13.5px !important;
+  line-height: 1.62 !important;
+  color: rgba(26, 29, 27, .52) !important;
+}
+
+/* ── Print ────────────────────────────────────────────────────────────────── */
+
+/* People print or save these, and a saved copy of what you agreed to is the
+   point of having them. Drop the chrome and let the measure run wider on
+   paper, where line length is fixed and generous. */
+@media print {
+  .evbar, .fn-footer, footer { display: none !important; }
+  .lgl-sect { padding-block: 0; }
+  .lgl-body, .lgl-head { max-width: none; }
+  .lgl-note { background: none; border-left: 2px solid #999; }
+  .lgl-block { break-inside: avoid; }
+  .lgl-block h2 { break-after: avoid; }
+}

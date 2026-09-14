@@ -1,27 +1,24 @@
-import { BrandBar, Footer } from '@/components/Chrome'
+import type { Metadata } from 'next'
+import { LegalDocument } from '@/components/legal/LegalDocument'
+import { DISCLOSURES } from '@/content/legal-pages'
 
-/* ⚠️ ATTORNEY-SUPPLIED COPY ONLY — CLAUDE.md invariant 6. Do not draft. */
+/* ⚠ FORCE-DYNAMIC IS LOAD-BEARING, NOT A PERFORMANCE MISTAKE.
+   middleware.ts issues a per-request CSP nonce, and Next only stamps that
+   nonce onto script tags when the page renders per request. Statically
+   rendered under that middleware, every script on the page is blocked — the
+   fault that silently removed the password toggle and the Turnstile widget
+   from /signup until 2026-09-11.
+
+   This page carries no client components today, so nothing visible would
+   break. That is luck, not design, and it stops being true the moment one is
+   added. Cheap insurance on a page served a few times a day. */
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Disclosures · GWOP University',
+  description: 'What we sell, what we earn from, and what we do not promise.',
+}
+
 export default function Page() {
-  return (
-    <>
-      {/* Unlinked bar and legal-only footer: an attendee reaches this page
-          mid-signup from the /830 consent wording, and every route out of it —
-          Sign In, the Pathway levels, the Student area — leads to a login wall
-          they have no account for. The page itself must stay readable; the ways
-          off it must not exist. Invariant 10.
-          Brought into line with /privacy, /terms and /sms-terms on 2026-08-27:
-          these two were the only legal routes still shipping the linked bar and
-          the live footer. */}
-      <BrandBar linked={false} />
-      <section>
-        <div className="wrap">
-          <div className="head">
-            <p className="tag">Legal</p>
-            <h2 className="h2">Disclosures</h2>
-          </div>
-        </div>
-      </section>
-      <Footer legalOnly />
-    </>
-  )
+  return <LegalDocument doc={DISCLOSURES} />
 }

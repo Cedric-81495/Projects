@@ -1,24 +1,24 @@
-import { BrandBar, Footer } from '@/components/Chrome'
+import type { Metadata } from 'next'
+import { LegalDocument } from '@/components/legal/LegalDocument'
+import { PRIVACY } from '@/content/legal-pages'
 
-/* ⚠️ ATTORNEY-SUPPLIED COPY ONLY — CLAUDE.md invariant 6. Do not draft. */
+/* ⚠ FORCE-DYNAMIC IS LOAD-BEARING, NOT A PERFORMANCE MISTAKE.
+   middleware.ts issues a per-request CSP nonce, and Next only stamps that
+   nonce onto script tags when the page renders per request. Statically
+   rendered under that middleware, every script on the page is blocked — the
+   fault that silently removed the password toggle and the Turnstile widget
+   from /signup until 2026-09-11.
+
+   This page carries no client components today, so nothing visible would
+   break. That is luck, not design, and it stops being true the moment one is
+   added. Cheap insurance on a page served a few times a day. */
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy · GWOP University',
+  description: 'How we handle the information you give us.',
+}
+
 export default function Page() {
-  return (
-    <>
-      {/* Unlinked bar and legal-only footer: an attendee reaches this page
-          mid-signup from the /830 consent wording, and every route out of it —
-          Sign In, the Pathway levels, the Student area — leads to a login wall
-          they have no account for. The page itself must stay readable; the ways
-          off it must not exist. Invariant 10. */}
-      <BrandBar linked={false} />
-      <section>
-        <div className="wrap">
-          <div className="head">
-            <p className="tag">Legal</p>
-            <h2 className="h2">Privacy Policy</h2>
-          </div>
-        </div>
-      </section>
-      <Footer legalOnly />
-    </>
-  )
+  return <LegalDocument doc={PRIVACY} />
 }

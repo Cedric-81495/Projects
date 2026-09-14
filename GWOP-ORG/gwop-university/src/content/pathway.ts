@@ -17,10 +17,16 @@
    what each level is actually about. The level titles say both — the position
    in the sequence and the subject.
 
-   ⚠ THE GOAL LINES SURVIVE. "Earn the Game", "Get in Position", "Get Funded &
+   ⚠ THE GOAL LINES SURVIVE. "Learn the Game", "Get in Position", "Get Funded &
    Build", "Get with GWOP Plan" came from the 09-03 mockup and are Surpaul's
    words. They are not stage names, so they stay — they are the line that gives
    each level its voice, and nothing in his memo replaces them.
+
+   ⚠ "EARN THE GAME" WAS A TYPO, CORRECTED 2026-09-14 per the Pricing, Payment
+   & Package Master (build order item 1). It read "Earn" here and on the top of
+   the funnel from the 09-03 mockup onward. The line is "Learn the Game" — it
+   names Level 1's subject, and the level is called Learn the Game in the
+   master price table. Do not "restore" the old spelling.
 
    ⚠ THIS RENAME IS NOT COMPLETE IN THIS FILE ALONE. These names live in two
    places: this file feeds the marketing surfaces, and the student portal reads
@@ -79,7 +85,7 @@ export const PATHWAY: PathwayLevel[] = [
      other; see 0013_level_rename.sql. */
   { slug: 'freshman',  n: 1, label: 'Level 1',
     title: 'Personal Credit',
-    goal: 'Earn the Game',
+    goal: 'Learn the Game',
     detail: 'Scoring mechanics, disputes, utilization, collections',
     /* Shown as the small caps line above the headline on the funnel card.
        `label` stays short ("Level 1") because the portal nav and PathwayRail
@@ -89,10 +95,19 @@ export const PATHWAY: PathwayLevel[] = [
       { title: 'The Credit Game: What They Never Taught Us', lessons: 6 },
       { title: 'Credit Cleanup & Control', lessons: 6 },
     ],
+    /* ⚠ FOUR, NOT THREE. The Dispute & correction letter pack was added
+       2026-09-14 per the Pricing, Payment & Package Master (build order item
+       2). It is the only Level 1 download that already exists as a finished
+       asset — it ships as the 13pp PDF, where the other three are still
+       extracts to be cut from the Starter Kit and Master the Money.
+
+       This is the one that changes TOTAL_DOWNLOADS from 12 to 13. The capstone
+       bar prints that total, so it corrects itself. */
     downloads: [
       'Credit report review checklist',
       'Credit utilization worksheet',
       'Personal financial inventory',
+      'Dispute & correction letter pack',
     ],
     /* Memo §8 — which Blueprint section this level completes. Verbatim from
        his headings; changing them breaks the link between what the page
@@ -165,7 +180,7 @@ export const PATHWAY: PathwayLevel[] = [
 
 /* ── Derived totals ───────────────────────────────────────────────────────
    ⚠ COMPUTED, NEVER TYPED. The capstone bar prints "8 modules · 47 lessons ·
-   12 downloads" and all three are summed from the data above. Typing them
+   13 downloads" and all three are summed from the data above. Typing them
    invites the arithmetic to drift the first time a module moves, and a wrong
    total on a page that also says "non-refundable" is a refund argument we
    would lose. */

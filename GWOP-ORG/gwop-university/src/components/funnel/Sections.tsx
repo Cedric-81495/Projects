@@ -32,7 +32,7 @@ import {
 import {
   LEVELS, BLUEPRINT_BUNDLE, REFUND_POLICY, PRICING_PUBLISHED,
   LEVEL_PAGES_OPEN, levelHref,
-  oneTimeLabel, priceLabel, separateTotal, planTotal, fmtMoney, bundleSavings,
+  oneTimeLabel, priceLabel, separateTotal, fmtMoney, bundleSavings,
 } from '@/config/membership'
 import { Tbc } from '@/components/Chrome'
 
@@ -375,39 +375,15 @@ export function Bundle() {
             </p>
           )}
 
-          {BLUEPRINT_BUNDLE.monthly !== null && (
-            <p className="fn-offer-note">
-              {/* ⚠ "monthly" is from the memo — "3 monthly payments of $397".
-                  The approved mockup said "3 payments of $397", written before
-                  his final direction. Without the cadence a reader does not
-                  know whether that is three weeks or three months, on a plan
-                  that totals $1,191. */}
-              or spread it: {BLUEPRINT_BUNDLE.planMonths} monthly payments of{' '}
-              {fmtMoney(BLUEPRINT_BUNDLE.monthly)}
-              {/* ⚠ THE PLAN TOTAL IS STATED, per Surpaul's memo §1 — "Total on
-                  payment plan: $1,191". The plan costs $194 more than paying
-                  once, and leaving that as arithmetic for the reader is the
-                  kind of omission that reads as a trick when they notice.
-                  Computed, so it cannot drift from the figure beside it. */}
-              {planTotal() !== null && <> &middot; {fmtMoney(planTotal()!)} total</>}
-            </p>
-          )}
+          {/* ⚠ THE PAYMENT-PLAN BLOCK AND ITS ACCESS NOTE WERE REMOVED HERE
+              2026-09-14. Both were gated on BLUEPRINT_BUNDLE.monthly, which no
+              longer exists: the Pricing, Payment & Package Master rules out
+              instalments, subscriptions and recurring charges of any kind.
 
-          {/* His words, §1. The condition that matters most to whoever picks
-              the plan, and it was only in the memo. */}
-          {/* ⚠ GATED ON `monthly`, NOT RENDERED UNCONDITIONALLY. Fixed
-              2026-09-11.
-
-              This sentence describes what happens to access when PLAN payments
-              stop. With the plan withdrawn there are no plan payments, so on
-              its own it reads as a condition attached to the $997 one-time
-              purchase — telling a buyer their access can pause when it cannot.
-
-              It sat outside the guard above it, so nulling the price removed
-              the offer and left its terms behind. Same value, same guard. */}
-          {BLUEPRINT_BUNDLE.monthly !== null && (
-            <p className="fn-offer-plannote">{BLUEPRINT_BUNDLE.planNote}</p>
-          )}
+              Do not reinstate either. The replacement for "what if I cannot
+              pay $997" is the ladder and the upgrade credit — LADDER_NOTE and
+              upgradeToBundlePrice() in config/membership.ts — which is a
+              cheaper first purchase, not a smaller monthly one. */}
 
           {/* ⚠ POINTS AT #choose, NOT AT A CHECKOUT — which is what the mockup
               does, and the only honest destination today. Checkout is gated
@@ -696,15 +672,6 @@ export function Faq() {
     .replace('{levels}', range ?? 'a price announced soon')
     .replace('{bundle}', priceLabel(BLUEPRINT_BUNDLE.oneTime))
     .replace('{savings}', saving !== null ? fmtMoney(saving) : 'a')
-    /* Empty string while the plan is withdrawn, so the sentence closes cleanly
-       after the savings bracket. The comma lives in the token rather than the
-       template — leaving it in the template would strand ", ." mid-sentence. */
-    .replace(
-      '{plan}',
-      BLUEPRINT_BUNDLE.monthly !== null
-        ? `, with a ${BLUEPRINT_BUNDLE.planMonths}-payment plan available`
-        : '',
-    )
     .replace('{refund}', REFUND_POLICY.text)
 
   return (

@@ -104,127 +104,117 @@ export const LEVELS = [
 /* ── THE BUNDLE ────────────────────────────────────────────────────────────
    Surpaul's memo: "That should be positioned as the primary offer."
 
-   `planMonths` × `monthly` is the payment plan. Note the plan total ($1,191)
-   is higher than the one-time price ($997) — that is intentional and standard,
-   and the funnel states both numbers so nobody discovers it at checkout.
+   ⚠ ONE-TIME ONLY. THERE IS NO PAYMENT PLAN, AND THERE IS NOT GOING TO BE.
 
-   Access on the plan follows payment status: "People on the payment plan
-   receive access according to their payment status. If payments stop, access
-   pauses." That is subscription logic, and it is NOT built yet — see
-   `subscriptions` in 0004_commerce.sql for the table it will use.
+   The Pricing, Payment & Package Master (2026-09-14) supersedes the memo's
+   "3 monthly payments of $397" and every earlier instalment note. `monthly`,
+   `planMonths` and `planNote` were removed on that date rather than left
+   nulled, because a null is an invitation and three separate people have now
+   asked whether the plan can be "turned back on".
+
+   THE THREE REASONS, so nobody re-litigates them:
+
+     1. The buyers are selected for cash-flow problems. That is who the product
+        is for and who defaults on instalments. Each payment after the first
+        carries its own decline risk, and this population has more expired
+        cards, more insufficient funds and more closed accounts. Instalments
+        here do not produce revenue; they produce dunning, paused accounts,
+        support tickets and chargebacks.
+     2. CROA restricts collecting payment before promised services are
+        performed. A multi-month schedule against progressively-released
+        content is the messiest possible version of that question. A single
+        payment for immediately-delivered material is the cleanest. This does
+        not resolve CROA — counsel still has to — but it removes the hard half.
+     3. It contradicts the curriculum. Module 7.2 teaches good leverage versus
+        bad; Level 1 Module 2 tells people to stop using credit cards when they
+        are short on cash. Offering a card-funded instalment plan to someone in
+        exactly that position is the brand arguing with itself.
+
+   THE LADDER IS THE PAYMENT PLAN. A $197 entry point already exists. Someone
+   who cannot pay $997 today pays $197, finishes Level 1, gets a result and
+   comes back. The customer controls the pace and we carry no collection risk.
+   With instalments you finance a promise; with the ladder every dollar
+   collected has already been earned. See LADDER_NOTE and UPGRADE_CREDIT below
+   — together they are the replacement, not an absence.
    ────────────────────────────────────────────────────────────────────────── */
 export const BLUEPRINT_BUNDLE = {
   sku: 'GWOPU-BLUEPRINT-ALL',
   oneTime: 997 as number | null,
-  /* ⚠ NULLED 2026-09-11 — THE PLAN IS TBD AND WAS BEING ADVERTISED.
-     Surpaul's memo §1 states it: "3 monthly payments of $397. Total on payment
-     plan: $1,191." The funnel was printing that, and there was no way to pay it.
-
-     Nothing exists behind the offer. seed-stripe.mts creates five ONE-TIME
-     prices and no recurring one; there is no membership_plans row with
-     billing = 'subscription'; nothing anywhere inserts into `subscriptions`.
-     A buyer could read a specific price and a specific access policy and find
-     no route to either — on the same card as the no-refund line.
-
-     ⚠ RESTORING IT IS NOT PUTTING 397 BACK. Read the build note under
-     `planNote` before you do. The memo rules out the thing a bare Stripe
-     subscription would give you.
-
-     Set to 397 again only when the plan can actually be bought. Every surface
-     reads this value, so one edit turns the offer on everywhere at once — which
-     is exactly why it must not be turned on ahead of the mechanism. */
-  monthly: null as number | null,
-  planMonths: 3,
-  /* ⚠ ADDED 2026-09-08 from Surpaul's memo §1. He states the plan total
-     explicitly — "Total on payment plan: $1,191" — and the funnel was showing
-     "or 3 payments of $397" without it. Three times a number is arithmetic
-     somebody has to do while deciding whether to buy, and the plan costs $194
-     more than the one-time price. Stating it is his instruction and it is also
-     the honest version.
-
-     Computed rather than typed so it cannot drift from `monthly` × the months
-     above it — see planTotal() below. */
-
-  /* ⚠ HIS WORDS, §1: "People on the payment plan receive access according to
-     their payment status. If payments stop, access pauses."
-
-     This is the cancellation half of the Refund & Cancellation policy, and it
-     was living only in the memo. Anyone choosing the plan over the one-time
-     price is choosing it because of cash flow, so this is the condition most
-     relevant to them.
-
-     ⚠ NOT BUILT YET. This is subscription logic — see `subscriptions` in
-     0004_commerce.sql for the table it will use. Stating it on the page is
-     correct now; enforcing it is work that has to exist before the first plan
-     payment is taken. */
-  planNote: 'Access continues while payments are current and pauses if they stop.',
 } as const
 
-/* ══ BEFORE YOU BUILD THE PAYMENT PLAN ══════════════════════════════════════
-   Written down because the memo and a default Stripe subscription look like
-   the same product and are not.
+/* ── THE LADDER ────────────────────────────────────────────────────────────
+   Master doc, Part Two: this replaces plan language on the pricing page. It is
+   copy, so it lives here beside the numbers it depends on rather than in
+   content/funnel.ts — the second sentence is only true because UPGRADE_CREDIT
+   exists, and the two must not be editable apart.
+   ────────────────────────────────────────────────────────────────────────── */
+export const LADDER_NOTE =
+  'Start with one level. Each level stands on its own and opens the moment you '
+  + 'buy it. Take the next one when you are ready — and if you upgrade to the '
+  + 'full bundle later, we credit everything you have already paid.'
 
-   ── WHAT HE ASKED FOR ────────────────────────────────────────────────────
-   §1, both halves, and the second half is the one that gets missed:
+/* ── UPGRADE CREDIT ────────────────────────────────────────────────────────
+   Someone buys one level, later wants the bundle. Credit the earlier purchase
+   in full. We collect $997 either way rather than more, and that is deliberate.
 
-     "3 monthly payments of $397. Total on payment plan: $1,191."
-     "I do NOT want a traditional endless monthly subscription required just to
-      keep accessing the course right now. The core product should be a
-      purchase."
+   ⚠ COMPUTED, NOT TABULATED. The master doc prints the four upgrade prices
+   ($800 / $700 / $600 / $500) as a table. They are just 997 minus what the
+   buyer has paid, so typing them would let the table drift from LEVELS the
+   first time a level price moves. If you need the table, map over LEVELS.
 
-   So it is a FIXED INSTALMENT — three charges and it is paid off — not a
-   recurring plan. Seed a $397 recurring price, point checkout at it, and you
-   have built the exact thing he ruled out. Payment four then lands on somebody
-   who has already paid in full.
+   ⚠ THIS CHANGES WHAT bundleIsBestDeal() IS FOR — read the note above it.
 
-   Stripe's mechanism for stopping is a subscription schedule: one phase,
-   `iterations: 3`, `end_behavior: 'cancel'`, created in the
-   checkout.session.completed handler. Without it the subscription runs forever.
+   ⚠ NOT YET ENFORCED AT CHECKOUT. This is the pricing rule; applying it needs
+   Stripe coupons or a dynamic price in lib/stripe/checkout.ts plus a read of
+   what the user already owns. Until that exists, the sentence on the level
+   pages is a commitment we honour by hand. Do not publish it on a page with a
+   live buy button until the checkout does the arithmetic.
+   ────────────────────────────────────────────────────────────────────────── */
 
-   ── THE TRAP IN THE WEBHOOK ──────────────────────────────────────────────
-   ⚠ customer.subscription.deleted SETS expires_at ON THE BUYER'S ENROLLMENTS.
+/** What the bundle costs a buyer who already owns some levels. Never below 0. */
+export function upgradeToBundlePrice(ownedLevels: readonly number[]): number | null {
+  if (!PRICING_PUBLISHED || BLUEPRINT_BUNDLE.oneTime === null) return null
+  const paid = LEVELS
+    .filter(l => ownedLevels.includes(l.order))
+    .map(l => l.oneTime)
+  if (paid.some(a => a === null)) return null
+  const credit = (paid as number[]).reduce((a, b) => a + b, 0)
+  return Math.max(0, BLUEPRINT_BUNDLE.oneTime - credit)
+}
 
-   When the third payment completes and the schedule ends the subscription,
-   that branch fires and revokes access from the person who just finished
-   paying $1,191. Correct for a cancellation, catastrophic for a completion —
-   and today the two are indistinguishable to that code. Whatever tracks
-   payments made has to exist BEFORE the recurring price does.
+/* ── THE LEVEL 4 ORDER BUMP ────────────────────────────────────────────────
+   Master doc, Part Two: "your highest-value single change and it costs nothing
+   to implement". At $497, Level 4 alone is half the bundle price, so anyone on
+   that checkout page is one sentence from $997.
 
-   ── THE DECISION THAT IS NOT A DEVELOPER'S ───────────────────────────────
-   "If payments stop, access pauses." A pause implies it can resume. The code
-   expires access at the end of the paid period, which is termination. They are
-   different products:
+   `{delta}` resolves at render time from the two prices so it cannot disagree
+   with them. Show this on the Level 4 purchase surface only.
+   ────────────────────────────────────────────────────────────────────────── */
+export const ORDER_BUMP = {
+  appliesToSku: 'GWOPU-SENIOR',
+  template:
+    'Level 4 on its own is {level}. All four levels are {bundle}. '
+    + 'Add Levels 1, 2 and 3 for {delta} more →',
+} as const
 
-     · PAUSE — miss payment two, pay a month later, access returns and one
-       payment is still owed. Needs a resume path, retry handling, dunning, and
-       a state that is neither active nor expired.
-     · EXPIRE — a missed payment ends it, they have paid $794 for nothing, and
-       the no-refund policy is what they meet when they complain. That is a
-       chargeback with a sympathetic story attached.
+/* ── THE CHECKOUT LINE ─────────────────────────────────────────────────────
+   Master doc, Part Three §2. Costs a handful of sales, buys the credibility
+   the brand is built on, and prevents the purchases most likely to become
+   complaints. It only works because the $197 entry point and the upgrade
+   credit both exist — it routes the buyer somewhere they can succeed rather
+   than losing them.
+   ────────────────────────────────────────────────────────────────────────── */
+export const CHECKOUT_CONSCIENCE_LINE =
+  'If this would stretch you, start with Level 1 at {entry} — or take the free '
+  + 'Blueprint and come back when it will not. That is the same advice we give '
+  + 'inside the course.'
 
-   His word is "pauses". Put the second version in front of him before building
-   either, and put both in front of counsel with the CROA question — instalment
-   billing for credit-related services is squarely what CROA regulates.
-
-   ── WHAT IS ALREADY DONE, SO NOBODY REBUILDS IT ──────────────────────────
-   · lib/stripe/checkout.ts already branches on plan.billing and passes
-     mode: 'subscription'.
-   · grant_enrollments_for_payment already writes source = 'subscription' when
-     billing = 'subscription' — which is what the pause branch keys on.
-   · The `subscriptions` table exists (0004_commerce.sql).
-
-   ── WHAT IS MISSING ──────────────────────────────────────────────────────
-   · A membership_plans row with billing = 'subscription'. Suggest
-     GWOPU-BLUEPRINT-PLAN, grants_level 4, grants_cumulative true — a second
-     way to buy the bundle, not a fifth product, so the funnel still shows one
-     bundle card with two payment options.
-   · A recurring price in scripts/seed-stripe.mts.
-   · The subscription schedule that stops it at three.
-   · An INSERT into `subscriptions`. Nothing writes that table today, so the
-     pause branch updates zero rows and cannot fire at all.
-   · A completion branch that runs BEFORE the deletion branch: three paid means
-     permanent, expires_at = null, never touched again.
-   ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ DO NOT ENABLE BUY-NOW-PAY-LATER AT CHECKOUT.
+   Stripe offers Klarna, Afterpay and Affirm as payment method types and they
+   are off by default — keep them off. Level 1 Module 8 teaches students to
+   audit their BNPL exposure. Selling the course through BNPL is a
+   contradiction a buyer will notice, and screenshot. Master doc, Part Two. */
+export const BNPL_ALLOWED = false
 
 /* ── WHAT THE PLATFORM MUST SUPPORT (Brand direction §1) ───────────────────────────
    Flags, not features. Each one is off until the business decides to activate
@@ -242,7 +232,13 @@ export const CAPABILITIES = {
      want it. It came from the earlier brand direction and was never defined.
      Do not reinstate this flag without him asking for it by name. */
   oneTimePayment:        true,
-  monthlyPayment:        true,
+  /* ⚠ FALSE 2026-09-14, and this one is not a "not yet". The Pricing, Payment
+     & Package Master rules out instalments, subscriptions and recurring
+     charges of any kind — see the reasoning under THE BUNDLE. The ladder plus
+     UPGRADE_CREDIT is the answer to "what about people who cannot pay $997",
+     not a monthly price. Flipping this true re-opens a CROA question counsel
+     has not answered and contradicts Module 7.2. */
+  monthlyPayment:        false,
 } as const
 
 /* ── OFFERS ────────────────────────────────────────────────────────────────
@@ -427,14 +423,6 @@ export function bundleSavings(): number | null {
   return sep - BLUEPRINT_BUNDLE.oneTime
 }
 
-/** Total across the payment plan — $1,191 with today's numbers. Computed from
-    `monthly` × `planMonths`, never typed, so it cannot disagree with the
-    per-payment figure shown beside it. */
-export function planTotal(): number | null {
-  if (!PRICING_PUBLISHED || BLUEPRINT_BUNDLE.monthly === null) return null
-  return BLUEPRINT_BUNDLE.monthly * BLUEPRINT_BUNDLE.planMonths
-}
-
 /* ══ IS THE BUNDLE STILL THE BEST DEAL? ══════════════════════════════════════
    ⚠ NOT ALWAYS, AND THAT IS WHY THIS EXISTS.
 
@@ -457,10 +445,25 @@ export function planTotal(): number | null {
    often showing them the worse option, which contradicts the instruction it
    was priced to satisfy.
 
-   ⚠ THE FIX IS TO HIDE IT, NOT TO DISCOUNT IT. Crediting prior spend needs
-   Stripe coupons, a record of what each user has paid, and a decision about
-   whether credit expires — real work for a case that has not happened yet.
-   Hiding the bundle when it is not the best deal satisfies the memo exactly:
+   ⚠ HIDING IS NOW THE INTERIM FIX, NOT THE ANSWER. Superseded in principle
+   2026-09-14 by the Pricing, Payment & Package Master, which mandates the
+   upgrade credit this note previously deferred as "real work for a case that
+   has not happened yet".
+
+   With UPGRADE_CREDIT applied, the table above collapses: every buyer pays
+   $997 in total however they get there, so the bundle is never the worse
+   option and there is nothing to hide. Owns L3 is the case that used to lose
+   by $6 — credited, the upgrade is $600 against $991 to finish separately.
+
+   So this function stays, unchanged, only until checkout can do that
+   arithmetic. It hides the bundle from buyers for whom it is currently priced
+   badly, which remains true while upgrade pricing is not enforced. When
+   upgradeToBundlePrice() is wired into lib/stripe/checkout.ts, replace the
+   call sites with the credited price rather than deleting the bundle card —
+   showing a credited $600 is the offer; showing nothing is a missed sale.
+
+   THE ORIGINAL REASONING, kept because it explains the current behaviour:
+   hiding the bundle when it is not the best deal satisfies the memo exactly —
    the bundle is never presented as anything other than the best offer
    available, because when it is not, it is not presented.
 
@@ -513,6 +516,8 @@ export const fmtMoney = money
     both unapproved, which is correct — see their notes above. */
 export const pricingReady = () =>
   PRICING_PUBLISHED &&
-  LEVELS.every(l => l.oneTime !== null || l.monthly !== null) &&
+  /* One-time only since 2026-09-14 — a level with no oneTime price has no
+     price, and `monthly` is no longer a fallback anywhere. */
+  LEVELS.every(l => l.oneTime !== null) &&
   REFUND_POLICY.approved &&
   OFFERS.foundingMember.approved

@@ -137,7 +137,10 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('next', pathname)
-    return applyHeaders(NextResponse.redirect(url), nonce, csp)
+    /* carryCookies: the sign-out clearing above writes to `response`, and a
+       bare redirect would discard it — leaving the dead cookie in the browser
+       to fail again on the next request. */
+    return carryCookies(applyHeaders(NextResponse.redirect(url), nonce, csp), response)
   }
 
   // Signed in on /login or /signup → straight to the dashboard. `next` is
@@ -147,10 +150,42 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     url.search = ''
-    return applyHeaders(NextResponse.redirect(url), nonce, csp)
+    /* ⚠ carryCookies IS WHAT KEEPS PEOPLE SIGNED IN. See the note on the
+       function — without it this branch silently signs a buyer out. */
+    return carryCookies(applyHeaders(NextResponse.redirect(url), nonce, csp), response)
   }
 
   return applyHeaders(response, nonce, csp)
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   carryCookies — MOVES A REFRESHED SESSION ONTO A REDIRECT
+
+   ⚠ WITHOUT THIS, A REDIRECT SILENTLY SIGNS PEOPLE OUT. This is subtle and it
+   cost a real buyer their post-checkout session on 2026-09-18.
+
+   supabase.auth.getUser() rotates the refresh token when the access token is
+   near expiry, and hands the new pair to our `setAll`, which writes them onto
+   `response`. Both redirect branches below used to return a brand-new
+   NextResponse.redirect(), so those cookies never reached the browser.
+
+   The browser therefore kept the OLD refresh token — which the auth server has
+   already consumed. Past Supabase's reuse-interval the next refresh is denied
+   with refresh_token_not_found, the clearing block above wipes the cookies, and
+   the visitor is signed out. It surfaces on whatever request happens to come
+   next, which is why it looked like "the purchase logged me out": the Stripe
+   round trip is simply long enough for the token to need refreshing.
+
+   Rotation is also why retrying looked fine — a fresh sign-in issues a new pair
+   and the fault only reappears once the next refresh lands on a redirect.
+
+   ⚠ APPLY THIS TO EVERY redirect() AND rewrite() ADDED TO THIS FILE. A response
+   that does not carry `response.cookies` drops the session.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function carryCookies(target: NextResponse, source: NextResponse): NextResponse {
+  for (const cookie of source.cookies.getAll()) target.cookies.set(cookie)
+  return target
 }
 
 function applyHeaders(response: NextResponse, nonce: string, csp: string) {

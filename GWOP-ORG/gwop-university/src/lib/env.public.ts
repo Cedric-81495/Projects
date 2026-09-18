@@ -35,6 +35,26 @@ const clientSchema = z.object({
      An env var deliberately, not a code branch: on event day a revert has to
      take thirty seconds, not a redeploy. */
   NEXT_PUBLIC_LEAD_CAPTURE_MODE: z.enum(['native', 'iframe']).default('native'),
+
+  /* ── THE DOMAIN THE AUTH COOKIE IS SCOPED TO ──────────────────────────────
+     Set to '.thegwopblueprint.com' in Vercel so one session works on BOTH
+     thegwopblueprint.com and go.thegwopblueprint.com. Left unset everywhere
+     else, which gives host-only cookies — the correct behaviour on localhost
+     and on *.vercel.app preview URLs, where a shared parent domain would be
+     wrong or impossible.
+
+     ⚠ THE LEADING DOT IS NOT OPTIONAL. 'thegwopblueprint.com' without it is
+     treated by browsers as the apex only in some contexts and as the whole
+     tree in others; '.thegwopblueprint.com' is unambiguous and is what makes
+     the cookie travel to subdomains.
+
+     ⚠ THIS IS A PUBLIC VALUE BY NECESSITY. The browser client sets cookies
+     too, so it has to know the scope. Nothing is leaked — a cookie's domain is
+     visible in devtools on any request. The session TOKEN is still httpOnly. */
+  NEXT_PUBLIC_AUTH_COOKIE_DOMAIN: z
+    .string()
+    .startsWith('.', 'Must begin with a dot, e.g. .thegwopblueprint.com')
+    .optional(),
 })
 
 const parsed = clientSchema.safeParse({
@@ -46,6 +66,7 @@ const parsed = clientSchema.safeParse({
   NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
   NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
   NEXT_PUBLIC_LEAD_CAPTURE_MODE: process.env.NEXT_PUBLIC_LEAD_CAPTURE_MODE,
+  NEXT_PUBLIC_AUTH_COOKIE_DOMAIN: process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN,
 })
 
 if (!parsed.success) {

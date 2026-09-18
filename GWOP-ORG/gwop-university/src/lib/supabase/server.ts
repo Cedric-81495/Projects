@@ -1,6 +1,7 @@
 import 'server-only'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
+import { authCookieOptions } from './cookies'
 import { env } from '@/lib/env'
 import type { Database } from './types'
 
@@ -28,6 +29,9 @@ export async function createServerSupabase() {
         }
       },
     },
+    /* See cookies.ts — one scope across every client, or the browser ends up
+       holding two cookies with the same name. */
+    cookieOptions: authCookieOptions,
   })
 }
 

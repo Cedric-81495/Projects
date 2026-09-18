@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { authCookieOptions } from '@/lib/supabase/cookies'
 
 /* Routes that require a session.
 
@@ -101,6 +102,12 @@ export async function middleware(request: NextRequest) {
           toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
         },
       },
+      /* ⚠ THE SAME SCOPE AS EVERY OTHER CLIENT — see lib/supabase/cookies.ts.
+         This one matters most: middleware is what REFRESHES the session, so if
+         it writes at a different scope than the client that created the
+         session, the refreshed cookie lands beside the original instead of
+         replacing it. */
+      cookieOptions: authCookieOptions,
     },
   )
 

@@ -1,0 +1,44 @@
+# Free scheduled collection.
+#
+# Vercel's Hobby plan allows one cron per day and caps functions at 60s. This
+# workflow is the fallback described in docs/ARCHITECTURE.md: GitHub Actions
+# gives free scheduled minutes on public repos and a generous allowance on
+# private ones, with no function timeout to design around.
+#
+# Add these repository secrets:
+#   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
+#   SUPABASE_SERVICE_ROLE_KEY, CRAWLER_USER_AGENT, GREENHOUSE_BOARDS
+name: Collect jobs
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every six hours, UTC
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: 'Space-separated source ids (blank = every due source)'
+        required: false
+        default: ''
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run collection
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CRAWLER_USER_AGENT: ${{ secrets.CRAWLER_USER_AGENT }}
+          GREENHOUSE_BOARDS: ${{ secrets.GREENHOUSE_BOARDS }}
+        run: npm run collect -- ${{ github.event.inputs.sources }}

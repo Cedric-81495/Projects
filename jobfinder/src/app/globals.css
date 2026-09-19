@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind v4 defines the design tokens here rather than in
+ * tailwind.config.ts, which it no longer reads by default. Each variable
+ * generates the matching utilities: --color-moss gives bg-moss, text-moss,
+ * border-moss; --radius-card gives rounded-card.
+ */
+@theme {
+  --color-ink: #17201c;
+  --color-ink-muted: #5c6b63;
+
+  --color-paper: #fbfaf7;
+  --color-paper-raised: #ffffff;
+
+  --color-line: #e2e0d8;
+
+  --color-moss: #2f6b4f;
+  --color-moss-deep: #23513c;
+  --color-moss-wash: #eaf2ec;
+
+  --radius-card: 10px;
+
+  --font-sans: "Inter Tight", Inter, system-ui, sans-serif;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { background-color: var(--color-paper); color: var(--color-ink); -webkit-font-smoothing: antialiased; }
+  a { text-underline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--color-moss); outline-offset: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

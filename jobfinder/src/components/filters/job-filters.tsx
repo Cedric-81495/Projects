@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useTransition } from 'react';
 import { Select } from '@/components/ui/input';
+import { clearFilterKeys, countActiveFilters } from '@/lib/filters';
 
 const JOB_TYPES = [
   ['', 'All job types'], ['full_time', 'Full-time'], ['part_time', 'Part-time'],
@@ -42,27 +43,11 @@ export function JobFilters({ sources }: { sources: { id: string; name: string }[
 
   const field = (key: string) => params.get(key) ?? '';
 
-  // Keys this sidebar owns. `q` and `location` belong to the search box, so
-  // clearing filters must not discard the search someone just typed.
-  const FILTER_KEYS = [
-    'type', 'arrangement', 'posted', 'sort', 'source',
-    'salaryMin', 'salaryMax', 'currency', 'salaryOnly',
-  ];
-
-  // 'sort' only counts as active when it is not the default.
-  const activeCount = FILTER_KEYS.filter((key) => {
-    const value = params.get(key);
-    if (!value) return false;
-    if (key === 'sort') return value !== 'recent';
-    return true;
-  }).length;
+  const activeCount = countActiveFilters(new URLSearchParams(params.toString()));
 
   const clearAll = useCallback(() => {
-    const next = new URLSearchParams(params.toString());
-    FILTER_KEYS.forEach((key) => next.delete(key));
-    next.delete('page');
+    const next = clearFilterKeys(new URLSearchParams(params.toString()));
     startTransition(() => router.push(`/jobs?${next.toString()}`));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params, router]);
 
   return (

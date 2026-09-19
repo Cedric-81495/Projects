@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { FiltersDrawer } from '@/components/filters/filters-drawer';
 import { JobFilters } from '@/components/filters/job-filters';
 import { JobFiltersSkeleton } from '@/components/filters/job-filters-skeleton';
 import { JobList } from '@/components/jobs/job-list';
@@ -32,9 +33,11 @@ export default async function JobsPage({
       </Suspense>
 
       <div className="grid items-start gap-6 lg:grid-cols-[260px_1fr]">
-        <Suspense fallback={<JobFiltersSkeleton />}>
-          <SourceFilters />
-        </Suspense>
+        <FiltersDrawer>
+          <Suspense fallback={<JobFiltersSkeleton />}>
+            <SourceFilters />
+          </Suspense>
+        </FiltersDrawer>
 
         {/*
           Keyed on the query string: React discards the old subtree and shows

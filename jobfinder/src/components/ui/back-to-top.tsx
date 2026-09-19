@@ -28,7 +28,7 @@ export function BackToTop({ showAfter = 600 }: { showAfter?: number }) {
       type="button"
       onClick={toTop}
       aria-label="Back to top"
-      className="fixed bottom-6 right-6 z-40 inline-flex h-10 items-center gap-2 rounded-card
+      className="fixed bottom-6 right-6 z-30 inline-flex h-10 items-center gap-2 rounded-card
                  border border-line bg-paper-raised px-3 text-sm text-ink shadow-sm
                  hover:border-moss hover:text-moss-deep
                  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2

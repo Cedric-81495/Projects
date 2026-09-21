@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { PATHWAY } from '@/content/pathway'
 import type { Metadata } from 'next'
 import { createServerSupabase } from '@/lib/supabase/server'
-import { LEVELS, canAccessLevel, type AccessState } from '@/lib/access/policy'
+import { LEVELS, canAccessLevel, isStaff, type AccessState } from '@/lib/access/policy'
+import { loadAccessState } from '@/lib/access/load'
 
 export const metadata: Metadata = {
   title: 'Dashboard · GWOP University',
@@ -39,14 +40,18 @@ export default async function DashboardPage() {
 
   const enrolledLevel = typeof enrolled === 'number' ? enrolled : 0
 
-  /* Assembled so the card gating can go through canAccessLevel rather than
-     comparing numbers here. Role is 'student' because this page only ever
-     decides whether to show a level card — and every query above already runs
-     through the RLS-bound client, so the real gate is the database. If a staff
-     override is ever wanted on this page, fetch the role rather than widening
-     the comparison. */
-  const enrolledLevels = Array.isArray(levels) ? (levels as number[]) : []
-  const access: AccessState = { userId, role: 'student', enrolledLevel, enrolledLevels }
+  /* ⚠ THE ROLE IS FETCHED, NOT ASSUMED — corrected 2026-09-21.
+     This line used to read `role: 'student'`, with a comment arguing it was
+     safe because the database is the real gate. Safe, but wrong: an admin saw
+     the ADMIN link in the nav above this page while every level card beneath
+     it read "Unlocks with Level 1 enrollment", and the RLS policy would have
+     served those lessons on request. Three layers, three answers.
+
+     loadAccessState() resolves role and enrollments together so the nav, this
+     page and the level routes cannot disagree. See lib/access/load.ts. */
+  const state = await loadAccessState(supabase)
+  const enrolledLevels = state?.enrolledLevels ?? []
+  const access: AccessState = state ?? { userId, role: 'student', enrolledLevel, enrolledLevels }
 
   const progress = await Promise.all(
     LEVELS.map(async (l) => {
@@ -62,9 +67,29 @@ export default async function DashboardPage() {
       <p className="tag">Your pathway</p>
       <h1 className="poh1">{firstName ? `Welcome back, ${firstName}.` : 'Welcome back.'}</h1>
 
+      {/* ⚠ STAFF FIRST, AND NOT BECAUSE OF THE BANNER — added 2026-09-21.
+          A reviewer holds no enrollments, so the array is empty and the old
+          code showed them "You're not enrolled yet" above four cards their
+          role had just unlocked. Two contradictory claims, stacked.
+
+          The distinction is real and worth stating rather than hiding: staff
+          access is a ROLE GRANT for content review, not a purchase. Somebody
+          reviewing Level 3 should know they are seeing it as staff — because
+          it means they are NOT seeing what a buyer sees, which is the whole
+          point of the review. */}
+      {enrolledLevels.length === 0 && isStaff(access) && (
+        <div className="poempty">
+          <h2>Staff access</h2>
+          <p>
+            You hold no enrollments, so every level below is open to you by role
+            rather than by purchase. A student sees only what they have bought.
+          </p>
+        </div>
+      )}
+
       {/* Array length, not the max: both are 0 for a new student, but the array
           is the thing that actually describes what they hold. */}
-      {enrolledLevels.length === 0 && (
+      {enrolledLevels.length === 0 && !isStaff(access) && (
         <div className="poempty">
           <h2>You&rsquo;re not enrolled yet</h2>
           {/* Built from PATHWAY rather than naming a level in prose — this

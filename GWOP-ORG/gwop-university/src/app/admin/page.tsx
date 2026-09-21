@@ -3,6 +3,10 @@ import Link from 'next/link'
 import { PATHWAY } from '@/content/pathway'
 import { MODULES, byLevel, STATUS_LABEL, missingAssets, moduleStatus, moduleMinutes, TOTAL_LESSONS } from '@/content/modules'
 import { Crest } from '@/components/Chrome'
+import { notFound } from 'next/navigation'
+import { createServerSupabase } from '@/lib/supabase/server'
+import { loadAccessState } from '@/lib/access/load'
+import { isStaff } from '@/lib/access/policy'
 
 export const metadata: Metadata = {
   title: 'Module Admin — GWOP University',
@@ -13,9 +17,31 @@ export const metadata: Metadata = {
    MODULE ADMIN  —  built for MAUI's tracker tasks:
      "Organize modules by GWOP level"  (Aug 23, support: Jhon)
      "Report missing items" / "identify missing assets"
-   Read-only status view. No auth yet — Phase 2. Do not expose publicly.
+   ⚠ STAFF ONLY — GATED 2026-09-21. This block used to read "No auth yet —
+   Phase 2. Do not expose publicly." It was exposed publicly: middleware.ts
+   lists /admin in PROTECTED_PREFIXES, but that only requires A SESSION, and
+   signup is open to anyone. Every registered student could read the whole
+   production map — which lessons are unfilmed, which assets are missing, and
+   the team names in the header bar.
+
+   No customer data was reachable here, so this was internal disclosure rather
+   than a breach. It still told any curious buyer that the course they had just
+   paid for was 47 lessons short.
+
+   ⚠ notFound(), NOT A REDIRECT AND NOT A 403. Same reasoning as the asset
+   route: a 403 confirms the page exists and is worth attacking. A student who
+   wanders here gets the same 404 as a typo.
+
+   ⚠ STAFF, NOT ADMIN, DESPITE THE ROUTE NAME. has_role() is a rank
+   comparison, so admin and owner pass this too. Maui and Sheena — the people
+   this page was built for — need reading rights, not write rights, and the
+   page is read-only.
    ═══════════════════════════════════════════════════════════════════════════ */
-export default function Admin() {
+export default async function Admin() {
+  const supabase = await createServerSupabase()
+  const access = await loadAccessState(supabase)
+  if (!access || !isStaff(access)) notFound()
+
   /* Derived, never stored — see moduleStatus(). A module is only as ready as
      its weakest lesson, so these counts cannot flatter the pipeline. */
   const total = MODULES.length

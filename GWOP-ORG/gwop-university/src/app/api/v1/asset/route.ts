@@ -70,6 +70,23 @@ export async function GET(req: Request) {
   const levelNumbers = asset.levels.map(
     slug => LEVELS.find(l => l.slug === slug)?.level ?? 99,
   )
+  /* ⚠ 'student' HERE IS DELIBERATE, UNLIKE THE PORTAL PAGES — reviewed
+     2026-09-21, when three other call sites were corrected to fetch the real
+     role. This one stays.
+
+     A portal page decides what to DRAW. This route mints a signed URL to a
+     paid PDF — a file that leaves the platform, can be forwarded, and cannot
+     be recalled. Staff access exists for content review, and review happens
+     against the source documents, not by pulling customer download links.
+
+     Giving every staff account a working download endpoint for all twelve
+     paid PDFs widens the blast radius of one compromised or departed staff
+     login from "can read lessons in the browser" to "can take the product".
+     The asymmetry is the point: read access in the UI, no bulk export.
+
+     ⚠ IF A REVIEWER GENUINELY NEEDS THE FILES, grant them an enrollment or
+     hand them the source. Do not widen this line — the moment it reads the
+     real role, every staff session is a download key. */
   const access: AccessState = {
     userId: userData.user.id,
     role: 'student',

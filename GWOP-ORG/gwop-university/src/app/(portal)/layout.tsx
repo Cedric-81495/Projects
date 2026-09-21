@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { PortalChrome } from '@/components/portal/PortalChrome'
 import type { AccessState } from '@/lib/access/policy'
+import { highestRole } from '@/lib/access/load'
 import '@/styles/portal.css'
 
 export const dynamic = 'force-dynamic' // never statically cache a signed-in shell
@@ -39,11 +40,10 @@ export default async function PortalLayout({ children }: { children: React.React
     supabase.rpc('enrolled_levels', { uid: userData.user.id }),
   ])
 
-  const rank = { student: 10, staff: 20, admin: 30, owner: 40 } as const
-  const role = (roles ?? [{ role: 'student' }]).reduce(
-    (best, r) => (rank[r.role as keyof typeof rank] > rank[best as keyof typeof rank] ? r.role : best),
-    'student' as string,
-  ) as AccessState['role']
+  /* ⚠ ONE RANK MAP, IN lib/access/load.ts. This block used to carry its own
+     copy, and so did app/layout.tsx — two identical ladders that would drift
+     the first time a role was added to the app_role enum in one of them. */
+  const role = highestRole(roles)
 
   const access: AccessState = {
     enrolledLevels: Array.isArray(levels) ? (levels as number[]) : [],

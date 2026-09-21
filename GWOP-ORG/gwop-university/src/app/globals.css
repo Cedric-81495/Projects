@@ -1546,3 +1546,25 @@ body>section:only-of-type{display:grid;align-content:center}
 /* The ™ sits small and raised, as in the mockup. */
 .evoffer-badge b sup{font-size:.5em;vertical-align:super;margin-left:1px;
   color:rgba(247,243,233,.75)}
+
+/* ── ERROR AND 404 PAGES ──────────────────────────────────────────────────
+   Shared by not-found.tsx and error.tsx. Deliberately plain: these pages are
+   read once, in a moment of confusion, and the only thing that matters is the
+   way out being obvious.
+
+   ⚠ min-height uses svh with a vh fallback. On mobile Safari, 100vh is taller
+   than the visible area while the address bar is showing, which would push the
+   buttons below the fold — on the one page where the button IS the content. */
+.errpage{
+  display:flex; align-items:center; justify-content:center;
+  min-height:100vh; min-height:100svh;
+  padding:40px 22px; text-align:center;
+}
+.errwrap{max-width:34rem}
+.errwrap .crest{margin:0 auto 22px}
+.errpage h1{font-size:clamp(28px,5vw,42px); margin:0 0 16px}
+.errlede{font-size:16.5px; line-height:1.65; color:var(--muted); margin:0 0 30px}
+/* Wraps at narrow widths rather than shrinking the tap targets below 48px. */
+.erractions{display:flex; flex-wrap:wrap; gap:12px; justify-content:center}
+.errref{margin-top:26px; font-size:13px; color:var(--muted)}
+.errref code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px}

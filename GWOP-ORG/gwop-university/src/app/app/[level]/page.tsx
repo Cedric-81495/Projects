@@ -4,6 +4,7 @@ import { PATHWAY } from '@/content/pathway'
 import { byLevel, moduleStatus, moduleMinutes } from '@/content/modules'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { LEVELS, canAccessLevel, type AccessState } from '@/lib/access/policy'
+import { loadAccessState } from '@/lib/access/load'
 
 /* Dynamic, not static: the page now differs by who is asking. Prerendering it
    would serve one visitor's access state to everyone. */
@@ -39,7 +40,12 @@ export default async function LevelPage(
   ])
 
   const levelNumber = LEVELS.find(l => l.slug === level)?.level ?? 99
-  const access: AccessState = {
+  /* ⚠ THE ROLE IS FETCHED, NOT ASSUMED — corrected 2026-09-21. This built
+     `role: 'student'` by hand, so a staff reviewer was shown the locked state
+     on a level the RLS policy would have served them. One loader now answers
+     for the nav, the dashboard and this page. See lib/access/load.ts. */
+  const state = await loadAccessState(supabase)
+  const access: AccessState = state ?? {
     userId,
     role: 'student',
     enrolledLevel: typeof enrolled === 'number' ? enrolled : 0,

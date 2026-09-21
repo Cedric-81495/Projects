@@ -16,9 +16,18 @@ export const GET = route({ auth: 'student', limit: 'read' }, async ({ ctx }) => 
     .eq('id', ctx!.userId)
     .single()
 
+  /* ⚠ .eq('user_id') ADDED 2026-09-21. This relied on RLS alone, which is
+     correct for a student — "read own enrollments" pins user_id to auth.uid().
+     But that same policy also permits has_role('staff'), so a staff account
+     calling /me received EVERY user's enrollment rows inside their own profile
+     response. Never exploited, and not a leak to customers, but this endpoint
+     answers "who am I" and it was answering "who is everyone".
+
+     RLS stays the gate; this is the query saying what it actually wants. */
   const { data: enrollments } = await ctx!.db
     .from('enrollments')
     .select('level, source, status, starts_at, expires_at')
+    .eq('user_id', ctx!.userId)
     .eq('status', 'active')
     .order('level')
 

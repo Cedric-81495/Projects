@@ -234,4 +234,46 @@ describe('the seven regression tests', () => {
       .from('lessons').select('id').eq('level', 4).eq('is_preview', false).limit(1)
     expect(own ?? [], 'a Level 4 buyer cannot read their own level').not.toHaveLength(0)
   })
+
+  /* ── 8 ── NOT ONE OF THE SEVEN. Added 2026-09-21 alongside 0024.
+     The grant used to reassign payment_reference_id on conflict, so a bundle
+     purchase adopted the enrollments of levels already bought separately —
+     and a refund of the bundle then revoked them too. Nobody has hit it,
+     because the bundle is hidden from these buyers and now refused at
+     checkout, but it goes live the moment the upgrade credit ships. */
+  it('8 · a later bundle purchase does not adopt separately-bought levels', async () => {
+    const { userId } = await buyer('t8')
+    const l2Payment = await purchase(userId, SKU.l2)
+    const l3Payment = await purchase(userId, SKU.l3)
+    const bundlePayment = await purchase(userId, SKU.bundle)
+
+    expect(await activeLevels(userId)).toEqual([1, 2, 3, 4])
+
+    const { data: rows } = await admin
+      .from('enrollments')
+      .select('level, payment_reference_id')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+
+    const by = new Map((rows ?? []).map(r => [r.level as number, r.payment_reference_id]))
+
+    expect(by.get(2), 'level 2 was adopted by the bundle payment').toBe(l2Payment)
+    expect(by.get(3), 'level 3 was adopted by the bundle payment').toBe(l3Payment)
+    /* The two the bundle genuinely bought stay with the bundle. */
+    expect(by.get(1)).toBe(bundlePayment)
+    expect(by.get(4)).toBe(bundlePayment)
+
+    /* And the consequence that made it matter: refunding the bundle should
+       take only what the bundle paid for. */
+    await admin
+      .from('enrollments')
+      .update({ status: 'revoked', note: 'refund:test' })
+      .eq('payment_reference_id', bundlePayment)
+      .eq('status', 'active')
+
+    expect(
+      await activeLevels(userId),
+      'refunding the bundle revoked separately-purchased levels',
+    ).toEqual([2, 3])
+  })
 })

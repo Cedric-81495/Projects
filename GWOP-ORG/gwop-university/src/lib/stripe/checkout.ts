@@ -5,7 +5,7 @@ import { publicEnv } from '@/lib/env'
 import { ApiError, notFound } from '@/lib/http/errors'
 import type { AuthContext } from '@/lib/auth/context'
 import { logger } from '@/lib/observability/logger'
-import { BNPL_ALLOWED } from '@/config/membership'
+import { BNPL_ALLOWED, BLUEPRINT_BUNDLE, bundleIsBestDeal, remainingSeparateTotal } from '@/config/membership'
 
 /* ══ WHAT THE CUSTOMER MAY PAY WITH ════════════════════════════════════════
    ⚠ PINNED TO CARD. THIS IS THE FLAG BEING ENFORCED, NOT DESCRIBED.
@@ -137,6 +137,62 @@ export async function createCheckoutSession(
       'You already own this level. It is available in your account.',
       { paymentId: alreadyPaid.id },
     )
+  }
+
+  /* ── 1b · Would the bundle overcharge somebody who already owns levels? ──
+     ⚠ ADDED 2026-09-21. The membership page already hides the bundle card in
+     this case via bundleIsBestDeal(), but hiding a card is not a guard. A
+     direct link, a stale tab, a bookmark or an old email all reach this
+     function with the card never rendered.
+
+     The case that matters: a buyer holding Levels 2 and 3 has $694 of content
+     left to buy. The bundle charges $997 for it. They would pay $1,691 in
+     total for a $997 product, having done nothing wrong but click the thing
+     in front of them. That purchase becomes a refund request, and the site
+     says no refunds — so it becomes a chargeback, from exactly the audience
+     the founder story is about.
+
+     ⚠ THE SAME ARITHMETIC THE DISPLAY USES, NOT A SECOND RULE. Both go through
+     bundleIsBestDeal(), so the card and the door can never disagree. Do not
+     re-implement the comparison here.
+
+     ⚠ NOT "OWNS ANY LEVEL". A Level 1 owner has $1,191 left to buy and saves
+     $194 on the bundle — blocking them would cost the customer money and cost
+     us a $997 sale. The rule is whether the bundle is still cheaper, which is
+     false only once Level 3 or Level 4 is held.
+
+     ⚠ DELETE THIS WHEN THE UPGRADE CREDIT SHIPS. Once checkout prices the
+     bundle through upgradeToBundlePrice(), every route costs $997 in total
+     and there is nothing to protect anyone from — the Level 2+3 buyer is
+     quoted $303 and it is simply the right price. Blocking a correctly-priced
+     sale at that point would be the bug. See UPGRADE_CREDIT_AT_CHECKOUT. */
+  if (plan.sku === BLUEPRINT_BUNDLE.sku) {
+    const { data: held } = await admin
+      .from('enrollments')
+      .select('level')
+      .eq('user_id', ctx.userId)
+      .eq('status', 'active')
+
+    const ownedLevels = (held ?? []).map(r => r.level as number)
+
+    if (ownedLevels.length > 0 && !bundleIsBestDeal(ownedLevels)) {
+      logger.info('checkout_bundle_worse_than_remaining', {
+        sku: plan.sku,
+        ownedLevels,
+        remaining: remainingSeparateTotal(ownedLevels),
+      })
+      /* 409 for the same reason as step 1: the request is well-formed, the
+         world has moved on. The message names the cheaper route rather than
+         just refusing — a bare "not available" reads as a fault. */
+      throw new ApiError(
+        409,
+        'conflict',
+        'You already own part of this bundle, so buying the levels you are '
+        + 'missing costs less than the bundle does. Pick them up individually '
+        + 'from the membership page.',
+        { ownedLevels },
+      )
+    }
   }
 
   /* ── 2 · An open attempt for this plan? Return ITS session. ─────────────

@@ -3,7 +3,7 @@ import { PATHWAY_HEADING } from '@/content/pathway'
 import Link from 'next/link'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { BrandBar, Footer } from '@/components/Chrome'
-import { PlanCard } from './PlanCard'
+import { PlanGrid } from './PlanGrid'
 import { BLUEPRINT_BUNDLE, bundleIsBestDeal } from '@/config/membership'
 /* ⚠ THIS IMPORT IS WHY THE PAGE HAS STYLES. DO NOT REMOVE IT AS UNUSED.
    Added 2026-09-11.
@@ -107,55 +107,16 @@ export default async function MembershipPage() {
             <p>Enrollment details are coming soon.</p>
           </div>
         ) : (
-          <div className="mbgrid">
-            {plans
-              /* ⚠ HIDES THE BUNDLE WHEN IT IS NO LONGER THE BEST DEAL.
-
-                 Surpaul's memo §1 requires the bundle to "clearly be the best
-                 deal". For a new buyer it is — $997 against $1,388. But it
-                 re-charges for anything already owned, so once somebody holds
-                 Level 3 or higher, buying the remaining levels separately costs
-                 the same or less. In twelve of fifteen ownership combinations
-                 the bundle is the worse option.
-
-                 So it is offered only while it wins. Anyone past that point
-                 sees the individual levels they actually need, at a lower
-                 total. That satisfies the instruction rather than working
-                 around it: the bundle is never shown as the best deal when it
-                 is not one.
-
-                 See bundleIsBestDeal() in config/membership.ts for the
-                 arithmetic. */
-              .filter(
-                (plan) =>
-                  plan.sku !== BLUEPRINT_BUNDLE.sku || bundleIsBestDeal(enrolledLevels),
-              )
-              .map((plan) => (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                /* ⚠ THE BUNDLE NEEDS ALL FOUR, NOT JUST LEVEL 4. Same
-                   grants_level = 4 collision as the Includes line: a student
-                   who bought Level 4 alone held level 4, so `includes(4)` was
-                   true and the bundle rendered "You're enrolled" for three
-                   levels they had never paid for. They could not buy them, and
-                   nothing raised an error — the page simply told them they
-                   already had it.
-
-                   Masked today by bundleIsBestDeal(), which hides the bundle
-                   from anyone holding Level 4. Masked, not fixed: change a
-                   price so the bundle wins again and it returns silently. */
-                owned={
-                  plan.grants_cumulative
-                    ? Array.from({ length: plan.grants_level }, (_, i) => i + 1).every(l =>
-                        enrolledLevels.includes(l),
-                      )
-                    : enrolledLevels.includes(plan.grants_level)
-                }
-                signedIn={Boolean(userData.user)}
-              />
-            ))}
-          </div>
+          <PlanGrid
+            /* ⚠ THE BUNDLE FILTER STAYS HERE, SERVER-SIDE. Same rule as
+               before: it is offered only while $997 still beats buying the
+               levels that are left. See bundleIsBestDeal(). */
+            plans={plans.filter(
+              (plan) => plan.sku !== BLUEPRINT_BUNDLE.sku || bundleIsBestDeal(enrolledLevels),
+            )}
+            enrolledLevels={enrolledLevels}
+            signedIn={Boolean(userData.user)}
+          />
         )}
       </section>
       <Footer />

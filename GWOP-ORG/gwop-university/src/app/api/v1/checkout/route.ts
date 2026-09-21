@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { route } from '@/lib/http/handler'
 import { createCheckoutSchema } from '@/lib/validation/schemas'
 import { createCheckoutSession } from '@/lib/stripe/checkout'
+import { createCartCheckoutSession } from '@/lib/stripe/cart'
 import { currentAck } from '@/config/purchase'
 import { ApiError } from '@/lib/http/errors'
 
@@ -42,11 +43,35 @@ export const POST = route(
     const ip =
       h.get('x-real-ip') ?? h.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null
 
-    return createCheckoutSession(ctx!, body, {
+    /* ── ONE LEVEL, OR SEVERAL ──────────────────────────────────────────
+       ⚠ A SINGLE SELECTION TAKES THE OLD PATH, UNCHANGED — including a
+       plan_skus array of length one. That path is hardened by 0018, 0019 and
+       0024, all written after real defects, and a multi-item feature is no
+       reason to put any of it back in play. The cart path exists only for the
+       case the old one genuinely cannot express.
+
+       The acknowledgement is recorded by createCheckoutSession for single
+       purchases. For carts it is recorded here, before anything is charged,
+       because the cart path deals in several plans and the record is per
+       purchase decision, not per plan. */
+    const skus = body.plan_skus ?? (body.plan_sku ? [body.plan_sku] : [])
+    const unique = [...new Set(skus)]
+
+    const ackRecord = {
       text: ack.text,
       version: ack.version,
       ip: ip && ip !== '0.0.0.0' ? ip : null,
       userAgent: h.get('user-agent')?.slice(0, 500) ?? null,
-    })
+    }
+
+    if (unique.length === 1) {
+      return createCheckoutSession(ctx!, { ...body, plan_sku: unique[0] }, ackRecord)
+    }
+
+    return createCartCheckoutSession(
+      ctx!,
+      { plan_skus: unique, return_path: body.return_path },
+      ackRecord,
+    )
   },
 )

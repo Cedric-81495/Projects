@@ -524,3 +524,50 @@
 .lessonlist .lt{font-size:15px;line-height:1.45;color:var(--ink)}
 .lessonlist .lr{margin-left:auto;font-size:10.5px;font-weight:700;
   letter-spacing:.13em;text-transform:uppercase;color:var(--emerald);flex:none}
+
+/* ── MULTI-SELECT CART ────────────────────────────────────────────────────
+   Added 2026-09-21. The checkbox beside each card, and the bar that appears
+   once something is ticked. */
+
+/* The slot wraps the card so the tick box can sit outside it — PlanCard is
+   untouched, and a single purchase through its own button still works. */
+.mbslot{display:flex; flex-direction:column; gap:10px}
+.mbslot--on .mbcard{border-color:var(--emerald); box-shadow:0 0 0 2px rgba(20,83,45,.12)}
+
+.mbpick{
+  display:flex; align-items:center; gap:10px;
+  padding:11px 14px; min-height:48px;      /* tap target, not decoration */
+  border:1.5px solid var(--stone); border-radius:12px;
+  background:var(--white); cursor:pointer;
+  font-size:13.5px; color:var(--ink);
+}
+.mbpick:hover{border-color:var(--emerald)}
+.mbpick:focus-within{outline:2px solid var(--gold); outline-offset:2px}
+.mbpick input{width:18px; height:18px; accent-color:var(--emerald); flex:none}
+
+/* ⚠ STICKY, NOT FIXED. Fixed would sit over the last card on a short viewport
+   with no way to scroll past it. Sticky keeps it above the footer instead. */
+.mbcart{
+  position:sticky; bottom:0; z-index:5;
+  margin-top:26px; padding:18px;
+  border:1.5px solid var(--emerald); border-radius:14px;
+  background:var(--white);
+  box-shadow:0 -6px 24px rgba(0,0,0,.08);
+  /* Clears the home indicator on iOS; zero elsewhere. */
+  padding-bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+}
+.mbcart-sum{display:flex; align-items:baseline; justify-content:space-between; gap:12px}
+.mbcart-total{font-family:var(--display); font-size:26px; color:var(--emerald)}
+.mbcart-bundle{
+  margin:12px 0 0; padding:11px 13px;
+  border-left:3px solid var(--gold); background:var(--ivory);
+  font-size:13.5px; line-height:1.5; color:var(--ink);
+}
+.mbcart .mback{margin-top:14px}
+.mbcart-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
+.mbcart-actions .btn{flex:1 1 auto}
+
+@media (max-width:520px){
+  .mbcart-sum{flex-direction:column; align-items:flex-start; gap:2px}
+  .mbcart-actions .btn{flex:1 1 100%}
+}

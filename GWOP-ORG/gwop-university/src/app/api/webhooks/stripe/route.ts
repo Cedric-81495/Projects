@@ -160,6 +160,93 @@ async function processEvent(event: Stripe.Event) {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session
+
+      /* ── MULTI-ITEM CARTS ──────────────────────────────────────────────
+         ⚠ BRANCHES ON metadata.kind, NOT ON THE PRESENCE OF A GROUP ID.
+         client_reference_id carries a payment id for a single purchase and a
+         group id for a cart — same shape, different meaning. Guessing from
+         the value would eventually guess wrong; the flag is explicit.
+
+         A cart is N independent purchases sharing one session, so this loops
+         the same two steps the single path does, once per row. No special
+         grant function: grant_enrollments_for_payment() already takes one
+         payment and is idempotent.
+
+         ⚠ THE LOOP CONTINUES PAST A FAILED ROW, THEN THROWS AT THE END.
+         Stopping at the first failure would leave the earlier levels granted
+         and the later ones not, and Stripe's retry would replay the whole
+         thing. Better to attempt every row — the grant is idempotent, so
+         re-running the successful ones costs a query — and then fail loudly so
+         Stripe retries whatever is still outstanding. */
+      if (session.metadata?.kind === 'cart') {
+        const groupId = session.metadata.checkout_group_id
+        if (!groupId) throw new Error(`cart session ${session.id} has no group id`)
+
+        if (session.payment_status !== 'paid' && session.payment_status !== 'no_payment_required') {
+          logger.info('cart_not_yet_paid', { groupId, status: session.payment_status })
+          return
+        }
+
+        const { data: rows, error: rowsError } = await admin
+          .from('payment_references')
+          .select('id, plan_id, status')
+          .eq('checkout_group_id', groupId)
+
+        if (rowsError) throw new Error(`cart lookup failed: ${rowsError.message}`)
+        if (!rows || rows.length === 0) {
+          throw new Error(`cart ${groupId} has no payment rows`)
+        }
+
+        const intentId =
+          typeof session.payment_intent === 'string' ? session.payment_intent : null
+        const customerId = typeof session.customer === 'string' ? session.customer : null
+
+        const failures: string[] = []
+
+        for (const row of rows) {
+          const { error: updateError } = await admin
+            .from('payment_references')
+            .update({
+              status: 'paid',
+              paid_at: new Date().toISOString(),
+              stripe_payment_intent_id: intentId,
+              stripe_customer_id: customerId,
+            })
+            .eq('id', row.id)
+            .in('status', ['pending', 'processing', 'requires_action'])
+
+          if (updateError) {
+            failures.push(`${row.id}: ${updateError.message}`)
+            continue
+          }
+
+          const { error: grantError } = await admin.rpc('grant_enrollments_for_payment', {
+            p_payment_id: row.id,
+          })
+          if (grantError) failures.push(`${row.id}: ${grantError.message}`)
+        }
+
+        if (failures.length > 0) {
+          /* Money is taken and at least one level is not granted. Throwing
+             returns non-2xx, so Stripe retries and the idempotent grant
+             finishes the job. */
+          logger.error('cart_grant_partial', { groupId, failures })
+          throw new Error(`cart ${groupId} partially granted: ${failures.join('; ')}`)
+        }
+
+        logger.info('cart_enrollments_granted', { groupId, count: rows.length })
+
+        const cartUserId = session.metadata.user_id
+        if (cartUserId) {
+          await captureServer(cartUserId, ANALYTICS_EVENTS.purchaseCompleted, {
+            plan_sku: session.metadata.plan_skus,
+            amount_cents: session.amount_total ?? undefined,
+            currency: session.currency?.toUpperCase(),
+          })
+        }
+        return
+      }
+
       const paymentId = session.client_reference_id ?? session.metadata?.payment_id
       if (!paymentId) throw new Error(`session ${session.id} has no payment reference`)
 

@@ -277,3 +277,112 @@ describe('the seven regression tests', () => {
     ).toEqual([2, 3])
   })
 })
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MULTI-ITEM CHECKOUT — 0025
+
+   These exercise the DATABASE half of a cart: several payment rows sharing one
+   checkout_group_id, each granting its own level, each refundable on its own.
+
+   ⚠ WHAT THEY DO NOT COVER. The Stripe half — session creation, line items,
+   the webhook loop — needs Stripe test mode and a live webhook. Do not read a
+   green run here as "carts work end to end". See APPLY-NOTES.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+describe('multi-item checkout', () => {
+  /** A cart: N payment rows sharing a group, then the grant for each. */
+  async function cart(userId: string, skus: string[]): Promise<{ groupId: string; ids: string[] }> {
+    const groupId = crypto.randomUUID()
+    const ids: string[] = []
+
+    for (const sku of skus) {
+      const plan = plans.get(sku)!
+      const { data: row, error } = await admin
+        .from('payment_references')
+        .insert({
+          user_id: userId,
+          plan_id: plan.id,
+          checkout_group_id: groupId,
+          amount_cents: plan.amount_cents ?? 0,
+          currency: 'usd',
+          status: 'paid',
+          attempt_number: 1,
+          idempotency_key: `cart:${groupId}:${sku}`,
+          paid_at: new Date().toISOString(),
+        })
+        .select('id')
+        .single()
+      if (error) throw error
+      ids.push(row!.id)
+    }
+
+    for (const id of ids) {
+      const { error } = await admin.rpc('grant_enrollments_for_payment', { p_payment_id: id })
+      if (error) throw error
+    }
+    return { groupId, ids }
+  }
+
+  it('9 · a two-level cart grants exactly those two levels', async () => {
+    const { userId } = await buyer('t9')
+    await cart(userId, [SKU.l1, SKU.l3])
+
+    expect(await activeLevels(userId)).toEqual([1, 3])
+  })
+
+  it('10 · each level in a cart keeps its own payment row and amount', async () => {
+    const { userId } = await buyer('t10')
+    const { groupId } = await cart(userId, [SKU.l1, SKU.l3])
+
+    const { data: rows } = await admin
+      .from('payment_references')
+      .select('plan_id, amount_cents')
+      .eq('checkout_group_id', groupId)
+
+    /* Two rows at their own prices — never one row at a summed amount. That is
+       what keeps per-level revenue reportable and a refund per level possible. */
+    expect(rows).toHaveLength(2)
+    expect((rows ?? []).map(r => r.amount_cents).sort((a, b) => a - b)).toEqual([19700, 39700])
+  })
+
+  it('11 · refunding one level of a cart leaves the other intact', async () => {
+    const { userId } = await buyer('t11')
+    const { ids } = await cart(userId, [SKU.l1, SKU.l3])
+
+    /* Refund the first row only — what a per-level chargeback looks like. */
+    await admin.from('payment_references').update({ status: 'refunded' }).eq('id', ids[0])
+    await admin
+      .from('enrollments')
+      .update({ status: 'revoked', note: 'refund:test' })
+      .eq('payment_reference_id', ids[0])
+      .eq('status', 'active')
+
+    expect(
+      await activeLevels(userId),
+      'refunding one cart line revoked the other',
+    ).toEqual([3])
+  })
+
+  it('12 · the per-plan paid guard still holds inside a cart', async () => {
+    const { userId } = await buyer('t12')
+    await cart(userId, [SKU.l2])
+
+    /* payments_one_paid_per_plan must still reject a second paid row for the
+       same plan, cart or not. 0025 re-keyed the session/intent uniques; it must
+       not have loosened this one. */
+    const plan = plans.get(SKU.l2)!
+    const { error } = await admin.from('payment_references').insert({
+      user_id: userId,
+      plan_id: plan.id,
+      checkout_group_id: crypto.randomUUID(),
+      amount_cents: plan.amount_cents ?? 0,
+      currency: 'usd',
+      status: 'paid',
+      attempt_number: 2,
+      idempotency_key: `cart:dup:${crypto.randomUUID()}`,
+      paid_at: new Date().toISOString(),
+    })
+
+    expect(error, 'a second paid row for the same plan was accepted').not.toBeNull()
+  })
+})

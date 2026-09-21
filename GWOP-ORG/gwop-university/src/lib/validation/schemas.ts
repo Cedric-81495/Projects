@@ -75,7 +75,27 @@ export const createCheckoutSchema = z
       .string()
       .trim()
       .regex(/^[A-Z0-9]+(-[A-Z0-9]+)*$/, 'Unknown plan.')
-      .max(60),
+      .max(60)
+      .optional(),
+
+    /* ⚠ MULTI-SELECT — 2026-09-21. Exactly one of plan_sku or plan_skus, and
+       the refine below enforces that rather than trusting the caller.
+
+       SKUs only. No amount, no total, no price id: every figure is looked up
+       server-side from membership_plans. A client that can name its own total
+       will eventually name $1.
+
+       Capped at 4 because there are four levels. A longer array is either a
+       mistake or someone probing, and either way there is nothing legitimate
+       to do with it. Duplicates are de-duplicated in lib/stripe/cart.ts, not
+       rejected — a double-tapped checkbox is not an error worth showing. */
+    plan_skus: z
+      .array(
+        z.string().trim().regex(/^[A-Z0-9]+(-[A-Z0-9]+)*$/, 'Unknown plan.').max(60),
+      )
+      .min(1)
+      .max(4)
+      .optional(),
     /* ⚠ idempotency_key REMOVED FROM THE CLIENT CONTRACT — 2026-09-10.
 
        It was a uuid the browser generated per click, which meant a double-tap
@@ -112,6 +132,15 @@ export const createCheckoutSchema = z
     ack_version: z.string().trim().min(1).max(40),
   })
   .strict()
+  /* ⚠ EXACTLY ONE OF plan_sku OR plan_skus. Both optional individually so the
+     old single-field contract keeps working unchanged, but a request carrying
+     neither has nothing to buy, and one carrying both is ambiguous about which
+     the server should charge for. Ambiguity at a payment endpoint gets
+     rejected, never resolved by picking a side. */
+  .refine(
+    v => (v.plan_sku === undefined) !== (v.plan_skus === undefined),
+    { message: 'Select at least one level.', path: ['plan_skus'] },
+  )
 
 // ---------------------------------------------------------------------------
 // NOTE: there is deliberately no lead schema here.

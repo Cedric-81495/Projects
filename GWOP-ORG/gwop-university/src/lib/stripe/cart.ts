@@ -176,7 +176,107 @@ export async function createCartCheckoutSession(
     )
   }
 
-  /* ── 4 · Claim an attempt for each plan ──────────────────────────────────
+  /* ── 4 · An open attempt on any of these levels ──────────────────────────
+     ⚠ THIS USED TO REFUSE, AND THAT WAS A DEAD END — corrected 2026-09-21
+     after testing. The message said "finish or cancel that one first", and
+     there is nothing in the product that cancels a checkout. A buyer who
+     opened a cart and pressed Back could never buy those levels again until
+     the Stripe session expired on its own. Worse than the bug it guarded
+     against.
+
+     The single path resumes. So does this one now, with one extra case: the
+     open rows may belong to a DIFFERENT selection than the one in front of us.
+
+     ⚠ EXPIRE AT STRIPE BEFORE CANCELLING A ROW. This is the part that must not
+     be simplified. A row marked `canceled` while its Stripe session is still
+     open is a live payment link pointing at a record that no longer expects
+     money: the customer pays, the webhook's status guard is narrowed to open
+     states, the update no-ops, and they are charged with no access. Expiring
+     the session first makes that impossible — an expired session cannot be
+     paid. */
+  const { data: openRows } = await admin
+    .from('payment_references')
+    .select('id, plan_id, checkout_group_id, stripe_checkout_session_id')
+    .eq('user_id', ctx.userId)
+    .in('plan_id', buying.map(p => p.id))
+    .in('status', ['pending', 'processing', 'requires_action'])
+
+  if (openRows && openRows.length > 0) {
+    /* Does one existing cart match this selection exactly? If so it is the
+       same purchase being retried, and Stripe's own session is the right
+       thing to hand back. */
+    const groupIds = [...new Set(openRows.map(r => r.checkout_group_id).filter(Boolean))] as string[]
+
+    if (groupIds.length === 1 && openRows.every(r => r.checkout_group_id === groupIds[0])) {
+      const { data: groupRows } = await admin
+        .from('payment_references')
+        .select('plan_id, stripe_checkout_session_id')
+        .eq('checkout_group_id', groupIds[0])
+        .in('status', ['pending', 'processing', 'requires_action'])
+
+      const groupPlans = new Set((groupRows ?? []).map(r => r.plan_id))
+      const sameSelection =
+        groupPlans.size === buying.length && buying.every(p => groupPlans.has(p.id))
+      const sessionId = groupRows?.find(r => r.stripe_checkout_session_id)?.stripe_checkout_session_id
+
+      if (sameSelection && sessionId) {
+        try {
+          const existing = await stripe.checkout.sessions.retrieve(sessionId)
+          if (existing.status === 'open' && existing.url) {
+            logger.info('cart_session_reused', { groupId: groupIds[0], sessionId })
+            return {
+              groupId: groupIds[0],
+              paymentIds: openRows.map(r => r.id),
+              url: existing.url,
+            }
+          }
+        } catch (e) {
+          logger.warn('cart_session_retrieve_failed', {
+            sessionId,
+            message: e instanceof Error ? e.message : 'unknown',
+          })
+        }
+      }
+    }
+
+    /* Either a different selection, or a session that is no longer open.
+       Clear the way — expiring first, one session at a time. */
+    const seen = new Set<string>()
+    for (const row of openRows) {
+      const sid = row.stripe_checkout_session_id
+      if (sid && !seen.has(sid)) {
+        seen.add(sid)
+        try {
+          const s = await stripe.checkout.sessions.retrieve(sid)
+          if (s.status === 'open') await stripe.checkout.sessions.expire(sid)
+        } catch (e) {
+          /* ⚠ ABORT RATHER THAN CANCEL BLIND. If Stripe cannot be reached we do
+             not know whether that session is still payable, and cancelling the
+             row on a guess is exactly the charge-without-access case above. */
+          logger.error('cart_expire_failed', {
+            sessionId: sid,
+            message: e instanceof Error ? e.message : 'unknown',
+          })
+          throw new ApiError(503, 'upstream_unavailable', 'Checkout is unavailable right now.')
+        }
+      }
+    }
+
+    const { error: cancelError } = await admin
+      .from('payment_references')
+      .update({ status: 'canceled' })
+      .in('id', openRows.map(r => r.id))
+      .in('status', ['pending', 'processing', 'requires_action'])
+
+    if (cancelError) {
+      logger.error('cart_cancel_stale_failed', { message: cancelError.message })
+      throw new ApiError(503, 'upstream_unavailable', 'Checkout is unavailable right now.')
+    }
+
+    logger.info('cart_cleared_stale_attempts', { count: openRows.length })
+  }
+
+  /* ── 5 · Claim an attempt for each plan ──────────────────────────────────
      ⚠ SORTED BY plan_id, AND THAT IS NOT COSMETIC. next_payment_attempt()
      takes a per-(user, plan) advisory lock. Two carts overlapping on two
      plans, each locking in its own order, is a textbook deadlock: A holds
@@ -186,9 +286,8 @@ export async function createCartCheckoutSession(
      ⚠ SEQUENTIAL, NOT Promise.all, for the same reason. Concurrent calls
      inside one request would defeat the ordering.
 
-     A 0 means an open or paid attempt already exists for that plan. The single
-     path resumes it; here we stop, because half a cart resumed and half
-     created is a worse state than an error the buyer can act on. */
+     A 0 here now means a race: another request claimed the plan between our
+     clear-out above and this call. Rare, and retrying is the right answer. */
   const ordered = [...buying].sort((a, b) => a.id.localeCompare(b.id))
   const attempts = new Map<string, number>()
 
@@ -202,18 +301,18 @@ export async function createCartCheckoutSession(
       throw new ApiError(503, 'upstream_unavailable', 'Checkout is unavailable right now.')
     }
     if (!attempt || attempt === 0) {
-      logger.info('cart_plan_has_open_attempt', { userId: ctx.userId, sku: plan.sku })
+      logger.warn('cart_attempt_raced', { userId: ctx.userId, sku: plan.sku })
       throw new ApiError(
         409,
         'conflict',
-        `You have a checkout already open for ${plan.name}. Finish or cancel that one first.`,
+        'Another checkout started at the same moment. Please try again.',
         { sku: plan.sku },
       )
     }
     attempts.set(plan.id, attempt as number)
   }
 
-  /* ── 5 · Write the rows BEFORE calling Stripe ────────────────────────────
+  /* ── 6 · Write the rows BEFORE calling Stripe ────────────────────────────
      ⚠ THIS ORDER IS DELIBERATE and matches the single path. Rows first means a
      crash between here and Stripe leaves recoverable state; Stripe first would
      mean a session nothing in our database knows about.
@@ -267,7 +366,7 @@ export async function createCartCheckoutSession(
     throw new ApiError(503, 'upstream_unavailable', 'Checkout could not be started.')
   }
 
-  /* ── 6 · One session, one line item per level ────────────────────────────
+  /* ── 7 · One session, one line item per level ────────────────────────────
      ⚠ SEPARATE LINE ITEMS, NEVER A SUMMED price_data. Each level keeps its own
      Stripe price, so the receipt names what was bought and Stripe reporting
      still attributes revenue per level. A single merged amount would be a

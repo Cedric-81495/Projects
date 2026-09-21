@@ -138,33 +138,22 @@ export function PlanGrid({
   return (
     <>
       <div className="mbgrid">
-        {plans.map(plan => {
-          const owned = ownedOf(plan)
-          const canSelect = selectable(plan)
-          const isSelected = selected.includes(plan.sku)
-
-          return (
-            <div
-              key={plan.id}
-              className={`mbslot${isSelected ? ' mbslot--on' : ''}`}
-            >
-              {canSelect && signedIn && (
-                <label className="mbpick">
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => toggle(plan.sku)}
-                    /* Names the level, because a bare "select" repeated four
-                       times is useless to a screen reader. */
-                    aria-label={`Add ${plan.name} to this purchase`}
-                  />
-                  <span>Add to my purchase</span>
-                </label>
-              )}
-              <PlanCard plan={plan} owned={owned} signedIn={signedIn} />
-            </div>
-          )
-        })}
+        {plans.map(plan => (
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            owned={ownedOf(plan)}
+            signedIn={signedIn}
+            /* Undefined for anything that cannot be added — the bundle, an
+               owned level, an unpriced one, or a signed-out visitor. The card
+               then renders exactly as it did before multi-select existed. */
+            selection={
+              selectable(plan) && signedIn
+                ? { checked: selected.includes(plan.sku), onToggle: () => toggle(plan.sku) }
+                : undefined
+            }
+          />
+        ))}
       </div>
 
       {/* ⚠ RENDERS ONLY WHEN SOMETHING IS TICKED. A permanently visible empty

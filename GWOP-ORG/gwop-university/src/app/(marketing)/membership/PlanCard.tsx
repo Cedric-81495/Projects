@@ -78,10 +78,17 @@ export function PlanCard({
   plan,
   owned,
   signedIn,
+  selection,
 }: {
   plan: Plan
   owned: boolean
   signedIn: boolean
+  /* ⚠ OPTIONAL, AND ABSENT MEANS THE CARD BEHAVES EXACTLY AS IT DID BEFORE
+     multi-select existed. Passed only by PlanGrid, and only for cards that can
+     actually be added — not the bundle, not an owned level, not an unpriced
+     one. When it is undefined the card renders no checkbox and no selected
+     state, which is what every other caller wants. */
+  selection?: { checked: boolean; onToggle: () => void }
 }) {
   const router = useRouter()
   const [pending, setPending] = useState(false)
@@ -166,8 +173,33 @@ export function PlanCard({
         }).format(plan.amount_cents / 100)
 
   return (
-    <article className="mbcard">
-      <h2>{plan.name}</h2>
+    <article className={`mbcard${selection?.checked ? ' mbcard--on' : ''}`}>
+      {/* ── SELECTION ────────────────────────────────────────────────────
+          ⚠ INSIDE THE CARD, IN THE HEADER ROW — not a separate bordered box
+          above it. The first version stacked a bordered control on top of a
+          bordered card, which read as two unrelated things rather than one
+          control belonging to one product.
+
+          It sits on the title line because that is the line a reader is
+          already on when deciding, and because a tick beside a name is the
+          one arrangement nobody has to think about.
+
+          The whole label is the hit target, so the 44px minimum is met by the
+          row rather than by inflating the box itself. */}
+      <div className="mbhead">
+        <h2>{plan.name}</h2>
+        {selection && (
+          <label className="mbpick" title={`Add ${plan.name} to this purchase`}>
+            <input
+              type="checkbox"
+              checked={selection.checked}
+              onChange={selection.onToggle}
+              aria-label={`Add ${plan.name} to this purchase`}
+            />
+            <span aria-hidden="true">Add</span>
+          </label>
+        )}
+      </div>
       {plan.description && <p className="mbdesc">{plan.description}</p>}
 
       <p className="mbprice">

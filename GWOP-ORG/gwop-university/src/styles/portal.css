@@ -525,25 +525,40 @@
 .lessonlist .lr{margin-left:auto;font-size:10.5px;font-weight:700;
   letter-spacing:.13em;text-transform:uppercase;color:var(--emerald);flex:none}
 
-/* ── MULTI-SELECT CART ────────────────────────────────────────────────────
-   Added 2026-09-21. The checkbox beside each card, and the bar that appears
-   once something is ticked. */
+/* ── MULTI-SELECT ─────────────────────────────────────────────────────────
+   Added 2026-09-21, reworked the same day.
 
-/* The slot wraps the card so the tick box can sit outside it — PlanCard is
-   untouched, and a single purchase through its own button still works. */
-.mbslot{display:flex; flex-direction:column; gap:10px}
-.mbslot--on .mbcard{border-color:var(--emerald); box-shadow:0 0 0 2px rgba(20,83,45,.12)}
+   ⚠ THE FIRST VERSION PUT THE CHECKBOX IN ITS OWN BORDERED BOX ABOVE EACH
+   CARD. It looked bolted on, because it was: a bordered control stacked on a
+   bordered card reads as two unrelated things. The control now lives on the
+   card's title row, where the reader already is. */
 
-.mbpick{
-  display:flex; align-items:center; gap:10px;
-  padding:11px 14px; min-height:48px;      /* tap target, not decoration */
-  border:1.5px solid var(--stone); border-radius:12px;
-  background:var(--white); cursor:pointer;
-  font-size:13.5px; color:var(--ink);
+/* Title row: name on the left, tick on the right, baselines aligned. */
+.mbhead{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:12px; margin-bottom:6px;
 }
-.mbpick:hover{border-color:var(--emerald)}
-.mbpick:focus-within{outline:2px solid var(--gold); outline-offset:2px}
-.mbpick input{width:18px; height:18px; accent-color:var(--emerald); flex:none}
+.mbhead h2{margin:0; flex:1 1 auto}
+
+/* ⚠ NO BORDER AND NO BACKGROUND. The card already supplies both. This is a
+   control on a surface, not a surface of its own — which is the whole
+   correction. Negative right margin pulls it into the card's padding so the
+   tick sits on the same optical edge as the text below it. */
+.mbpick{
+  display:inline-flex; align-items:center; gap:7px; flex:none;
+  margin:-6px -4px 0 0; padding:6px 4px; min-height:32px;
+  cursor:pointer; user-select:none;
+  font-size:11.5px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted); transition:color .15s ease;
+}
+.mbpick:hover{color:var(--emerald)}
+.mbpick:focus-within{outline:2px solid var(--gold); outline-offset:3px; border-radius:6px}
+.mbpick input{width:17px; height:17px; accent-color:var(--emerald); cursor:pointer; flex:none}
+
+/* Selected card: the emerald ring is the only cue that changes, so a glance
+   down the row shows what is in the purchase without reading anything. */
+.mbcard--on{border-color:var(--emerald); box-shadow:0 0 0 2px rgba(20,83,45,.12)}
+.mbcard--on .mbpick{color:var(--emerald)}
 
 /* ⚠ STICKY, NOT FIXED. Fixed would sit over the last card on a short viewport
    with no way to scroll past it. Sticky keeps it above the footer instead. */

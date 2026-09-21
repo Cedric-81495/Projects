@@ -9,7 +9,10 @@ import { currentAck } from '@/config/purchase'
 /* Both resolve their own numbers from LEVELS / BLUEPRINT_BUNDLE and return
    null when they must not be shown, so this component never renders a
    half-filled template or a price it derived itself. */
-import { orderBumpLine, conscienceLine } from '@/config/membership'
+import {
+  orderBumpLine, conscienceLine, upgradeCreditLine,
+  BLUEPRINT_BUNDLE, UPGRADE_CREDIT_AT_CHECKOUT, upgradeToBundlePrice,
+} from '@/config/membership'
 
 interface Plan {
   id: string
@@ -79,6 +82,7 @@ export function PlanCard({
   owned,
   signedIn,
   selection,
+  enrolledLevels = [],
 }: {
   plan: Plan
   owned: boolean
@@ -89,6 +93,10 @@ export function PlanCard({
      one. When it is undefined the card renders no checkbox and no selected
      state, which is what every other caller wants. */
   selection?: { checked: boolean; onToggle: () => void }
+  /* What the buyer already holds. Used only to price the bundle card against
+     the upgrade credit. Defaults to nothing owned, which is the ordinary case
+     and the one the doc's pricing table describes. */
+  enrolledLevels?: number[]
 }) {
   const router = useRouter()
   const [pending, setPending] = useState(false)
@@ -163,14 +171,27 @@ export function PlanCard({
     }
   }
 
+  const fmt = (dollars: number) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: plan.currency,
+      maximumFractionDigits: 0,
+    }).format(dollars)
+
+  /* ⚠ THE BUNDLE IS PRICED AGAINST WHAT THEY ALREADY OWN. Pricing Master:
+     "Credit the earlier purchase in full." A Level 3 owner sees $600, not
+     $997, because $600 is what checkout will actually charge them — and a
+     card that quotes a different number from the till is the one defect this
+     whole feature exists to avoid. Everyone else sees the list price. */
+  const credited =
+    plan.sku === BLUEPRINT_BUNDLE.sku && UPGRADE_CREDIT_AT_CHECKOUT && enrolledLevels.length > 0
+      ? upgradeToBundlePrice(enrolledLevels)
+      : null
+
   const price =
     plan.amount_cents === null
       ? 'Pricing announced soon'
-      : new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: plan.currency,
-          maximumFractionDigits: 0,
-        }).format(plan.amount_cents / 100)
+      : fmt(credited ?? plan.amount_cents / 100)
 
   return (
     <article className={`mbcard${selection?.checked ? ' mbcard--on' : ''}`}>
@@ -207,7 +228,29 @@ export function PlanCard({
         {plan.billing === 'subscription' && plan.amount_cents !== null && <sub>/month</sub>}
       </p>
 
+      {/* What the credit actually did, in the buyer's own terms. A bare $600
+          on a $997 product invites the question this line answers. */}
+      {credited !== null && plan.amount_cents !== null && (
+        <p className="mbcredit">
+          <s>{fmt(plan.amount_cents / 100)}</s> less{' '}
+          {fmt(plan.amount_cents / 100 - credited)} credit for what you already own
+        </p>
+      )}
+
       <p className="mbincl">{includesLabel(plan)}</p>
+
+      {/* ── THE CREDIT PROMISE ─────────────────────────────────────────────
+          Pricing Master: "Put it on every level sales page." These cards are
+          the level sales surfaces — /levels/* does not exist while
+          LEVEL_PAGES_OPEN is false.
+
+          ⚠ ON THE LEVEL CARDS, NOT THE BUNDLE. On the bundle it would be
+          nonsense: there is nothing left to upgrade to. upgradeCreditLine()
+          returns null until checkout honours it. */}
+      {!owned && plan.sku !== BLUEPRINT_BUNDLE.sku && plan.amount_cents !== null
+        && upgradeCreditLine() && (
+        <p className="mbupgrade">{upgradeCreditLine()}</p>
+      )}
 
       {/* ── THE LEVEL 4 ORDER BUMP ──────────────────────────────────────────
           Master doc, Part Two: "your highest-value single change and it costs

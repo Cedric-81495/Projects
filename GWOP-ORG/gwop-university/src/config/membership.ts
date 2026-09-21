@@ -232,10 +232,13 @@ export const LADDER_NOTE_PARTS = {
 /** The master doc's full sentence. Kept as the canonical wording. */
 export const LADDER_NOTE = LADDER_NOTE_PARTS.full
 
-/* ⚠ FLIP THIS IN THE SAME COMMIT THAT WIRES upgradeToBundlePrice() INTO
-   lib/stripe/checkout.ts, AND NOT BEFORE. It is the switch between promising
-   the credit publicly and honouring it by hand. */
-export const UPGRADE_CREDIT_AT_CHECKOUT = false
+/* ⚠ TRUE SINCE 2026-09-21 — checkout now does the arithmetic.
+   lib/stripe/checkout.ts reads enrolled_levels, prices the bundle through
+   upgradeToBundlePrice() and applies the difference as a Stripe coupon, so the
+   sentence below is a term the system honours rather than one a person has to
+   remember. Setting this back to false without also removing that block would
+   leave the credit applied while the site stops mentioning it. */
+export const UPGRADE_CREDIT_AT_CHECKOUT = true
 
 /** What the pricing page may say today about buying one level at a time. */
 export function ladderNote(): string {
@@ -279,6 +282,25 @@ export function upgradeToBundlePrice(ownedLevels: readonly number[]): number | n
    `{delta}` resolves at render time from the two prices so it cannot disagree
    with them. Show this on the Level 4 purchase surface only.
    ────────────────────────────────────────────────────────────────────────── */
+/* ── THE CREDIT LINE ───────────────────────────────────────────────────────
+   Pricing Master, verbatim: "Put it on every level sales page: 'Buy any level
+   now. If you upgrade to the full bundle later, we credit what you paid.'"
+
+   ⚠ THE WORDING IS QUOTED FROM THE DOC, NOT PARAPHRASED. It is a commercial
+   term, and the sentence a buyer acted on is the sentence that has to be
+   honoured. Reword it and the promise and the behaviour drift apart.
+
+   ⚠ RENDERED ONLY WHEN UPGRADE_CREDIT_AT_CHECKOUT IS TRUE. Published while
+   checkout charges full price, it is a term we break on every upgrade. */
+export const UPGRADE_CREDIT_LINE =
+  'Buy any level now. If you upgrade to the full bundle later, we credit what you paid.'
+
+/** The credit line, or null when checkout cannot yet honour it. */
+export function upgradeCreditLine(): string | null {
+  if (!PRICING_PUBLISHED || !UPGRADE_CREDIT_AT_CHECKOUT) return null
+  return UPGRADE_CREDIT_LINE
+}
+
 export const ORDER_BUMP = {
   appliesToSku: 'GWOPU-SENIOR',
   template:
@@ -646,10 +668,35 @@ export function bundleIsBestDeal(ownedLevels: readonly number[] = []): boolean {
   if (BLUEPRINT_BUNDLE.oneTime === null) return false
   /* Owns all four already — nothing to sell. */
   if (ownedLevels.length >= LEVELS.length) return false
+
   const remaining = remainingSeparateTotal(ownedLevels)
   /* Unknown remaining total: show it. See the note in remainingSeparateTotal. */
   if (remaining === null) return true
-  return BLUEPRINT_BUNDLE.oneTime < remaining
+
+  /* ⚠ COMPARES THE CREDITED PRICE ONCE THE CREDIT IS ENFORCED — 2026-09-21.
+     Before this, it compared the full $997 and therefore hid the bundle from
+     anyone holding Level 3 or 4. With the credit applied that comparison is
+     the wrong one: a Level 3 owner is not choosing between $997 and $991, they
+     are choosing between $600 and $991.
+
+     Pricing Master: "You collect $997 either way rather than more. That is
+     deliberate." Every route ends at $997 in total, so the credited bundle
+     always beats finishing separately — and the card should be shown, not
+     hidden. Hiding it was the workaround for not having this. */
+  const price = UPGRADE_CREDIT_AT_CHECKOUT
+    ? upgradeToBundlePrice(ownedLevels)
+    : BLUEPRINT_BUNDLE.oneTime
+
+  /* ⚠ A ZERO OR NEGATIVE CREDITED PRICE MEANS DO NOT SELL IT. Someone holding
+     three levels may have paid more than the bundle costs — {2,3,4} is $1,191
+     against $997. The doc's table only ever contemplates ONE prior purchase
+     and says nothing about this, so nothing here invents a policy: the bundle
+     is simply not offered, and they buy the one level they are missing at its
+     own price, which is cheaper for them anyway. Stripe also rejects a
+     zero-amount session, so there is no version of this that could be sold. */
+  if (price === null || price <= 0) return false
+
+  return price < remaining
 }
 
 /** "$197–$497" — the range the FAQ quotes. */

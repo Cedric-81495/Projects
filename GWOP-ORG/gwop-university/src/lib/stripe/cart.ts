@@ -6,7 +6,10 @@ import { admin } from '@/lib/supabase/admin'
 import { ApiError } from '@/lib/http/errors'
 import { logger } from '@/lib/observability/logger'
 import type { AuthContext } from '@/lib/auth/context'
-import { BLUEPRINT_BUNDLE, BNPL_ALLOWED, fmtMoney } from '@/config/membership'
+import {
+  BLUEPRINT_BUNDLE, BNPL_ALLOWED, fmtMoney,
+  UPGRADE_CREDIT_AT_CHECKOUT, upgradeToBundlePrice,
+} from '@/config/membership'
 import { env, publicEnv } from '@/lib/env'
 // publicEnv is re-exported from lib/env, same source the single path uses
 
@@ -158,7 +161,17 @@ export async function createCartCheckoutSession(
 
      Ties go to the bundle: equal price, more convenient, and it is the product
      being promoted. */
-  const bundleCents = (BLUEPRINT_BUNDLE.oneTime ?? 0) * 100
+  /* ⚠ AGAINST THE CREDITED PRICE, NOT THE LIST PRICE — 2026-09-21. A buyer who
+     already owns a level is not choosing between this selection and $997; they
+     are choosing between it and whatever the credit leaves. Quoting $997 here
+     would tell somebody the bundle costs more than it would actually charge
+     them, which is the same defect in reverse. upgradeToBundlePrice() returns
+     the list price when they own nothing. */
+  const bundlePrice = UPGRADE_CREDIT_AT_CHECKOUT
+    ? upgradeToBundlePrice(ownedLevels.size > 0 ? [...ownedLevels] : [])
+    : BLUEPRINT_BUNDLE.oneTime
+  const bundleCents = Math.round((bundlePrice ?? 0) * 100)
+
   if (bundleCents > 0 && total >= bundleCents) {
     logger.info('cart_bundle_is_cheaper', {
       userId: ctx.userId,
@@ -169,7 +182,7 @@ export async function createCartCheckoutSession(
     throw new ApiError(
       409,
       'conflict',
-      `All four levels together are ${fmtMoney(BLUEPRINT_BUNDLE.oneTime ?? 0)} — `
+      `All four levels together are ${fmtMoney(bundlePrice ?? 0)} — `
       + `${fmtMoney((total - bundleCents) / 100)} less than buying these separately. `
       + 'Choose the complete Blueprint instead.',
       { offerBundle: true, bundleSku: BLUEPRINT_BUNDLE.sku, selectedTotalCents: total, bundleCents },

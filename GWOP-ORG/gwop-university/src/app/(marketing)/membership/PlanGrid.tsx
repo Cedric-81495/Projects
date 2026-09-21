@@ -144,6 +144,9 @@ export function PlanGrid({
             plan={plan}
             owned={ownedOf(plan)}
             signedIn={signedIn}
+            /* So the bundle card can quote the credited price rather than the
+               list price. See the note beside `credited` in PlanCard. */
+            enrolledLevels={enrolledLevels}
             /* Undefined for anything that cannot be added — the bundle, an
                owned level, an unpriced one, or a signed-out visitor. The card
                then renders exactly as it did before multi-select existed. */

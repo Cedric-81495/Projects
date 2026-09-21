@@ -1,11 +1,15 @@
 import 'server-only'
+import type Stripe from 'stripe'
 import { stripe, priceIdFor } from './client'
 import { admin } from '@/lib/supabase/admin'
 import { publicEnv } from '@/lib/env'
 import { ApiError, notFound } from '@/lib/http/errors'
 import type { AuthContext } from '@/lib/auth/context'
 import { logger } from '@/lib/observability/logger'
-import { BNPL_ALLOWED, BLUEPRINT_BUNDLE, bundleIsBestDeal, remainingSeparateTotal } from '@/config/membership'
+import {
+  BNPL_ALLOWED, BLUEPRINT_BUNDLE, bundleIsBestDeal, remainingSeparateTotal,
+  UPGRADE_CREDIT_AT_CHECKOUT, upgradeToBundlePrice,
+} from '@/config/membership'
 
 /* ══ WHAT THE CUSTOMER MAY PAY WITH ════════════════════════════════════════
    ⚠ PINNED TO CARD. THIS IS THE FLAG BEING ENFORCED, NOT DESCRIBED.
@@ -430,6 +434,97 @@ export async function createCheckoutSession(
   }
   logger.info('payment_record_created', { paymentId: payment.id, sku: plan.sku })
 
+  /* ── THE UPGRADE CREDIT ──────────────────────────────────────────────────
+     Pricing Master, "The upgrade credit — this is what replaces the payment
+     plan": "Someone buys one level and later wants the bundle. Credit the
+     earlier purchase in full. You collect $997 either way rather than more.
+     That is deliberate."
+
+     ⚠ IT COLLECTS LESS, AND THAT IS THE POINT. A Level 3 owner finishing
+     separately pays $991; credited, they pay $600. The doc says why: it
+     "removes every reason to hesitate on a first purchase, turns each
+     individual level into a low-risk door into the bundle, and gives a
+     cash-constrained buyer a genuine path to all four levels without you
+     financing anything." It is what replaced the instalment plan. Do not
+     optimise it away without going back to that passage.
+
+     ⚠ A COUPON, NOT A CHEAPER PRICE. The receipt then reads $997 less the
+     credit — the promise kept in front of the buyer — and Stripe still reports
+     every bundle sale against the one $997 price rather than four ad-hoc
+     amounts nobody can group later.
+
+     ⚠ COMPUTED FROM enrolled_levels, NEVER FROM THE REQUEST. Same rule as the
+     price itself. */
+  let discount: Stripe.Checkout.SessionCreateParams.Discount | undefined
+  let creditCents = 0
+
+  if (plan.sku === BLUEPRINT_BUNDLE.sku && UPGRADE_CREDIT_AT_CHECKOUT) {
+    const { data: held } = await admin
+      .from('enrollments')
+      .select('level')
+      .eq('user_id', ctx.userId)
+      .eq('status', 'active')
+
+    const owned = (held ?? []).map(r => r.level as number)
+
+    if (owned.length > 0) {
+      const credited = upgradeToBundlePrice(owned)
+      const list = BLUEPRINT_BUNDLE.oneTime
+
+      /* Unresolvable, or credited past the bundle price — {2,3,4} is $1,191
+         paid against a $997 product. bundleIsBestDeal() hides the card in both
+         cases, so arriving here is a stale tab or a direct request. Refuse
+         rather than charge full price to somebody we promised a credit. */
+      if (credited === null || list === null || credited <= 0) {
+        logger.info('upgrade_credit_not_applicable', { userId: ctx.userId, owned, credited })
+        throw new ApiError(
+          409,
+          'conflict',
+          'Your existing purchases already cover most of the bundle. Buying the '
+          + 'levels you are missing costs less — they are on the membership page.',
+          { owned },
+        )
+      }
+
+      /* ⚠ Stripe rejects charges under $0.50. The smallest credited price these
+         prices can produce is $6, so this cannot fire today. It is here so a
+         future price change surfaces as a refusal rather than a Stripe error
+         the buyer reads. */
+      if (credited < 1) {
+        logger.error('upgrade_credit_below_minimum', { owned, credited })
+        throw new ApiError(503, 'upstream_unavailable', 'Checkout is unavailable right now.')
+      }
+
+      creditCents = Math.round((list - credited) * 100)
+
+      const coupon = await stripe.coupons.create(
+        {
+          amount_off: creditCents,
+          currency: plan.currency.toLowerCase(),
+          duration: 'once',
+          name: `Upgrade credit — ${owned.length} level${owned.length > 1 ? 's' : ''} already owned`,
+          max_redemptions: 1,
+        },
+        /* Keyed on the buyer and exactly what they own, so a retry reuses the
+           same coupon rather than minting a second redeemable one. */
+        { idempotencyKey: `credit:${ctx.userId}:${[...owned].sort((a, b) => a - b).join('-')}` },
+      )
+      discount = { coupon: coupon.id }
+
+      await admin
+        .from('payment_references')
+        .update({ credit_applied_cents: creditCents })
+        .eq('id', payment.id)
+
+      logger.info('upgrade_credit_applied', {
+        userId: ctx.userId,
+        owned,
+        creditCents,
+        chargeCents: Math.round(credited * 100),
+      })
+    }
+  }
+
   const origin = publicEnv.NEXT_PUBLIC_SITE_URL
   // Relative paths only — already enforced by the Zod schema, re-checked here
   // so a future caller cannot turn this into an open redirect.
@@ -452,8 +547,13 @@ export async function createCheckoutSession(
         : { metadata: { payment_id: payment.id, user_id: ctx.userId } },
       success_url: `${origin}${returnPath}?checkout=success&ref=${payment.id}`,
       cancel_url: `${origin}${returnPath}?checkout=canceled`,
-      // CAPABILITIES.promoCodes in config/membership.ts
-      allow_promotion_codes: true,
+      ...(discount ? { discounts: [discount] } : {}),
+      /* ⚠ STRIPE REJECTS A SESSION CARRYING BOTH `discounts` AND
+         `allow_promotion_codes`. They are mutually exclusive, so the credit
+         suppresses the promo field — which is also the right behaviour:
+         stacking a marketing code on top of an upgrade credit is a discount
+         nobody priced. CAPABILITIES.promoCodes in config/membership.ts. */
+      ...(discount ? {} : { allow_promotion_codes: true }),
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
     },
     // Stripe-level idempotency, on top of our own unique index.

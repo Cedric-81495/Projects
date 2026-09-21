@@ -137,7 +137,11 @@ export const POST = route(
         consent_ip: ip === '0.0.0.0' ? null : ip,
         user_agent: req.headers.get('user-agent'),
       })
-      .select('id')
+      /* ⚠ WIDENED 2026-09-21 for the Founding Member register — it needs the
+         address, the name and the moment, and reading them back from the row
+         we just wrote is cheaper and more honest than reusing the request body
+         (which has not been through the database's own normalisation). */
+      .select('id, email, first_name, last_name, created_at')
       .single()
 
     if (error || !lead) {
@@ -158,6 +162,41 @@ export const POST = route(
       interest: body.interest,
       source: body.source || null,
     })
+
+    /* ── 3b. Founding Member window ────────────────────────────────────────
+       Master doc: award the status once per unique PERSON, deduplicated by
+       email, and enforce the 30 Sep cutoff server-side rather than in UI copy.
+
+       ⚠ THE FUNCTION DECIDES, NOT THIS ROUTE. qualify_founding_member() checks
+       the deadline against founding_member_cutoff() and dedupes on the
+       normalised address. Re-implementing either here would give us two rules
+       that disagree the first time one is edited.
+
+       ⚠ AWAITED, UNLIKE THE GHL FORWARD BELOW. It is a single local insert
+       that either takes or no-ops, and a lead who qualified but was not
+       recorded is a dispute later — "I signed up on the 12th". Milliseconds
+       against a record we cannot reconstruct afterwards.
+
+       ⚠ NEVER FAILS THE REQUEST. The lead is already committed and the
+       attendee is owed their confirmation. A founding-member row that did not
+       write is recoverable by re-running the batch over `leads`; a lead lost
+       to a rollback is not. */
+    const { error: foundingError } = await admin.rpc('qualify_founding_member', {
+      p_email: lead.email,
+      p_first_name: lead.first_name,
+      p_last_name: lead.last_name,
+      p_qualified_at: lead.created_at,
+      p_source: 'lead',
+      p_lead_id: lead.id,
+    })
+
+    if (foundingError) {
+      logger.warn('founding_member_qualify_failed', {
+        requestId,
+        leadId: lead.id,
+        message: foundingError.message,
+      })
+    }
 
     /* ── 4. Forward, best effort ───────────────────────────────────────────
        Deliberately not awaited into the response. A failure here leaves the

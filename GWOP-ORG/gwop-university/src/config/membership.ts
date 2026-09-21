@@ -331,19 +331,33 @@ export const CHECKOUT_CONSCIENCE_LINE =
   + 'inside the course.'
 
 /**
- * The checkout line with the entry price filled in, or null when there is no
- * entry price to route somebody to.
+ * The checkout line with the entry price filled in, or null when it must not
+ * be shown on this card.
  *
  * ⚠ THE {entry} PRICE IS LEVEL 1's, NOT THE CARD'S. The whole line is a
  * redirect to the cheapest door. Resolving it against the plan being viewed
  * would produce "start with Level 1 at $497" on the Level 4 card, which is
  * the opposite of the advice.
+ *
+ * ⚠ AND IT IS SUPPRESSED ON LEVEL 1 ITSELF — corrected 2026-09-21 after it
+ * shipped. On the entry card it read "If this would stretch you, start with
+ * Level 1 at $197" to somebody already looking at Level 1 for $197. Circular,
+ * and it reads as boilerplate, which cheapens the same sentence on the cards
+ * where it does real work.
+ *
+ * ⚠ DO NOT READ THIS AS "THE LINE MATTERS LESS DOWN HERE". Level 1 buyers are
+ * the most likely of the four to be stretched by the purchase. What is missing
+ * on that card is the OTHER half of the master doc's sentence — the free
+ * Blueprint — which is the only route left below $197. Wording that is
+ * Surpaul's call, not something to improvise here, so the card says nothing
+ * rather than something circular. Raise it; do not quietly invent copy.
  */
-export function conscienceLine(): string | null {
+export function conscienceLine(sku: string): string | null {
   if (!PRICING_PUBLISHED) return null
-  const entry = LEVELS.find(l => l.order === 1)?.oneTime ?? null
-  if (entry === null) return null
-  return CHECKOUT_CONSCIENCE_LINE.replace('{entry}', money(entry))
+  const entry = LEVELS.find(l => l.order === 1) ?? null
+  if (entry === null || entry.oneTime === null) return null
+  if (sku === entry.sku) return null
+  return CHECKOUT_CONSCIENCE_LINE.replace('{entry}', money(entry.oneTime))
 }
 
 /* ⚠ DO NOT ENABLE BUY-NOW-PAY-LATER AT CHECKOUT.

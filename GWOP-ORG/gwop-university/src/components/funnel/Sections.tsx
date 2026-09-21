@@ -33,6 +33,8 @@ import {
   LEVELS, BLUEPRINT_BUNDLE, REFUND_POLICY, PRICING_PUBLISHED,
   LEVEL_PAGES_OPEN, levelHref,
   oneTimeLabel, priceLabel, separateTotal, fmtMoney, bundleSavings,
+  /* ⚠ THE FUNCTION, NOT LADDER_NOTE. See the note at its render site. */
+  ladderNote,
 } from '@/config/membership'
 import { Tbc } from '@/components/Chrome'
 
@@ -304,7 +306,24 @@ export function Pathway() {
         </div>
       )}
 
+        {/* ── WHAT YOU GET, THEN HOW TO BUY IT ────────────────────────────
+            Two sentences doing different jobs, in this order on purpose.
+
+            levelNote is the material TERM: buying one level opens that level.
+            It comes first because it is the thing a reader can get wrong, and
+            getting it wrong costs them $497.
+
+            ladderNote() is the ROUTE: start anywhere, take the next when you
+            are ready. Master doc, Part Two — it belongs on the pricing page
+            "in place of any plan language", and it is half of what replaced
+            the instalment plan removed on 2026-09-14.
+
+            ⚠ ladderNote() IS A FUNCTION, NOT THE CONSTANT. It withholds the
+            upgrade-credit sentence until UPGRADE_CREDIT_AT_CHECKOUT is true.
+            Do not swap it for LADDER_NOTE to "show the whole thing" — that
+            publishes a credit the checkout does not yet apply. */}
         <p className="fn-levelnote">{funnel.levelNote}</p>
+        <p className="fn-laddernote">{ladderNote()}</p>
       </div>
     </section>
   )

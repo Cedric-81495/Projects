@@ -224,8 +224,8 @@ export function PlanCard({
           prevents the purchases most likely to come back as chargebacks. Do
           not soften it, do not move it, do not make it smaller than the
           acknowledgement it sits above. */}
-      {!owned && plan.amount_cents !== null && conscienceLine() && (
-        <p className="mbconscience">{conscienceLine()}</p>
+      {!owned && plan.amount_cents !== null && conscienceLine(plan.sku) && (
+        <p className="mbconscience">{conscienceLine(plan.sku)}</p>
       )}
 
       {!owned && plan.amount_cents !== null && (

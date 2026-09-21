@@ -386,11 +386,21 @@ export function Bundle() {
               cheaper first purchase, not a smaller monthly one. */}
 
           {/* ⚠ POINTS AT #choose, NOT AT A CHECKOUT — which is what the mockup
-              does, and the only honest destination today. Checkout is gated
-              three ways: membership_plans.published is false, STRIPE_MODE is
-              test, and /api/v1/checkout requires auth: 'student'. A button
-              labelled "Get GWOP University" that dead-ends at a login wall is
-              worse than one that leads to the free Blueprint. */}
+              does, and the only honest destination today.
+
+              ⚠ CORRECTED 2026-09-21. This used to say checkout was gated by
+              membership_plans.published being false. It is not — all five
+              rows are published = true with amount_cents set and test price
+              IDs seeded. What stops a real charge now:
+                · every stripe_price_id_live is NULL, so live mode throws
+                  plan_missing_stripe_price rather than taking money
+                · STRIPE_MODE is test
+                · /api/v1/checkout requires auth: 'student'
+              See the block at the top of config/membership.ts, which carries
+              the verified production state.
+
+              A button labelled "Get GWOP University" that dead-ends at a
+              login wall is worse than one that leads to the free Blueprint. */}
           <a className="fn-btn" href="#choose">{funnel.bundle.cta}</a>
         </div>
       </div>

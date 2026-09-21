@@ -105,12 +105,29 @@ describe('level enforcement', () => {
     expect(data ?? []).toHaveLength(0)
   })
 
-  it('a level-3 user reads levels 1-3 and not 4 — access is cumulative', async () => {
-    const { client } = await userAtLevel(3)
-    const { data } = await client.from('lessons').select('level').eq('published', true)
+  /* ⚠ THIS TEST WAS INVERTED UNTIL 2026-09-21 AND PASSING WAS THE BUG.
+     It read "a level-3 user reads levels 1-3 — access is cumulative", which
+     described the model 0014 removed and 0021 corrected in the data. Because
+     userAtLevel(3) enrols levels 1, 2 AND 3, it kept passing against a
+     database that no longer works that way — a green test asserting the
+     defect. Access is per-level: an enrollment row grants that level and
+     nothing else. The purchase-side proof is tests/entitlements.spec.ts. */
+  it('enrollment at one level grants that level only', async () => {
+    const { userId, client } = await userAtLevel(0)
+    await admin.from('enrollments').insert({
+      user_id: userId, level: 3, source: 'manual_grant', status: 'active',
+    })
+
+    const { data } = await client
+      .from('lessons').select('level').eq('published', true).eq('is_preview', false)
     const levels = new Set(data!.map((l) => l.level))
-    expect(levels.has(4)).toBe(false)
-    expect([...levels].every((l) => l <= 3)).toBe(true)
+
+    expect(levels.has(3), 'level 3 unreadable by its own enrollee').toBe(true)
+    /* The ones below are the point. A cumulative reading would hand over 1
+       and 2 for free, which is $494 of content per affected buyer. */
+    expect(levels.has(1), 'level 1 leaked to a level-3 enrollee').toBe(false)
+    expect(levels.has(2), 'level 2 leaked to a level-3 enrollee').toBe(false)
+    expect(levels.has(4), 'level 4 leaked to a level-3 enrollee').toBe(false)
   })
 
   it('an expired enrollment stops granting access', async () => {

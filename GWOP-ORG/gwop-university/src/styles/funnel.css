@@ -1471,6 +1471,18 @@
   color: var(--stone);
 }
 
+/* How to buy — the ladder that replaced the instalment plan. Same type and
+   colour as .fn-levelnote because the two are one thought in two sentences;
+   only the gap is tighter, so it reads as a continuation rather than a new
+   note. Master doc, Part Two. */
+.fn-laddernote {
+  margin-top: 8px;
+  font-family: var(--ui);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--stone);
+}
+
 /* "one payment · all four levels" — sits directly under the $997 so the
    payment plan below reads as an alternative to it rather than a rival price. */
 .fn-offer-terms {

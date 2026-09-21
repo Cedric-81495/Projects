@@ -5,6 +5,29 @@ import { publicEnv } from '@/lib/env'
 import { ApiError, notFound } from '@/lib/http/errors'
 import type { AuthContext } from '@/lib/auth/context'
 import { logger } from '@/lib/observability/logger'
+import { BNPL_ALLOWED } from '@/config/membership'
+
+/* ══ WHAT THE CUSTOMER MAY PAY WITH ════════════════════════════════════════
+   ⚠ PINNED TO CARD. THIS IS THE FLAG BEING ENFORCED, NOT DESCRIBED.
+
+   Until 2026-09-21 neither session passed payment_method_types at all, so
+   Stripe fell back to whatever the Dashboard's automatic payment methods had
+   enabled — which can include Klarna, Affirm and Afterpay, and can be turned
+   on by anyone with Dashboard access without touching this repository.
+   BNPL_ALLOWED was a comment describing an intention nothing enforced.
+
+   Level 1 Module 8 teaches students to audit their buy-now-pay-later
+   exposure. Selling the course through BNPL is a contradiction a buyer will
+   notice, and screenshot. Master doc, Part Two: "If your checkout offers a
+   buy-now-pay-later option, remove it."
+
+   ⚠ THE DASHBOARD STILL HAS TO BE TURNED OFF TOO. This closes the code path;
+   it does not change what is enabled on the account. Both, or neither counts.
+
+   Returning undefined when BNPL_ALLOWED flips to true is deliberate: that
+   hands the decision back to the Dashboard rather than silently encoding a
+   second list here that would then need maintaining. */
+const PAYMENT_METHOD_TYPES = BNPL_ALLOWED ? undefined : (['card'] as const)
 
 /**
  * Creates a Stripe Checkout Session.
@@ -48,6 +71,34 @@ export async function createCheckoutSession(
     .maybeSingle()
 
   if (!plan) throw notFound('Plan')
+
+  /* ══ ONE-TIME ONLY ═══════════════════════════════════════════════════════
+     ⚠ THE LAST GATE BEFORE MONEY. Every layer above this already says no —
+     config/membership.ts has no `monthly` field, 0021 forced billing to
+     'one_time' on every row and asserted it, and scripts/seed-stripe.mts
+     creates no recurring prices. This is the one that holds if somebody edits
+     a row in the Supabase dashboard rather than in a migration.
+
+     Master doc, Part Two: "No payment plans. No instalments. No
+     subscriptions. No recurring charges of any kind." The three reasons are
+     in config/membership.ts beside BLUEPRINT_BUNDLE; the short version is
+     that instalments on a credit-challenged audience produce dunning and
+     chargebacks rather than revenue, and CROA restricts collecting payment
+     before promised services are performed.
+
+     ⚠ REFUSE, DO NOT COERCE. Charging a plan marked 'subscription' once, as a
+     payment, would take money against a row whose price may well be a
+     recurring Stripe price — and would hide the misconfiguration instead of
+     surfacing it. 503 rather than 400: nothing is wrong with the request, the
+     server is holding something it should not be.
+
+     The `mode: isSubscription ? …` branches further down are now unreachable
+     and left in place on purpose — they are what still parses historical
+     rows, and removing them is a separate change with its own review. */
+  if (plan.billing !== 'one_time') {
+    logger.error('plan_billing_not_one_time', { sku: plan.sku, billing: plan.billing })
+    throw new ApiError(503, 'upstream_unavailable', 'This plan is not available right now.')
+  }
 
   const priceId = priceIdFor(plan)
   if (!priceId) {
@@ -333,6 +384,8 @@ export async function createCheckoutSession(
   const session = await stripe.checkout.sessions.create(
     {
       mode: isSubscription ? 'subscription' : 'payment',
+      /* See PAYMENT_METHOD_TYPES at the top of this file. Card only. */
+      ...(PAYMENT_METHOD_TYPES ? { payment_method_types: [...PAYMENT_METHOD_TYPES] } : {}),
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
       // The only trustworthy link between a Stripe event and our data.
@@ -395,6 +448,8 @@ async function resumeSession(
   const session = await stripe.checkout.sessions.create(
     {
       mode: isSubscription ? 'subscription' : 'payment',
+      /* See PAYMENT_METHOD_TYPES at the top of this file. Card only. */
+      ...(PAYMENT_METHOD_TYPES ? { payment_method_types: [...PAYMENT_METHOD_TYPES] } : {}),
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
       client_reference_id: paymentId,

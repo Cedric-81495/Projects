@@ -23,35 +23,84 @@
      Level 4 — Execution, Capital & Wealth Strategy         $497 one-time
      All four separately                                  $1,388
      GWOP University — All 4 Levels                         $997 one-time
-     Payment plan                            3 × $397  (total $1,191)
+
+   ⚠ THE PAYMENT PLAN THAT USED TO BE LISTED HERE IS GONE. A 3 × $397 line
+   (total $1,191) sat under the bundle until the GWOP Pricing, Payment &
+   Package Master, 2026-09-14. Surpaul, verbatim: "I want to get rid of this
+   totally." There are no instalments, no subscriptions and no recurring
+   charges. See the note beside BLUEPRINT_BUNDLE for the three reasons, and
+   supabase/migrations/0020 for what was left dormant behind it.
 
    ⚠ DISPLAY IS NOT THE SAME THING AS CHECKOUT. Read this before telling
    anybody they can buy.
 
-   Nothing on this page can take a payment yet, and that is enforced in three
-   independent places, none of which this file controls:
+   ⚠ CORRECTED 2026-09-21 AGAINST PRODUCTION. This block used to say all five
+   rows had published = false and amount_cents = null. Both had stopped being
+   true. Anyone reading the old text would have counted three guards where
+   only two remain — which is exactly the kind of comment that gets somebody
+   comfortable flipping a switch. Verified state of `membership_plans`:
 
-     1. All five rows in `membership_plans` have published = false and
-        amount_cents = null. The DB constraint `plans_publishable` refuses to
-        publish a plan with no amount AND no Stripe price ID to charge against.
-     2. STRIPE_MODE is `test`.
+     sku                  amount_cents   price_id_test   price_id_live
+     GWOPU-FRESHMAN             19700   set             NULL
+     GWOPU-SOPHOMORE            29700   set             NULL
+     GWOPU-JUNIOR               39700   set             NULL
+     GWOPU-SENIOR               49700   set             NULL
+     GWOPU-BLUEPRINT-ALL        99700   set             NULL
+
+   All five are published = true. The prices are seeded, correct against the
+   master doc, and live in TEST mode only.
+
+   What actually stops a real charge today, in order of how hard each is to
+   remove by accident:
+
+     1. Every `stripe_price_id_live` is NULL. priceIdFor() returns null in
+        live mode and createCheckoutSession throws plan_missing_stripe_price.
+        ⚠ THIS IS THE LOAD-BEARING ONE. Flipping STRIPE_MODE alone does not
+        take a payment — it takes an error. Minting live prices is a separate,
+        deliberate act: run scripts/seed-stripe.mts against live keys and
+        write the IDs into these rows.
+     2. STRIPE_MODE is `test` in the deployed environment. One env var.
      3. /api/v1/checkout is declared `auth: 'student'` — a visitor with no
         account cannot reach it at all.
 
+   ⚠ published = true MEANS THE PLAN ROWS ARE NO LONGER A GUARD. They were
+   the first line of defence when this comment was written and they are not
+   any more. Do not re-add them to the list without checking the database.
+
+   ⚠ AND THE ATTORNEY REVIEW IS STILL OPEN. The no-refund line, the Founding
+   Member terms and Lesson 8.7 are on the launch gate in the Master Build &
+   Launch Requirements. Guards 1 to 3 are technical; this one is not, and it
+   is the reason not to mint live prices yet even once the rest is ready.
+
    So the page states Surpaul's approved prices and every CTA points at the
    free assessment, which is exactly what the approved layout does. To actually
-   sell: run scripts/seed-stripe.ts, write amount_cents and the price IDs into
-   membership_plans, set published = true, switch STRIPE_MODE to live, and
+   sell: run scripts/seed-stripe.ts against live keys, write the live price IDs
+   into membership_plans, switch STRIPE_MODE to live, and
    build signup → checkout. Until then the buttons are honest — they lead to
    the Blueprint, not to a card form.
 
-   ⚠ AND FIX THE ENTITLEMENT FIRST. In 0007_seed.sql, GWOPU-SENIOR and
-   GWOPU-BLUEPRINT-ALL both carry grants_level = 4 with grants_cumulative =
-   true — identical access. Level 4 at $497 unlocks everything the $997 bundle
-   unlocks, so the bundle is irrational to buy and the "$1,388 separately"
-   framing does not hold. Set grants_cumulative = false on the four individual
-   levels. This is compatible with Surpaul's memo: he ruled out a forced
-   PURCHASE sequence, which is about buying order, not about access stacking.
+   ⚠ THE ENTITLEMENT DEFECT IS FIXED — 2026-09-21. This block used to open
+   "AND FIX THE ENTITLEMENT FIRST", and it was right to. In 0007_seed.sql,
+   GWOPU-SENIOR and GWOPU-BLUEPRINT-ALL both carried grants_level = 4 with
+   grants_cumulative = true, so Level 4 at $497 unlocked everything the $997
+   bundle unlocked. The bundle was irrational to buy and the "$1,388
+   separately" framing did not hold. $500 of leak per affected purchase.
+
+   Closed in three layers, and verified against production:
+     · 0014 — RLS reads enrolled_levels as a set, not a ceiling
+     · 0021 — grants_cumulative = false on the four levels, true on the bundle
+     · 0023 — a check constraint refusing cumulative access to any SKU other
+       than the bundle, and the column default flipped from true to false.
+       The default was the actual cause: nothing was mistyped, a default did
+       what defaults do.
+
+   The behaviour is covered by tests/entitlements.spec.ts — the seven
+   regression tests from the Master Build doc, run through the same grant
+   function the Stripe webhook calls.
+
+   ⚠ NOBODY HAD BOUGHT LEVEL 4 WHEN THIS WAS FIXED, so nothing actually
+   leaked and no remediation was owed. That is luck, not process. Do not read
+   it as evidence the defect was minor.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── LEVEL DETAIL PAGES ────────────────────────────────────────────────────
@@ -62,7 +111,7 @@
    in place — because the work of making them linkable later should be a flag,
    not a rewrite. What is missing is the destination being worth arriving at:
 
-     · membership_plans.published is false and amount_cents is null
+     · every stripe_price_id_live is NULL, so live mode cannot charge
      · STRIPE_MODE is test
      · /api/v1/checkout is auth: 'student', so a visitor cannot reach it
 
@@ -148,10 +197,50 @@ export const BLUEPRINT_BUNDLE = {
    content/funnel.ts — the second sentence is only true because UPGRADE_CREDIT
    exists, and the two must not be editable apart.
    ────────────────────────────────────────────────────────────────────────── */
-export const LADDER_NOTE =
+/* ⚠ TWO PARTS, AND THE SECOND ONE IS A PROMISE.
+   The first two sentences describe how the ladder works and are true today.
+   The third commits us to crediting an earlier purchase — which the checkout
+   does not yet do (see UPGRADE_CREDIT below). Publishing that sentence beside
+   a live buy button would be a term we cannot honour automatically, so it is
+   gated on UPGRADE_CREDIT_AT_CHECKOUT rather than commented out: flipping one
+   boolean is what ships it, not an edit to copy nobody can find. */
+const LADDER_CLAUSE =
   'Start with one level. Each level stands on its own and opens the moment you '
-  + 'buy it. Take the next one when you are ready — and if you upgrade to the '
-  + 'full bundle later, we credit everything you have already paid.'
+  + 'buy it. Take the next one when you are ready'
+
+export const LADDER_NOTE_PARTS = {
+  /* ⚠ NOT A PREFIX OF `full`, AND DELIBERATELY SO. Rendered on 830 this sits
+     directly beneath funnel.levelNote — "Each level is sold on its own —
+     buying one level opens that level" — and the master doc's own wording
+     then says "Each level stands on its own and opens the moment you buy
+     it." Same fact, twice, in consecutive lines. It reads as padding on the
+     page even though it reads fine in the document, where nothing precedes
+     it. So the published fragment keeps only what the level note does not
+     already cover: that you can start anywhere and come back.
+
+     Do not "restore the full wording" here. `full` below is the canonical
+     sentence and is what ships once the credit is honoured at checkout — at
+     which point the redundancy is worth paying for, because the sentence is
+     carrying a commercial promise rather than repeating a term. */
+  ladder: 'Start with one level and take the next one when you are ready.',
+  /** The master doc's wording. Needs the checkout to honour the credit. */
+  full:
+    `${LADDER_CLAUSE} — and if you upgrade to the full bundle later, we credit `
+    + 'everything you have already paid.',
+} as const
+
+/** The master doc's full sentence. Kept as the canonical wording. */
+export const LADDER_NOTE = LADDER_NOTE_PARTS.full
+
+/* ⚠ FLIP THIS IN THE SAME COMMIT THAT WIRES upgradeToBundlePrice() INTO
+   lib/stripe/checkout.ts, AND NOT BEFORE. It is the switch between promising
+   the credit publicly and honouring it by hand. */
+export const UPGRADE_CREDIT_AT_CHECKOUT = false
+
+/** What the pricing page may say today about buying one level at a time. */
+export function ladderNote(): string {
+  return UPGRADE_CREDIT_AT_CHECKOUT ? LADDER_NOTE_PARTS.full : LADDER_NOTE_PARTS.ladder
+}
 
 /* ── UPGRADE CREDIT ────────────────────────────────────────────────────────
    Someone buys one level, later wants the bundle. Credit the earlier purchase
@@ -197,6 +286,38 @@ export const ORDER_BUMP = {
     + 'Add Levels 1, 2 and 3 for {delta} more →',
 } as const
 
+/**
+ * The order-bump line with its three numbers filled in, or null when it must
+ * not be shown.
+ *
+ * ⚠ RETURNS null RATHER THAN A PARTIAL SENTENCE. If either price is missing or
+ * pricing is unpublished, a template with "{delta}" left in it would ship to a
+ * buyer. Null is the only safe failure here — the caller renders nothing.
+ *
+ * ⚠ THE DELTA IS SUBTRACTED, NEVER TYPED. $500 is 997 − 497 today; if either
+ * price moves, this moves with it. A hard-coded number on a checkout page is
+ * how a site ends up offering three levels for less than they cost.
+ */
+export function orderBumpLine(sku: string): string | null {
+  if (sku !== ORDER_BUMP.appliesToSku) return null
+  if (!PRICING_PUBLISHED) return null
+
+  const level = LEVELS.find(l => l.sku === ORDER_BUMP.appliesToSku)?.oneTime ?? null
+  const bundle = BLUEPRINT_BUNDLE.oneTime
+  if (level === null || bundle === null) return null
+
+  const delta = bundle - level
+  /* A non-positive delta means the bundle is no longer dearer than Level 4 —
+     the arithmetic behind the whole line has stopped holding. Say nothing
+     rather than invite somebody to "add three levels for $0 more". */
+  if (delta <= 0) return null
+
+  return ORDER_BUMP.template
+    .replace('{level}', money(level))
+    .replace('{bundle}', money(bundle))
+    .replace('{delta}', money(delta))
+}
+
 /* ── THE CHECKOUT LINE ─────────────────────────────────────────────────────
    Master doc, Part Three §2. Costs a handful of sales, buys the credibility
    the brand is built on, and prevents the purchases most likely to become
@@ -208,6 +329,22 @@ export const CHECKOUT_CONSCIENCE_LINE =
   'If this would stretch you, start with Level 1 at {entry} — or take the free '
   + 'Blueprint and come back when it will not. That is the same advice we give '
   + 'inside the course.'
+
+/**
+ * The checkout line with the entry price filled in, or null when there is no
+ * entry price to route somebody to.
+ *
+ * ⚠ THE {entry} PRICE IS LEVEL 1's, NOT THE CARD'S. The whole line is a
+ * redirect to the cheapest door. Resolving it against the plan being viewed
+ * would produce "start with Level 1 at $497" on the Level 4 card, which is
+ * the opposite of the advice.
+ */
+export function conscienceLine(): string | null {
+  if (!PRICING_PUBLISHED) return null
+  const entry = LEVELS.find(l => l.order === 1)?.oneTime ?? null
+  if (entry === null) return null
+  return CHECKOUT_CONSCIENCE_LINE.replace('{entry}', money(entry))
+}
 
 /* ⚠ DO NOT ENABLE BUY-NOW-PAY-LATER AT CHECKOUT.
    Stripe offers Klarna, Afterpay and Affirm as payment method types and they

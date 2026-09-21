@@ -1,4 +1,28 @@
 -- ═══════════════════════════════════════════════════════════════════════════
+-- ⚠⚠ RETIRED 2026-09-21 — READ THIS BEFORE ACTING ON ANYTHING BELOW ⚠⚠
+--
+-- The GWOP Pricing, Payment & Package Master (2026-09-14) ended the payment
+-- plan outright. Surpaul, verbatim: "I want to get rid of this totally." There
+-- are no instalments, no subscriptions and no recurring charges of any kind,
+-- and there is not going to be a plan this migration was preparing for.
+--
+-- ⚠ THE TWO COLUMNS STAY. They are harmless, they cost nothing, and dropping
+-- them would rewrite history for no gain. What is retired is the ROADMAP in
+-- the comments below — the "still owed before the plan can be sold" list at
+-- the foot of this file. That is not a to-do any more. Do not work from it,
+-- and do not treat it as evidence the plan was merely deferred.
+--
+-- What enforces the decision, so nobody has to trust a comment:
+--   · config/membership.ts — no `monthly`, `planMonths` or `planNote` fields
+--   · 0021_level_access_fix.sql §3 — asserts billing = 'one_time' on every row
+--   · lib/stripe/checkout.ts — refuses any plan whose billing is not one_time
+--   · scripts/seed-stripe.mts — creates one-time prices only
+--
+-- The three reasons are in config/membership.ts beside BLUEPRINT_BUNDLE. If
+-- somebody asks for the plan back — and three people have now asked — that is
+-- the note to read first, not this file.
+-- ═══════════════════════════════════════════════════════════════════════════
+--
 -- 0020_instalment_counters.sql
 -- Two columns on `subscriptions` that let a COMPLETED payment plan be told
 -- apart from a CANCELLED one.

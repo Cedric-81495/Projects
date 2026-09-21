@@ -329,6 +329,31 @@
 .mbprice{font-family:var(--display); font-size:30px; font-weight:700; color:var(--emerald); margin:12px 0 4px}
 .mbprice sub{font-family:var(--body); font-size:13px; font-weight:500; color:var(--muted); vertical-align:baseline}
 .mbincl{font-size:13px; color:var(--gold-ink); letter-spacing:.04em; margin:0 0 20px}
+/* ── THE LEVEL 4 ORDER BUMP ────────────────────────────────────────────────
+   Reads as an offer, not as fine print: emerald rule, ink-coloured text at
+   the same size as the card description. It sits under "Includes Level 4
+   only", which is what sets it up. */
+.mbbump{
+  border-left:3px solid var(--emerald); padding:2px 0 2px 11px;
+  margin:0 0 20px; font-size:13.5px; line-height:1.5; color:var(--ink);
+}
+/* ── THE AFFORDABILITY LINE ────────────────────────────────────────────────
+   ⚠ CARRIES margin-top:auto, WHICH .mback USED TO OWN. That property is what
+   pushes the closing block to the bottom of a flex card so buttons line up
+   across plans of differing height. This element is now the last one before
+   the acknowledgement, so it has to carry the push — left on .mback, the free
+   space opened up BETWEEN this line and the tick and stranded it mid-card.
+
+   The adjacent-sibling rule below hands the push back to .mback whenever this
+   line is not rendered (unpublished pricing, or a plan somebody owns).
+
+   Muted and italic, unlike the acknowledgement directly beneath it: this is
+   advice the buyer may ignore, that one is a term they must accept. */
+.mbconscience{
+  margin:0 0 10px; margin-top:auto;
+  font-size:12.5px; line-height:1.55; font-style:italic; color:var(--muted);
+}
+.mbconscience + .mback{margin-top:0}
 /* ── PURCHASE ACKNOWLEDGEMENT ──────────────────────────────────────────────
    The no-refund tick, sat directly above the enrol button.
 

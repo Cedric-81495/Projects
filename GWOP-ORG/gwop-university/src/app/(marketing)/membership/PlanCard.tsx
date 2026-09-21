@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation'
 /* Wording comes from config, not from this component — see the header of
    config/purchase.ts for why. It may change once counsel answers on CROA. */
 import { currentAck } from '@/config/purchase'
+/* Both resolve their own numbers from LEVELS / BLUEPRINT_BUNDLE and return
+   null when they must not be shown, so this component never renders a
+   half-filled template or a price it derived itself. */
+import { orderBumpLine, conscienceLine } from '@/config/membership'
 
 interface Plan {
   id: string
@@ -173,6 +177,24 @@ export function PlanCard({
 
       <p className="mbincl">{includesLabel(plan)}</p>
 
+      {/* ── THE LEVEL 4 ORDER BUMP ──────────────────────────────────────────
+          Master doc, Part Two: "your highest-value single change and it costs
+          nothing to implement." At $497 this card is half the bundle price,
+          so the reader is one sentence from $997.
+
+          ⚠ ONLY ON THE LEVEL 4 CARD, AND ONLY WHEN IT IS STILL FOR SALE.
+          orderBumpLine() returns null for every other SKU; `owned` suppresses
+          it for somebody who already bought it, because telling an existing
+          customer what they could add for $500 more is an upsell, not an
+          offer — and it is the wrong $500 once they own Level 4.
+
+          ⚠ DIRECTLY UNDER THE "Includes Level 4 only" LINE, ON PURPOSE. That
+          sentence is what makes this one land: the reader has just learned
+          what they are NOT getting. */}
+      {!owned && plan.amount_cents !== null && orderBumpLine(plan.sku) && (
+        <p className="mbbump">{orderBumpLine(plan.sku)}</p>
+      )}
+
       {error && (
         <p className="mberr" role="alert">
           {error}
@@ -185,6 +207,27 @@ export function PlanCard({
 
           Not rendered for a plan somebody already owns, or one with no price —
           there is nothing to acknowledge in either case. */}
+      {/* ── THE AFFORDABILITY LINE ──────────────────────────────────────────
+          Master doc, Part Three §2, under legal requirements rather than copy.
+          Module 7.2 teaches good leverage against bad; Level 1 Module 2 tells
+          students to stop reaching for credit when they are short on cash.
+          Pushing a distressed buyer into a card-funded purchase they cannot
+          service would contradict the curriculum they are about to pay for.
+
+          ⚠ ABOVE THE ACKNOWLEDGEMENT, WHICH IS ITSELF ABOVE THE BUTTON. The
+          order is deliberate: here is a way out, here is what you are
+          agreeing to, here is the button. Below the button it is a footnote
+          to a decision already made.
+
+          ⚠ IT COSTS SALES AND THAT IS THE POINT. It routes somebody who
+          cannot afford $997 to the $197 door instead of losing them — and
+          prevents the purchases most likely to come back as chargebacks. Do
+          not soften it, do not move it, do not make it smaller than the
+          acknowledgement it sits above. */}
+      {!owned && plan.amount_cents !== null && conscienceLine() && (
+        <p className="mbconscience">{conscienceLine()}</p>
+      )}
+
       {!owned && plan.amount_cents !== null && (
         <label className="mback">
           <input

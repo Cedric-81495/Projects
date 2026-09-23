@@ -104,3 +104,36 @@ describe('upgrade credit', () => {
     }
   })
 })
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE RECONCILIATION INVARIANT
+
+   ⚠ THIS EXISTS BECAUSE IT WAS BROKEN ON THE FIRST REAL CREDITED PURCHASE.
+   The payment row is inserted at the plan's LIST price, before the credit is
+   known. Checkout must then rewrite amount_cents to what Stripe will actually
+   capture. It did not, so a $600 charge was recorded as $997 and verify query
+   C in 0027 returned 139400 instead of 99700.
+
+   Two things go wrong quietly when that happens: revenue overstates every
+   credited sale by the credit, and payments_refund_bounds (0004) permits
+   amount_refunded_cents <= amount_cents — so the database would have allowed
+   refunding $997 on money never taken.
+
+   What the rows must satisfy:  amount_cents + credit_applied_cents == list
+   ═══════════════════════════════════════════════════════════════════════════ */
+describe('credited purchase reconciles to list price', () => {
+  it.each([
+    [[1]],
+    [[2]],
+    [[3]],
+    [[4]],
+    [[2, 3]],
+    [[1, 2, 3]],
+  ])('owning %j: charge + credit equals the bundle list price', owned => {
+    const credited = upgradeToBundlePrice(owned)!
+    const creditCents = Math.round((BUNDLE - credited) * 100)
+    const chargeCents = Math.round(credited * 100)
+
+    expect(chargeCents + creditCents).toBe(Math.round(BUNDLE * 100))
+  })
+})

@@ -511,9 +511,24 @@ export async function createCheckoutSession(
       )
       discount = { coupon: coupon.id }
 
+      /* ⚠ BOTH COLUMNS, AND amount_cents IS THE ONE THAT MATTERS.
+         The row was inserted at the plan's LIST price, before we knew a credit
+         applied. Stripe will capture the credited amount, so leaving
+         amount_cents at $997 against a $600 charge breaks the one thing that
+         column is for: reconciliation. Concretely, payments_refund_bounds in
+         0004 allows amount_refunded_cents <= amount_cents — so the database
+         would have permitted refunding $997 on money we never took.
+
+         amount_cents = what Stripe charges. credit_applied_cents = what came
+         off. The two add up to the list price, which is verify query C in
+         0027. Found 2026-09-21 by running that query against a real credited
+         purchase: it returned 139400 instead of 99700. */
       await admin
         .from('payment_references')
-        .update({ credit_applied_cents: creditCents })
+        .update({
+          amount_cents: Math.round(credited * 100),
+          credit_applied_cents: creditCents,
+        })
         .eq('id', payment.id)
 
       logger.info('upgrade_credit_applied', {

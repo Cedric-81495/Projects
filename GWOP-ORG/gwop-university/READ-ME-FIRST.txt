@@ -1,0 +1,114 @@
+ONE SESSION ACROSS BOTH DOMAINS  (six files + one env var)
+===========================================================
+
+  src/lib/supabase/cookies.ts          NEW
+  src/lib/env.public.ts                REPLACES yours
+  src/lib/supabase/browser.ts          REPLACES yours
+  src/lib/supabase/server.ts           REPLACES yours
+  src/middleware.ts                    REPLACES yours
+  src/app/(portal)/account/page.tsx    REPLACES yours   (access wording + dates)
+
+⚠ THE CODE DOES NOTHING WITHOUT THE ENV VAR. Set it in Vercel, Production and
+Preview, then redeploy:
+
+    NEXT_PUBLIC_AUTH_COOKIE_DOMAIN=.thegwopblueprint.com
+
+Leave it UNSET locally and it stays host-only, which is correct for localhost.
+
+
+WHAT THIS FIXES
+===============
+
+Supabase's cookies were host-only, because no domain was ever configured. Both
+hosts serve the same app, so a session created on thegwopblueprint.com simply
+did not exist on go.thegwopblueprint.com.
+
+That is the second, independent way a buyer gets signed out after checkout: sign
+in on the apex domain, Stripe returns you to `go.` per NEXT_PUBLIC_SITE_URL, and
+you arrive with no cookie at all. carryCookies cannot help — there was never a
+cookie to carry.
+
+Scoping to '.thegwopblueprint.com' makes one session valid on the apex and every
+subdomain, which is what "both domains do the same thing" actually requires.
+
+⚠ THE LEADING DOT IS NOT OPTIONAL. The schema rejects a value without it.
+
+
+ALL FOUR CLIENTS CHANGED TOGETHER — THIS IS THE PART TO GET RIGHT
+==================================================================
+
+There are four Supabase clients: browser, two server, and the one inside
+middleware. They all read and write the same cookie.
+
+⚠ IF ONE WRITES WITH A DOMAIN AND ANOTHER WITHOUT, THE BROWSER HOLDS TWO
+COOKIES WITH THE SAME NAME AT DIFFERENT SCOPES, and which one it sends is
+decided by rules nobody wants to debug. Symptoms: "signed out at random",
+"signed in on one page and out on the next".
+
+That is why cookies.ts exists — one exported constant, imported by all of them.
+If you add another Supabase client anywhere, it passes authCookieOptions too.
+
+The Bearer client is the exception and is untouched: it authenticates the mobile
+app via an Authorization header and writes no cookies at all.
+
+
+THE TRADE, STATED PLAINLY
+==========================
+
+⚠ ANY SUBDOMAIN NOW RECEIVES THIS COOKIE. Cookie scope is a tree — the browser
+sends it to go.*, www.*, and anything else ever hosted under
+thegwopblueprint.com. The token is httpOnly so page scripts cannot read it, but
+a subdomain pointed at a third-party service receives it on every request.
+
+So: do not park a GoHighLevel funnel, a status page, a webmail redirect or any
+third-party tool on a subdomain of this domain. Use a different domain. If that
+ever becomes necessary, revisit this decision first.
+
+
+AFTER DEPLOYING — CLEAR YOUR COOKIES ONCE
+==========================================
+
+Existing sessions were written host-only and will sit alongside the new
+domain-scoped ones. Clear cookies for both hosts, or test in a fresh incognito
+window, or you will be debugging the exact duplicate-cookie problem described
+above.
+
+Tell anyone already signed in that they may need to sign in once more.
+
+
+TEST, IN THIS ORDER
+
+  1. Fresh incognito. Sign in on thegwopblueprint.com.
+  2. Open go.thegwopblueprint.com — you should already be signed in.
+  3. Go to /login while signed in — you should land on /dashboard, still
+     signed in. That is the branch carryCookies fixed.
+  4. Then a test purchase: you should return straight to /dashboard.
+
+Step 2 is the one this change is for. Step 3 covers the earlier fix.
+
+
+ALSO IN THIS DROP
+
+The account page: "Level 4 and below" becomes the levels actually owned, plus a
+per-level purchase date read from enrollments. Full notes were in the previous
+drop; unchanged here.
+
+
+STILL OUTSTANDING
+
+NEXT_PUBLIC_SITE_URL still points at go.thegwopblueprint.com while the public
+site is the apex. With shared cookies that no longer signs anyone out, but it
+still drives the canonical tag and the QR destinations, so it is worth setting
+deliberately rather than by accident.
+
+And GHL_WEBHOOK_URL is still unset — leads save as pending and nothing reaches
+the CRM.
+
+
+VERIFIED
+
+Applied to a clean extract of the live code: typecheck clean, build passes,
+/830 unchanged, middleware compiles. With the variable set, the domain is
+present in the server bundle AND in the client chunks that ship
+createBrowserClient (signup, reset-password, /830). With it unset, no Domain
+attribute is emitted at all.

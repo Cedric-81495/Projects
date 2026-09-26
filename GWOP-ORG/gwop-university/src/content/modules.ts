@@ -141,7 +141,23 @@ export function assetHref(path: string): string {
    Level 4 the lightest and most expensive, which is correct but reads badly in
    a table. This field is for production tracking only.
 
-   `key` is undefined until the file is actually uploaded. Build order item 3.
+   ⚠ KEYS SET 2026-09-26. Build order item 3 is done for these twelve. The
+   eleven paid files live under the `notes/` prefix in the `course-materials`
+   bucket (MODULE_BUCKET), uploaded to BOTH databases — gwop-dev and the
+   GWOP-owned gwop-university project (sjfbolqfqzlpmtmyicpn). Keys are
+   identical in both.
+
+   ⚠ NO LEVEL SUBFOLDERS, AND THAT IS ON PURPOSE. Master the Money ships in
+   Levels 1 and 2, the Tier Map in 2 and 3, the Funding Readiness Pack in 3
+   and 4. A level-foldered layout forces a shared file into one home and the
+   `levels` list below stops being the single source of truth. Flat under
+   `notes/`, level encoded in the filename only.
+
+   ⚠ THE FREE ASSET IS NOT IN THE BUCKET. Its key carries a leading slash, so
+   the file must sit in the repo at
+   `public/notes/GWOP-FREE-From-Handcuffs-To-Credit-Limits.pdf` and is served
+   by the CDN. /api/v1/asset refuses anything starting with a slash — putting
+   this one in the bucket creates a file no route can reach.
    ═══════════════════════════════════════════════════════════════════════════ */
 export type CourseAsset = {
   file: string
@@ -156,30 +172,43 @@ export type CourseAsset = {
 
 export const COURSE_ASSETS: CourseAsset[] = [
   { file: 'GWOP-L1-Fundable-Profile-Starter-Kit.pdf',
+    key: 'notes/GWOP-L1-Fundable-Profile-Starter-Kit.pdf',
     title: 'Fundable Profile Starter Kit v2', pages: 23, levels: ['freshman'] },
   { file: 'GWOP-L1-Master-The-Money.pdf',
+    key: 'notes/GWOP-L1-Master-The-Money.pdf',
     title: 'Master the Money', pages: 23, levels: ['freshman', 'sophomore'] },
   { file: 'GWOP-L1-Foundation-Before-Credit-Repair.pdf',
+    key: 'notes/GWOP-L1-Foundation-Before-Credit-Repair.pdf',
     title: 'Foundation Before Credit Repair', pages: 21, levels: ['freshman'] },
   { file: 'GWOP-L1-Understanding-Credit-Repair.pdf',
+    key: 'notes/GWOP-L1-Understanding-Credit-Repair.pdf',
     title: 'Understanding Credit Repair', pages: 22, levels: ['freshman'] },
   { file: 'GWOP-L1-Dispute-and-Correction-Letter-Pack.pdf',
+    key: 'notes/GWOP-L1-Dispute-and-Correction-Letter-Pack.pdf',
     title: 'Dispute & Correction Letter Pack', pages: 13, levels: ['freshman'] },
   { file: 'GWOP-L2-The-Fundable-LLC-Build.pdf',
+    key: 'notes/GWOP-L2-The-Fundable-LLC-Build.pdf',
     title: 'The Fundable LLC Build', pages: 25, levels: ['sophomore'] },
   { file: 'GWOP-L2-Business-Credit-Tier-Map.pdf',
+    key: 'notes/GWOP-L2-Business-Credit-Tier-Map.pdf',
     title: 'Business Credit Tier Map', pages: 7, levels: ['sophomore', 'junior'] },
   { file: 'GWOP-L3-Zero-APR-Business-Credit.pdf',
+    key: 'notes/GWOP-L3-Zero-APR-Business-Credit.pdf',
     title: '0% APR Business Credit', pages: 17, levels: ['junior'] },
   { file: 'GWOP-L3-Funding-Readiness-Document-Pack.pdf',
+    key: 'notes/GWOP-L3-Funding-Readiness-Document-Pack.pdf',
     title: 'Funding Readiness Document Pack', pages: 11, levels: ['junior', 'senior'] },
   { file: 'GWOP-L4-The-Funding-Assembly-Line.pdf',
+    key: 'notes/GWOP-L4-The-Funding-Assembly-Line.pdf',
     title: 'The Funding Assembly Line', pages: 24, levels: ['senior'] },
   { file: 'GWOP-L4-Good-Credit-Gave-Me-Options.pdf',
+    key: 'notes/GWOP-L4-Good-Credit-Gave-Me-Options.pdf',
     title: 'Good Credit Gave Me Options', pages: 15, levels: ['senior'] },
   /* Ships with every level and is excluded from all page counts in the doc.
-     Free, so when uploaded it takes a public path with a leading slash. */
+     Free, so it takes a public path with a leading slash — the file lives in
+     the repo at public/notes/, NOT in the private bucket. */
   { file: 'GWOP-FREE-From-Handcuffs-To-Credit-Limits.pdf',
+    key: '/notes/GWOP-FREE-From-Handcuffs-To-Credit-Limits.pdf',
     title: 'From Handcuffs to Credit Limits', pages: 11, free: true,
     levels: ['freshman', 'sophomore', 'junior', 'senior'] },
 ]

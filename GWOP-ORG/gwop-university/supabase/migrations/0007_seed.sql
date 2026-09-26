@@ -43,8 +43,14 @@ on conflict (course_id, slug) do nothing;
 -- ── Lessons — mirrors src/content/modules.ts exactly ───────────────────────
 -- `is_preview` on the first Freshman lesson only: that is the one currently
 -- shipped as free: true. Everything else requires an enrollment.
+-- ⚠ published is seeded FALSE, not l.pub. The lessons_publishable
+-- constraint in 0003 forbids publishing a lesson that has no video_id,
+-- storage_path or external_url. No video assets exist yet, so every
+-- seeded lesson must start unpublished and be published individually
+-- as its asset lands. Do NOT "restore" l.pub here — 0007 will fail
+-- on any clean database. Found 2026-09-26 rebuilding on a fresh project.
 insert into public.lessons (module_id, level, slug, title, kind, sort_order, duration_sec, is_preview, published)
-select mo.id, mo.level, l.slug, l.title, l.kind::public.lesson_kind, l.ord, l.secs, l.preview, l.pub
+select mo.id, mo.level, l.slug, l.title, l.kind::public.lesson_kind, l.ord, l.secs, l.preview, false
 from public.modules mo
 join (values
   ('credit-and-cash-flow','credit-foundations','Credit Foundations','video',1::smallint,840,false,true),

@@ -166,17 +166,36 @@ because splitting them would create two sources of truth for the same fact:
 **The policy that is the entire security posture:**
 
 ```sql
-create policy "lessons at or below enrolled level"
+create policy "lessons in an enrolled level"
   on public.lessons for select to authenticated
-  using (published and level <= public.max_enrolled_level());
+  using (published and public.can_access_level(level));
 ```
 
 Even if a lesson ID leaks into a page, a query string, or an Expo deep link, Postgres
 refuses to return the row. Hiding a link is not access control.
 
-**Cumulative access.** Buying Junior grants levels 1–3 (`grants_cumulative`), matching
-`membership.ts`'s `upgradeToHigherLevel: true`. Re-purchase **extends** expiry, never
-shortens it.
+**⚠ PER-LEVEL ACCESS, NOT CUMULATIVE. CORRECTED 2026-09-26.**
+
+This section said "Cumulative access — buying Junior grants levels 1–3
+(`grants_cumulative`)" and quoted a policy reading `level <= max_enrolled_level()`.
+Both were true before migration 0014 and have been wrong since. Anyone building
+against this doc — including the Expo app — would have implemented the old rule.
+
+Access is **set membership**. Holding Level 3 grants Level 3 and nothing else.
+Someone may hold {1, 3} with no claim on 2, which a single number cannot express.
+Three layers implement the same rule and must not diverge:
+
+| Layer | Mechanism |
+|---|---|
+| Postgres (the guarantee) | `can_access_level(level)` — 0014, fixed in 0021 |
+| API | `requireLevel()` — `ctx.enrolledLevels.includes(level)` |
+| UI affordances | `canAccessLevel()` in `lib/access/policy.ts` |
+
+`grants_cumulative` is now **false on the four individual levels and true only on
+the bundle SKU** (0021), with a check constraint in 0023 refusing cumulative access
+to any other SKU. `max_enrolled_level()` still exists and is still correct — for
+**display only**: progress rings, "you have reached Level 3". It is not an access
+decision. Re-purchase **extends** expiry, never shortens it.
 
 ---
 

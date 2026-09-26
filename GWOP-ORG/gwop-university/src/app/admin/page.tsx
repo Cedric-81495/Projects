@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PATHWAY } from '@/content/pathway'
-import { MODULES, byLevel, STATUS_LABEL, missingAssets, moduleStatus, moduleMinutes, TOTAL_LESSONS } from '@/content/modules'
+import { MODULES, byLevel, STATUS_LABEL, missingAssets, moduleStatus, moduleMinutes, TOTAL_LESSONS, COURSE_ASSETS, DOWNLOAD_STATUS } from '@/content/modules'
 import { Crest } from '@/components/Chrome'
 import { notFound } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/server'
@@ -51,6 +51,22 @@ export default async function Admin() {
     (s, m) => s + m.lessons.filter(l => l.status === 'ready').length, 0,
   )
 
+  /* ⚠ THE TWO ASSET CLASSES THE MODULE MAP ABOVE DOES NOT COVER, ADDED
+     2026-09-26. Until now this page reported modules and lessons only, so the
+     twelve course PDFs and the thirteen downloads existed as status tables in
+     an internal document and nowhere in the product. Anyone wanting to know
+     what was outstanding had to open a PDF dated weeks earlier, which is how a
+     count gets quoted wrong in a status update.
+
+     Both read from content/modules.ts, same as everything else here. The
+     numbers cannot drift from what the app ships because they ARE what the
+     app ships. */
+  const assetsUploaded = COURSE_ASSETS.filter(a => a.key).length
+  const downloads = Object.entries(DOWNLOAD_STATUS)
+  const dlShips = downloads.filter(([, d]) => d.status === 'ships').length
+  const dlExtract = downloads.filter(([, d]) => d.status === 'extract').length
+  const dlBuild = downloads.filter(([, d]) => d.status === 'build').length
+
   return (
     <>
       <div className="abar">
@@ -81,6 +97,8 @@ export default async function Admin() {
                 the actual production backlog. 8 modules reads as nearly done;
                 47 lessons does not. */}
             <div className="stat"><b>{lessonsReady}/{TOTAL_LESSONS}</b><span>Lessons filmed</span></div>
+            <div className="stat"><b>{assetsUploaded}/{COURSE_ASSETS.length}</b><span>PDFs uploaded</span></div>
+            <div className="stat"><b>{dlShips}/{downloads.length}</b><span>Downloads finished</span></div>
           </div>
 
           {PATHWAY.map(l => {
@@ -122,6 +140,78 @@ export default async function Admin() {
               </div>
             )
           })}
+
+          {/* ═══ COURSE PDFS ═════════════════════════════════════════════════
+              `key` is set once a file is uploaded to the private bucket, so
+              "uploaded" here is not someone ticking a box — it is whether the
+              app can actually serve the file. A row without a key renders no
+              link on the level page and 404s from /api/v1/asset.
+
+              ⚠ PAGE COUNTS ARE SHOWN HERE AND NOWHERE ELSE. The master doc is
+              explicit that they must never be published: Level 1 is the
+              heaviest and the cheapest. This page is staff-only, and `pages`
+              is exactly the production-tracking field it was recorded for. */}
+          <div className="lvlblock">
+            <div className="lvlhead">
+              <h3>Course PDFs</h3>
+              <span className="chip ok">12 files, 3 shared across levels</span>
+              <span className="cnt">{assetsUploaded}/{COURSE_ASSETS.length} uploaded</span>
+            </div>
+            <div className="mods">
+              {COURSE_ASSETS.map(a => (
+                <div className="mod" key={a.file}>
+                  <span className="mn">PDF</span>
+                  <span>
+                    <h3>{a.title}</h3>
+                    <span className="meta">
+                      {a.pages}pp · {a.levels.length === 4
+                        ? 'all levels'
+                        : a.levels.map(l => `L${['freshman','sophomore','junior','senior'].indexOf(l) + 1}`).join(' + ')}
+                      {a.free && <> · free</>}
+                      {' '}· {a.file}
+                    </span>
+                  </span>
+                  <span className={`chip ${a.key ? 'ok' : 'miss'}`}>
+                    {a.key ? 'Uploaded' : 'Not uploaded'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ═══ DOWNLOADS ════════════════════════════════════════════════════
+              Thirteen worksheets and checklists. `from` is the production
+              instruction, not a student-facing string — "Starter Kit M4" tells
+              Maui which document to cut the extract out of.
+
+              ⚠ TITLES ARE NOT DUPLICATED HERE. DOWNLOAD_STATUS is keyed by the
+              title that content/pathway.ts already renders on the funnel, so
+              the two lists cannot drift into saying different things. */}
+          <div className="lvlblock">
+            <div className="lvlhead">
+              <h3>Downloads</h3>
+              <span className="chip ok">{dlShips} finished</span>
+              <span className="chip wait">{dlExtract} to extract</span>
+              <span className="chip miss">{dlBuild} to build</span>
+              <span className="cnt">{dlShips}/{downloads.length} done</span>
+            </div>
+            <div className="mods">
+              {downloads.map(([title, d]) => (
+                <div className="mod" key={title}>
+                  <span className="mn">{d.status === 'ships' ? '\u2713' : d.status === 'extract' ? '\u2702' : '+'}</span>
+                  <span>
+                    <h3>{title}</h3>
+                    <span className="meta">{d.from}</span>
+                  </span>
+                  <span className={`chip ${
+                    d.status === 'ships' ? 'ok' : d.status === 'extract' ? 'wait' : 'miss'
+                  }`}>
+                    {d.status === 'ships' ? 'Ships' : d.status === 'extract' ? 'Extract' : 'Build'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <p className="lede" style={{ marginTop: 8 }}>
             Status comes from <code>src/content/modules.ts</code>. Upload and reordering land

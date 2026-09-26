@@ -452,6 +452,18 @@ a.evbar:hover{background:var(--forest-dk)}
   color:var(--gold-ink);white-space:nowrap}
 .mod[data-locked="true"]{opacity:.55;pointer-events:none}
 
+/* Course documents — the PDFs a level ships with. Deliberately reuses .mods
+   and .mod so the list is the same card system as the module list (p.2 team
+   rule) and nothing new has to be kept in visual sync.
+
+   ⚠ .mn HOLDS THREE LETTERS HERE, NOT A DIGIT. The module badge is sized for
+   "01"; "PDF" at 14px overflows a 34px circle, so the override below is what
+   keeps it inside. Change .mn and check this too. */
+.docs-wrap{margin-top:30px}
+.docs-h{font-size:12.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:14px}
+.mod .mn.mn-doc,.docs-wrap .mod .mn{font-size:9.5px;letter-spacing:.04em}
+
 .player{background:var(--forest);border-radius:var(--r-lg);aspect-ratio:16/9;
   display:grid;place-items:center;color:rgba(247,243,233,.5);font-size:13px;
   text-align:center;padding:20px;border:1px solid rgba(200,163,74,.2)}

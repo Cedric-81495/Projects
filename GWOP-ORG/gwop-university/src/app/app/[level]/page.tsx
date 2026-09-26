@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PATHWAY } from '@/content/pathway'
-import { byLevel, moduleStatus, moduleMinutes } from '@/content/modules'
+import { byLevel, moduleStatus, moduleMinutes, assetsForLevel, assetHref } from '@/content/modules'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { LEVELS, canAccessLevel, type AccessState } from '@/lib/access/policy'
 import { loadAccessState } from '@/lib/access/load'
@@ -18,6 +18,12 @@ export default async function LevelPage(
   if (!meta) notFound()
 
   const mods = byLevel(level)
+
+  /* ⚠ ONLY ASSETS WITH A KEY. `key` is undefined until the file is actually
+     uploaded (content/modules.ts, build order item 3). Rendering a link for an
+     unuploaded asset gives a student a 404 from /api/v1/asset, which reads as
+     broken rather than as "not ready yet". Filter, do not render-and-hope. */
+  const docs = assetsForLevel(level).filter(a => a.key)
 
   /* ACCESS.
      Until now this page rendered the module list for anyone signed in, so every
@@ -117,6 +123,53 @@ export default async function LevelPage(
               )
             })}
           </div>
+
+          {/* ═══ COURSE DOCUMENTS ═══════════════════════════════════════════
+              The PDFs this level ships with. assetsForLevel() is the single
+              source of which files belong where — three of the twelve ship in
+              two levels each, so this list is NOT derivable from the filename
+              prefix. GWOP-L1-Master-The-Money.pdf appears on Level 2 as well,
+              and a student there sees `title`, never the filename.
+
+              ⚠ RENDERED ONLY WHEN THE LEVEL IS UNLOCKED. /api/v1/asset would
+              refuse a non-entitled request anyway — this is the affordance,
+              not the guarantee — but listing a locked level's documents would
+              put twelve dead links in front of someone who cannot open one.
+
+              ⚠ NEVER PRINT `pages`. The master doc is explicit: Level 1 is the
+              heaviest and the cheapest, Level 4 the lightest and the most
+              expensive. True, and it reads badly in a list.
+
+              ⚠ PLAIN <a>, NOT next/link. A free asset resolves to a public
+              /notes/ path and a paid one to /api/v1/asset, which answers with a
+              307 to a signed URL. Next's client router would try to treat both
+              as in-app navigations. target/rel keep the portal tab alive
+              behind the PDF viewer. */}
+          {unlocked && docs.length > 0 && (
+            <div className="docs-wrap">
+              <h3 className="docs-h">Course documents</h3>
+              <div className="mods">
+                {docs.map(a => (
+                  <a
+                    className="mod"
+                    href={assetHref(a.key!)}
+                    key={a.file}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span className="mn">PDF</span>
+                    <span>
+                      <h3>{a.title}</h3>
+                      <span className="meta">
+                        {a.free ? 'Free · yours to keep' : 'Included with this level'}
+                      </span>
+                    </span>
+                    <span className="go">Open ›</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>

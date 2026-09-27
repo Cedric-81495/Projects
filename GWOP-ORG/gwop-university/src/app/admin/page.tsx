@@ -1,225 +1,193 @@
-import type { Metadata } from 'next'
 import Link from 'next/link'
-import { PATHWAY } from '@/content/pathway'
-import { MODULES, byLevel, STATUS_LABEL, missingAssets, moduleStatus, moduleMinutes, TOTAL_LESSONS, COURSE_ASSETS, DOWNLOAD_STATUS } from '@/content/modules'
-import { Crest } from '@/components/Chrome'
 import { notFound } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { loadAccessState } from '@/lib/access/load'
 import { isStaff } from '@/lib/access/policy'
+import { PATHWAY } from '@/content/pathway'
+import {
+  MODULES, moduleStatus, TOTAL_LESSONS, TOTAL_MODULES,
+  COURSE_ASSETS, DOWNLOAD_STATUS,
+} from '@/content/modules'
 
-export const metadata: Metadata = {
-  title: 'Module Admin — GWOP University',
-  robots: { index: false, follow: false },
-}
+export const dynamic = 'force-dynamic'
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MODULE ADMIN  —  built for MAUI's tracker tasks:
-     "Organize modules by GWOP level"  (Aug 23, support: Jhon)
-     "Report missing items" / "identify missing assets"
-   ⚠ STAFF ONLY — GATED 2026-09-21. This block used to read "No auth yet —
-   Phase 2. Do not expose publicly." It was exposed publicly: middleware.ts
-   lists /admin in PROTECTED_PREFIXES, but that only requires A SESSION, and
-   signup is open to anyone. Every registered student could read the whole
-   production map — which lessons are unfilmed, which assets are missing, and
-   the team names in the header bar.
+   DASHBOARD — "how are we doing", on one screen.
 
-   No customer data was reachable here, so this was internal disclosure rather
-   than a breach. It still told any curious buyer that the course they had just
-   paid for was 47 lessons short.
+   ⚠ COUNTS ONLY. NO NAMES, NO EMAILS, NO INDIVIDUAL PAYMENTS. Staff can read
+   every profile, enrollment and payment row under RLS, so a student list here
+   would work. It is left out on purpose — see the note in layout.tsx. The
+   queries below use head:true wherever possible, so rows never leave Postgres;
+   only the count does.
 
-   ⚠ notFound(), NOT A REDIRECT AND NOT A 403. Same reasoning as the asset
-   route: a 403 confirms the page exists and is worth attacking. A student who
-   wanders here gets the same 404 as a typo.
+   ⚠ REVENUE IS THE ONE EXCEPTION AND IT IS DELIBERATE. PostgREST cannot sum
+   server-side without an RPC, so amount_cents is selected and summed here.
+   That column is an integer and carries no identity — no user_id, no email,
+   no Stripe reference. If this ever needs more than the amount, write an RPC
+   rather than widening the select.
 
-   ⚠ STAFF, NOT ADMIN, DESPITE THE ROUTE NAME. has_role() is a rank
-   comparison, so admin and owner pass this too. Maui and Sheena — the people
-   this page was built for — need reading rights, not write rights, and the
-   page is read-only.
+   ⚠ THE GATE IS REPEATED FROM layout.tsx ON PURPOSE. A layout and its page
+   render in parallel; this page queries the database, so it checks for itself
+   rather than trusting the ordering. The three content pages do not, because
+   they read a TypeScript file and reach nothing.
    ═══════════════════════════════════════════════════════════════════════════ */
-export default async function Admin() {
+export default async function AdminDashboard() {
   const supabase = await createServerSupabase()
   const access = await loadAccessState(supabase)
   if (!access || !isStaff(access)) notFound()
 
-  /* Derived, never stored — see moduleStatus(). A module is only as ready as
-     its weakest lesson, so these counts cannot flatter the pipeline. */
-  const total = MODULES.length
-  const ready = MODULES.filter(m => moduleStatus(m) === 'ready').length
-  const missing = MODULES.filter(m => moduleStatus(m) === 'missing').length
+  const [enrollments, paid, founding, students, cutoff] = await Promise.all([
+    supabase.from('enrollments').select('level').eq('status', 'active'),
+    supabase.from('payment_references').select('amount_cents').eq('status', 'paid'),
+    supabase.from('founding_members').select('*', { count: 'exact', head: true }),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    /* ⚠ THE CUTOFF IS READ, NEVER RESTATED. founding_member_cutoff() carries
+       its own instruction: "Server-side source of truth — UI copy must read
+       from this, never restate it." Hardcoding '30 Sep' here would be a second
+       copy of the deadline that drifts the moment the first one moves, and the
+       date is not a fixed offset anyway — 11:59pm America/New_York is 03:59 UTC
+       while daylight time is in effect and 04:59 after it ends. */
+    supabase.rpc('founding_member_cutoff'),
+  ])
+
+  const perLevel = (n: number) => (enrollments.data ?? []).filter(e => e.level === n).length
+
+  /* Null when the RPC is unavailable — an older database, or the function
+     renamed. The tile degrades to the bare count rather than printing a
+     confident wrong date. */
+  const cutoffAt = typeof cutoff.data === 'string' ? new Date(cutoff.data) : null
+  const msLeft = cutoffAt ? cutoffAt.getTime() - Date.now() : null
+  const daysLeft = msLeft === null ? null : Math.ceil(msLeft / 86_400_000)
+  const cutoffNote =
+    cutoffAt === null ? 'Founding members'
+    : daysLeft !== null && daysLeft > 1 ? `Founding members · ${daysLeft} days left`
+    : daysLeft === 1 ? 'Founding members · closes tomorrow'
+    : daysLeft === 0 ? 'Founding members · closes today'
+    : 'Founding members · register closed'
+  const revenue = (paid.data ?? []).reduce((s, p) => s + (p.amount_cents ?? 0), 0)
+
+  const modsReady = MODULES.filter(m => moduleStatus(m) === 'ready').length
   const lessonsReady = MODULES.reduce(
     (s, m) => s + m.lessons.filter(l => l.status === 'ready').length, 0,
   )
-
-  /* ⚠ THE TWO ASSET CLASSES THE MODULE MAP ABOVE DOES NOT COVER, ADDED
-     2026-09-26. Until now this page reported modules and lessons only, so the
-     twelve course PDFs and the thirteen downloads existed as status tables in
-     an internal document and nowhere in the product. Anyone wanting to know
-     what was outstanding had to open a PDF dated weeks earlier, which is how a
-     count gets quoted wrong in a status update.
-
-     Both read from content/modules.ts, same as everything else here. The
-     numbers cannot drift from what the app ships because they ARE what the
-     app ships. */
   const assetsUploaded = COURSE_ASSETS.filter(a => a.key).length
-  const downloads = Object.entries(DOWNLOAD_STATUS)
-  const dlShips = downloads.filter(([, d]) => d.status === 'ships').length
-  const dlExtract = downloads.filter(([, d]) => d.status === 'extract').length
-  const dlBuild = downloads.filter(([, d]) => d.status === 'build').length
+  const dl = Object.values(DOWNLOAD_STATUS)
+  const dlShips = dl.filter(d => d.status === 'ships').length
+
+  /* ⚠ THE FOUR GATES ARE SHIN'S, VERBATIM FROM THE MASTER BUILD & LAUNCH
+     REQUIREMENTS. Recorded here rather than in a document because a document
+     goes stale on the shelf and this does not.
+
+     ⚠ `done` IS HARDCODED, NOT DERIVED, AND THAT IS HONEST. "Attorney review
+     complete" is not a state any table holds. Flipping one of these is a
+     deliberate edit by somebody who knows it is true. Do not wire it to a
+     proxy — a green tick nobody earned is worse than no tick. */
+  const gates: { n: number; label: string; done: boolean; note?: string }[] = [
+    { n: 1, label: 'Upload the twelve reissued PDFs', done: true,
+      note: 'all twelve serving, access tested both directions' },
+    { n: 2, label: 'Fix the Level 4 access defect', done: true,
+      note: 'per-level entitlement, verified against the RLS policy' },
+    { n: 3, label: 'Attorney review — refund line, Founding Member terms, Lesson 8.7',
+      done: false, note: 'the only one left, and the one we do not control the speed of' },
+    { n: 4, label: 'One-time checkout only — no instalments, no BNPL', done: true },
+  ]
+  const gatesDone = gates.filter(g => g.done).length
 
   return (
-    <>
-      <div className="abar">
-        <Crest size={30} />
-        <b>Module Admin</b>
-        <span className="who">Maui &amp; Sheena</span>
+    <div className="wrap">
+      <div className="head">
+        <p className="tag">Overview</p>
+        <h2 className="h2">Where we are</h2>
+        <p className="lede">
+          Content status is read from the codebase; counts are read from the
+          database. Nothing here is typed in by hand except the launch gates.
+        </p>
       </div>
 
-      <section>
-        <div className="wrap">
-          <div className="head">
-            <p className="tag">Content status</p>
-            <h2 className="h2">Level 1\u2013Level 4 Map</h2>
-            <p className="lede">
-              {/* Aug 22 deadline removed 2026-09-03 — it has passed and the
-                  content is still outstanding. */}
-              Every module the app expects, by level, from the Pricing, Payment
-              &amp; Package Master. Anything not marked ready is still to be
-              filmed or written.
-            </p>
-          </div>
-
-          <div className="stats">
-            <div className="stat"><b>{ready}/{total}</b><span>Ready to publish</span></div>
-            <div className="stat"><b>{total - ready - missing}</b><span>In production</span></div>
-            <div className="stat"><b>{missing}</b><span>Missing assets</span></div>
-            {/* The module counts round off how much is left; the lesson count is
-                the actual production backlog. 8 modules reads as nearly done;
-                47 lessons does not. */}
-            <div className="stat"><b>{lessonsReady}/{TOTAL_LESSONS}</b><span>Lessons filmed</span></div>
-            <div className="stat"><b>{assetsUploaded}/{COURSE_ASSETS.length}</b><span>PDFs uploaded</span></div>
-            <div className="stat"><b>{dlShips}/{downloads.length}</b><span>Downloads finished</span></div>
-          </div>
-
-          {PATHWAY.map(l => {
-            const mods = byLevel(l.slug)
-            const done = mods.filter(m => moduleStatus(m) === 'ready').length
-            return (
-              <div className="lvlblock" key={l.slug}>
-                <div className="lvlhead">
-                  <h3>{l.label}</h3>
-                  <span className="chip ok">{l.title}</span>
-                  <span className="cnt">{done}/{mods.length} ready</span>
-                </div>
-
-                <div className="mods">
-                  {mods.map(m => (
-                    <div className="mod" key={m.slug}>
-                      <span className="mn">{String(m.order).padStart(2, '0')}</span>
-                      <span>
-                        <h3>{m.title}</h3>
-                        <span className="meta">
-                          {m.lessons.length} lessons
-                          {moduleMinutes(m) !== null && <> · {moduleMinutes(m)} min</>}
-                          {' '}· {m.slug}
-                          {/* Maui's tracker task is "report missing items" —
-                              this names them instead of leaving her to guess. */}
-                          {missingAssets(m).length > 0 && (
-                            <> · needs {missingAssets(m).join(', ')}</>
-                          )}
-                          {m.note && <> · note ✓</>}
-                        </span>
-                      </span>
-                      <span className={`chip ${
-                        moduleStatus(m) === 'ready' ? 'ok'
-                          : moduleStatus(m) === 'pending' ? 'wait' : 'miss'
-                      }`}>{STATUS_LABEL[moduleStatus(m)]}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-
-          {/* ═══ COURSE PDFS ═════════════════════════════════════════════════
-              `key` is set once a file is uploaded to the private bucket, so
-              "uploaded" here is not someone ticking a box — it is whether the
-              app can actually serve the file. A row without a key renders no
-              link on the level page and 404s from /api/v1/asset.
-
-              ⚠ PAGE COUNTS ARE SHOWN HERE AND NOWHERE ELSE. The master doc is
-              explicit that they must never be published: Level 1 is the
-              heaviest and the cheapest. This page is staff-only, and `pages`
-              is exactly the production-tracking field it was recorded for. */}
-          <div className="lvlblock">
-            <div className="lvlhead">
-              <h3>Course PDFs</h3>
-              <span className="chip ok">12 files, 3 shared across levels</span>
-              <span className="cnt">{assetsUploaded}/{COURSE_ASSETS.length} uploaded</span>
-            </div>
-            <div className="mods">
-              {COURSE_ASSETS.map(a => (
-                <div className="mod" key={a.file}>
-                  <span className="mn">PDF</span>
-                  <span>
-                    <h3>{a.title}</h3>
-                    <span className="meta">
-                      {a.pages}pp · {a.levels.length === 4
-                        ? 'all levels'
-                        : a.levels.map(l => `L${['freshman','sophomore','junior','senior'].indexOf(l) + 1}`).join(' + ')}
-                      {a.free && <> · free</>}
-                      {' '}· {a.file}
-                    </span>
-                  </span>
-                  <span className={`chip ${a.key ? 'ok' : 'miss'}`}>
-                    {a.key ? 'Uploaded' : 'Not uploaded'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ═══ DOWNLOADS ════════════════════════════════════════════════════
-              Thirteen worksheets and checklists. `from` is the production
-              instruction, not a student-facing string — "Starter Kit M4" tells
-              Maui which document to cut the extract out of.
-
-              ⚠ TITLES ARE NOT DUPLICATED HERE. DOWNLOAD_STATUS is keyed by the
-              title that content/pathway.ts already renders on the funnel, so
-              the two lists cannot drift into saying different things. */}
-          <div className="lvlblock">
-            <div className="lvlhead">
-              <h3>Downloads</h3>
-              <span className="chip ok">{dlShips} finished</span>
-              <span className="chip wait">{dlExtract} to extract</span>
-              <span className="chip miss">{dlBuild} to build</span>
-              <span className="cnt">{dlShips}/{downloads.length} done</span>
-            </div>
-            <div className="mods">
-              {downloads.map(([title, d]) => (
-                <div className="mod" key={title}>
-                  <span className="mn">{d.status === 'ships' ? '\u2713' : d.status === 'extract' ? '\u2702' : '+'}</span>
-                  <span>
-                    <h3>{title}</h3>
-                    <span className="meta">{d.from}</span>
-                  </span>
-                  <span className={`chip ${
-                    d.status === 'ships' ? 'ok' : d.status === 'extract' ? 'wait' : 'miss'
-                  }`}>
-                    {d.status === 'ships' ? 'Ships' : d.status === 'extract' ? 'Extract' : 'Build'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <p className="lede" style={{ marginTop: 8 }}>
-            Status comes from <code>src/content/modules.ts</code>. Upload and reordering land
-            in Phase 2 — until then Maui edits that file, or sends the list to Jhon.{' '}
-            <Link href="/app">View the student side ›</Link>
-          </p>
+      <div className="lvlblock">
+        <div className="lvlhead">
+          <h3>Launch gate</h3>
+          <span className={`chip ${gatesDone === gates.length ? 'ok' : 'wait'}`}>
+            {gatesDone} of {gates.length} closed
+          </span>
+          <span className="cnt">Master Build &amp; Launch Requirements</span>
         </div>
-      </section>
-    </>
+        <div className="mods">
+          {gates.map(g => (
+            <div className="mod" key={g.n}>
+              <span className="mn">{g.done ? '\u2713' : g.n}</span>
+              <span>
+                <h3>{g.label}</h3>
+                {g.note && <span className="meta">{g.note}</span>}
+              </span>
+              <span className={`chip ${g.done ? 'ok' : 'miss'}`}>
+                {g.done ? 'Closed' : 'Open'}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="lvlblock">
+        <div className="lvlhead">
+          <h3>Content</h3>
+          <span className="cnt">from src/content/modules.ts</span>
+        </div>
+        <div className="stats">
+          <div className="stat"><b>{modsReady}/{TOTAL_MODULES}</b><span>Modules ready</span></div>
+          {/* 8 modules reads as nearly done; 47 lessons does not. The lesson
+              count is the real backlog, so it sits beside the module one. */}
+          <div className="stat"><b>{lessonsReady}/{TOTAL_LESSONS}</b><span>Lessons filmed</span></div>
+          <div className="stat"><b>{assetsUploaded}/{COURSE_ASSETS.length}</b><span>PDFs uploaded</span></div>
+          <div className="stat"><b>{dlShips}/{dl.length}</b><span>Downloads finished</span></div>
+        </div>
+      </div>
+
+      <div className="lvlblock">
+        <div className="lvlhead">
+          <h3>Enrollment</h3>
+          <span className="cnt">active enrollments, by level</span>
+        </div>
+        <div className="stats">
+          {PATHWAY.map(l => (
+            <div className="stat" key={l.slug}>
+              <b>{perLevel(l.n)}</b><span>{l.label}</span>
+            </div>
+          ))}
+          <div className="stat"><b>{students.count ?? 0}</b><span>Registered accounts</span></div>
+        </div>
+      </div>
+
+      <div className="lvlblock">
+        <div className="lvlhead">
+          <h3>Commerce</h3>
+          <span className="cnt">paid only — pending and failed excluded</span>
+          {cutoffAt && (
+            <span className={`chip ${daysLeft !== null && daysLeft < 0 ? 'miss' : daysLeft !== null && daysLeft <= 3 ? 'wait' : 'ok'}`}>
+              Founding cutoff {cutoffAt.toLocaleDateString('en-GB', {
+                day: 'numeric', month: 'short', year: 'numeric',
+                timeZone: 'America/New_York',
+              })}
+            </span>
+          )}
+        </div>
+        <div className="stats">
+          <div className="stat">
+            <b>${(revenue / 100).toLocaleString('en-US')}</b><span>Collected</span>
+          </div>
+          <div className="stat"><b>{(paid.data ?? []).length}</b><span>Paid orders</span></div>
+          {/* ⚠ The register is populated and the cutoff enforces itself in
+              Postgres (0026). What the status is WORTH is still undecided —
+              that is Surpaul's call, and this number is the reason to make it. */}
+          <div className="stat"><b>{founding.count ?? 0}</b><span>{cutoffNote}</span></div>
+        </div>
+      </div>
+
+      <p className="lede" style={{ marginTop: 8 }}>
+        No customer names, emails or individual payments appear anywhere in this
+        console — see the note at the top of <code>src/app/admin/layout.tsx</code>.{' '}
+        <Link href="/app">View the student side ›</Link>
+      </p>
+    </div>
   )
 }

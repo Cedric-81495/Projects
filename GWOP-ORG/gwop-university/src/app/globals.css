@@ -493,6 +493,63 @@ a.evbar:hover{background:var(--forest-dk)}
 /* admin */
 .abar{background:var(--forest);color:#fff;padding:14px var(--pad);display:flex;
   align-items:center;gap:12px;padding-top:calc(14px + env(safe-area-inset-top))}
+
+/* ═══ ADMIN CONSOLE SHELL ═══════════════════════════════════════════════════
+   Sidebar console, 2026-09-26. Replaces the single scrolling page — four
+   sections could not keep sharing one route without the top of it becoming a
+   table of contents nobody reads.
+
+   ⚠ .abar IS KEPT ABOVE AND IS NOW UNUSED BY /admin. Left in place rather than
+   deleted: it is 40 lines up from here and removing a class to find out what
+   else used it is the wrong order of operations. Delete it once grep is clean.
+
+   ⚠ THE SIDEBAR COLLAPSES TO A TOP STRIP UNDER 900px, NOT TO A DRAWER. This is
+   a staff tool read on a laptop. A hamburger and an overlay is a week of
+   fiddling for a case that is Maui checking something on a phone twice a month;
+   a horizontally scrolling strip of links does that job in nine lines. */
+.ashell{display:grid;grid-template-columns:232px 1fr;min-height:100vh;
+  background:var(--ivory)}
+.aside{background:var(--forest);color:var(--ivory);padding:22px 0 18px;
+  display:flex;flex-direction:column;gap:22px;position:sticky;top:0;
+  height:100vh;overflow-y:auto}
+.aside-brand{display:flex;align-items:center;gap:10px;padding:0 20px 18px;
+  border-bottom:1px solid rgba(200,163,74,.22)}
+.aside-brand b{font-family:var(--display);font-size:19px;letter-spacing:.01em;
+  color:var(--ivory)}
+.aside-foot{margin-top:auto;padding:16px 20px 0;font-size:11.5px;line-height:1.6;
+  color:rgba(247,243,233,.5);border-top:1px solid rgba(200,163,74,.16)}
+.aside-foot code{font-size:10.5px;color:var(--gold-light)}
+
+.anav{display:flex;flex-direction:column;gap:20px}
+.anav-group{display:flex;flex-direction:column;gap:2px}
+.anav-label{margin:0 0 6px;padding:0 20px;font-size:10.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.anav-link{padding:8px 20px;font-size:14px;color:rgba(247,243,233,.78);
+  text-decoration:none;border-left:2px solid transparent;transition:.14s}
+.anav-link:hover{color:var(--ivory);background:rgba(255,255,255,.04)}
+/* The active marker is a gold rule on the left edge, not a filled pill — the
+   sidebar already carries a lot of weight and a filled state fights the crest. */
+.anav-link.is-on{color:var(--ivory);font-weight:600;
+  border-left-color:var(--gold);background:rgba(200,163,74,.10)}
+
+.amain{padding:34px 0 60px;min-width:0}
+.amain .wrap{max-width:900px}
+
+@media (max-width:900px){
+  .ashell{grid-template-columns:1fr}
+  .aside{position:static;height:auto;flex-direction:row;align-items:center;
+    gap:14px;padding:12px 16px;overflow-x:auto}
+  .aside-brand{border:0;padding:0;flex:0 0 auto}
+  .aside-brand b{font-size:16px}
+  .anav{flex-direction:row;gap:14px}
+  .anav-group{flex-direction:row;align-items:center;gap:4px}
+  .anav-label{display:none}
+  .anav-link{padding:6px 10px;white-space:nowrap;border-left:0;
+    border-bottom:2px solid transparent;border-radius:0}
+  .anav-link.is-on{border-left:0;border-bottom-color:var(--gold)}
+  .aside-foot{display:none}
+  .amain{padding:20px 0 40px}
+}
 .abar b{font-family:var(--display);font-size:17px;font-weight:700}
 .abar .who{margin-left:auto;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--gold-lt)}

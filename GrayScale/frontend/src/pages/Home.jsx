@@ -44,28 +44,28 @@ const Home = () => {
       <GenderCollectionSection />
       <NewArrivals />
 
-      {/* Best Sellter */}
-      <h2 className="text-3xl text-center font-bold mb-4">Best Seller</h2>
-      {bestSellerProduct ? ( 
-        <ProductDetails productId={bestSellerProduct._id} /> 
-      ) : (
-         <p className="text-center">No product found</p>
-      )}
-    
-      {products.length > 0 ? (
+      {/* Best Seller */}
+      <section className="pt-12">
+        <h2 className="text-3xl text-center font-bold px-4">Best Seller</h2>
+        {bestSellerProduct ? (
+          <ProductDetails productId={bestSellerProduct._id} />
+        ) : (
+          <p className="text-center py-8">No product found</p>
+        )}
+      </section>
+
+      {/* Top Wears for Women */}
+      <section className="py-12 px-4 lg:px-12">
         <div className="container mx-auto">
-          <h2 className="text-3xl text-center font-bold mb-4">
-            Top Wears for Women
-          </h2>
-          <ProductGrid products={products} loading={loading} error={error} />
+          <h2 className="text-3xl text-center font-bold mb-8">Top Wears for Women</h2>
+          {products.length > 0 ? (
+            <ProductGrid products={products} loading={loading} error={error} />
+          ) : (
+            !loading && !error && <p className="text-center">No product found</p>
+          )}
         </div>
-      ) : (
-        !loading && !error && (
-          <div className="container mx-auto">
-            <p className="text-center">No product found</p>
-          </div>
-        )
-      )}
+      </section>
+
       <FeaturedCollection />
       <FeaturesSection />
     </div>

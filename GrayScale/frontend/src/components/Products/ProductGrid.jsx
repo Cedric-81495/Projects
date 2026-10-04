@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PriceTag from "./PriceTag";
+import noImg from "../../assets/no-image.jpg";
 
 const ProductGrid = ({ products, loading, error }) => {
   if (loading) {
@@ -19,24 +20,28 @@ const ProductGrid = ({ products, loading, error }) => {
   }
   
   return (
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
-  {products.map((product) => (
-    <Link key={product._id} to={`/product/${product._id}`}>
-      <div className="bg-white p-4 rounded-lg">
-        <div className="w-full h-96 md:h-[300px] lg:h-[290px] mb-4">
-          <img
-            src={product.images[0].url}
-            alt={product.images[0].altText || product.name}
-            className="w-full h-full object-cover rounded-lg"
-          />
-        </div>
-        <h3 className="text-sm mb-2">{product.name}</h3>
-        <PriceTag product={product} className="text-gray-500 text-sm tracking-tighter" />
-      </div>
-    </Link>
-  ))}
-</div>
-
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+      {products.map((product) => {
+        const image = product.images?.[0];
+        return (
+          <Link key={product._id} to={`/product/${product._id}`} className="group block">
+            <div className="w-full aspect-[3/4] mb-3 rounded-lg overflow-hidden bg-gray-100">
+              <img
+                src={image?.url || noImg}
+                alt={image?.altText || product.name}
+                loading="lazy"
+                className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                onError={(e) => {
+                  e.currentTarget.src = noImg;
+                }}
+              />
+            </div>
+            <h3 className="text-sm mb-1 line-clamp-2">{product.name}</h3>
+            <PriceTag product={product} className="text-gray-500 text-sm tracking-tighter" />
+          </Link>
+        );
+      })}
+    </div>
   );
 };
 

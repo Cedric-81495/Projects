@@ -20,12 +20,12 @@ const ProductGrid = ({ products, loading, error }) => {
   }
   
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-6">
       {products.map((product) => {
         const image = product.images?.[0];
         return (
           <Link key={product._id} to={`/product/${product._id}`} className="group block">
-            <div className="w-full aspect-[3/4] mb-3 rounded-lg overflow-hidden bg-gray-100">
+            <div className="w-full aspect-square mb-3 rounded-xl overflow-hidden bg-gray-100">
               <img
                 src={image?.url || noImg}
                 alt={image?.altText || product.name}
@@ -36,8 +36,10 @@ const ProductGrid = ({ products, loading, error }) => {
                 }}
               />
             </div>
-            <h3 className="text-sm mb-1 line-clamp-2">{product.name}</h3>
-            <PriceTag product={product} className="text-gray-500 text-sm tracking-tighter" />
+            <h3 className="text-sm md:text-base font-medium text-gray-900 mb-1 line-clamp-1 group-hover:underline">
+              {product.name}
+            </h3>
+            <PriceTag product={product} className="text-gray-600 text-sm" />
           </Link>
         );
       })}

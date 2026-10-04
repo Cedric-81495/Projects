@@ -275,9 +275,9 @@ if (error)
 
         {/* You May Also Like Section */}
         {similarProducts?.length > 0 && (
-          <div className="mt-20">
-            <h2 className="text-2xl text-center font-medium mb-8">You May Also Like</h2>
-            <ProductGrid products={similarProducts} loading={loading} error={error} />
+          <div className="mt-16 md:mt-20 pt-12 border-t border-gray-200">
+            <h2 className="text-2xl md:text-3xl text-center font-bold mb-8 md:mb-10">You May Also Like</h2>
+            <ProductGrid products={similarProducts.slice(0, 4)} loading={loading} error={error} />
           </div>
         )}
       </div>

@@ -132,8 +132,8 @@ if (error)
           {/* Gallery */}
           <div className="flex flex-col md:flex-row-reverse gap-4">
             {/* Main Image */}
-            <div className="flex-1 min-w-0">
-              <div className="w-full aspect-[4/5] max-h-[640px] rounded-xl overflow-hidden bg-gray-100">
+            <div className="w-full md:flex-1 md:min-w-0">
+              <div className="w-full aspect-square md:aspect-[4/5] md:max-h-[640px] rounded-xl overflow-hidden bg-gray-100">
                 <img
                   src={resolvedMainImage || noImg}
                   alt={selectedProduct.name}

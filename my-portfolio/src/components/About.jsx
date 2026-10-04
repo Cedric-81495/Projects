@@ -19,17 +19,26 @@ export default function About() {
         {/* Content card */}
         <div className="bg-gray-190 dark:bg-gray-800 rounded-xl p-6 md:p-10 shadow-xl">
           <p className="text-lg leading-relaxed">
-            I’m Cedric, a full-stack web developer based in the Philippines,
-            focused on building modern, scalable, and user-centric web
-            applications. I primarily work with React, Tailwind CSS, and
-            Node.js to create clean and maintainable solutions.
+            I’m Cedric, an AI engineer based in the Philippines with a focus on
+            web development. I build full-stack web applications with React,
+            Tailwind CSS, Node.js, Express, and MongoDB, and I use AI tools at
+            every stage of the process, from planning and prototyping to writing,
+            testing, and refining code.
           </p>
 
           <p className="text-lg mt-5 leading-relaxed">
-            I value thoughtful design, performance, and clarity in both code
-            and user experience. I continuously learn and adapt to new
-            technologies to stay effective in a fast-moving development
-            landscape.
+            AI helps me move from idea to working product much faster, while my
+            engineering background keeps that work reliable. I review and
+            understand everything I ship, so speed never comes at the cost of
+            clean, maintainable code.
+          </p>
+
+          <p className="text-lg mt-5 leading-relaxed">
+            Since 2022, I’ve worked as a software engineer at Straive, where I
+            maintain and improve publishing platforms and automate internal data
+            processes. That professional experience shapes how I approach every
+            project: with care for structure, performance, and the people who
+            will use it.
           </p>
         </div>
       </div>

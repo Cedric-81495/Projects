@@ -40,13 +40,6 @@ export default function Experience() {
               />
 
               <ProjectItem
-                name="Todo Board"
-                description="Productivity-focused task manager with responsive layout."
-                live="https://mern-todoboard.onrender.com"
-                github="https://github.com/Cedric-81495/Projects/tree/main/ToDoBoard"
-              />
-
-              <ProjectItem
                 name="GrayScale"
                 description="Full-stack MERN e-commerce platform for fashion products with real-world user and admin workflows."
                 live="https://mern-grayscale.onrender.com"

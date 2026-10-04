@@ -25,11 +25,11 @@ export default function Hero() {
             {/* Text */}
              <div className="flex-1 text-center md:text-left">
                 <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
-                  A full-stack web developer based in the Philippines, building modern, 
-                  responsive, and scalable web applications with React, Tailwind CSS, 
-                  and Node.js. I leverage AI tools and technologies to enhance 
-                  development efficiency, improve user experience, and stay at the 
-                  forefront of industry trends.
+                  An AI engineer based in the Philippines, focused on web development.
+                  I build modern, responsive web applications with React, Tailwind CSS,
+                  and Node.js, using AI tools throughout my workflow to ship faster
+                  without cutting corners on quality. Backed by professional experience
+                  as a software engineer since 2022.
                 </p>
 
 

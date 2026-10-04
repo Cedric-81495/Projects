@@ -9,6 +9,7 @@ import CollectionPage from "./pages/CollectionPage";
 import ProductDetails from "./components/Products/ProductDetails";
 import Checkout from "./components/Cart/Checkout";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import GCashReturnPage from "./pages/GCashReturnPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import AdminLayout from "./components/Admin/AdminLayout";
@@ -18,7 +19,8 @@ import ProductManagement from "./components/Admin/ProductManagement";
 import EditProductPage from "./components/Admin/EditProductPage";
 import OrderManagement from "./components/Admin/OrderManagement";
 import ScrollToTop from "./components/Common/ScrollToTop";
-import ProtectedRoute from "../src/components/Common/ProtectedRoute";
+import AppEffects from "./components/Common/AppEffects";
+import ProtectedRoute from "./components/Common/ProtectedRoute";
 
 import { Provider } from "react-redux";
 import store from "../redux/store";
@@ -28,6 +30,7 @@ const App = () => {
     <Provider store={store}>
       <BrowserRouter>
        <ScrollToTop />
+        <AppEffects />
         <Toaster position="top-right" />
         <Routes>
           {/* User Layout */}
@@ -47,9 +50,13 @@ const App = () => {
               <ProtectedRoute>
                 <Checkout />
               </ProtectedRoute>} />
-            <Route path="order-confirmation" element={
+            <Route path="order-confirmation/:id" element={
               <ProtectedRoute>
                 <OrderConfirmationPage />
+              </ProtectedRoute>} />
+            <Route path="payment/gcash/return" element={
+              <ProtectedRoute>
+                <GCashReturnPage />
               </ProtectedRoute>} />
             <Route path="order/:id" element={
               <ProtectedRoute>
@@ -64,7 +71,7 @@ const App = () => {
 
           {/* Admin Layout */}
           <Route path="/admin" element={ 
-            <ProtectedRoute>
+            <ProtectedRoute role="admin">
             <AdminLayout />
           </ProtectedRoute>}>
             <Route index element={<AdminHomePage />} />

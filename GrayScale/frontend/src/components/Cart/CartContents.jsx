@@ -4,6 +4,7 @@ import {
   updateCartItemQuantity,
   removeFromCart,
 } from "../../../redux/slices/cartSlice";
+import { toast } from "sonner";
 const CartContents = ({ cart, userId, guestId }) => {
     const dispatch = useDispatch();
     
@@ -20,7 +21,9 @@ const CartContents = ({ cart, userId, guestId }) => {
                     size,
                     color,
                 })
-            );
+            )
+                .unwrap()
+                .catch((err) => toast.error(err?.message || "Couldn't update quantity"));
         }
     };
 
@@ -77,7 +80,10 @@ const CartContents = ({ cart, userId, guestId }) => {
                     </div>
                 </div>
                 <div>
-                    <p className="font-medium">₱{product.price.toLocaleString()}</p>
+                    <p className="font-medium">₱{(product.price * product.quantity).toLocaleString()}</p>
+                    {product.quantity > 1 && (
+                        <p className="text-xs text-gray-500">₱{product.price.toLocaleString()} each</p>
+                    )}
                     <button onClick={() => 
                         handleRemovFromCart(
                             product.productId,

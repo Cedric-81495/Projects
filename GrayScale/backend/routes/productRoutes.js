@@ -1,354 +1,170 @@
+// backend/routes/productRoutes.js
+// PUBLIC, READ-ONLY storefront routes.
+// All product writes live in /api/admin/products (productAdminRoutes.js) — the duplicate
+// POST/PUT/PATCH/DELETE that used to be here were removed.
 const express = require("express");
 const Product = require("../models/Product");
-const { protect, admin } = require("../middleware/authMiddleware");
+const { optionalAuth } = require("../middleware/authMiddleware");
+const { validateObjectIdParam } = require("../middleware/validateObjectId");
 
 const router = express.Router();
+router.param("id", validateObjectIdParam);
 
-// @route POST /api/products
-// @desc Create a new Product
-// @access Private/Admin
-router.post("/", protect, admin, async (req, res) => {
-    try{
-        const { 
-            name, 
-            description, 
-            price, 
-            discountPrice, 
-            countInStock, 
-            category, 
-            brand, 
-            sizes, 
-            colors, 
-            collections, 
-            material, 
-            gender, 
-            images,
-            isFeatured, 
-            isPublished, 
-            tags, 
-            dimensions, 
-            weight,
-            sku,
-        } = req.body;
+// Customers only ever see published products
+const PUBLISHED = { isPublished: true };
 
-        const product = new Product({     
-            name, 
-            description, 
-            price, 
-            discountPrice, 
-            countInStock, 
-            category, 
-            brand, sizes, 
-            colors, 
-            collections, 
-            material, 
-            gender, 
-            images,
-            isFeatured, 
-            isPublished, 
-            tags, 
-            dimensions, 
-            weight,
-            sku,
-            user: req.user._id, // Reference to the admin user who created the product.
-        });
+const MAX_LIMIT = 100;
+const MAX_SEARCH_LENGTH = 100;
 
-        const createProduct =  await product.save();
-        console.log("Success creating product");
-        res.status(201).json(createProduct);
-    }catch(error){
-        console.log(error);
-        res.status(500).send("Server error");
-    }
-});
+// Escape every regex metacharacter so user input is matched literally.
+// Prevents regex injection (e.g. "." matching everything) and ReDoS (e.g. "(a+)+$").
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-// @route PUT /api/products/:id
-// @desc Updat an existing product ID
-// @access Private/Admin
-router.put("/:id", protect, admin, async (req, res) => {
-    try{
-        const { 
-            name, 
-            description, 
-            price, 
-            discountPrice, 
-            countInStock, 
-            category, 
-            brand, 
-            sizes, 
-            colors, 
-            collections, 
-            material, 
-            gender, 
-            images,
-            isFeatured, 
-            isPublished, 
-            tags, 
-            dimensions, 
-            weight,
-            sku,
-        } = req.body;
+// Query values can arrive as arrays (?size=M&size=L). Take them as plain strings only.
+const str = (value) => {
+  if (Array.isArray(value)) value = value.join(",");
+  return typeof value === "string" ? value.trim() : "";
+};
+const list = (value) =>
+  str(value)
+    .split(",")
+    .map((v) => v.trim())
+    .filter(Boolean)
+    .slice(0, 20);
 
-        // Find product by ID
-        const product = await Product.findById(req.params.id);
-
-        if (product) {
-            // Update prduct fields
-            product.name = name || product.name; 
-            product.description = description || product.description; 
-            product.price = price || product.price; 
-            product.discountPrice = discountPrice || product.discountPrice; 
-            product.countInStock = countInStock || product.countInStock; 
-            product.category = category || product.category; 
-            product.brand = brand || product.brand; 
-            product.sizes = sizes || product.sizes; 
-            product.colors = colors || product.colors; 
-            product.collections = collections || product.collections; 
-            product.material = material || product.material; 
-            product.gender = gender || product.gender; 
-            product.images = images || product.images;
-            product.isFeatured = isFeatured  !== undefined ? isFeatured : product.isFeatured; 
-            product.isPublished = isPublished !== undefined ? isPublished : product.isPublished; 
-            product.tags = tags || product.tags; 
-            product.dimensions = dimensions || product.dimensions; 
-            product.weight = weight || product.weight;
-            product.sku = sku || product.sku;
-
-        // Save the updated product
-        const updatedProduct = await product.save();
-        res.json(updatedProduct);
-        console.log("Update product successfull!");
-        } else {
-            res.status(404).json({ message: "Product not found" });
-        }
-    }catch(error){
-        console.log("Failed to update product ", error);
-        res.status(500).send("Server Error");
-    }
-})
-
-
-// @route PATCH /api/products/:id
-// @desc Partially update an existing product
-// @access Private/Admin
-router.patch("/:id", protect, admin, async (req, res) => {
-    try {
-        // Only update fields provided in req.body
-        const updatedProduct = await Product.findByIdAndUpdate(
-            req.params.id,
-            { $set: req.body },
-            { new: true, runValidators: true } // Validate only updated fields
-        );
-
-        if (!updatedProduct) {
-            return res.status(404).json({ message: "Product not found" });
-        }
-
-        console.log("Product updated successfully");
-        res.json(updatedProduct);
-    } catch (error) {
-        console.log("Failed to update product", error);
-        res.status(500).send("Server Error");
-    }
-});
-
-// @route DELETE /api/products/:id
-// @desc Delete an existing product
-// @access Private/Admin
-router.delete("/:id", protect, admin, async (req, res) => {
-    try{
-        const product = await Product.findById(req.params.id);
-
-        if (product) {
-            // Remove the product from DB
-            await product.deleteOne();
-            res.json({ message: "Product removed"});
-            console.log("Product removed");
-        } else {
-            res.status(404).json({ message: "Product not found"});
-        }
-
-    }catch(error){
-        console.error(error);
-        res.status(500).send("Server error");
-    }
-});
+const SORTS = {
+  priceAsc: { price: 1 },
+  priceDesc: { price: -1 },
+  popularity: { rating: -1 },
+};
 
 // @route GET /api/products
-// @desc Get all the products with optional qery filters
+// @desc Get published products with optional filters
 // @access Public
-
 router.get("/", async (req, res) => {
-    try {
-        const  {
-            collection, 
-            size, 
-            color, 
-            gender, 
-            minPrice, 
-            maxPrice, 
-            sortBy,
-            search, 
-            category,
-            material, 
-            brand, 
-            limit
-        } = req.query;
+  try {
+    const q = req.query;
+    const query = { ...PUBLISHED };
 
-        let query = {};
+    const collection = str(q.collection);
+    if (collection && collection.toLowerCase() !== "all") query.collections = collection;
 
-        // Filter logic 
-        if (collection && collection.toLowerCase() !== "all") {
-            query.collections = collection;
-        }
-        
-        if (category && category.toLowerCase() !== "all") {
-            query.category = category;
-        }
+    const category = str(q.category);
+    if (category && category.toLowerCase() !== "all") query.category = category;
 
-        if (material) {
-            query.material = {$in: material.split(",")};
-        }
-        
-        if (brand) {
-            query.brand = {$in: brand.split(",")};
-        }
+    const materials = list(q.material);
+    if (materials.length) query.material = { $in: materials };
 
-        if (size) {
-        query.sizes = {
-            $in: size.split(",").map(s => s.trim().toUpperCase())
-        };
-        }
-        
-        if (color) {
-            query.colors = { $in: [color] };
-        }
+    const brands = list(q.brand);
+    if (brands.length) query.brand = { $in: brands };
 
-        if (gender) {
-            query.gender = gender;
-        }
+    const sizes = list(q.size).map((s) => s.toUpperCase());
+    if (sizes.length) query.sizes = { $in: sizes };
 
-        if (minPrice || maxPrice) {
-            query.price = {};
-            if (minPrice) query.price.$gte = Number(minPrice);
-            if (maxPrice) query.price.$lte = Number(maxPrice);
-        }
+    const color = str(q.color);
+    if (color) query.colors = { $in: [color] };
 
-        if (search) {
-            query.$or = [
-                { name: { $regex: search, $options: "i" } },
-                { description: { $regex: search, $options: "i" } },
-            ];
-        }
+    const gender = str(q.gender);
+    if (gender) query.gender = gender;
 
-        // Sort Logic
-        let sort = {};
-        if (sortBy) {
-            switch (sortBy) {
-                case "priceAsc": 
-                    sort = { price: 1};
-                    break;
-                case "priceDesc": 
-                    sort = { price: -1};
-                    break;
-                case "popularity": 
-                    sort = { rating: -1};
-                    break;
-                default:
-                    break;
+    const minPrice = Number(str(q.minPrice));
+    const maxPrice = Number(str(q.maxPrice));
+    if (str(q.minPrice) && Number.isFinite(minPrice)) query.price = { ...query.price, $gte: minPrice };
+    if (str(q.maxPrice) && Number.isFinite(maxPrice)) query.price = { ...query.price, $lte: maxPrice };
 
-            }
-        }
-
-    // Fetch products and apply sorting and limit
-    let products = await Product.find(query)
-        .sort(sort)
-        .limit(Number(limit) || 0);
-        res.json(products);
-    } 
-    catch (error) {
-        console.log(error);
-        res.status(500).send("Server error");
+    const search = str(q.search).slice(0, MAX_SEARCH_LENGTH);
+    if (search) {
+      const pattern = escapeRegex(search);
+      query.$or = [
+        { name: { $regex: pattern, $options: "i" } },
+        { description: { $regex: pattern, $options: "i" } },
+      ];
     }
+
+    const sort = SORTS[str(q.sortBy)] || { createdAt: -1 };
+
+    const requested = parseInt(str(q.limit), 10);
+    const limit = Number.isFinite(requested) && requested > 0 ? Math.min(requested, MAX_LIMIT) : MAX_LIMIT;
+
+    const products = await Product.find(query).sort(sort).limit(limit);
+    res.json(products);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-// @route GET /api/products/best-seler/:id
-// @desc Get Best Seler Product by ID
+// @route GET /api/products/best-seller
+// @desc Highest-rated published product
 // @access Public
-router.get("/best-seller", async (req, res) =>{
-    try{
-        const bestSeller = await Product.findOne().sort({ rating: -1 });
-        
-        if (bestSeller){
-            res.json(bestSeller);
-
-        } else {
-            res.status(404).json({ message: "No Best Seller Found"});
-        }
-    }catch(error){
-        console.log(error);
-        res.status(500).send("Server error");
+router.get("/best-seller", async (req, res) => {
+  try {
+    const bestSeller = await Product.findOne(PUBLISHED).sort({ rating: -1 });
+    if (!bestSeller) {
+      return res.status(404).json({ message: "No Best Seller Found" });
     }
-
+    res.json(bestSeller);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-// @route GET /api/products/id:
-// @desc Get New Arrivals Product by ID
+// @route GET /api/products/new-arrivals
+// @desc Latest 8 published products
 // @access Public
 router.get("/new-arrivals", async (req, res) => {
-    try{
-        // Fetch latest 8 products
-        const newArrivals = await Product.find().sort({ createdAt: -1}).limit(8);
-        res.json(newArrivals);
-    } catch(error){
-        console.log(error);
-        res.status(500).send("Server Error");
+  try {
+    const newArrivals = await Product.find(PUBLISHED).sort({ createdAt: -1 }).limit(8);
+    res.json(newArrivals);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// @route GET /api/products/similar/:id
+// @desc Similar published products
+// @access Public
+router.get("/similar/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
+
+    const similarProducts = await Product.find({
+      ...PUBLISHED,
+      _id: { $ne: product._id },
+      gender: product.gender,
+      category: product.category,
+    }).limit(4);
+
+    res.json(similarProducts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
 // @route GET /api/products/:id
-// @desc Get Product by ID
+// @desc Get product by ID. Unpublished products are 404 for customers,
+//       but visible to admins (the admin edit page loads products through this route).
 // @access Public
-router.get("/:id", async (req, res) => {
-   try {
-        const product = await Product.findById(req.params.id);
-        if (product){
-            res.json(product);
-        } else {
-            res.status(404).json({ message: "Product Not Found"});
-        }
-   } catch (error) {
-        console.log(error);
-        res.status(500).send("Server Error");
-   } 
-});
+router.get("/:id", optionalAuth, async (req, res) => {
+  try {
+    const isAdmin = req.user?.role === "admin";
+    const filter = isAdmin ? { _id: req.params.id } : { _id: req.params.id, ...PUBLISHED };
 
-
-// @route GET /api/similar/:id
-// @desc Get Similar Product by ID
-// @access Public
-router.get("/similar/:id", async (req, res) => {
-    const { id } = req.params;
-
-    try{
-        const product = await Product.findById(id);
-
-        if (!product) {
-            return res.status(404).json({ message: "Product not found"});
-        }
-
-        const similarProducts = await Product.find({     
-            _id: { $ne: id}, // Exclude the current product ID
-            gender: product.gender,
-            category: product.category,
-        }).limit(4);
-
-        res.json(similarProducts);
-    } catch(error) {
-        console.log(error);
-        res.status(500).send("Server Error");
+    const product = await Product.findOne(filter);
+    if (!product) {
+      return res.status(404).json({ message: "Product Not Found" });
     }
+    res.json(product);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 });
-
 
 module.exports = router;

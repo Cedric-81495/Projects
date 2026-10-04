@@ -1,80 +1,87 @@
 const express = require("express");
 const Checkout = require("../models/Checkout");
-const Cart = require("../models/Cart");
-const Product = require("../models/Product");
-const Order = require("../models/Order");
 const { protect } = require("../middleware/authMiddleware");
+const { validateObjectIdParam } = require("../middleware/validateObjectId");
+const { priceItems, PricingError } = require("../services/pricingService");
+const { finalizeCheckout } = require("../services/orderService");
 
 const router = express.Router();
+router.param("id", validateObjectIdParam); // invalid IDs -> 404, not 500
+
+const PAYMENT_METHODS = ["GCash", "PayPal"];
+// All required for new checkouts (schema keeps them optional so old orders stay valid)
+const ADDRESS_FIELDS = ["firstName", "lastName", "phone", "address", "city", "postalCode", "country"];
+const PHONE_PATTERN = /^\+?[0-9\s-]{7,20}$/;
+
+// Returns { address } or { error }
+const cleanAddress = (shippingAddress = {}) => {
+  const clean = {};
+  for (const field of ADDRESS_FIELDS) {
+    const value = String(shippingAddress?.[field] ?? "").trim();
+    if (!value) return { error: `Shipping ${field} is required` };
+    clean[field] = value.slice(0, 200);
+  }
+  if (!PHONE_PATTERN.test(clean.phone)) {
+    return { error: "Please enter a valid phone number" };
+  }
+  return { address: clean };
+};
 
 // @route POST /api/checkout
-// @desc Create a new checount session
-// @access Priate
-router.post("/", protect, async (req, res) => {
-    const { checkoutItems, shippingAddress, paymentMethod, totalPrice } = req.body;
-
-    if (!checkoutItems || checkoutItems.length === 0) {
-        return res.status(400).json({ message: "No items in checkout "});
-    }
-
-    try{
-        // Create a new checkout session
-      const newCheckout = await Checkout.create({
-            user: req.user._id,
-            checkoutItems: checkoutItems,
-            shippingAddress,
-            paymentMethod,
-            totalPrice,
-            paymentStatus: "Pending",
-            isPaid: false,
-      });
-
-        console.log(`Checkout created for user: ${req.user._id}`);
-        res.status(201).json(newCheckout);
-    } catch(error){
-        console.log("Error creating checkout session", error);
-        res.status(500).json({ message: "Server error"});
-    }
-});
-
-// @route PUT /api/checkout/:id/pay
-// @desc Update checkout to mark as paid after successful payment
+// @desc Create a new checkout session. Prices and total are computed on the server.
 // @access Private
-router.put("/:id/pay", protect, async (req, res) => {
-    const { paymentStatus, paymentDetails } = req.body;
+router.post("/", protect, async (req, res) => {
+  // Only productId / size / color / quantity are read from checkoutItems.
+  // Any price or totalPrice sent by the client is ignored.
+  const { checkoutItems, shippingAddress, paymentMethod } = req.body;
 
-    try {
-        const checkout = await Checkout.findById(req.params.id);
+  if (!PAYMENT_METHODS.includes(paymentMethod)) {
+    return res.status(400).json({ message: "Invalid payment method" });
+  }
 
-        if (!checkout) {
-            return res.status(404).json({ message: "Checkout not found "});
-        }
+  const { address, error: addressError } = cleanAddress(shippingAddress);
+  if (addressError) {
+    return res.status(400).json({ message: addressError });
+  }
 
-        if (paymentStatus === "paid") {
-            checkout.isPaid = true,
-            checkout.paymentStatus = paymentStatus,
-            checkout.paymentDetails = paymentDetails,
-            checkout.paidAt = Date.now();
-            await checkout.save();
+  try {
+    const { items, totalPrice } = await priceItems(checkoutItems);
 
-            res.status(201).json(checkout);
-        } else {
-            res.status(400).json({ message: "Invalid payment status" });
-        }
-    } catch(error){
-        console.log(error);
-        res.status(500).json({ message: "Server error" });
+    const newCheckout = await Checkout.create({
+      user: req.user._id,
+      checkoutItems: items,
+      shippingAddress: address,
+      paymentMethod,
+      totalPrice,
+      paymentStatus: "pending",
+      isPaid: false,
+    });
+
+    res.status(201).json(newCheckout);
+  } catch (error) {
+    if (error instanceof PricingError) {
+      return res.status(400).json({ message: error.message });
     }
+    console.log("Error creating checkout session", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
-// @route POST /api/checkout/id:/finalize
-// @desc Finalize checkout and convert to an order after confirmation
-// @access Private 
+// NOTE: PUT /api/checkout/:id/pay was REMOVED.
+// It let the client mark its own checkout as paid. Payments are now confirmed only by the
+// server talking to the payment provider:
+//   PayPal -> POST /api/payments/paypal/capture
+//   GCash  -> GET  /api/payments/gcash/verify/:checkoutId  (+ PayMongo webhook)
+
+// @route POST /api/checkout/:id/finalize
+// @desc Convert a paid checkout into an order (idempotent). Normally done automatically by the
+//       payment routes; kept for retrying if that step failed.
+// @access Private (owner only)
 router.post("/:id/finalize", protect, async (req, res) => {
   try {
     const checkout = await Checkout.findById(req.params.id);
 
-    if (!checkout) {
+    if (!checkout || String(checkout.user) !== String(req.user._id)) {
       return res.status(404).json({ message: "Checkout not found" });
     }
 
@@ -82,41 +89,16 @@ router.post("/:id/finalize", protect, async (req, res) => {
       return res.status(400).json({ message: "Checkout is not paid" });
     }
 
-    if (checkout.isFinalized) {
-      return res.status(400).json({ message: "Checkout already finalized" });
+    const order = await finalizeCheckout(checkout._id);
+    if (!order) {
+      return res.status(409).json({ message: "Checkout could not be finalized" });
     }
 
-    // 1Create Order
-    const finalOrder = await Order.create({
-      user: checkout.user,
-      orderItems: checkout.checkoutItems,
-      shippingAddress: checkout.shippingAddress,
-      paymentMethod: checkout.paymentMethod,
-      totalPrice: checkout.totalPrice,
-      isPaid: true,
-      paidAt: checkout.paidAt,
-      isDelivered: false,
-      paymentStatus: "paid",
-      paymentDetails: checkout.paymentDetails,
-    });
-
-    // Mark checkout finalized
-    checkout.isFinalized = true;
-    checkout.finalizedAt = Date.now();
-    await checkout.save();
-
-    // 3CLEAR CART
-    await Cart.findOneAndUpdate(
-      { user: checkout.user },
-      { products: [], totalPrice: 0 }
-    );
-
-    // Optional: also remove guest cart if it exists
-    await Cart.deleteMany({ guestId: { $exists: true }, user: checkout.user });
-
-    res.status(201).json(finalOrder);
-
+    res.status(200).json(order);
   } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(404).json({ message: "Checkout not found" });
+    }
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }

@@ -80,7 +80,12 @@ if (error)
                <div>
                 <h4 className="text-lg font-semibold mb-2">Shipping Info</h4> 
              
-                <p>Address: {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.country}</p>
+                {(orderDetails.shippingAddress.firstName || orderDetails.shippingAddress.lastName) && (
+                  <p>{orderDetails.shippingAddress.firstName} {orderDetails.shippingAddress.lastName}</p>
+                )}
+                <p>{orderDetails.shippingAddress.address}</p>
+                <p>{orderDetails.shippingAddress.city} {orderDetails.shippingAddress.postalCode}, {orderDetails.shippingAddress.country}</p>
+                {orderDetails.shippingAddress.phone && <p>{orderDetails.shippingAddress.phone}</p>}
               </div>
           </div>
           {/* Product list */}

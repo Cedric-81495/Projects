@@ -15,9 +15,13 @@ try {
 }
 
 
+// Unguessable guest IDs (timestamps can be enumerated to find other guests' carts)
+const makeGuestId = () =>
+    `guest_${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`}`;
+
 // Check for an existing guest ID in the localstorage or generate new One
 const initialGuestId =
-    localStorage.getItem("guestId") || `guest_${new Date().getTime()}`;
+    localStorage.getItem("guestId") || makeGuestId();
 localStorage.setItem("guestId", initialGuestId);
 
 // Intial state
@@ -49,7 +53,7 @@ export const loginUser = createAsyncThunk(
             return userWithToken;
         } 
         catch(error) {
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data || { message: "Network error. Please try again." });
         }
     }
 );
@@ -93,14 +97,15 @@ export const registerUser = createAsyncThunk(
             };
 
             localStorage.setItem("userInfo", JSON.stringify(userWithToken));
+            localStorage.setItem("userToken", response.data.token); // was missing for register
 
-// Return user WITH token
-return userWithToken;
+            // Return user WITH token
+            return userWithToken;
 
 
         } 
         catch(error) {
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data || { message: "Network error. Please try again." });
         }
     }
 );
@@ -122,7 +127,7 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         generateNewGuestId: (state) => {
-            state.guestId = `guest_${new Date().getTime()}`;
+            state.guestId = makeGuestId();
             localStorage.setItem("guestId", state.guestId);
         },
 
@@ -176,9 +181,13 @@ const authSlice = createSlice({
             state.loading = false;
             state.user = null;
 
-            state.guestId = `guest_${new Date().getTime()}`;
-            
+            state.guestId = makeGuestId();
+
+            // Remove EVERYTHING tied to this user so the next person on this device
+            // starts clean. (cartSlice also resets its state on logoutUser.fulfilled.)
             localStorage.removeItem("userInfo");
+            localStorage.removeItem("userToken");
+            localStorage.removeItem("cart");
             localStorage.setItem("guestId", state.guestId);
             })
             .addCase(logoutUser.rejected, (state) => {

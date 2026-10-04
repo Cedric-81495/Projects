@@ -14,9 +14,16 @@ const ProtectedRoute = ({ children, role }) => {
      <div className="min-h-screen w-full mx-auto p-6 bg-white fixed inset-0 z-10 text-center">
         <h2 className="pt-[300px] text-2xl font-bold mb-4">Access Denied</h2>
         <p className="mb-6">You do not have permission to view this page.</p>
-        <Link to="/login" state={{ from: location }} className="text-blue-500 underline">
-          Go to Login
-        </Link>
+        {user ? (
+          <Link to="/" className="text-blue-500 underline">Back to Home</Link>
+        ) : (
+          <Link
+            to={`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`}
+            className="text-blue-500 underline"
+          >
+            Go to Login
+          </Link>
+        )}
       </div>
     );
   }

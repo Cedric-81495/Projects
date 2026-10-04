@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import PriceTag from "./PriceTag";
 
 const ProductGrid = ({ products, loading, error }) => {
   if (loading) {
@@ -30,9 +31,7 @@ const ProductGrid = ({ products, loading, error }) => {
           />
         </div>
         <h3 className="text-sm mb-2">{product.name}</h3>
-        <p className="text-gray-500 font-medium text-sm tracking-tighter">
-          ₱{product.price.toLocaleString()}
-        </p>
+        <PriceTag product={product} className="text-gray-500 text-sm tracking-tighter" />
       </div>
     </Link>
   ))}

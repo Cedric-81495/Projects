@@ -1,12 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import registerpage from "../assets/registerpage.jpg"
 import { registerUser } from "../../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { loginWithGoogle } from "../../redux/slices/authSlice";
-import { mergeCart } from "../../redux/slices/cartSlice";
+import usePostLoginRedirect from "../hooks/usePostLoginRedirect";
 import PageWrapper from "../components/Common/PageWrapper"; 
 import { FaEye, FaEyeSlash } from "react-icons/fa";    
 
@@ -15,15 +14,10 @@ const Register = () => {
     const [email, setEmaiil] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const dispath = useDispatch();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { user, guestId, loading, error } = useSelector((state) => state.auth);
-    const { cart } = useSelector((state) => state.cart);
+    const { loading, error } = useSelector((state) => state.auth);
 
-    // Get the redirect parameter and check if it'c checkout or somthing else
-    const redirect = new URLSearchParams(location.search).get("redirect") || "/";
-    const isCheckoutRedirect = redirect.includes("checkout");
+    // Merges the guest cart once, then returns to the page that sent us here
+    const redirect = usePostLoginRedirect();
     const dispatch = useDispatch();
 
     const handleGoogleSuccess = (credentialResponse) => {
@@ -38,21 +32,9 @@ const Register = () => {
     console.error("Google login failed");
     };
 
-    useEffect(() => {
-        if (user) {
-            if (cart?.products?.length > 0 && guestId){
-                dispath(mergeCart({ guestId, user})).then(() => {
-                    navigate(isCheckoutRedirect ? "/checkout" : "/");
-                });
-            } else {
-                navigate(isCheckoutRedirect ? "/checkout" : "/");
-            }
-        }
-    }, [user, guestId, cart, dispath, navigate, isCheckoutRedirect]);
-
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispath(registerUser({ name, email, password }));
+        dispatch(registerUser({ name, email, password }));
         
     }
 

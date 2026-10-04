@@ -14,7 +14,7 @@ Frontend: React, Vite, Tailwind CSS
 State Management: Redux Toolkit
 Authentication: JWT (JSON Web Tokens), Google OAuth (Google Sign-In)
 File Uploads: Cloudinary, Multer
-Payment Methods: PayPal
+Payment Methods: PayPal, GCash (via PayMongo)
 
 Project Description
 
@@ -66,7 +66,7 @@ Admin routes for product, order, and user management
 
 JWT authentication and admin authorization
 
-Google OAuth authentication endpoint (`/api/users/google-login`)
+Google OAuth authentication endpoint (`/api/users/google`)
 
 Image upload via Cloudinary
 
@@ -214,3 +214,31 @@ Google OAuth allows users to login with their Google accounts using a client-sid
 data/ folder is optional but useful for seeding initial data.
 
 Assets in frontend should be organized logically (images, icons, logos) for maintainability.
+
+Setup Scripts (run from backend/)
+
+npm run seed -- --yes          Replace all products with sample data (keeps users; asks to confirm without --yes)
+npm run seed -- --yes --fresh  Also delete all users and carts (local development only)
+npm run publish-existing       One-time: publish products saved before publishing existed
+npm run paymongo:webhook -- https://your-backend-url   Register the GCash webhook and print its secret
+
+The seeder refuses to run when NODE_ENV=production. If no admin exists it creates one from
+SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD, or prints a random password once.
+
+GCash Payments (PayMongo)
+
+1. Create a PayMongo account and copy the test secret key (sk_test_...) from
+   Developers > API Keys into PAYMONGO_SECRET_KEY in backend/.env.
+2. Set FRONTEND_URL to the site customers use (GCash returns them to
+   FRONTEND_URL/payment/gcash/return).
+3. Deploy the backend (webhooks need a public HTTPS URL), then run:
+   npm run paymongo:webhook -- https://your-backend-url
+   and put the printed secret in PAYMONGO_WEBHOOK_SECRET (locally AND on your host).
+4. Test: pick GCash at checkout. PayMongo's test page lets you authorize or fail the payment.
+5. Going live: switch to sk_live_... and run the webhook script again. Test and live
+   webhooks are separate, each with its own secret.
+
+Payment is confirmed two ways: the return page asks the backend to verify with PayMongo,
+and the webhook confirms it independently. Either one creates the order; duplicates are
+impossible. Local testing works without a webhook (the return page handles it).
+GCash limits: minimum PHP 20.00, maximum PHP 100,000.00 per payment.

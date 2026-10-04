@@ -7,6 +7,7 @@ import orderReducer from "./slices/orderSlice";
 import adminReducer from "./slices/adminSlice";
 import adminProductReducer from "./slices/adminProductSlice";
 import adminOrdersReducer from "./slices/adminOrderSlice";
+import { setupAxiosInterceptors } from "../src/utils/axiosSetup";
 
 const store = configureStore({
     reducer: {
@@ -20,5 +21,8 @@ const store = configureStore({
         adminOrders: adminOrdersReducer,
     },
 });
+
+// Register the 401 -> logout interceptor now that the store exists
+setupAxiosInterceptors(store);
 
 export default store;

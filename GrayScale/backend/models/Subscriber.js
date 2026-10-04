@@ -10,7 +10,7 @@ const subscriberSchema = new mongoose.Schema({
     },
     subscribeAt: {
         type: Date,
-        default: Date.now(),
+        default: Date.now, // function reference: evaluated per document, not once at startup
     },
 });
 

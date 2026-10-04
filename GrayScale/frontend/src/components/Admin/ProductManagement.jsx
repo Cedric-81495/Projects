@@ -43,6 +43,7 @@ const ProductManagement = () => {
                         <th className="py-3 px-4">Price</th>
                         <th className="py-3 px-4">Sku</th>
                         <th className="py-3 px-4">Stock</th>
+                        <th className="py-3 px-4">Status</th>
                         <th className="py-3 px-4">Actions</th>
                     </tr>
                 </thead>
@@ -59,7 +60,16 @@ const ProductManagement = () => {
                             <td className="p-4"> {product.category}</td>
                             <td className="p-4"> {product.price}</td>
                             <td className="p-4"> {product.sku}</td>
-                            <td className="p-4"> {product.countInStock}</td>
+                            <td className={`p-4 ${product.countInStock === 0 ? "text-red-600 font-semibold" : ""}`}>
+                                {product.countInStock === 0 ? "Out of stock" : product.countInStock}
+                            </td>
+                            <td className="p-4">
+                                <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                                    product.isPublished ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-700"
+                                }`}>
+                                    {product.isPublished ? "Published" : "Draft"}
+                                </span>
+                            </td>
                             <td className="p-4">
                                 <Link 
                                     to={`/admin/products/${product._id}/edit`}
@@ -76,7 +86,7 @@ const ProductManagement = () => {
                         </tr>  
                         )) : (
                             <tr>
-                                <td colSpan={6} className="p-4 text-gray-500 text-center">No Products Found</td>
+                                <td colSpan={7} className="p-4 text-gray-500 text-center">No Products Found</td>
                             </tr>
                         )}
                 </tbody>

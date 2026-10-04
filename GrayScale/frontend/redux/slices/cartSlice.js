@@ -1,10 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../src/utils/axiosInstance";
+import { logoutUser } from "./authSlice";
 
 // Helper function to load cart from localStorage
 const loadCartFromStorage = () => {
-    const storedCart = localStorage.getItem("cart");
-    return storedCart ? JSON.parse(storedCart) : { products: [] };
+    try {
+        const storedCart = localStorage.getItem("cart");
+        return storedCart ? JSON.parse(storedCart) : { products: [] };
+    } catch {
+        localStorage.removeItem("cart");
+        return { products: [] };
+    }
 };
 
 // Helper function to save the cart
@@ -25,8 +31,10 @@ export const fetchCart = createAsyncThunk(
             );
             return response.data;
         } catch(error) {
-            console.log(error);
-            return rejectWithValue(error.response.data);
+            return rejectWithValue({
+                status: error.response?.status,
+                message: error.response?.data?.message || "Failed to fetch cart",
+            });
         }
     }
 );
@@ -57,7 +65,7 @@ export const addToCart = createAsyncThunk(
             return response.data;
         } catch(error) {
             console.log(error);
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data || { message: "Network error" });
         }
 })
 
@@ -79,7 +87,7 @@ export const updateCartItemQuantity = createAsyncThunk(
             return response.data;
         } catch (error) {   
             console.log(error);
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data || { message: "Network error" });
         }
     }
 );
@@ -117,7 +125,7 @@ export const mergeCart = createAsyncThunk(
             return response.data;
         } catch (error) {
             console.log(error);
-            return rejectWithValue(error.response.data);
+            return rejectWithValue(error.response?.data || { message: "Network error" });
         }
     }
 );
@@ -150,7 +158,21 @@ const cartSlice = createSlice({
         })
         .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to fetch cart";
+        // 404 = no cart on the server yet -> show an empty cart instead of stale local data
+        if (action.payload?.status === 404) {
+            state.cart = { products: [] };
+            state.error = null;
+            localStorage.removeItem("cart");
+        } else {
+            state.error = action.payload?.message || "Failed to fetch cart";
+        }
+        })
+
+        // Logout -> wipe the previous user's cart from memory (authSlice clears storage)
+        .addCase(logoutUser.fulfilled, (state) => {
+        state.cart = { products: [] };
+        state.loading = false;
+        state.error = null;
         })
 
         // Add to Cart

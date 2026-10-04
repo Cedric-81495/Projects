@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState} from "react";
+import { formatPeso, getUnitPrice } from "../../utils/price";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"
 import { Link } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
@@ -142,7 +143,7 @@ const NewArivals = () => {
                     <div className="absolute bottom-0 left-0 right-0 bg-opacity-50 backdrop-blur-md text-white p-4 rounded-b-lg">
                         <Link to={`/product/${product._id}`} className="block">
                             <h4 className="font-medium">{product.name}</h4>
-                            <p className="mt-1">₱{product.price.toLocaleString()}</p>
+                            <p className="mt-1">{formatPeso(getUnitPrice(product))}</p>
                         </Link>
                     </div>
                 </div>

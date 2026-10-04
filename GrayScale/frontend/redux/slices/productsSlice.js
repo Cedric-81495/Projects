@@ -19,7 +19,7 @@ export const fetchProductsByFilters = createAsyncThunk(
     limit,
   }) => {
     const query = new URLSearchParams();
-    if (collection) query.append("collections", collection);
+    if (collection) query.append("collection", collection); // backend reads `collection`
     if (size) query.append("size", size);
     if (color) query.append("color", color);
     if (gender) query.append("gender", gender);
@@ -49,21 +49,8 @@ export const fetchProductDetails = createAsyncThunk(
   }
 );
 
-export const updateProduct = createAsyncThunk(
-  "products/updateProduct",
-  async ({ id, productData }) => {
-    const response = await axiosInstance.put(
-      `/api/products/${id}`,
-      productData,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-        },
-      }
-    );
-    return response.data;
-  }
-);
+// Product writes live in adminProductSlice (/api/admin/products) — the duplicate
+// updateProduct thunk that used the removed public PUT route was deleted.
 
 export const fetchSimilarProducts = createAsyncThunk(
   "products/fetchSimilarProducts",
@@ -150,26 +137,6 @@ const productsSlice = createSlice({
         state.selectedProduct = action.payload;
       })
       .addCase(fetchProductDetails.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-
-      // updateProduct
-      .addCase(updateProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        const updatedProduct = action.payload;
-        const index = state.products.findIndex(
-          (product) => product._id === updatedProduct._id
-        );
-        if (index !== -1) {
-          state.products[index] = updatedProduct;
-        }
-      })
-      .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })

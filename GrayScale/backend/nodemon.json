@@ -1,0 +1,6 @@
+{
+  "watch": [".", ".env"],
+  "ext": "js,json",
+  "ignore": ["node_modules/", "scripts/", "seeder.js", "data/"],
+  "delay": 500
+}

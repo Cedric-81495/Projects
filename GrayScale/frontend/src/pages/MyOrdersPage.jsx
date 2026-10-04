@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchUserOrders } from "../../redux/slices/orderSlice";
 import PageWrapper from "../components/Common/PageWrapper";
+import axiosInstance from "../utils/axiosInstance";
+import { toast } from "sonner";
 
 const MyOrdersPage = () => {
   const navigate = useNavigate();
@@ -10,8 +12,28 @@ const MyOrdersPage = () => {
   const { orders, loading, error } = useSelector((state) => state.orders);
 
   useEffect(() => {
-    // Trigger loading by dispatching the async thunk
-    dispatch(fetchUserOrders());
+    let cancelled = false;
+    (async () => {
+      // First ask the server to re-check any unpaid checkouts with PayMongo/PayPal.
+      // This recovers orders when a customer paid but the confirmation never arrived
+      // (closed the tab, lost signal). Never blocks the page: failures are ignored.
+      try {
+        const { data } = await axiosInstance.post("/api/payments/reconcile", null, { timeout: 15000 });
+        if (!cancelled && data?.recovered?.length) {
+          toast.success(
+            data.recovered.length === 1
+              ? "We found your payment and confirmed your order."
+              : `We found ${data.recovered.length} payments and confirmed your orders.`
+          );
+        }
+      } catch {
+        // ignore: orders still load below
+      }
+      if (!cancelled) dispatch(fetchUserOrders());
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [dispatch]);
 
   const handleRowClick = (orderId) => {

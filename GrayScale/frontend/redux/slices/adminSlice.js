@@ -74,7 +74,8 @@ const adminSlice = createSlice({
         })
         // Update user
         .addCase(updateUser.fulfilled, (state, action) => {
-            const updatedUser = action.payload;
+            // API returns { message, user }
+            const updatedUser = action.payload?.user || action.payload;
             const userIndex = state.users.findIndex(
                 (user) => user._id === updatedUser._id
             );

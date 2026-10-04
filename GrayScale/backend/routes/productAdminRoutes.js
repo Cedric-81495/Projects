@@ -1,112 +1,67 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
 const { protect, admin } = require("../middleware/authMiddleware");
+const { validateObjectIdParam } = require("../middleware/validateObjectId");
+const {
+    pickProductFields,
+    applyProductUpdates,
+    sendProductError,
+} = require("../services/productService");
 
 const router = express.Router();
+router.param("id", validateObjectIdParam); // invalid IDs -> 404, not 500
 
 // @route GET /api/admin/products
 // @desc Get All Products
 // @access Private/Admin
 router.get("/", protect, admin, async (req, res) => {
     try {
-        const products = await Product.find({});
+        const products = await Product.find({}).sort({ createdAt: -1 });
         res.json(products);
-    } catch(error) {
-        console.log(error);
-        res.status(500).json({ message: "Server Error" });
+    } catch (error) {
+        sendProductError(res, error);
     }
 });
 
 // @route POST /api/admin/products
-// @desc  Create a product
+// @desc Create a product
 // @access Private/Admin
 router.post("/", protect, admin, async (req, res) => {
     try {
-         const { 
-                name, 
-                description, 
-                price, 
-                discountPrice, 
-                countInStock, 
-                category, 
-                brand, 
-                sizes, 
-                colors, 
-                collections, 
-                material, 
-                gender, 
-                images,
-                isFeatured, 
-                isPublished, 
-                tags, 
-                dimensions, 
-                weight,
-                sku,
-            } = req.body;
-
-            const product = new Product({     
-                name, 
-                description, 
-                price, 
-                discountPrice, 
-                countInStock, 
-                category, 
-                brand, sizes, 
-                colors, 
-                collections, 
-                material, 
-                gender, 
-                images,
-                isFeatured, 
-                isPublished, 
-                tags, 
-                dimensions, 
-                weight,
-                sku,
-                user: req.user._id, // Reference to the admin user who created the product.
-            });
-            const createdProduct = await product.save();
-            res.status(201).json({ message: "Product created successfully" });
-    } catch(error) {
-            console.log(error);
-            res.status(500).json({ message: "Server Error" });
+        const product = new Product({
+            ...pickProductFields(req.body),
+            user: req.user._id, // admin who created it
+        });
+        const createdProduct = await product.save();
+        // Return the product itself (adminProductSlice pushes action.payload into the list)
+        res.status(201).json(createdProduct);
+    } catch (error) {
+        sendProductError(res, error, "Failed to create product");
     }
 });
 
-// @route PUT /admin/products/:id
-// @desc   Update a product by id
-// @access  Private/Admin
-
+// @route PUT /api/admin/products/:id
+// @desc Update a product by id. Any field present in the body is applied,
+//       including 0 / false (stock 0, unpublish, unfeature).
+// @access Private/Admin
 router.put("/:id", protect, admin, async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(404).json({ message: "Product not found" });
+    }
     try {
         const product = await Product.findById(req.params.id);
-        if (product) {
-            product.name = req.body.name || product.name; 
-            product.description = req.body.description || product.description; 
-            product.price = req.body.price || product.price; 
-            product.discountPrice = req.body.discountPrice || product.discountPrice; 
-            product.countInStock = req.body.countInStock || product.countInStock; 
-            product.category = req.body.category || product.category; 
-            product.brand = req.body.brand || product.brand; 
-            product.sizes = req.body.sizes || product.sizes; 
-            product.colors = req.body.colors || product.colors; 
-            product.collections = req.body.collections || product.collections; 
-            product.material = req.body.material || product.material; 
-            product.gender = req.body.gender || product.gender; 
-            product.images = req.body.images || product.images;
-            product.isFeatured = req.body.isFeatured || product.isFeatured; 
-            product.isPublished = req.body.isPublished || product.isPublished; 
-            product.tags = req.body.tags || product.tags; 
-            product.dimensions = req.body.dimensions || product.dimensions; 
-            product.weight = req.body.weight || product.weight;
-            product.sku = req.body.sku || product.sku;
-            
-            const updatedProduct = await product.save();
-            res.status(201).json({ message: "Product updated successfully", product: updatedProduct });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
         }
-    } catch(error) {
-        console.log(error);
-        res.status(500).json({ message: "Server Error" });
+
+        applyProductUpdates(product, req.body);
+        const updatedProduct = await product.save();
+
+        // Return the product itself (adminProductSlice replaces it by _id)
+        res.status(200).json(updatedProduct);
+    } catch (error) {
+        sendProductError(res, error, "Failed to update product");
     }
 });
 
@@ -114,17 +69,18 @@ router.put("/:id", protect, admin, async (req, res) => {
 // @desc Delete product by ID
 // @access Private/Admin
 router.delete("/:id", protect, admin, async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(404).json({ message: "Product not found" });
+    }
     try {
         const product = await Product.findById(req.params.id);
-        if (product) {
-            const deletedProduct = await product.deleteOne();
-            res.status(201).json({ message: "Product deleted successfully" });
-        } else {
-            res.status(404).json({ message: "Product not found" });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
         }
-    } catch(error) {
-        console.log(error);
-        res.status(500).json({ message: "Server Error" });
+        await product.deleteOne();
+        res.status(200).json({ message: "Product deleted successfully" });
+    } catch (error) {
+        sendProductError(res, error);
     }
 });
 

@@ -12,7 +12,7 @@ const orderItemSchema = new mongoose.Schema({
         },
         image: {
             type: String,
-            required: true,
+            default: "", // not required: a product without images must not block a paid order
         },
         price: {
             type: Number,
@@ -29,6 +29,13 @@ const orderItemSchema = new mongoose.Schema({
 );
 
 const orderSchema = new mongoose.Schema({
+        // Link back to the checkout that produced this order (prevents duplicate orders)
+        checkout: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Checkout",
+            unique: true,
+            sparse: true,
+        },
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -36,6 +43,9 @@ const orderSchema = new mongoose.Schema({
         },
         orderItems: [orderItemSchema],
         shippingAddress: {
+            firstName: { type: String },
+            lastName: { type: String },
+            phone: { type: String },
             address: { type: String, required: true },
             city:  { type: String, required: true },
             postalCode: { type: String, required: true },
@@ -66,6 +76,21 @@ const orderSchema = new mongoose.Schema({
         paymentStatus: {
             type: String,
             default: "pending",
+        },
+        // Items that were paid for but couldn't be taken from stock (sold out between
+        // payment start and confirmation). Admin must restock, fulfil later, or refund.
+        stockShortfall: [
+            {
+                productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+                name: String,
+                size: String,
+                color: String,
+                quantity: Number,
+                _id: false,
+            },
+        ],
+        paymentDetails: {
+            type: mongoose.Schema.Types.Mixed, // PayPal capture / PayMongo payment info
         },
         status: {
             type: String,

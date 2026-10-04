@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchProductDetails } from "../../../redux/slices/productsSlice";
 import { updateProduct } from "../../../redux/slices/adminProductSlice";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance";
+import { toast } from "sonner";
 
 const EditProductPage = () => {
     const dispatch = useDispatch();
@@ -18,6 +19,9 @@ const EditProductPage = () => {
         description: "",
         price: "",
         countInStock: "",
+        discountPrice: "",
+        isPublished: false,
+        isFeatured: false,
         sku: "",
         category: "",
         brand: "",
@@ -58,15 +62,19 @@ const EditProductPage = () => {
 
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("Image must be 5 MB or smaller");
+            e.target.value = "";
+            return;
+        }
         const formData = new FormData();
         formData.append("image", file);
 
         try {
             setUploading(true);
-            const { data } = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/upload`,
-                formData
-            );
+            // axiosInstance attaches the admin's Bearer token (upload is admin-only now)
+            const { data } = await axiosInstance.post("/api/upload", formData);
 
             setProductData((prevData) => ({
                 ...prevData,
@@ -75,14 +83,38 @@ const EditProductPage = () => {
             setUploading(false);
         } catch (error) {
             console.log(error);
+            toast.error(error.response?.data?.message || "Image upload failed");
             setUploading(false);
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleCheckbox = (e) => {
+        const { name, checked } = e.target;
+        setProductData((prev) => ({ ...prev, [name]: checked }));
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(updateProduct({ id, productData }));
-        navigate("/admin/products");
+
+        const price = Number(productData.price);
+        const sale = productData.discountPrice === "" || productData.discountPrice == null
+            ? null
+            : Number(productData.discountPrice);
+        if (sale !== null && (!Number.isFinite(sale) || sale <= 0 || sale >= price)) {
+            toast.error("Sale price must be greater than 0 and lower than the regular price");
+            return;
+        }
+
+        try {
+            // Wait for the server before leaving, so errors are actually shown
+            await dispatch(
+                updateProduct({ id, productData: { ...productData, discountPrice: sale ?? "" } })
+            ).unwrap();
+            toast.success("Product updated");
+            navigate("/admin/products");
+        } catch (message) {
+            toast.error(typeof message === "string" ? message : "Failed to update product");
+        }
     };
 
     if (loading) return <p>Loading edit page...</p>;
@@ -140,6 +172,46 @@ const EditProductPage = () => {
                     className="w-full border border-gray-300 rounded-md p-2"
                 />
             </div>
+            {/* Sale Price */}
+            <div className="mb-6">
+                <label className="block font-semibold mb-2">Sale Price (optional)</label>
+                <input
+                    type="number"
+                    name="discountPrice"
+                    min="0"
+                    step="0.01"
+                    value={productData.discountPrice ?? ""}
+                    onChange={handleChange}
+                    placeholder="Leave empty for no sale"
+                    className="w-full border border-gray-300 rounded-md p-2"
+                />
+                <p className="text-xs text-gray-600 mt-1">
+                    Customers are charged this price when it's lower than the regular price.
+                </p>
+            </div>
+
+            {/* Visibility */}
+            <div className="mb-6 flex flex-wrap gap-6">
+                <label className="flex items-center gap-2 font-semibold cursor-pointer">
+                    <input
+                        type="checkbox"
+                        name="isPublished"
+                        checked={Boolean(productData.isPublished)}
+                        onChange={handleCheckbox}
+                    />
+                    Published (visible in store)
+                </label>
+                <label className="flex items-center gap-2 font-semibold cursor-pointer">
+                    <input
+                        type="checkbox"
+                        name="isFeatured"
+                        checked={Boolean(productData.isFeatured)}
+                        onChange={handleCheckbox}
+                    />
+                    Featured
+                </label>
+            </div>
+
             {/* Sku */}
             <div className="mb-6">
                 <label className="block font-semibold mb-2">SKU</label>
@@ -186,7 +258,8 @@ const EditProductPage = () => {
             {/* Image Upload */}
             <div className="mb-6">
                 <label className="block font-semibold mb-2">Upload Image</label>
-                <input type="file" onChange={handleImageUpload} />
+                <input type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageUpload} />
                  {uploading && <p>Uploading image...</p>}
                 <div className="flex gap-4 mt-4">
                         {productData.images.map((image, index) => (

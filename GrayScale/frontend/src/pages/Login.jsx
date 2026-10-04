@@ -1,12 +1,12 @@
 // frontend/src/pages/Login.jsx
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { GoogleLogin } from "@react-oauth/google";
 import loginpage from "../assets/loginpage.jpg";
 import PageWrapper from "../components/Common/PageWrapper";
 import { loginUser, loginWithGoogle } from "../../redux/slices/authSlice";
-import { mergeCart } from "../../redux/slices/cartSlice";
+import usePostLoginRedirect from "../hooks/usePostLoginRedirect";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 
 const Login = () => {
@@ -14,26 +14,10 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, guestId, loading, error} = useSelector((state) => state.auth);
-  const { cart } = useSelector((state) => state.cart);
+  const { loading, error } = useSelector((state) => state.auth);
 
-  const redirect = new URLSearchParams(location.search).get("redirect") || "/";
-  const isCheckoutRedirect = redirect.includes("checkout");
-
-  // Redirect logic + cart merge
-  useEffect(() => {
-    if (user) {
-      if (cart?.products?.length > 0 && guestId) {
-        dispatch(mergeCart({ guestId, user })).then(() => {
-          navigate(isCheckoutRedirect ? "/checkout" : "/");
-        });
-      } else {
-        navigate(isCheckoutRedirect ? "/checkout" : "/");
-      }
-    }
-  }, [user, guestId, cart, dispatch, navigate, isCheckoutRedirect]);
+  // Merges the guest cart once, then returns to the page that sent us here (e.g. /order/123)
+  const redirect = usePostLoginRedirect();
 
   // Email/password login
   const handleSubmit = (e) => {

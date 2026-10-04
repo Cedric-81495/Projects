@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PriceTag from "./PriceTag";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -50,7 +51,9 @@ const ProductDetails = ({ productId }) => {
   }, [dispatch, productFetchId]);
 
   const handleQuantityChange = (action) => {
-    if (action === "plus") setQuantity((prev) => prev + 1);
+    // Don't let the selector go past what's in stock (server enforces this too)
+    const maxQty = Math.max(Number(selectedProduct?.countInStock) || 0, 1);
+    if (action === "plus") setQuantity((prev) => Math.min(prev + 1, maxQty));
     if (action === "minus" && quantity > 1) setQuantity((prev) => prev - 1);
   };
 
@@ -75,7 +78,8 @@ const ProductDetails = ({ productId }) => {
     )
       .unwrap()
       .then(() => toast.success("Product added to cart!", { duration: 1000 }))
-      .catch(() => toast.error("Failed to add product to cart.", { duration: 1000 }))
+      // Show the server's reason (e.g. "Only 2 more available", "This item is out of stock")
+      .catch((err) => toast.error(err?.message || "Failed to add product to cart.", { duration: 2500 }))
       .finally(() => setIsButtonDisabled(false));
   };
     
@@ -160,13 +164,8 @@ if (error)
                             {selectedProduct.name}
                         </h1>
                         {/* Price */}
-                        <p className='text-sm text-gray-600 mb-1 line-through'>
-                            ₱{selectedProduct.price && `${selectedProduct.price.toLocaleString()}`}
-                        </p>
-                    
-                        <p className='text-lg text-gray-500 mb-2'>
-                        ₱{selectedProduct.discountPrice && `${selectedProduct.discountPrice.toLocaleString()}`}
-                        </p>
+                        {/* Same rule the cart & checkout charge (utils/price.js) */}
+                        <PriceTag product={selectedProduct} large className="mb-2 text-gray-700" />
                         <p className='text-lg text-gray-600 mb-1'>{selectedProduct.description}</p>
                         {/* Colors */}
                         <div className="mb-4">
@@ -229,12 +228,20 @@ if (error)
                                 </button>
                             </div>
                         </div>
+                        {selectedProduct.countInStock > 0 && selectedProduct.countInStock <= 5 && (
+                            <p className="text-sm text-red-600 mb-2">Only {selectedProduct.countInStock} left</p>
+                        )}
                         <button 
                             onClick={handleAddToCart}
+                            disabled={isButtonDisabled || selectedProduct.countInStock === 0}
                             className={`bg-black text-white rounded  py-2 px-6 w-full ${
-                                isButtonDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-900"
+                                isButtonDisabled || selectedProduct.countInStock === 0
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : "hover:bg-gray-900"
                             }`}>
-                            {isButtonDisabled ? "ADDING..." : "ADD TO CART"}
+                            {selectedProduct.countInStock === 0
+                                ? "OUT OF STOCK"
+                                : isButtonDisabled ? "ADDING..." : "ADD TO CART"}
                         </button>
 
                         <div className='mt-10 text-gray-700'>

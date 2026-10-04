@@ -1,7 +1,11 @@
 const jwt = require("jsonwebtoken");
 
-const generateToken = (user) => {
-  return jwt.sign(
+// Single place that issues JWTs, so every login method gets the same payload and expiry.
+// Set JWT_EXPIRES_IN in .env (e.g. "1d", "12h"); defaults to 1 day.
+const TOKEN_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
+
+const generateToken = (user) =>
+  jwt.sign(
     {
       user: {
         id: user._id,
@@ -9,8 +13,7 @@ const generateToken = (user) => {
       },
     },
     process.env.JWT_SECRET,
-    { expiresIn: "5h" }
+    { expiresIn: TOKEN_EXPIRES_IN }
   );
-};
 
 module.exports = generateToken;

@@ -1,8 +1,10 @@
 const express = require("express");
 const Order = require("../models/Order");
 const { protect, admin } = require("../middleware/authMiddleware");
+const { validateObjectIdParam } = require("../middleware/validateObjectId");
 
 const router = express.Router();
+router.param("id", validateObjectIdParam); // invalid IDs -> 404, not 500
 
 // @router GET /api/admin/orders
 // @desc Get all Orders
@@ -22,6 +24,10 @@ router.get("/", protect, admin, async (req, res) => {
 // @acces Private/Admin
 router.put("/:id", protect, admin, async (req, res) => {
     try {
+        const ORDER_STATUSES = ["Processing", "Shipped", "Delivered", "Cancelled"];
+        if (req.body.status !== undefined && !ORDER_STATUSES.includes(req.body.status)) {
+            return res.status(400).json({ message: "Invalid order status" });
+        }
         const order = await Order.findById(req.params.id);
         if (order) {
             order.status = req.body.status || order.status;
@@ -51,7 +57,7 @@ router.delete("/:id", protect, admin, async (req, res) => {
         const order = await Order.findById(req.params.id);
         if (order) {
             await order.deleteOne();
-            res.status(201).json({ message: "Order removed" });
+            res.status(200).json({ message: "Order removed" });
         } else {
              res.status(404).json({ message: "Order not found" });
         }

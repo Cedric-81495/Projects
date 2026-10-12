@@ -111,10 +111,13 @@ summary:focus-visible {
   color: #FFFFFF;
   box-shadow: 0 8px 20px -8px rgba(16, 42, 67, 0.45);
   border: 1px solid var(--gold-dark);
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .btn-primary:hover {
-  background: var(--maroon);
+  background: var(--gold-light);
+  color: var(--maroon);
+  border-color: var(--gold-dark);
 }
 
 .btn-ghost {

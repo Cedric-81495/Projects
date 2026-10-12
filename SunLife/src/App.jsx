@@ -68,9 +68,9 @@ function Header() {
       </a>
       <nav className="site-nav">
         <a href="#about">About</a>
-        <a href="#services">Services</a>
-        <a href="#process">Process</a>
-        <a href="#faq">FAQ</a>
+        <a href="#services">Products</a>
+        <a href="#achievements">Achievements</a>
+        <a href="#testimonials">Testimonials</a>
         <a href="#contact" className="btn btn-primary btn-sm">Book a consultation</a>
       </nav>
     </header>
@@ -133,11 +133,14 @@ const ACHIEVEMENTS = [
   { title: 'Monthly Champions Awardee', body: 'Recognized for consistent monthly results.' },
   { title: 'Top Advisor recognition', body: "Ranked among the agency's leading advisors." },
   { title: 'Team recognition award', body: 'Celebrated alongside colleagues for collective results.' },
+  { title: 'Hall of Fame Qualifier', body: 'Reached career-milestone status within the agency.' },
+  { title: 'Client Retention Award', body: 'Recognized for keeping client relationships strong year after year.' },
+  { title: 'New Business Leader, Q2 2025', body: 'Top new-business producer in the branch for the quarter.' },
 ]
 
 function Achievements() {
   return (
-    <section className="section achievements section-wash">
+    <section id="achievements" className="section achievements section-wash">
       <h2 className="section-heading" style={{ marginBottom: '8px' }}>Recognition along the way</h2>
       <p className="achievements-note">
         These mark consistency, not the point of the work — that's still your family's peace of mind.
@@ -348,11 +351,23 @@ const TESTIMONIALS = [
     quote: '[Testimonial placeholder — ask a client for a short quote about their experience with you.]',
     who: '[Client descriptor placeholder]',
   },
+  {
+    quote: '[Testimonial placeholder — ask a client for a short quote about their experience with you.]',
+    who: '[Client descriptor placeholder]',
+  },
+  {
+    quote: '[Testimonial placeholder — ask a client for a short quote about their experience with you.]',
+    who: '[Client descriptor placeholder]',
+  },
+  {
+    quote: '[Testimonial placeholder — ask a client for a short quote about their experience with you.]',
+    who: '[Client descriptor placeholder]',
+  },
 ]
 
 function Testimonials() {
   return (
-    <section className="section testimonials">
+    <section id="testimonials" className="section testimonials">
       <h2 className="section-heading" style={{ marginBottom: '8px' }}>What clients say</h2>
       <p className="testimonials-note">[Replace with real, permissioned client quotes before this goes live.]</p>
       <div className="testimonial-grid">

@@ -6,16 +6,12 @@ import { Footer } from './Footer.jsx'
 // ---------------------------------------------------------------
 // Systeme.io integration
 // ---------------------------------------------------------------
-// Replace this with the real endpoint once it's available:
-//   - If using a Systeme.io "Form" element on a funnel page, open the
-//     form's embed/share settings and copy its POST action URL here.
-//   - If using Systeme.io's API instead, point this at your own
-//     backend/serverless function (don't call a secret-keyed API
-//     directly from the browser), and have that function forward
-//     the lead to Systeme.io.
-// Until this is set, submissions are only logged to the browser
-// console so the flow can be tested end-to-end.
-const SYSTEME_IO_FORM_ACTION = '[SYSTEME.IO FORM ACTION URL PLACEHOLDER]'
+// This form always submits to our own /api/submit-consultation
+// serverless function — never directly to Systeme.io. That function
+// holds the real API key server-side and is the only thing that
+// needs to change once the client pays for a plan. See
+// api/submit-consultation.js for the full setup steps.
+const SUBMIT_ENDPOINT = '/api/submit-consultation'
 
 const TRUST_POINTS = [
   "Forty-five minutes, start to finish — I won't run over.",
@@ -93,6 +89,10 @@ export function BookConsultation() {
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
   const [contact, setContact] = useState({ fullName: '', mobile: '', email: '' })
+  // Honeypot: a hidden field real visitors never see or fill in.
+  // Bots that auto-fill every input on the page will fill this one,
+  // which tells the server to quietly discard the submission.
+  const [website, setWebsite] = useState('')
   const [status, setStatus] = useState('form') // 'form' | 'submitting' | 'done' | 'error'
 
   const isContactStep = step === QUESTIONS.length
@@ -111,27 +111,24 @@ export function BookConsultation() {
     setStatus('submitting')
 
     const payload = {
-      name: contact.fullName,
+      fullName: contact.fullName,
       email: contact.email,
-      phone: contact.mobile,
-      ...answers,
-    }
-
-    const isPlaceholder = SYSTEME_IO_FORM_ACTION.startsWith('[')
-
-    if (isPlaceholder) {
-      // No endpoint configured yet — log so the flow is testable locally.
-      console.log('[BookConsultation] Lead captured (Systeme.io not yet connected):', payload)
-      setStatus('done')
-      return
+      mobile: contact.mobile,
+      answers,
+      website, // honeypot — should always be empty for real visitors
     }
 
     try {
-      await fetch(SYSTEME_IO_FORM_ACTION, {
+      const res = await fetch(SUBMIT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
+
+      if (!res.ok) {
+        throw new Error(`Submission failed with status ${res.status}`)
+      }
+
       setStatus('done')
     } catch (err) {
       console.error('[BookConsultation] Submission failed:', err)
@@ -194,6 +191,8 @@ export function BookConsultation() {
                   <ContactStep
                     contact={contact}
                     setContact={setContact}
+                    website={website}
+                    setWebsite={setWebsite}
                     onSubmit={handleSubmit}
                     submitting={status === 'submitting'}
                     error={status === 'error'}
@@ -236,13 +235,29 @@ function QuestionStep({ question, selected, onSelect }) {
   )
 }
 
-function ContactStep({ contact, setContact, onSubmit, submitting, error }) {
+function ContactStep({ contact, setContact, website, setWebsite, onSubmit, submitting, error }) {
   return (
     <form className="consult-step consult-contact-form" onSubmit={onSubmit}>
       <h2 className="consult-question">Where should I reach you?</h2>
       <p className="consult-contact-note">
         I reply personally, usually within a day. Whatever you share stays between us.
       </p>
+
+      {/* Honeypot — hidden from real visitors, invisible to screen readers,
+          but still present in the DOM for bots that auto-fill every field. */}
+      <div className="consult-honeypot" aria-hidden="true">
+        <label>
+          Website
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
+        </label>
+      </div>
 
       <label className="consult-field">
         <span>Full name</span>

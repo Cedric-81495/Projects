@@ -390,10 +390,94 @@ summary:focus-visible {
   padding: 24px;
   border: 1px solid var(--stone);
   border-radius: var(--radius);
+  background: var(--surface);
+  height: 100%;
 }
 
 .testimonial-card p:first-child { margin-bottom: 16px; font-style: italic; }
 .testimonial-card p:last-child { color: var(--muted); font-size: 14px; }
+
+/* ---------- Auto-scrolling carousel ---------- */
+
+.carousel {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 48px, #000 calc(100% - 48px), transparent 100%);
+}
+
+.carousel-track {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+  animation-name: carousel-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: paused;
+  padding-block: 4px;
+}
+
+@keyframes carousel-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.carousel-item {
+  flex: 0 0 auto;
+  width: min(340px, 82vw);
+}
+
+.carousel-toggle {
+  margin-top: 20px;
+  background: none;
+  border: 1px solid var(--stone);
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.carousel-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------- Achievements ---------- */
+
+.achievements-note {
+  margin-bottom: 32px;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.achievement-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.achievement-photo {
+  aspect-ratio: 4 / 3;
+}
+
+.achievement-card h3 { font-size: 16px; }
+.achievement-card p { color: var(--muted); font-size: 14px; }
+
+/* ---------- Scroll-triggered reveal (per section item) ---------- */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
 
 /* ---------- FAQ ---------- */
 
@@ -558,6 +642,22 @@ summary:focus-visible {
   }
 
   .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .carousel {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .carousel-track {
+    animation: none !important;
+  }
+
+  .scroll-reveal {
     opacity: 1;
     transform: none;
     transition: none;

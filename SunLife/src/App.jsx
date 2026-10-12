@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { AutoCarousel } from './Carousel.jsx'
+import { Reveal } from './Reveal.jsx'
 
 export default function App() {
   const [revealed, setRevealed] = useState(false)
@@ -20,6 +22,7 @@ export default function App() {
         <Header />
         <Hero />
         <TrustStrip />
+        <Achievements />
         <Story />
         <WhyChoose />
         <ProblemCascade />
@@ -90,6 +93,38 @@ function TrustStrip() {
   )
 }
 
+const ACHIEVEMENTS = [
+  { title: '7-time Medallion Awardee', body: 'Recognized for consistent service, year over year.' },
+  { title: 'Grand Slam Awardee, 2024', body: 'Advisor-level recognition for outstanding performance.' },
+  { title: "President's Club recognition", body: 'Honored among top-performing advisors company-wide.' },
+  { title: 'Monthly Champions Awardee', body: 'Recognized for consistent monthly results.' },
+  { title: 'Top Advisor recognition', body: "Ranked among the agency's leading advisors." },
+  { title: 'Team recognition award', body: 'Celebrated alongside colleagues for collective results.' },
+]
+
+function Achievements() {
+  return (
+    <section className="section achievements">
+      <h2 className="section-heading" style={{ marginBottom: '8px' }}>Recognition along the way</h2>
+      <p className="achievements-note">
+        These mark consistency, not the point of the work — that's still your family's peace of mind.
+      </p>
+      <AutoCarousel
+        items={ACHIEVEMENTS}
+        ariaLabel="Awards and recognition"
+        speed={38}
+        renderItem={(item) => (
+          <div className="achievement-card">
+            <div className="photo-placeholder achievement-photo">[Award photo]</div>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </div>
+        )}
+      />
+    </section>
+  )
+}
+
 function Story() {
   return (
     <section id="about" className="section story">
@@ -125,11 +160,11 @@ function WhyChoose() {
     <section className="section section-tight">
       <h2 className="section-heading">Why clients choose to work with me</h2>
       <div className="feature-grid">
-        {CHOICE_FEATURES.map((f) => (
-          <div className="feature-card" key={f.title}>
+        {CHOICE_FEATURES.map((f, i) => (
+          <Reveal as="div" className="feature-card" delay={i * 80} key={f.title}>
             <h3>{f.title}</h3>
             <p>{f.body}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -154,14 +189,14 @@ function ProblemCascade() {
         </p>
       </div>
       <div className="problem-grid">
-        {CASCADE.map((item) => (
-          <div className="problem-item" key={item.n}>
+        {CASCADE.map((item, i) => (
+          <Reveal as="div" className="problem-item" delay={i * 90} key={item.n}>
             <span className="problem-num">{item.n}</span>
             <div>
               <h3>{item.title}</h3>
               <p>{item.body}</p>
             </div>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -182,12 +217,12 @@ function Process() {
         <p>Three unhurried steps. Nothing is decided until you're ready.</p>
       </div>
       <div className="process-grid">
-        {STEPS.map((step) => (
-          <div key={step.n}>
+        {STEPS.map((step, i) => (
+          <Reveal delay={i * 100} key={step.n}>
             <span className="step-badge">{step.n}</span>
             <h3>{step.title}</h3>
             <p>{step.body}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -209,11 +244,11 @@ function Services() {
         <p>Every plan below is a starting point, not a fixed package. Which one fits depends on your goals, worked out together.</p>
       </div>
       <div className="service-grid">
-        {SERVICES.map((s) => (
-          <div className="service-card" key={s.title}>
+        {SERVICES.map((s, i) => (
+          <Reveal as="div" className="service-card" delay={i * 80} key={s.title}>
             <h3>{s.title}</h3>
             <p>{s.body}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -245,29 +280,43 @@ function WhyWork() {
     <section className="section section-tight">
       <h2 className="section-heading">The kind of guidance that stays with you</h2>
       <div className="why-grid">
-        {WHY_WORK.map((w) => (
-          <div key={w.title}>
+        {WHY_WORK.map((w, i) => (
+          <Reveal delay={i * 70} key={w.title}>
             <h3>{w.title}</h3>
             <p>{w.body}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
   )
 }
 
+const TESTIMONIALS = [
+  {
+    quote: '[Testimonial placeholder — ask a client for a short quote about their experience with you.]',
+    who: '[Client descriptor placeholder]',
+  },
+  {
+    quote: '[Testimonial placeholder — ask a client for a short quote about their experience with you.]',
+    who: '[Client descriptor placeholder]',
+  },
+  {
+    quote: '[Testimonial placeholder — ask a client for a short quote about their experience with you.]',
+    who: '[Client descriptor placeholder]',
+  },
+]
+
 function Testimonials() {
-  const placeholders = [1, 2, 3]
   return (
     <section className="section testimonials">
       <h2 className="section-heading" style={{ marginBottom: '8px' }}>What clients say</h2>
       <p className="testimonials-note">[Replace with real, permissioned client quotes before this goes live.]</p>
       <div className="testimonial-grid">
-        {placeholders.map((i) => (
-          <div className="testimonial-card" key={i}>
-            <p>"[Testimonial placeholder — ask a client for a short quote about their experience with you.]"</p>
-            <p>[Client descriptor placeholder]</p>
-          </div>
+        {TESTIMONIALS.map((item, i) => (
+          <Reveal as="div" className="testimonial-card" delay={i * 80} key={item.who + i}>
+            <p>"{item.quote}"</p>
+            <p>{item.who}</p>
+          </Reveal>
         ))}
       </div>
     </section>

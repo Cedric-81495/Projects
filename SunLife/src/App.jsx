@@ -1,6 +1,35 @@
 import { useEffect, useState } from 'react'
+import {
+  Clock,
+  Award,
+  MapPin,
+  ShieldCheck,
+  HeartHandshake,
+  Ruler,
+  LifeBuoy,
+  MessageSquareText,
+  HeartPulse,
+  Coins,
+  PiggyBank,
+  MessageCircle,
+  Target,
+  Compass,
+  Handshake,
+  CheckCircle2,
+  ImageIcon,
+} from 'lucide-react'
 import { AutoCarousel } from './Carousel.jsx'
 import { Reveal } from './Reveal.jsx'
+import { IconTile } from './IconTile.jsx'
+
+function PhotoPlaceholder({ label, className = '' }) {
+  return (
+    <div className={`photo-placeholder${className ? ` ${className}` : ''}`}>
+      <ImageIcon size={22} strokeWidth={1.5} />
+      <span>{label}</span>
+    </div>
+  )
+}
 
 export default function App() {
   const [revealed, setRevealed] = useState(false)
@@ -19,6 +48,7 @@ export default function App() {
       </div>
 
       <div className={`page${revealed ? ' is-revealed' : ''}`}>
+        <div className="top-ribbon" aria-hidden="true" />
         <Header />
         <Hero />
         <TrustStrip />
@@ -74,20 +104,29 @@ function Hero() {
         </div>
       </div>
       <div className="hero-media reveal reveal-5">
-        <div className="photo-placeholder">[Advisor photo]</div>
+        <PhotoPlaceholder label="[Advisor photo]" />
       </div>
     </section>
   )
 }
 
+const TRUST_ITEMS = [
+  { icon: Clock, text: '[X]+ years guiding families through financial decisions' },
+  { icon: Award, text: '[Award or recognition placeholder]' },
+  { icon: MapPin, text: 'Serving [region placeholder] — online and in person' },
+  { icon: ShieldCheck, text: 'Licensed, independent, obligation-free consultations' },
+]
+
 function TrustStrip() {
   return (
     <section className="trust-strip">
       <div className="trust-grid">
-        <div>[X]+ years guiding families through financial decisions</div>
-        <div>[Award or recognition placeholder]</div>
-        <div>Serving [region placeholder] — online and in person</div>
-        <div>Licensed, independent, obligation-free consultations</div>
+        {TRUST_ITEMS.map((item, i) => (
+          <div className="trust-item" key={i}>
+            <IconTile icon={item.icon} tone="dark" size={18} />
+            <span>{item.text}</span>
+          </div>
+        ))}
       </div>
     </section>
   )
@@ -104,7 +143,7 @@ const ACHIEVEMENTS = [
 
 function Achievements() {
   return (
-    <section className="section achievements">
+    <section className="section achievements section-wash">
       <h2 className="section-heading" style={{ marginBottom: '8px' }}>Recognition along the way</h2>
       <p className="achievements-note">
         These mark consistency, not the point of the work — that's still your family's peace of mind.
@@ -115,7 +154,7 @@ function Achievements() {
         speed={38}
         renderItem={(item) => (
           <div className="achievement-card">
-            <div className="photo-placeholder achievement-photo">[Award photo]</div>
+            <PhotoPlaceholder label="[Award photo]" className="achievement-photo" />
             <h3>{item.title}</h3>
             <p>{item.body}</p>
           </div>
@@ -129,7 +168,7 @@ function Story() {
   return (
     <section id="about" className="section story">
       <div className="story-media">
-        <div className="photo-placeholder">[Advisor photo — at work]</div>
+        <PhotoPlaceholder label="[Advisor photo — at work]" />
       </div>
       <div className="story-copy">
         <h2>Why I do this work</h2>
@@ -149,10 +188,10 @@ function Story() {
 }
 
 const CHOICE_FEATURES = [
-  { title: 'No sales pressure', body: 'You leave the first conversation with clarity, whether or not you decide to move forward.' },
-  { title: 'Plans sized to your life', body: 'Your coverage is built around your budget and your priorities, not a template.' },
-  { title: "Support that doesn't end at signing", body: "I'm here for reviews, questions, and claims long after the paperwork is done." },
-  { title: 'Plain-language explanations', body: "You'll understand exactly what you own and why, before you sign anything." },
+  { icon: HeartHandshake, title: 'No sales pressure', body: 'You leave the first conversation with clarity, whether or not you decide to move forward.' },
+  { icon: Ruler, title: 'Plans sized to your life', body: 'Your coverage is built around your budget and your priorities, not a template.' },
+  { icon: LifeBuoy, title: "Support that doesn't end at signing", body: "I'm here for reviews, questions, and claims long after the paperwork is done." },
+  { icon: MessageSquareText, title: 'Plain-language explanations', body: "You'll understand exactly what you own and why, before you sign anything." },
 ]
 
 function WhyChoose() {
@@ -162,6 +201,7 @@ function WhyChoose() {
       <div className="feature-grid">
         {CHOICE_FEATURES.map((f, i) => (
           <Reveal as="div" className="feature-card" delay={i * 80} key={f.title}>
+            <IconTile icon={f.icon} />
             <h3>{f.title}</h3>
             <p>{f.body}</p>
           </Reveal>
@@ -230,10 +270,10 @@ function Process() {
 }
 
 const SERVICES = [
-  { title: 'Income protection', body: 'Coverage that keeps your household running if your income is interrupted.' },
-  { title: 'Critical illness coverage', body: "A payout you can use for treatment or recovery, so illness doesn't have to be funded by selling something." },
-  { title: 'Investment-linked life insurance', body: 'Protection and growth working together, pointed at a goal you can actually name.' },
-  { title: 'Retirement planning', body: 'A dependable income stream for the years when a paycheck no longer arrives.' },
+  { icon: ShieldCheck, title: 'Income protection', body: 'Coverage that keeps your household running if your income is interrupted.' },
+  { icon: HeartPulse, title: 'Critical illness coverage', body: "A payout you can use for treatment or recovery, so illness doesn't have to be funded by selling something." },
+  { icon: Coins, title: 'Investment-linked life insurance', body: 'Protection and growth working together, pointed at a goal you can actually name.' },
+  { icon: PiggyBank, title: 'Retirement planning', body: 'A dependable income stream for the years when a paycheck no longer arrives.' },
 ]
 
 function Services() {
@@ -246,6 +286,7 @@ function Services() {
       <div className="service-grid">
         {SERVICES.map((s, i) => (
           <Reveal as="div" className="service-card" delay={i * 80} key={s.title}>
+            <IconTile icon={s.icon} tone="dark" />
             <h3>{s.title}</h3>
             <p>{s.body}</p>
           </Reveal>
@@ -268,20 +309,21 @@ function Quote() {
 }
 
 const WHY_WORK = [
-  { title: 'Client-first conversations', body: "We begin with your life and goals, never with a product I'm trying to sell." },
-  { title: 'Plans sized to your goals', body: 'Your plan fits your budget and priorities, not a one-size template.' },
-  { title: 'Clear, pressure-free guidance', body: 'Honest answers and all the time you need to decide.' },
-  { title: 'A relationship, not a transaction', body: "I'm here after the paperwork too, for reviews, questions, and claims." },
-  { title: 'Full understanding before you sign', body: "You'll know exactly what you own and why." },
+  { icon: MessageCircle, title: 'Client-first conversations', body: "We begin with your life and goals, never with a product I'm trying to sell." },
+  { icon: Target, title: 'Plans sized to your goals', body: 'Your plan fits your budget and priorities, not a one-size template.' },
+  { icon: Compass, title: 'Clear, pressure-free guidance', body: 'Honest answers and all the time you need to decide.' },
+  { icon: Handshake, title: 'A relationship, not a transaction', body: "I'm here after the paperwork too, for reviews, questions, and claims." },
+  { icon: CheckCircle2, title: 'Full understanding before you sign', body: "You'll know exactly what you own and why." },
 ]
 
 function WhyWork() {
   return (
-    <section className="section section-tight">
+    <section className="section section-tight section-wash">
       <h2 className="section-heading">The kind of guidance that stays with you</h2>
       <div className="why-grid">
         {WHY_WORK.map((w, i) => (
           <Reveal delay={i * 70} key={w.title}>
+            <IconTile icon={w.icon} />
             <h3>{w.title}</h3>
             <p>{w.body}</p>
           </Reveal>
@@ -381,6 +423,13 @@ function FinalCTA() {
   )
 }
 
+const WHO_I_HELP = [
+  'Healthcare professionals',
+  'Business owners & entrepreneurs',
+  'OFWs & remote workers',
+  'Parents & young families',
+]
+
 function Footer() {
   return (
     <footer className="site-footer">
@@ -389,12 +438,23 @@ function Footer() {
           <div className="footer-brand-name">[Firm Name]</div>
           <p>[Advisor Name], licensed financial advisor with [Company Name]. Serving [region placeholder].</p>
         </div>
-        <nav className="footer-nav">
-          <a href="#about">About</a>
-          <a href="#services">Services</a>
-          <a href="#faq">FAQ</a>
-          <a href="#contact">Contact</a>
-        </nav>
+        <div className="footer-col">
+          <div className="footer-col-title">Who I help</div>
+          <nav className="footer-nav">
+            {WHO_I_HELP.map((who) => (
+              <a href="#" key={who}>{who}</a>
+            ))}
+          </nav>
+        </div>
+        <div className="footer-col">
+          <div className="footer-col-title">Get in touch</div>
+          <nav className="footer-nav">
+            <a href="#about">About</a>
+            <a href="#services">Services</a>
+            <a href="#faq">FAQ</a>
+            <a href="#contact">Contact</a>
+          </nav>
+        </div>
       </div>
       <p className="footer-legal">
         [Advisor Name] is a licensed financial advisor with [Company Name]. This site is for

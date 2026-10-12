@@ -218,61 +218,128 @@ export default async function handler(req, res) {
     return
   }
 
-  // ---- Live mode: actually create the contact + tags in Systeme.io ----
+  // ---- Live mode: create or update the contact, then tag it ----
+  const fields = [
+    { slug: BUILTIN_SLUGS.first_name, value: splitName(fullName).first },
+    { slug: BUILTIN_SLUGS.last_name, value: splitName(fullName).last },
+    { slug: BUILTIN_SLUGS.phone, value: normalisePhone(mobile) },
+    { slug: FIELD_SLUGS.reason, value: answers.reason },
+    { slug: FIELD_SLUGS.who_for, value: answers.who_for },
+    { slug: FIELD_SLUGS.timing, value: answers.timing },
+    { slug: FIELD_SLUGS.budget, value: answers.budget },
+    { slug: FIELD_SLUGS.walkthrough, value: answers.walkthrough },
+    { slug: FIELD_SLUGS.health, value: answers.health },
+  ]
+
   try {
-    const createRes = await fetch(`${SYSTEME_API_BASE}/contacts`, {
+    let contactId = null
+
+    // 1. Try to create a new contact.
+    const createRes = await systemeFetch(apiKey, '/contacts', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': apiKey,
-      },
-      body: JSON.stringify({
-        email,
-        fields: [
-          { slug: BUILTIN_SLUGS.first_name, value: splitName(fullName).first },
-          { slug: BUILTIN_SLUGS.last_name, value: splitName(fullName).last },
-          { slug: BUILTIN_SLUGS.phone, value: normalisePhone(mobile) },
-          { slug: FIELD_SLUGS.reason, value: answers.reason },
-          { slug: FIELD_SLUGS.who_for, value: answers.who_for },
-          { slug: FIELD_SLUGS.timing, value: answers.timing },
-          { slug: FIELD_SLUGS.budget, value: answers.budget },
-          { slug: FIELD_SLUGS.walkthrough, value: answers.walkthrough },
-          { slug: FIELD_SLUGS.health, value: answers.health },
-        ],
-      }),
+      body: JSON.stringify({ email, fields }),
     })
 
-    if (!createRes.ok) {
-      const errorBody = await createRes.text()
-      console.error('[submit-consultation] Systeme.io contact creation failed:', createRes.status, errorBody)
-      res.status(502).json({ error: 'Could not reach Systeme.io' })
-      return
+    if (createRes.ok) {
+      contactId = (await createRes.json()).id
+    } else {
+      // 2. Creation failed. The usual reason is that this email is
+      //    already a contact (someone filling in the form twice), so
+      //    look them up and update their answers instead of failing.
+      const createError = await createRes.text()
+      contactId = await findContactIdByEmail(apiKey, email)
+
+      if (!contactId) {
+        console.error('[submit-consultation] Contact creation failed:', createRes.status, createError)
+        res.status(502).json({ error: 'Could not save contact' })
+        return
+      }
+
+      const updateRes = await systemeFetch(apiKey, `/contacts/${contactId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/merge-patch+json' },
+        body: JSON.stringify({ fields }),
+      })
+
+      if (!updateRes.ok) {
+        console.error('[submit-consultation] Contact update failed:', updateRes.status, await updateRes.text())
+        res.status(502).json({ error: 'Could not update contact' })
+        return
+      }
+      console.log(`[submit-consultation] Existing contact ${contactId} updated with new answers.`)
     }
 
-    const contact = await createRes.json()
-    const contactId = contact.id
-
-    // Assign each computed tag. Done sequentially and best-effort —
-    // a tag failure shouldn't fail the whole submission, since the
-    // contact itself is already saved at this point.
+    // 3. Assign tags. Systeme.io assigns tags by numeric ID, not by
+    //    name, so each tag name is looked up first. Tags that don't
+    //    exist in the account (e.g. not created yet on the free plan)
+    //    are skipped and logged; the contact is already saved, so a
+    //    tag problem never fails the submission.
     for (const tagName of tags) {
       try {
-        await fetch(`${SYSTEME_API_BASE}/contacts/${contactId}/tags`, {
+        const tagId = await findTagIdByName(apiKey, tagName)
+        if (!tagId) {
+          console.warn(`[submit-consultation] Tag "${tagName}" does not exist in Systeme.io yet; skipped.`)
+          continue
+        }
+        const tagRes = await systemeFetch(apiKey, `/contacts/${contactId}/tags`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-API-Key': apiKey,
-          },
-          body: JSON.stringify({ name: tagName }),
+          body: JSON.stringify({ tagId }),
         })
+        if (!tagRes.ok) {
+          console.error(`[submit-consultation] Assigning tag "${tagName}" failed:`, tagRes.status, await tagRes.text())
+        }
       } catch (tagErr) {
-        console.error(`[submit-consultation] Failed to assign tag "${tagName}":`, tagErr)
+        console.error(`[submit-consultation] Error assigning tag "${tagName}":`, tagErr)
       }
     }
 
-    res.status(200).json({ ok: true, mode: 'live', contactId })
+    res.status(200).json({ ok: true, mode: 'live' })
   } catch (err) {
     console.error('[submit-consultation] Unexpected error:', err)
     res.status(500).json({ error: 'Unexpected server error' })
   }
+}
+
+// ---------------------------------------------------------------
+// Systeme.io API helpers
+// ---------------------------------------------------------------
+
+function systemeFetch(apiKey, path, options = {}) {
+  return fetch(`${SYSTEME_API_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...(options.headers || {}),
+      'X-API-Key': apiKey,
+    },
+  })
+}
+
+// Systeme.io list responses wrap results in an "items" array.
+function listItems(data) {
+  if (Array.isArray(data)) return data
+  return data?.items || []
+}
+
+async function findContactIdByEmail(apiKey, email) {
+  const res = await systemeFetch(apiKey, `/contacts?email=${encodeURIComponent(email)}`)
+  if (!res.ok) {
+    console.error('[submit-consultation] Contact lookup failed:', res.status, await res.text())
+    return null
+  }
+  const match = listItems(await res.json()).find(
+    (c) => c.email && c.email.toLowerCase() === email.toLowerCase()
+  )
+  return match ? match.id : null
+}
+
+async function findTagIdByName(apiKey, name) {
+  const res = await systemeFetch(apiKey, `/tags?query=${encodeURIComponent(name)}`)
+  if (!res.ok) {
+    console.error(`[submit-consultation] Tag lookup for "${name}" failed:`, res.status, await res.text())
+    return null
+  }
+  const match = listItems(await res.json()).find((t) => t.name === name)
+  return match ? match.id : null
 }

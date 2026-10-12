@@ -247,6 +247,18 @@ summary:focus-visible {
 
 .photo-placeholder svg { opacity: 0.7; }
 
+.test-photo {
+  width: 100%;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--gold-dark);
+}
+
+.hero-photo,
+.story-photo {
+  aspect-ratio: 4 / 5;
+}
+
 /* ---------- Trust strip ---------- */
 
 .trust-strip {
@@ -559,10 +571,10 @@ summary:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   flex-shrink: 0;
-  border-radius: 14px;
+  border-radius: 16px;
   margin-bottom: 14px;
 }
 

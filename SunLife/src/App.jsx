@@ -16,20 +16,10 @@ import {
   Compass,
   Handshake,
   CheckCircle2,
-  ImageIcon,
 } from 'lucide-react'
 import { AutoCarousel } from './Carousel.jsx'
 import { Reveal } from './Reveal.jsx'
 import { IconTile } from './IconTile.jsx'
-
-function PhotoPlaceholder({ label, className = '' }) {
-  return (
-    <div className={`photo-placeholder${className ? ` ${className}` : ''}`}>
-      <ImageIcon size={22} strokeWidth={1.5} />
-      <span>{label}</span>
-    </div>
-  )
-}
 
 export default function App() {
   const [revealed, setRevealed] = useState(false)
@@ -104,7 +94,11 @@ function Hero() {
         </div>
       </div>
       <div className="hero-media reveal reveal-5">
-        <PhotoPlaceholder label="[Advisor photo]" />
+        <img
+          className="test-photo hero-photo"
+          src="/test-photo.jpg"
+          alt="Test placeholder — swap for the advisor's real photo"
+        />
       </div>
     </section>
   )
@@ -154,7 +148,11 @@ function Achievements() {
         speed={38}
         renderItem={(item) => (
           <div className="achievement-card">
-            <PhotoPlaceholder label="[Award photo]" className="achievement-photo" />
+            <img
+              className="achievement-photo test-photo"
+              src="/test-photo-award.jpg"
+              alt="Test placeholder — swap for the award or recognition photo"
+            />
             <h3>{item.title}</h3>
             <p>{item.body}</p>
           </div>
@@ -168,7 +166,11 @@ function Story() {
   return (
     <section id="about" className="section story">
       <div className="story-media">
-        <PhotoPlaceholder label="[Advisor photo — at work]" />
+        <img
+          className="test-photo story-photo"
+          src="/test-photo-story.jpg"
+          alt="Test placeholder — swap for the advisor-at-work photo"
+        />
       </div>
       <div className="story-copy">
         <h2>Why I do this work</h2>

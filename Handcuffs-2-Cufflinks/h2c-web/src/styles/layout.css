@@ -18,21 +18,17 @@
 .s-forest{--surface:#102520}
 .s-emerald-ink{--surface:var(--emerald-ink)}
 .s-emerald{--surface:linear-gradient(170deg,var(--emerald-ink) 0%,var(--emerald-mid) 58%,#0C4630 100%)}
-.s-light{
-  --surface:var(--platinum-hi);--fg:var(--obsidian);--fg-quiet:#5E656B;
-  --rule:rgba(11,11,12,.16);--accent:var(--gold-deep);
-}
-.s-light-2{
-  --surface:var(--platinum-2);--fg:var(--obsidian);--fg-quiet:#5E656B;
-  --rule:rgba(11,11,12,.18);--accent:var(--gold-deep);
-}
+/* The platinum surfaces that used to sit here are gone. The arc now runs
+   steel -> emerald -> steel -> emerald -> black, and never leaves the dark
+   palette: white and grey are not brand colours. --platinum-hi survives as a
+   TEXT colour on dark surfaces and must not be removed from tokens.css. */
 
 /* Transition bands — the arc from steel to emerald, then to platinum */
 .band{height:clamp(90px,12vw,170px);position:relative}
 .band--to-forest{background:linear-gradient(180deg,var(--charcoal) 0%,#1B2321 44%,#102520 100%)}
 .band--to-emerald{background:linear-gradient(180deg,#102520 0%,#0A2419 46%,var(--emerald-ink) 100%)}
-.band--to-light{background:linear-gradient(180deg,var(--emerald-ink) 0%,#28362F 26%,#6E7671 54%,#A8AEB1 76%,var(--platinum-hi) 100%)}
-.band--to-dark{background:linear-gradient(180deg,var(--platinum-2) 0%,#9AA1A4 20%,#4C544F 44%,#123527 70%,var(--emerald-ink) 100%)}
+.band--to-steel{background:linear-gradient(180deg,var(--emerald-ink) 0%,#0B2018 34%,#131A1B 70%,var(--charcoal-2) 100%)}
+.band--to-emerald-deep{background:linear-gradient(180deg,var(--charcoal) 0%,#1C2523 32%,#0E2A1E 68%,var(--emerald-ink) 100%)}
 .band--to-black{background:linear-gradient(180deg,#0C4630 0%,#0A2E20 34%,#0A1512 66%,var(--obsidian) 100%)}
 
 /* Grids */

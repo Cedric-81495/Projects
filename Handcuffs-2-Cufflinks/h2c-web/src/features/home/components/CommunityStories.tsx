@@ -12,9 +12,9 @@ import type { ApiCommunityStory } from '@/lib/content/adapters';
 /**
  * Homepage section 10 — community stories.
  *
- * This is the first light surface on the page. The switch from emerald to
- * platinum is the point: the movement's own voices arrive in daylight.
- * Everything shown here has publication consent on record.
+ * The page steps back from emerald to steel here: the movement's own voices
+ * get their own ground rather than sharing the brand's. Everything shown here
+ * has publication consent on record.
  */
 export function CommunityStories() {
   // Featured stories only on the homepage: the moderator's pick is the point of
@@ -27,7 +27,7 @@ export function CommunityStories() {
   );
 
   return (
-    <Section surface="light">
+    <Section surface="charcoal">
       <Wrap>
         <Eyebrow>Community stories · submitted by the movement</Eyebrow>
         <h2 className="h-lg rise d1" style={{ marginBottom: 0 }}>

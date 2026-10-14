@@ -45,10 +45,10 @@ export function HomePage() {
       {/* 7 */} <PodcastHighlights />
       {/* 8 */} <MusicSpotlight />
       {/* 9 */} <EcosystemSection />
-      <Band direction="to-light" />
+      <Band direction="to-steel" />
       {/* 10 */} <CommunityStories />
       {/* 11 */} <FounderMessage />
-      <Band direction="to-dark" />
+      <Band direction="to-emerald-deep" />
       {/* 12 */} <JoinMovement />
       <Band direction="to-black" />
       {/* 13 */} <SocialMedia />

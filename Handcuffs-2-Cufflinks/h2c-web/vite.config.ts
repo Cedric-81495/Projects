@@ -40,5 +40,23 @@ export default defineConfig({
       },
     },
   },
-  server: { port: 5173, open: false },
+  server: {
+    port: 5173,
+    open: false,
+    watch: {
+      /**
+       * Photographs are copied into `public/media` by hand, and on Windows the
+       * file is often still locked when the watcher tries to attach — OneDrive
+       * uploading it, or Defender scanning it. chokidar then emits an
+       * unhandled EBUSY and takes the whole dev server down.
+       *
+       * Nothing in this folder needs hot reload: it is static files served
+       * as-is, and a manual refresh picks up a new image. Leaving it unwatched
+       * costs nothing and removes the crash.
+       */
+      ignored: ['**/public/media/**'],
+      /** Belt and braces: wait for a copy to finish before reporting it. */
+      awaitWriteFinish: { stabilityThreshold: 400, pollInterval: 100 },
+    },
+  },
 });

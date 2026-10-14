@@ -21,7 +21,19 @@
 .nav a.is-on{color:#fff}
 .nav .nav-join{color:var(--gold)}
 .hdr-tools{display:flex;align-items:center;gap:6px;margin-left:auto}
-.nav+.hdr-tools{margin-left:clamp(10px,2vw,26px)}
+/**
+ * With the nav visible, both it and the tools carry margin-left:auto and the
+ * free space splits between them, which leaves the nav floating mid-header. A
+ * fixed gap on the tools fixes that — but only while the nav is actually
+ * rendered. `.nav + .hdr-tools` matches on DOM adjacency, not visibility, so
+ * below the collapse breakpoint the hidden nav still satisfied the selector and
+ * the tools lost their auto margin, bunching the burger against the wordmark.
+ * Scoped to the width where the nav exists; the bound pairs with the
+ * max-width:1399px rule in responsive.css.
+ */
+@media (min-width:1400px){
+  .nav+.hdr-tools{margin-left:clamp(10px,2vw,26px)}
+}
 .iconbtn{width:40px;height:40px;display:grid;place-items:center;position:relative;
   color:var(--platinum);transition:color .3s}
 .iconbtn:hover{color:var(--gold)}

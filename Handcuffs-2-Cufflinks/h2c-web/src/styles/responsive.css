@@ -1,11 +1,21 @@
 /* Ported verbatim from the approved reference build. Values here are the
    design contract — change them only with client approval. */
 
-/* Breakpoints: 1279 (nav collapses), 900 (columns collapse), 620 (single col) */
+/* Breakpoints: 1399 (nav collapses), 1279 (grids step down), 900 (columns
+   collapse), 620 (single col) */
 /* ------------------------------------------------------------ responsive */
-@media (max-width:1279px){
+
+/* The desktop nav is eleven links plus a wordmark and the saved icon, and it
+   measures past 1280. Collapsing at 1279 left a band — 1280 to 1399, which
+   includes the common 1366px laptop — where the nav rendered and overflowed
+   the viewport, clipping the saved icon off the right edge. The burger is the
+   designed alternative, not a fallback, so it takes over until the nav fits. */
+@media (max-width:1399px){
   .nav{display:none}
   .burger{display:grid}
+}
+
+@media (max-width:1279px){
   .g4{grid-template-columns:repeat(2,1fr)}
   .socials{grid-template-columns:repeat(3,1fr)}
   .ftr-grid{grid-template-columns:1fr 1fr}

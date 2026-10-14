@@ -29,4 +29,10 @@ export const logger = pino({
   transport: env.isProduction
     ? undefined
     : { target: 'pino-pretty', options: { colorize: true, translateTime: 'HH:MM:ss' } },
+  /**
+   * Without this, `logger.fatal({ error }, 'failed to start')` prints `error: {}`
+   * — an Error's own properties are not enumerable, so the startup failure the
+   * connection code works hard to explain is thrown away at the last step.
+   */
+  serializers: { error: pino.stdSerializers.err, err: pino.stdSerializers.err },
 });

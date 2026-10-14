@@ -90,6 +90,8 @@ export function DocuseriesPage() {
                   tone={i % 3 === 1 ? 'warm' : i % 3 === 2 ? 'em' : ''}
                   label="POSTER"
                   spec={episode.asset}
+                  src={episode.poster || undefined}
+                  alt={episode.asset}
                 />
                 <div className="epmeta">
                   <span>Ep {episode.n}</span>

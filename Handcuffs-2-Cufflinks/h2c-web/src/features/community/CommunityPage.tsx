@@ -40,7 +40,7 @@ export function CommunityPage() {
         lede="Submitted by the movement, published with permission. Some of these became docuseries episodes."
       />
 
-      <Section surface="light" tight>
+      <Section surface="charcoal" tight>
         <Wrap>
           <Eyebrow>Featured stories</Eyebrow>
           <div className="g3 rise d1" style={{ marginTop: 'clamp(24px,3vw,40px)' }}>
@@ -64,7 +64,7 @@ export function CommunityPage() {
         </Wrap>
       </Section>
 
-      <Section surface="light-2">
+      <Section surface="charcoal-hi">
         <Wrap narrow>
           <Eyebrow>Get involved</Eyebrow>
           <h2 className="h-lg rise d1">Three ways in</h2>

@@ -15,7 +15,6 @@
 .btn--gold:hover{background:var(--gold-lit);border-color:var(--gold-lit)}
 .btn--ghost{border-color:currentColor;color:var(--fg);opacity:.9}
 .btn--ghost:hover{background:var(--fg);color:var(--surface);opacity:1}
-.s-light .btn--ghost:hover,.s-light-2 .btn--ghost:hover{background:var(--obsidian);color:var(--platinum-hi)}
 .btn--emerald{background:var(--emerald);color:var(--platinum-hi);border-color:var(--emerald)}
 .btn--emerald:hover{background:#0F6E4B;border-color:#0F6E4B}
 .btn--sm{padding:11px 18px;font-size:.64rem;letter-spacing:.14em}
@@ -47,6 +46,22 @@
     linear-gradient(140deg,rgba(13,91,63,.5),rgba(6,26,19,.9)),
     repeating-linear-gradient(135deg,rgba(200,163,74,.05) 0 1px,transparent 1px 10px),
     var(--emerald-ink);border-color:rgba(200,163,74,.22)}
+/**
+ * A delivered photograph fills the slot and is cropped to it.
+ *
+ * `.slot` is a centring grid built for the placeholder label, so without this
+ * an <img> lands as a centred grid child at its own intrinsic ratio — a 3:2
+ * camera file inside a 3:4 slot then shows the hatched slot background down
+ * both sides. `place-self:stretch` overrides the inherited centring so the
+ * image takes the whole cell, and `object-fit:cover` crops rather than
+ * distorts. The slot already has `overflow:hidden`, so the overflowing edge is
+ * clipped cleanly and the gold inset rule drawn by `.slot::after` still sits
+ * on top.
+ *
+ * `object-position` defaults to centre. Where a subject sits off-centre and a
+ * centre crop cuts them, set it per slot rather than changing it here.
+ */
+.slot img{place-self:stretch;display:block;width:100%;height:100%;object-fit:cover}
 .slot-txt{padding:clamp(16px,3vw,30px);max-width:34ch}
 .slot-txt b{display:block;font-family:var(--sans);font-size:.6rem;font-weight:700;
   letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:9px}
@@ -64,13 +79,6 @@
 .r-4x3{aspect-ratio:4/3}
 .r-16x9{aspect-ratio:16/9}
 .r-21x9{aspect-ratio:21/9}
-.s-light .slot,.s-light-2 .slot{background:
-    linear-gradient(135deg,rgba(138,110,40,.1),transparent 55%),
-    repeating-linear-gradient(135deg,rgba(11,11,12,.045) 0 1px,transparent 1px 9px),
-    #DDE1E3;border-color:rgba(11,11,12,.16);color:var(--obsidian)}
-.s-light .slot-txt b,.s-light-2 .slot-txt b{color:var(--gold-deep)}
-.s-light .slot-txt span,.s-light-2 .slot-txt span{color:#4C5257;opacity:.9}
-.s-light .slot::after,.s-light-2 .slot::after{border-color:rgba(11,11,12,.1)}
 
 /* video frame */
 .vframe{position:relative}
@@ -208,8 +216,6 @@
   width:100%;padding:14px 16px;background:rgba(191,195,199,.06);
   border:1px solid var(--rule);color:var(--fg);font-size:.9rem;font-weight:300;
   font-family:var(--sans);transition:border-color .3s,background .3s}
-.s-light .field input,.s-light .field select,.s-light .field textarea,
-.s-light-2 .field input,.s-light-2 .field select,.s-light-2 .field textarea{background:rgba(11,11,12,.04)}
 .field input:focus,.field select:focus,.field textarea:focus{
   outline:none;border-color:var(--accent);background:rgba(200,163,74,.07)}
 .field textarea{min-height:130px;resize:vertical;line-height:1.7}

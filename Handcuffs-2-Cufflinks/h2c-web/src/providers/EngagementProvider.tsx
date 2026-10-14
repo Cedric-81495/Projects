@@ -49,8 +49,16 @@ const FIELD: Record<EngagementKind, keyof EngagementState> = {
   notify: 'notifies',
 };
 
-/** A visitor's own vote is weighted so the meter visibly responds to them. */
-const OWN_VOTE_WEIGHT = 120;
+/**
+ * A visitor's own vote counts as one vote.
+ *
+ * It was weighted at 120 so the meter visibly jumped when someone voted. That
+ * only worked while the figures beside it were invented: against a real count
+ * starting at zero, one click would read "120 votes" and the number the client
+ * uses to decide which collection to produce would be wrong by two orders of
+ * magnitude. The meter is a readout, not an applause light.
+ */
+const OWN_VOTE_WEIGHT = 1;
 
 /** Merges two id lists without duplicates. */
 function union(a: string[], b: string[] | undefined): string[] {

@@ -4,8 +4,12 @@ import { cn } from '@/lib/utils/cn';
  * Surface themes. Each class re-declares --surface / --fg / --fg-quiet /
  * --rule / --accent, so any component dropped inside inherits the right
  * treatment without knowing where it sits. This is what lets the page move
- * from obsidian through emerald to platinum and back without per-component
- * light/dark variants.
+ * from obsidian through steel to emerald and back without per-component
+ * variants.
+ *
+ * There is deliberately no light surface. White and grey are not brand
+ * colours, so every surface here is drawn from the obsidian / charcoal /
+ * emerald families and the page never leaves them.
  */
 export type Surface =
   | 'pitch'
@@ -16,9 +20,7 @@ export type Surface =
   | 'drift'
   | 'forest'
   | 'emerald-ink'
-  | 'emerald'
-  | 'light'
-  | 'light-2';
+  | 'emerald';
 
 interface SectionProps extends React.HTMLAttributes<HTMLElement> {
   surface?: Surface;
@@ -57,11 +59,16 @@ export function Wrap({ narrow = false, className, children, ...rest }: WrapProps
 
 /**
  * Transition bands. The page's colour arc is deliberate: steel for the past,
- * emerald for the turn, platinum for arrival. These bands carry the eye
- * between those states so the shift reads as a journey rather than a theme
- * change.
+ * emerald for the turn, and a return to steel where the movement's own voices
+ * speak. These bands carry the eye between those states so the shift reads as
+ * a journey rather than a theme change.
  */
-export type BandDirection = 'to-forest' | 'to-emerald' | 'to-light' | 'to-dark' | 'to-black';
+export type BandDirection =
+  | 'to-forest'
+  | 'to-emerald'
+  | 'to-steel'
+  | 'to-emerald-deep'
+  | 'to-black';
 
 export function Band({ direction }: { direction: BandDirection }) {
   return <div className={cn('band', `band--${direction}`)} aria-hidden="true" />;

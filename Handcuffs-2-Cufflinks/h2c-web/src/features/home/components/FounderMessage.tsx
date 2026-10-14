@@ -8,7 +8,7 @@ import { ROUTES } from '@/router/routes';
 /** Homepage section 11 — founder message. */
 export function FounderMessage() {
   return (
-    <Section surface="light-2">
+    <Section surface="charcoal-hi">
       <Wrap>
         <div className="split split--rev split--top">
           <div>

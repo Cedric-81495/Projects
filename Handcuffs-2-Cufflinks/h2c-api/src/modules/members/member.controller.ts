@@ -93,11 +93,7 @@ memberRouter.patch(
   requireMember,
   validateBody(updateProfileSchema),
   asyncHandler(async (req, res) => {
-    const member = await Member.findByIdAndUpdate(req.member!.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!member) throw ApiError.unauthorized();
+    const member = await service.updateProfile(req.member!.id, req.body);
     ok(res, service.publicMember(member));
   })
 );

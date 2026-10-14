@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Seo } from '@/lib/seo/Seo';
 import { PageHero } from '@/components/layout/PageHero';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
@@ -13,7 +13,12 @@ import { ROUTES } from '@/router/routes';
 import { cn } from '@/lib/utils/cn';
 import { SectionLoad } from '@/components/ui/Spinner';
 import { useContent } from '@/lib/api/useContent';
-import { toApparel, toCollection } from '@/lib/content/adapters';
+import {
+  collectionSlugMap,
+  toApparel,
+  toCollection,
+  withCollectionSlugs,
+} from '@/lib/content/adapters';
 import type { ApiApparelItem, ApiCollection } from '@/lib/content/adapters';
 
 /**
@@ -30,24 +35,20 @@ export function CollectionsPage() {
     COLLECTIONS_SEED
   );
 
-  /**
-   * Apparel carries a collection id, not a slug, so the filter buttons need the
-   * collections in hand before the mapping means anything. Building the lookup
-   * from whatever has arrived keeps the grid usable during the moment when
-   * apparel has loaded and collections have not.
-   */
-  const slugById = Object.fromEntries(
-    COLLECTIONS.map((collection) => {
-      const withId = collection as { id?: string; slug: string };
-      return [withId.id ?? withId.slug, withId.slug];
-    })
-  );
+  const { items: RAW_APPAREL, loading } = useContent<
+    ApiApparelItem,
+    (typeof APPAREL_SEED)[number]
+  >('/apparel', toApparel, APPAREL_SEED, { params: { pageSize: 100 } });
 
-  const { items: APPAREL, loading } = useContent<ApiApparelItem, (typeof APPAREL_SEED)[number]>(
-    '/apparel',
-    (item) => toApparel(item, 0, slugById),
-    APPAREL_SEED,
-    { params: { pageSize: 100 } }
+  /**
+   * Apparel references its collection by id; the filter buttons are keyed by
+   * slug. The two lists are fetched independently, so the mapping is done here
+   * rather than inside the fetch — it re-runs when either arrives, instead of
+   * being decided once by whichever request happened to win.
+   */
+  const APPAREL = useMemo(
+    () => withCollectionSlugs(RAW_APPAREL, collectionSlugMap(COLLECTIONS)),
+    [RAW_APPAREL, COLLECTIONS]
   );
 
   const [filter, setFilter] = useState<string>('all');

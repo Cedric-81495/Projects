@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 import { ApiError } from '@/lib/ApiError';
 import { logger } from '@/lib/logger';
+import { sendToGhl } from '@/lib/ghl';
 import { fakeVerify, hashPassword, verifyPassword } from '@/lib/password';
 import {
   REFRESH_TTL_DAYS,
@@ -130,6 +131,95 @@ export async function register(
   }
 
   return issueSession(member, req);
+}
+
+/**
+ * Updates a member's own profile, keeping the subscriber list in step.
+ *
+ * `subscribedToMovement` on the member record is a statement of what they want.
+ * The Subscriber collection is the list that actually gets exported and sent to,
+ * and it carries the consent trail a compliance review asks for. Writing the
+ * flag without touching the list let the two disagree: a member could switch the
+ * mailing list on and never be subscribed, or switch it off and keep receiving
+ * email. Registration already did this correctly; the later change did not.
+ *
+ * Turning it on upserts a subscription with a fresh consent timestamp. Turning
+ * it off is a full unsubscribe, identical to the one-click link in an email —
+ * withdrawing consent through a different door should not mean something weaker.
+ */
+export async function updateProfile(
+  memberId: string,
+  input: {
+    firstName?: string;
+    lastName?: string;
+    location?: string;
+    subscribedToMovement?: boolean;
+  }
+) {
+  const member = await Member.findByIdAndUpdate(memberId, input, {
+    new: true,
+    runValidators: true,
+  });
+  if (!member) throw ApiError.unauthorized();
+
+  /**
+   * Only act when the flag was actually sent. A member editing their location
+   * must not have their consent rewritten as a side effect of an absent field.
+   */
+  if (input.subscribedToMovement === undefined) return member;
+
+  const now = new Date();
+  const email = member.email;
+
+  if (input.subscribedToMovement) {
+    await Subscriber.updateOne(
+      { email },
+      {
+        $set: {
+          firstName: member.firstName,
+          email,
+          consentEmail: true,
+          consentAt: now,
+          consentSource: 'member-account',
+          status: 'subscribed',
+          unsubscribedAt: null,
+        },
+      },
+      { upsert: true }
+    );
+  } else {
+    /**
+     * Scoped to a live subscription on purpose: an upsert here would create a
+     * row for someone who never subscribed, just to record that they are not
+     * subscribed.
+     */
+    await Subscriber.updateOne(
+      { email, status: 'subscribed' },
+      {
+        $set: {
+          status: 'unsubscribed',
+          unsubscribedAt: now,
+          consentEmail: false,
+          consentSms: false,
+        },
+      }
+    );
+  }
+
+  /** Not awaited, and never throws: consent is already recorded either way. */
+  void sendToGhl({
+    event: 'subscriber.preference_changed',
+    sentAt: now.toISOString(),
+    email,
+    consent: {
+      email: input.subscribedToMovement,
+      sms: false,
+      at: now.toISOString(),
+      source: 'member-account',
+    },
+  });
+
+  return member;
 }
 
 export async function signIn(email: string, password: string, req: Request) {

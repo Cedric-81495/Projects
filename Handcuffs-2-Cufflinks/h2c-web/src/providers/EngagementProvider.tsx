@@ -10,7 +10,12 @@ import { COLLECTIONS as COLLECTIONS_SEED } from '@/data/collections';
 import { apiPost } from '@/lib/api/client';
 import { API } from '@/lib/api/endpoints';
 import { useContent } from '@/lib/api/useContent';
-import { toApparel, toCollection } from '@/lib/content/adapters';
+import {
+  collectionSlugMap,
+  toApparel,
+  toCollection,
+  withCollectionSlugs,
+} from '@/lib/content/adapters';
 import type { ApiApparelItem, ApiCollection } from '@/lib/content/adapters';
 
 /**
@@ -78,11 +83,21 @@ export function EngagementProvider({ children }: { children: React.ReactNode }) 
     COLLECTIONS_SEED
   );
 
-  const { items: catalogue } = useContent<ApiApparelItem, (typeof APPAREL_SEED)[number]>(
+  const { items: rawCatalogue } = useContent<ApiApparelItem, (typeof APPAREL_SEED)[number]>(
     '/apparel',
     toApparel,
     APPAREL_SEED,
     { params: { pageSize: 100 } }
+  );
+
+  /**
+   * Vote totals are grouped by collection slug, and apparel arrives carrying a
+   * collection id, so without this every group matches nothing and the meter
+   * reads zero for all six collections regardless of how many votes were cast.
+   */
+  const catalogue = useMemo(
+    () => withCollectionSlugs(rawCatalogue, collectionSlugMap(collections)),
+    [rawCatalogue, collections]
   );
 
   const itemById = useCallback(

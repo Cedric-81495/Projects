@@ -7,6 +7,9 @@ import { requireAuth, requirePermission } from '@/middleware/auth';
 import { optionalMember } from '@/middleware/memberAuth';
 import { engagementLimiter } from '@/middleware/rateLimit';
 import { validateBody } from '@/middleware/validate';
+import { env } from '@/config/env';
+import { sendToGhl } from '@/lib/ghl';
+import { logger } from '@/lib/logger';
 import { ApparelItem } from '@/models/content';
 import { Engagement } from '@/models/engagement';
 
@@ -88,10 +91,102 @@ engagementRouter.post(
       throw error;
     }
 
-    await ApparelItem.updateOne({ _id: id }, { $inc: { [COUNTER[action]]: 1 } });
+    const updated = await ApparelItem.findOneAndUpdate(
+      { _id: id },
+      { $inc: { [COUNTER[action]]: 1 } },
+      { new: true, projection: 'name slug collectionId engagement' }
+    );
+
     ok(res, { action, counted: true });
+
+    /**
+     * Announce a vote milestone, after the visitor has their response.
+     *
+     * Deliberately not awaited: the founder being told a design has demand is
+     * not something a visitor should wait for, and `announceMilestone` never
+     * throws, so there is no rejection to leave unhandled.
+     */
+    if (action === 'vote' && updated) void announceMilestone(updated);
   })
 );
+
+/**
+ * Tells the GHL side that a piece has reached a vote count worth a decision.
+ *
+ * The decision to manufacture is the founder's, so this carries a signal, not
+ * an instruction, and it goes to him rather than to the audience. Announcing a
+ * drop to the people who asked to hear about it is a separate, deliberate act
+ * from the CMS once that decision is made.
+ *
+ * Only the highest milestone crossed is sent. If the counter jumps — a recount,
+ * or an operator correcting a figure — passing two thresholds at once should
+ * read as one piece of news, not a burst.
+ */
+async function announceMilestone(item: {
+  /** Mongoose types the `id` virtual as optional, so `_id` is the reliable one. */
+  _id: unknown;
+  name: string;
+  slug: string;
+  collectionId?: unknown;
+  engagement?: {
+    votes?: number;
+    likes?: number;
+    favorites?: number;
+    notifyMeCount?: number;
+    shares?: number;
+    views?: number;
+    milestonesReached?: number[];
+  } | null;
+}): Promise<void> {
+  try {
+    const votes = item.engagement?.votes ?? 0;
+    const already = item.engagement?.milestonesReached ?? [];
+    const crossed = env.VOTE_MILESTONES.filter((m) => votes >= m && !already.includes(m));
+    if (crossed.length === 0) return;
+
+    const milestone = crossed[crossed.length - 1]!;
+
+    /**
+     * Claim the milestone before sending. The filter only matches while the
+     * number is absent, so of several concurrent votes crossing the same
+     * threshold exactly one gets modifiedCount 1 and the rest fall through.
+     * Any lower thresholds crossed in the same jump are recorded at the same
+     * time so they cannot fire later.
+     */
+    const claim = await ApparelItem.updateOne(
+      { _id: item._id, 'engagement.milestonesReached': { $ne: milestone } },
+      { $addToSet: { 'engagement.milestonesReached': { $each: crossed } } }
+    );
+    if (claim.modifiedCount !== 1) return;
+
+    const itemId = String(item._id);
+    const e = item.engagement ?? {};
+    await sendToGhl({
+      event: 'apparel.vote_milestone',
+      sentAt: new Date().toISOString(),
+      milestone,
+      piece: {
+        id: itemId,
+        name: item.name,
+        slug: item.slug,
+        collection: item.collectionId ? String(item.collectionId) : null,
+        publicUrl: `${env.SITE_URL.replace(/\/$/, '')}/collections/item/${item.slug}`,
+        adminUrl: `${env.ADMIN_URL.replace(/\/$/, '')}/records/apparel/${itemId}`,
+      },
+      engagement: {
+        votes,
+        likes: e.likes ?? 0,
+        favorites: e.favorites ?? 0,
+        notifyMeCount: e.notifyMeCount ?? 0,
+        shares: e.shares ?? 0,
+        views: e.views ?? 0,
+      },
+    });
+  } catch (error) {
+    /** A milestone announcement must never surface as a failed vote. */
+    logger.warn({ error }, 'vote milestone announcement failed');
+  }
+}
 
 engagementRouter.post(
   '/:id/:action/undo',

@@ -157,7 +157,40 @@ export interface ApiCollection extends Publishable {
 }
 
 export function toCollection(item: ApiCollection): SeedCollection {
-  return { slug: item.slug ?? item.id, name: item.name };
+  return { id: item.id, slug: item.slug ?? item.id, name: item.name };
+}
+
+/**
+ * Builds the id-to-slug lookup apparel needs to know which collection it is in.
+ *
+ * Seed collections have no id, so they map their slug to itself — harmless, and
+ * it keeps the resolver below a single code path.
+ */
+export function collectionSlugMap(collections: readonly SeedCollection[]): Record<string, string> {
+  return Object.fromEntries(collections.map((c) => [c.id ?? c.slug, c.slug]));
+}
+
+/**
+ * Resolves each piece's `coll` from a collection id to its slug.
+ *
+ * Deliberately applied at render rather than inside `toApparel`'s mapping: the
+ * two lists are fetched independently and `useContent` maps once, when its own
+ * request resolves. Apparel usually wins that race, so a map passed into the
+ * mapper is empty at the only moment it is read and every piece keeps a raw
+ * ObjectId for the life of the page. Resolving here re-runs when either list
+ * arrives.
+ *
+ * Idempotent: a `coll` that is already a slug is not in the map and is left
+ * alone, so this is safe to apply to seed data and to re-apply.
+ */
+export function withCollectionSlugs<T extends { coll: string }>(
+  items: readonly T[],
+  slugById: Record<string, string>
+): T[] {
+  return items.map((item) => {
+    const slug = slugById[item.coll];
+    return slug && slug !== item.coll ? { ...item, coll: slug } : item;
+  });
 }
 
 export interface ApiApparelItem extends Publishable {

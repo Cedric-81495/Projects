@@ -39,6 +39,30 @@ const schema = z.object({
   RESEND_API_KEY: z.string().optional(),
   MAIL_FROM: z.string().default('Handcuffs 2 Cufflinks <no-reply@handcuffs2cufflinks.com>'),
 
+  // --- GoHighLevel ----------------------------------------------------------
+  /**
+   * Inbound webhook URL from the GHL workflow. Optional: without it the
+   * payload is written to the log instead of sent, so the integration can be
+   * built and reviewed before the GHL side exists.
+   */
+  GHL_WEBHOOK_URL: z.string().url().optional(),
+  /**
+   * Vote counts at which a piece is worth a decision, lowest first.
+   *
+   * These are thresholds for telling the founder a design has demand, not
+   * targets. Crossing one fires exactly once per piece per milestone.
+   */
+  VOTE_MILESTONES: z
+    .string()
+    .default('100,250,500,1000')
+    .transform((value) =>
+      value
+        .split(',')
+        .map((part) => Number(part.trim()))
+        .filter((n) => Number.isInteger(n) && n > 0)
+        .sort((a, b) => a - b)
+    ),
+
   // --- Multi-factor authentication ------------------------------------------
   /**
    * When on, a super administrator who has not finished TOTP enrolment is

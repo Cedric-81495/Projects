@@ -85,6 +85,18 @@ const apparelItemSchema = new Schema(
       notifyMeCount: { type: Number, default: 0, min: 0 },
       shares: { type: Number, default: 0, min: 0 },
       views: { type: Number, default: 0, min: 0 },
+      /**
+       * Milestones already announced for this piece.
+       *
+       * Votes arrive continuously, so crossing 500 must not fire on vote 500,
+       * 501 and 502. A milestone is claimed with a conditional $addToSet: the
+       * write only matches while the number is absent, so exactly one
+       * concurrent request wins it and the rest see modifiedCount 0.
+       *
+       * Deliberately not derived from the counter. If /recount rebuilds the
+       * counters, or an operator corrects one, nothing should re-announce.
+       */
+      milestonesReached: { type: [Number], default: [] },
     },
     displayOrder: { type: Number, default: 0 },
     ...publishableFields,

@@ -72,8 +72,16 @@ export function CollectionsPage() {
       <Section surface="charcoal" tight>
         <Wrap>
           <Note label="Showcase">
-            This is a showcase, not a store. Nothing here can be purchased yet. Use the controls on
-            each piece to tell us what to produce, and join the movement to hear when it drops.
+            This is a showcase, not a store. Nothing here can be purchased yet.{' '}
+            {/*
+              Naming the vote button specifically, because the icons do not say
+              what they do. A heart beside the larger number reads as the one
+              that matters, and it is not — likes change nothing. The thumbs-up
+              is the only control that decides what gets manufactured, so it is
+              worth one sentence rather than leaving people to guess.
+            */}
+            <strong>Tap the thumbs-up to vote for what gets made next.</strong> Likes and saves are
+            just for you. Join the movement to hear when something drops.
           </Note>
 
           <div className="tabs" role="tablist" aria-label="Filter collections" style={{ marginTop: 'clamp(26px,3vw,40px)' }}>

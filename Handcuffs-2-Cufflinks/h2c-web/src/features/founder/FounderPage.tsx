@@ -12,7 +12,60 @@ import { BRAND, ECOSYSTEM } from '@/config/site';
 import { ROUTES } from '@/router/routes';
 
 /** Not a corporate biography. First person, specific, and unflattering where it needs to be. */
+/** The founder profile, as the CMS stores it. Every field is optional. */
+export interface FounderProfile {
+  name?: string;
+  role?: string;
+  portrait?: { url?: string; alt?: string };
+  message?: string;
+  story?: string;
+  whyThisExists?: string;
+  lessonsLearned?: string[];
+  gwopConnection?: string;
+  kitchenMuzikConnection?: string;
+  globalVision?: string;
+  speakingTopics?: string[];
+  speakingBlurb?: string;
+  press?: PressItem[];
+}
+
+/**
+ * Reads the founder profile.
+ *
+ * A singleton rather than a list, so `useContent` (which maps an items array)
+ * does not fit. Returns an empty object on failure: every field below falls
+ * back to the written copy, so a cold start or a network blip shows the page
+ * as it was rather than a set of gaps.
+ */
+function useFounder(): FounderProfile {
+  const [profile, setProfile] = useState<FounderProfile>({});
+
+  useEffect(() => {
+    const abort = new AbortController();
+    apiGet<FounderProfile>('/site/founder', undefined, abort.signal)
+      .then((data) => setProfile(data ?? {}))
+      .catch(() => {
+        /* Written copy stands in. Nothing here is load-bearing enough to error on. */
+      });
+    return () => abort.abort();
+  }, []);
+
+  return profile;
+}
+
+/**
+ * Splits a CMS text field into paragraphs on blank lines.
+ *
+ * Operators type into a textarea, not a rich editor, so a blank line is the
+ * only paragraph break they have. Without this the whole story renders as one
+ * unbroken block.
+ */
+function paragraphs(text: string): string[] {
+  return text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+}
+
 export function FounderPage() {
+  const founder = useFounder();
   return (
     <>
       <Seo
@@ -24,26 +77,47 @@ export function FounderPage() {
       <PageHero
         eyebrow="About the founder"
         title="Why this exists"
-        lede="I did not build this because it worked out. I built it because for a long time it did not."
+        lede={
+          founder.whyThisExists ||
+          'I did not build this because it worked out. I built it because for a long time it did not.'
+        }
       />
 
       <Section surface="charcoal" tight>
         <Wrap>
           <div className="split split--top">
-            <AssetSlot ratio="4x5" tone="warm" label="PHOTO" spec="H2C_Founder_Portrait_Standing_4x5.jpg" />
+            <AssetSlot
+              ratio="4x5"
+              tone="warm"
+              label="PHOTO"
+              spec="H2C_Founder_Portrait_Standing_4x5.jpg"
+              src={founder.portrait?.url || undefined}
+              alt={founder.portrait?.alt}
+            />
             <div>
               <Eyebrow>The journey</Eyebrow>
               <h2 className="h-md rise d1">Boston does not hand you anything</h2>
-              <p className="body rise d2">
-                It also does not let you forget where you came from — and for a long time I thought
-                that was a curse. Then I understood it was the whole point. You cannot show anybody
-                the distance you covered if you pretend you started somewhere else.
-              </p>
-              <p className="body rise d2">
-                Handcuffs 2 Cufflinks began as two words I could not stop repeating. Then it became
-                a shirt. Then a podcast, a docuseries, a label, and a set of programmes. What it has
-                always been is an argument: that whatever held you can become the reason you move.
-              </p>
+              {founder.story ? (
+                paragraphs(founder.story).map((para) => (
+                  <p key={para.slice(0, 40)} className="body rise d2">
+                    {para}
+                  </p>
+                ))
+              ) : (
+                <>
+                  <p className="body rise d2">
+                    It also does not let you forget where you came from — and for a long time I
+                    thought that was a curse. Then I understood it was the whole point. You cannot
+                    show anybody the distance you covered if you pretend you started somewhere else.
+                  </p>
+                  <p className="body rise d2">
+                    Handcuffs 2 Cufflinks began as two words I could not stop repeating. Then it
+                    became a shirt. Then a podcast, a docuseries, a label, and a set of programmes.
+                    What it has always been is an argument: that whatever held you can become the
+                    reason you move.
+                  </p>
+                </>
+              )}
               <p className="pull rise d3">
                 You cannot show anybody the distance you covered if you pretend you started
                 somewhere else.
@@ -54,33 +128,28 @@ export function FounderPage() {
           <Rule label="What I learned" />
 
           <div className="g3 rise">
-            <div>
-              <span className="num">01</span>
-              <h3 className="h-sm" style={{ marginTop: 10 }}>
-                Nobody is coming
-              </h3>
-              <p className="body body--quiet">
-                Waiting to be discovered is the most expensive thing you can do with a year.
-              </p>
-            </div>
-            <div>
-              <span className="num">02</span>
-              <h3 className="h-sm" style={{ marginTop: 10 }}>
-                Tell it first
-              </h3>
-              <p className="body body--quiet">
-                Whoever tells your story first controls what it means. Make that you.
-              </p>
-            </div>
-            <div>
-              <span className="num">03</span>
-              <h3 className="h-sm" style={{ marginTop: 10 }}>
-                Bring somebody
-              </h3>
-              <p className="body body--quiet">
-                If the door closes behind you, you did not actually open it.
-              </p>
-            </div>
+            {(founder.lessonsLearned?.length
+              ? founder.lessonsLearned
+              : [
+                  'Nobody is coming\nWaiting to be discovered is the most expensive thing you can do with a year.',
+                  'Tell it first\nWhoever tells your story first controls what it means. Make that you.',
+                  'Bring somebody\nIf the door closes behind you, you did not actually open it.',
+                ]
+            ).map((lesson, index) => {
+              /* A lesson is a heading and an explanation. The CMS gives one text
+                 field per lesson, so the first line is the heading and the rest
+                 is the body — the same shape the written copy already had. */
+              const [heading, ...rest] = lesson.split('\n');
+              return (
+                <div key={heading}>
+                  <span className="num">{String(index + 1).padStart(2, '0')}</span>
+                  <h3 className="h-sm" style={{ marginTop: 10 }}>
+                    {heading}
+                  </h3>
+                  {rest.length > 0 && <p className="body body--quiet">{rest.join(' ')}</p>}
+                </div>
+              );
+            })}
           </div>
         </Wrap>
       </Section>
@@ -93,15 +162,15 @@ export function FounderPage() {
             <div>
               <h3 className="h-sm">{ECOSYSTEM.gwop.name}</h3>
               <p className="body">
-                Inspiration on its own does not teach anybody how to open a bank account after a
-                record. GWOP exists to do the part that motivation cannot.
+                {founder.gwopConnection ||
+                  'Inspiration on its own does not teach anybody how to open a bank account after a record. GWOP exists to do the part that motivation cannot.'}
               </p>
             </div>
             <div>
               <h3 className="h-sm">{ECOSYSTEM.kitchen.name}</h3>
               <p className="body">
-                The music came before the brand did. Rather than license somebody else&rsquo;s
-                soundtrack, we built the label so the artists in this movement own theirs.
+                {founder.kitchenMuzikConnection ||
+                  'The music came before the brand did. Rather than license somebody else’s soundtrack, we built the label so the artists in this movement own theirs.'}
               </p>
             </div>
           </div>
@@ -112,7 +181,7 @@ export function FounderPage() {
         </Wrap>
       </Section>
 
-      <PressSection />
+      <PressSection press={founder.press ?? []} />
 
       <Band direction="to-emerald" />
 
@@ -155,24 +224,7 @@ interface PressItem {
   quote?: string;
 }
 
-function PressSection() {
-  const [press, setPress] = useState<PressItem[]>([]);
-
-  useEffect(() => {
-    /**
-     * The founder profile is a singleton rather than a list, so `useContent`
-     * (which maps an items array) does not fit. Aborted on unmount so a quick
-     * navigation away does not set state on a gone component.
-     */
-    const abort = new AbortController();
-    apiGet<{ press?: PressItem[] }>('/site/founder', undefined, abort.signal)
-      .then((data) => setPress(data.press ?? []))
-      .catch(() => {
-        /** No coverage shown rather than an error: this section is not load-bearing. */
-      });
-    return () => abort.abort();
-  }, []);
-
+function PressSection({ press }: { press: PressItem[] }) {
   if (press.length === 0) return null;
 
   return (

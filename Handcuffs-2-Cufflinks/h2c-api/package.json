@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Handcuffs 2 Cufflinks — REST API, CMS, and record management.",
+  "description": "Handcuffs 2 Cufflinks \u2014 REST API, CMS, and record management.",
   "engines": {
     "node": "22.x"
   },
@@ -17,7 +17,9 @@
     "create-admin": "tsx --env-file-if-exists=.env scripts/create-admin.ts",
     "smoke": "tsx scripts/smoke.ts",
     "verify-db": "tsx --env-file-if-exists=.env scripts/verify-db.ts",
-    "prebuild": "tsc --noEmit"
+    "prebuild": "tsc --noEmit",
+    "reset-engagement": "tsx --env-file-if-exists=.env scripts/reset-engagement.ts",
+    "fix-gwop-programmes": "tsx --env-file-if-exists=.env scripts/fix-gwop-programmes.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

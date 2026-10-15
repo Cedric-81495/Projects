@@ -51,10 +51,11 @@ export function GwopPage() {
                 you finally get access to capital.
               </p>
               <p className="body rise d2">
-                Four levels, taken in sequence. Freshman builds the foundation, Sophomore gets you
-                ready, Junior builds and scales, Senior is about legacy. It starts with how you
-                think about money rather than where to apply for it, because structure is what
-                lenders are actually reading.
+                Four levels, taken in sequence. Level 1 is personal credit. Level 2 is business
+                foundation and business credit. Level 3 is funding and banking strategy. Level 4 is
+                execution, capital and wealth strategy. It starts with how you think about money
+                rather than where to apply for it, because structure is what lenders are actually
+                reading.
               </p>
               <p className="body rise d2">
                 And money is not the whole conversation. Financial stress does not stay in a bank
@@ -65,8 +66,8 @@ export function GwopPage() {
                 through your own roadmap, rather than a course telling everybody the same thing.
               </p>
               <Row className="rise d3">
-                <ButtonLink to={ROUTES.community} variant="ghost" icon="arrow">
-                  Get involved
+                <ButtonLink to={ROUTES.join} variant="ghost" icon="arrow">
+                  Hear when enrolment opens
                 </ButtonLink>
               </Row>
             </div>
@@ -112,8 +113,8 @@ export function GwopPage() {
       <Section surface="emerald">
         <Wrap narrow>
           <Note label={ECOSYSTEM.gwop.attribution}>
-            GWOP operates within the Handcuffs 2 Cufflinks ecosystem with its own programmes,
-            enrolment, and reporting.
+            GWOP operates within the Handcuffs 2 Cufflinks ecosystem and runs its own programmes.
+            Enrolment and course access happen at GWOP University.
           </Note>
           <Row className="rise" style={{ marginTop: 'clamp(24px,3vw,38px)' }}>
             <ButtonLink to={ROUTES.join} variant="gold" icon="arrow">

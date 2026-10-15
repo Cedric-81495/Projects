@@ -71,6 +71,17 @@
  * both cases: a lone emblem reads as a mark, not as a left-aligned figure.
  */
 .brand-crest{display:block;margin-inline:auto}
+/**
+ * The cell a lone crest sits in.
+ *
+ * `.split--top` aligns both columns to the start, which is right for the text
+ * — a heading should begin at the top of its column — and wrong for a short
+ * emblem beside four paragraphs, which leaves it stranded at the top with a
+ * column of empty space beneath. Overridden here rather than on the split, so
+ * the text keeps the alignment it wants. Below the breakpoint the grid is one
+ * column and this has nothing to centre against, which is harmless.
+ */
+.crest-cell{align-self:center}
 
 /* ------------------------------------------------------------------ press */
 /**

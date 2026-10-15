@@ -71,7 +71,7 @@ export function GwopPage() {
                 </ButtonLink>
               </Row>
             </div>
-            <div className="rise d2">
+            <div className="rise d2 crest-cell">
               <img
                 className="brand-crest"
                 src="/media/crest-gwop-university.webp"

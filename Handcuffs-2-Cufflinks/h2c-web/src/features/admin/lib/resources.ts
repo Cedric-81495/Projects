@@ -750,6 +750,7 @@ export const RESOURCES: ResourceDef[] = [
       },
       { kind: 'text', name: 'length', label: 'Length', half: true, placeholder: '6 weeks' },
       { kind: 'number', name: 'capacity', label: 'Capacity', half: true },
+      { kind: 'number', name: 'displayOrder', label: 'Order', half: true },
       { kind: 'textarea', name: 'summary', label: 'Summary', rows: 3 },
       { kind: 'textarea', name: 'description', label: 'Description', rows: 10 },
       { kind: 'tags', name: 'outcomes', label: 'Outcomes' },

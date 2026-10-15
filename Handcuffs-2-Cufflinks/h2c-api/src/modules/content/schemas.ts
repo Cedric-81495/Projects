@@ -47,7 +47,12 @@ export const apparelCreate = z.object({
   badge: z.string().max(60).default(''),
   story: z.string().min(1, 'Every piece needs its meaning.').max(2000),
   wearYourStoryMessage: z.string().max(400).default(''),
-  images: z.array(mediaAsset).default([]),
+  garmentType: z
+    .enum(['hoodie', 'jacket', 'long-sleeve-sweatshirt', 'tee', 'cap', 'accessory', 'other'])
+    .default('other'),
+  colour: z.string().trim().max(40).default(''),
+  /** Six is the ceiling; four is the working set. See the model for why. */
+  images: z.array(mediaAsset).max(6, 'Six images per piece is the maximum.').default([]),
   assetSpec: z.string().max(200).optional(),
   fitNotes: z.string().max(1000).default(''),
   sizes: z.array(z.object({
@@ -173,6 +178,8 @@ export const programmeCreate = z.object({
   eligibility: z.string().max(1000).optional(),
   coverImage: mediaAsset.optional(),
   capacity: z.number().int().positive().optional(),
+  /** Position in the curriculum. The list is a sequence, not a feed. */
+  displayOrder: z.number().int().default(0),
 });
 export const programmeUpdate = programmeCreate.partial();
 

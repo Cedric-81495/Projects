@@ -65,7 +65,6 @@ const apparelItemSchema = new Schema(
     story: { type: String, required: true },
     wearYourStoryMessage: { type: String, default: '' },
     images: { type: [mediaAssetSchema], default: [] },
-    /** Filename the photographer must deliver, until real imagery lands. */
     assetSpec: String,
     fitNotes: { type: String, default: '' },
     sizes: { type: [{ size: String, chestInches: String, lengthInches: String, note: String }], default: [], _id: false },
@@ -322,6 +321,18 @@ const programmeSchema = new Schema(
     coverImage: mediaAssetSchema,
     capacity: Number,
     enrolledCount: { type: Number, default: 0 },
+    /**
+     * Position in the curriculum.
+     *
+     * A programme list is a sequence, not a feed — Level 1 comes before Level
+     * 4 whatever order the records happened to be written in. Without this the
+     * list sorted by creation date and the levels rendered backwards.
+     *
+     * Mongoose is strict, so an absent field is silently dropped on write: the
+     * script that set it wrote nothing and the failure was invisible until the
+     * page showed the wrong order.
+     */
+    displayOrder: { type: Number, default: 0, index: true },
     ...publishableFields,
   },
   { timestamps: true }

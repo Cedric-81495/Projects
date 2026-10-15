@@ -129,7 +129,12 @@ contentRouter.use(
     createSchema: s.programmeCreate,
     updateSchema: s.programmeUpdate,
     searchFields: ['name', 'summary'],
-    defaultSort: { createdAt: -1 },
+    /**
+     * A curriculum has an order, so newest-first was exactly backwards: the
+     * levels rendered 4, 3, 2, 1. `displayOrder` is set per programme and the
+     * creation date only breaks ties, for anything added without one.
+     */
+    defaultSort: { displayOrder: 1, createdAt: -1 },
     writePermission: 'gwop:manage',
   })
 );

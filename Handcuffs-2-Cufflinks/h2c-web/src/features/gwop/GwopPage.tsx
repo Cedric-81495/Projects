@@ -73,6 +73,7 @@ export function GwopPage() {
             </div>
             <div className="rise d2">
               <img
+                className="brand-crest"
                 src="/media/crest-gwop-university.webp"
                 alt="GWOP University crest"
                 /**

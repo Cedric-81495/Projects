@@ -34,9 +34,9 @@ export function GwopPage() {
       />
       <Breadcrumb trail={[{ label: 'Home', to: ROUTES.home }, { label: 'GWOP' }]} />
       <PageHero
-        eyebrow="GWOP · education and empowerment"
+        eyebrow="GWOP · get with our plan"
         title="Learn the way out"
-        lede="GWOP is the teaching arm of the movement. Courses, workshops, mentorship, and youth programmes — practical, in person, and free to the community."
+        lede="GWOP is the teaching arm of the movement. GWOP University takes the money side in the order it actually needs to happen — mindset first, then credit, banking, funding readiness, structure and ownership."
       />
 
       <Section surface="charcoal" tight>
@@ -44,15 +44,29 @@ export function GwopPage() {
           <div className="split split--top">
             <div>
               <Eyebrow>What GWOP does</Eyebrow>
-              <h2 className="h-md rise d1">Programmes, not platitudes</h2>
+              <h2 className="h-md rise d1">Order, not motivation</h2>
               <p className="body rise d2">
-                Every programme exists because somebody in the movement needed it and could not find
-                it. Money, paperwork, resumes, licensing, the first ninety days after release, and a
-                consistent adult for young people who do not have one.
+                Information about money is everywhere. The order is not. GWOP University exists to
+                connect the dots — what applies to you, what to fix first, and what happens after
+                you finally get access to capital.
+              </p>
+              <p className="body rise d2">
+                Four levels, taken in sequence. Freshman builds the foundation, Sophomore gets you
+                ready, Junior builds and scales, Senior is about legacy. It starts with how you
+                think about money rather than where to apply for it, because structure is what
+                lenders are actually reading.
+              </p>
+              <p className="body rise d2">
+                And money is not the whole conversation. Financial stress does not stay in a bank
+                account — it follows people home. The programme is built for the whole person.
+              </p>
+              <p className="body rise d2">
+                Alongside the levels there is the Blueprint one-to-one: an hour with Beast walking
+                through your own roadmap, rather than a course telling everybody the same thing.
               </p>
               <Row className="rise d3">
                 <ButtonLink to={ROUTES.community} variant="ghost" icon="arrow">
-                  Volunteer or mentor
+                  Get involved
                 </ButtonLink>
               </Row>
             </div>

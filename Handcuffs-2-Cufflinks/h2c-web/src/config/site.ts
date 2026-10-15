@@ -93,9 +93,17 @@ export const ECOSYSTEM: Record<
   gwop: {
     key: 'gwop',
     name: 'GWOP',
-    role: 'Education and empowerment',
+    role: 'Financial education',
+    /**
+     * GWOP is "Get With Our Plan", and GWOP University is its programme.
+     *
+     * This previously read as generic workshops and community initiatives,
+     * which described neither what it teaches nor how. It is a structured
+     * financial curriculum — credit, banking, funding, ownership — taught
+     * online across four levels.
+     */
     description:
-      'Programs that teach, mentor, and develop people — workshops, mentorship, and community initiatives.',
+      'Get With Our Plan. GWOP University teaches the money side in order — credit, banking, funding readiness, and ownership — with one-to-one sessions alongside it.',
     attribution: 'Powered by GWOP',
     accentVar: 'var(--color-brand-gwop)',
   },

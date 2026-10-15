@@ -22,7 +22,7 @@ export function EcosystemSection() {
     {
       ...ECOSYSTEM.gwop,
       crest: '/media/crest-gwop-university.webp',
-      does: ['Courses and workshops', 'Mentorship pairings', 'Youth and reentry programmes'],
+      does: ['Credit and credit repair', 'Banking and funding readiness', 'One-to-one blueprint sessions'],
     },
     {
       ...ECOSYSTEM.kitchen,

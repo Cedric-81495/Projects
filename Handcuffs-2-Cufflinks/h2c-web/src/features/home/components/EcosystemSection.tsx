@@ -16,7 +16,7 @@ export function EcosystemSection() {
   const cards = [
     {
       ...ECOSYSTEM.h2c,
-      crest: null,
+      crest: '/media/crest-h2c.webp',
       does: ['Storytelling and media', 'Apparel and collections', 'Community and events'],
     },
     {
@@ -26,7 +26,13 @@ export function EcosystemSection() {
     },
     {
       ...ECOSYSTEM.kitchen,
-      crest: '/media/crest-kmm.webp',
+      /**
+       * No mark yet. The file previously used here was the Handcuffs 2
+       * Cufflinks logo under a misleading name, which is how the parent
+       * brand's mark ended up labelling the record label. The card reads fine
+       * without one — better an honest gap than the wrong brand's identity.
+       */
+      crest: null,
       does: ['Artist development', 'Singles, albums, mixtapes', 'Scoring for the docuseries'],
     },
   ];

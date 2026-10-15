@@ -2,6 +2,24 @@ import { Link } from 'react-router-dom';
 import { BRAND, NAV_ITEMS, SOCIAL_LINKS, ECOSYSTEM } from '@/config/site';
 import { ROUTES } from '@/router/routes';
 
+/**
+ * Partner marks shown in the footer, in order.
+ *
+ * Only GWOP has an approved mark. The slot beside it belongs to Kitchen Muzik
+ * and renders nothing until one exists — a footer carrying an identity nobody
+ * signed off is worse than a footer carrying one, and the previous second crest
+ * was exactly that.
+ *
+ * To add the Kitchen Muzik mark: drop the file into `public/media` and put its
+ * path in `src` below. Nothing else needs changing — it is filtered in by the
+ * presence of a path, so the layout absorbs one mark or two without a code
+ * change either way.
+ */
+const PARTNER_CRESTS: { name: string; src: string | null }[] = [
+  { name: 'GWOP University', src: '/media/crest-gwop-university.webp' },
+  { name: 'Kitchen Muzik Management', src: null },
+];
+
 export function Footer() {
   const year = new Date().getFullYear();
 
@@ -16,8 +34,9 @@ export function Footer() {
             {BRAND.valueProposition}
           </p>
           <div className="ftr-crests">
-            <img src="/media/crest-gwop-university.webp" alt="GWOP University crest" />
-            <img src="/media/crest-founder.webp" alt="Founder crest" />
+            {PARTNER_CRESTS.filter((crest) => crest.src).map((crest) => (
+              <img key={crest.name} src={crest.src!} alt={`${crest.name} crest`} />
+            ))}
           </div>
         </div>
 

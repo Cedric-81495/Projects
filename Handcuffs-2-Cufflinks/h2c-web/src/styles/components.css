@@ -62,6 +62,22 @@
  * centre crop cuts them, set it per slot rather than changing it here.
  */
 .slot img{place-self:stretch;display:block;width:100%;height:100%;object-fit:cover}
+/* ------------------------------------------------------------------ press */
+/**
+ * Press coverage reads as a list of citations, not a card grid. Each entry is
+ * a link out, so the whole row is the target and the outlet sits above the
+ * headline the way a masthead does in print.
+ */
+.press-list{list-style:none;margin:clamp(20px,3vw,34px) 0 0;padding:0;display:grid;gap:0}
+.press-item{padding:clamp(16px,2.2vw,26px) 0;border-top:1px solid var(--rule)}
+.press-item:last-child{border-bottom:1px solid var(--rule)}
+.press-item a{display:grid;gap:4px;text-decoration:none;color:inherit}
+.press-item a:hover .press-title{color:var(--accent)}
+.press-outlet{font-size:.645rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+.press-title{font-family:var(--serif, Georgia, serif);font-size:clamp(1.05rem,2vw,1.4rem);line-height:1.25}
+.press-quote{margin:10px 0 0;color:var(--fg-quiet);font-style:italic;max-width:60ch}
+.press-item .micro{margin-top:6px}
+
 .slot-txt{padding:clamp(16px,3vw,30px);max-width:34ch}
 .slot-txt b{display:block;font-family:var(--sans);font-size:.6rem;font-weight:700;
   letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:9px}

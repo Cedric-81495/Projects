@@ -60,7 +60,13 @@ export function GwopPage() {
               <img
                 src="/media/crest-gwop-university.webp"
                 alt="GWOP University crest"
-                style={{ maxWidth: 220 }}
+                /**
+                 * 128 rather than 220: the crest is supplied at 232x256, and a
+                 * retina screen draws twice the CSS size — so anything above
+                 * 128 is upscaled and the lettering in the banner goes soft.
+                 * Raise this the moment a larger export exists.
+                 */
+                style={{ maxWidth: 128 }}
                 loading="lazy"
               />
             </div>

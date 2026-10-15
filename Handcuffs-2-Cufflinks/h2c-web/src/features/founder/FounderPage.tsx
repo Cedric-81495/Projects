@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { apiGet } from '@/lib/api/client';
 import { Seo } from '@/lib/seo/Seo';
 import { PageHero } from '@/components/layout/PageHero';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
@@ -110,6 +112,8 @@ export function FounderPage() {
         </Wrap>
       </Section>
 
+      <PressSection />
+
       <Band direction="to-emerald" />
 
       <Section surface="emerald">
@@ -126,5 +130,76 @@ export function FounderPage() {
         </Wrap>
       </Section>
     </>
+  );
+}
+
+/**
+ * Where the movement has been written about.
+ *
+ * A citation list, not a reprint. Each entry is an outlet, a headline, a date
+ * and a link out — the article belongs to whoever published it, and a reader
+ * who wants it should land on their page, which is also the only way the
+ * coverage keeps earning the outlet anything.
+ *
+ * The optional pulled line is capped at a sentence in the CMS for the same
+ * reason: enough to show what the piece is about, not enough to replace it.
+ *
+ * Renders nothing when there is no coverage yet. An empty "As featured in"
+ * heading reads worse than silence.
+ */
+interface PressItem {
+  outlet: string;
+  title: string;
+  url: string;
+  publishedAt?: string | null;
+  quote?: string;
+}
+
+function PressSection() {
+  const [press, setPress] = useState<PressItem[]>([]);
+
+  useEffect(() => {
+    /**
+     * The founder profile is a singleton rather than a list, so `useContent`
+     * (which maps an items array) does not fit. Aborted on unmount so a quick
+     * navigation away does not set state on a gone component.
+     */
+    const abort = new AbortController();
+    apiGet<{ press?: PressItem[] }>('/site/founder', undefined, abort.signal)
+      .then((data) => setPress(data.press ?? []))
+      .catch(() => {
+        /** No coverage shown rather than an error: this section is not load-bearing. */
+      });
+    return () => abort.abort();
+  }, []);
+
+  if (press.length === 0) return null;
+
+  return (
+    <Section surface="charcoal-hi">
+      <Wrap>
+        <Eyebrow>In the press</Eyebrow>
+        <h2 className="h-lg rise d1">Where the movement has been written about</h2>
+        <ul className="press-list rise d2">
+          {press.map((item) => (
+            <li key={item.url} className="press-item">
+              <a href={item.url} target="_blank" rel="noopener noreferrer">
+                <span className="press-outlet">{item.outlet}</span>
+                <span className="press-title">{item.title}</span>
+              </a>
+              {item.quote && <p className="press-quote">{item.quote}</p>}
+              {item.publishedAt && (
+                <p className="micro">
+                  {new Date(item.publishedAt).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                  })}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      </Wrap>
+    </Section>
   );
 }

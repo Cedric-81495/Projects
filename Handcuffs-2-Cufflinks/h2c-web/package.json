@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Handcuffs 2 Cufflinks \u2014 From Struggle to Success. Movement platform frontend.",
+  "description": "Handcuffs 2 Cufflinks — From Struggle to Success. Movement platform frontend.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && npm run build:client && npm run build:server && npm run prerender",
@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc -b --noEmit",
-    "verify:cms": "node scripts/verify-cms-contract.mjs"
+    "verify:cms": "node scripts/verify-cms-contract.mjs",
+    "verify:cms:render": "vite-node scripts/verify-cms-render.tsx"
   },
   "dependencies": {
     "framer-motion": "^11.15.0",
@@ -37,6 +38,7 @@
     "tailwindcss": "^4.0.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "vite-node": "^3.2.4"
   }
 }

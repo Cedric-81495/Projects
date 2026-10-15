@@ -17,6 +17,9 @@
  *   3. An untouched form produces no nested validation errors — the failure
  *      mode where a blank optional sub-object is posted as `{ url: '' }` and
  *      rejected for an address nobody typed.
+ *   4. Both sides agree on who may write each record type. The admin hides a
+ *      control a role cannot use and the API refuses it regardless; if the two
+ *      drift, the screen offers an action and the server rejects it.
  *
  *   npm run verify:cms
  */
@@ -123,11 +126,16 @@ function mountPathOf(layer) {
 }
 
 const routes = new Set();
+/** Route signature -> the permission its guard enforces, where it has one. */
+const routePermission = new Map();
 (function walk(stack, prefix) {
   for (const layer of stack) {
     if (layer.route) {
+      const guarded = layer.route.stack?.find((h) => h.handle?.h2cPermission);
       for (const method of Object.keys(layer.route.methods)) {
-        routes.add(`${method.toUpperCase()} ${prefix}${layer.route.path}`.replace(/\/$/, ''));
+        const signature = `${method.toUpperCase()} ${prefix}${layer.route.path}`.replace(/\/$/, '');
+        routes.add(signature);
+        if (guarded) routePermission.set(signature, guarded.handle.h2cPermission);
       }
     } else if (layer.handle?.stack) {
       walk(layer.handle.stack, prefix + mountPathOf(layer));
@@ -150,6 +158,25 @@ for (const resource of web.RESOURCES) {
   expect('POST', `${base}/:id/publish`, resource.key);
   expect('POST', `${base}/:id/unpublish`, resource.key);
   expect('DELETE', `${base}/:id`, resource.key);
+}
+
+/**
+ * 4. Both sides agree on who may write each record type.
+ *
+ * The admin hides a control the operator's role cannot use and the API refuses
+ * the request regardless — two declarations of the same rule, in two packages,
+ * with nothing linking them. If they drift the failure is quiet and the wrong
+ * way round: the screen offers an action, the operator takes it, and the server
+ * returns a permission error on a button that should not have been there.
+ */
+for (const resource of web.RESOURCES) {
+  const onAdmin = resource.writePermission ?? 'content:write';
+  const onApi = routePermission.get(`POST ${resource.basePath}`);
+  if (onApi && onApi !== onAdmin) {
+    failures.push(
+      `permission mismatch for ${resource.key}: admin expects ${onAdmin}, API enforces ${onApi}`
+    );
+  }
 }
 
 /** The screens that are not record lists and so have no registry entry. */
@@ -283,7 +310,7 @@ console.log(`${routes.size} API routes registered`);
 console.log(`${web.RESOURCES.length} record types in the admin registry`);
 
 if (failures.length === 0) {
-  console.log('\n✓ Contract OK — routes exist, field names match, and an empty form is honest.');
+  console.log('\n✓ Contract OK — routes exist, field names match, permissions agree, and an empty form is honest.');
 } else {
   console.log(`\n✗ ${failures.length} problem(s):`);
   for (const failure of failures) console.log(`  · ${failure}`);

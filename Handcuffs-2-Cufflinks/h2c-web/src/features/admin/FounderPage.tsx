@@ -41,6 +41,25 @@ const FIELDS: Field[] = [
   { kind: 'textarea', name: 'speakingBlurb', label: 'Speaking blurb', rows: 4 },
   {
     kind: 'repeater',
+    name: 'press',
+    label: 'Press coverage',
+    itemNoun: 'article',
+    max: 24,
+    fields: [
+      { kind: 'text', name: 'outlet', label: 'Publication', half: true },
+      { kind: 'date', name: 'publishedAt', label: 'Published', half: true },
+      { kind: 'text', name: 'title', label: 'Headline' },
+      { kind: 'text', name: 'url', label: 'Link to the article' },
+      {
+        kind: 'text',
+        name: 'quote',
+        label: 'Pulled line (optional, one sentence)',
+        hint: 'One short line at most. The article itself belongs to the publisher — link to it rather than reproducing it.',
+      },
+    ],
+  },
+  {
+    kind: 'repeater',
     name: 'gallery',
     label: 'Gallery',
     itemNoun: 'image',

@@ -26,7 +26,21 @@ interface JoinFields {
  *
  * Validation messages say what to do rather than what went wrong.
  */
-export function JoinForm({ compact = false }: { compact?: boolean }) {
+export function JoinForm({
+  compact = false,
+  /**
+   * Whether the form lists what a subscriber receives.
+   *
+   * On the homepage this is the only place those benefits appear, so the form
+   * carries them. The dedicated join page already leads with the same list
+   * under its own heading, and printing it again under the button read as a
+   * mistake rather than emphasis — so that page turns it off.
+   */
+  showBenefits = true,
+}: {
+  compact?: boolean;
+  showBenefits?: boolean;
+}) {
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -165,7 +179,7 @@ export function JoinForm({ compact = false }: { compact?: boolean }) {
         {isSubmitting ? 'Joining' : 'Join the Movement'}
       </Button>
 
-      {!compact && (
+      {showBenefits && (
         <ul className="bens">
           {MOVEMENT_BENEFITS.map((benefit) => (
             <li key={benefit}>
@@ -174,7 +188,7 @@ export function JoinForm({ compact = false }: { compact?: boolean }) {
             </li>
           ))}
         </ul>
-      )}
+      )}
     </form>
   );
 }

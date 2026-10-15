@@ -53,7 +53,7 @@ export function JoinPage() {
             </div>
 
             <div className="rise d2">
-              <JoinForm />
+              <JoinForm showBenefits={false} />
             </div>
           </div>
         </Wrap>

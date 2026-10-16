@@ -30,9 +30,33 @@ export function useReveal(dependency?: unknown): void {
       { rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
     );
 
-    const targets = document.querySelectorAll<HTMLElement>('.rise:not(.is-in), .draw:not(.is-in)');
-    targets.forEach((el) => observer.observe(el));
+    const observeAll = (): void => {
+      document
+        .querySelectorAll<HTMLElement>('.rise:not(.is-in), .draw:not(.is-in)')
+        .forEach((el) => observer.observe(el));
+    };
 
-    return () => observer.disconnect();
+    observeAll();
+
+    /**
+     * Re-observe whatever appears later.
+     *
+     * Most content arrives with the page: seed data renders immediately and the
+     * API quietly replaces the text inside elements that already exist, so they
+     * keep the class they were given. But where live data changes the *shape* of
+     * a section — two written paragraphs becoming three from the CMS — React
+     * unmounts the originals and mounts new ones, and those were never passed to
+     * the observer. They stay at opacity 0 and the section reads as empty.
+     *
+     * Cheap to run: the callback only queries for elements that are not already
+     * revealed, and the observer ignores anything it is already watching.
+     */
+    const mutations = new MutationObserver(observeAll);
+    mutations.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      mutations.disconnect();
+      observer.disconnect();
+    };
   }, [dependency]);
 }

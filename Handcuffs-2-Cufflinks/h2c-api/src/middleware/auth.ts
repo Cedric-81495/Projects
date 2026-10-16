@@ -43,11 +43,24 @@ export const requireAuth: RequestHandler = asyncHandler(async (req, _res, next) 
  * every protected route re-checks here.
  */
 export function requirePermission(permission: Permission): RequestHandler {
-  return (req, _res, next) => {
+  const guard: RequestHandler = (req, _res, next) => {
     if (!req.actor) return next(ApiError.unauthorized());
     if (!roleHas(req.actor.role, permission)) {
       return next(ApiError.forbidden('You do not have permission to do that.'));
     }
     next();
   };
+
+  /**
+   * The permission this guard enforces, readable from the route stack.
+   *
+   * The admin hides controls a role cannot use and the API refuses the request
+   * regardless — the same rule declared twice, in two packages, with nothing
+   * linking them. Express keeps no record of what a middleware checks, so
+   * without this tag the contract check cannot compare the two and a drift
+   * shows up as a permission error on a button that should not have been
+   * offered. Inert at runtime.
+   */
+  Object.defineProperty(guard, 'h2cPermission', { value: permission, enumerable: false });
+  return guard;
 }

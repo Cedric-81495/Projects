@@ -129,6 +129,18 @@ export const founderUpdate = z
     globalVision: trimmed(4000),
     speakingTopics: z.array(trimmed(160)).max(20),
     speakingBlurb: trimmed(2000),
+    press: z
+      .array(
+        z.object({
+          outlet: trimmed(120).min(1, 'Name the publication.'),
+          title: trimmed(200).min(1, 'Add the headline.'),
+          url: href,
+          publishedAt: z.coerce.date().nullable().optional(),
+          /** Capped deliberately: a citation, not a reproduction. */
+          quote: trimmed(200).optional(),
+        })
+      )
+      .max(24),
     gallery: z.array(imageSchema).max(24),
     seo: seoSchema,
   })

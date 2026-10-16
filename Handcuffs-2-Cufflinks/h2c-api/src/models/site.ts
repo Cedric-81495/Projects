@@ -240,6 +240,30 @@ const founderProfileSchema = new Schema(
     /** Shown alongside the booking email on the founder page. */
     speakingBlurb: { type: String, default: '' },
 
+    /**
+     * Press coverage — where the movement has been written about.
+     *
+     * Stored as a citation, never as the article. Publishers own their text, so
+     * what lives here is an outlet, a headline, a date, a link and at most one
+     * short pulled line. A visitor who wants the piece goes and reads it where
+     * it was published, which is also what the publisher would want.
+     */
+    press: {
+      type: [
+        new Schema(
+          {
+            outlet: { type: String, required: true, trim: true, maxlength: 120 },
+            title: { type: String, required: true, trim: true, maxlength: 200 },
+            url: { type: String, required: true, trim: true },
+            publishedAt: { type: Date, default: null },
+            /** One short line at most. Long extracts are the publisher's to run. */
+            quote: { type: String, trim: true, maxlength: 200 },
+          },
+          { _id: false }
+        ),
+      ],
+      default: [],
+    },
     gallery: { type: [imageSchema], default: [] },
     seo: { type: seoSchema, default: () => ({}) },
 

@@ -238,6 +238,15 @@ export function toApparel(
     badge: item.badge ?? '',
     meaning: item.story ?? '',
     asset: item.images?.[0]?.url || item.assetSpec || `${item.name} — product photograph`,
+    /**
+     * The second photograph, for the grid's hover swap.
+     *
+     * Only the first was ever carried through, so images two and three reached
+     * the browser and were thrown away. A card that changes to a second angle
+     * on hover is the standard in apparel — it sells the garment without adding
+     * a control to every tile.
+     */
+    assetAlt: item.images?.[1]?.url,
     likes: item.engagement?.likes ?? 0,
     votes: item.engagement?.votes ?? 0,
     tone: TONES[index % TONES.length],

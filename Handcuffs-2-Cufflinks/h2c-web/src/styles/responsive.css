@@ -24,15 +24,34 @@
   .split,.g2,.g3,.look,.eco,.stats{grid-template-columns:1fr}
   .split--rev>*:first-child{order:0}
   .eco,.stats{gap:1px}
-  .hero-figs{grid-template-columns:1fr 1fr}
-  .hero-figs>*:nth-child(3){display:none}
+  /**
+   * The hero figures become a swipe strip rather than losing one.
+   *
+   * They used to be hidden below this width — the third at 900, the second at
+   * 620 — so a phone saw one photograph of three. Hiding apparel on the page
+   * whose job is to show apparel is the wrong trade. Scroll-snap keeps each
+   * frame landing square, and the overflow is contained so the page body never
+   * scrolls sideways with it.
+   */
+  .hero-figs{
+    grid-template-columns:none;
+    grid-auto-flow:column;
+    grid-auto-columns:72%;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .hero-figs::-webkit-scrollbar{display:none}
+  .hero-figs>*{scroll-snap-align:center}
   .look-pieces{grid-template-columns:repeat(2,1fr);gap:12px}
 }
 @media (max-width:620px){
   .g4,.socials,.g2f{grid-template-columns:1fr}
   .hero-support{font-size:1.62rem}
-  .hero-figs{grid-template-columns:1fr}
-  .hero-figs>*:nth-child(2){display:none}
+  /** Wider frames on a narrow screen; still all three, still swipeable. */
+  .hero-figs{grid-auto-columns:84%}
   .ftr-grid{grid-template-columns:1fr}
   .cookie{left:12px;right:12px;max-width:none}
   .saved{grid-template-columns:52px 1fr}

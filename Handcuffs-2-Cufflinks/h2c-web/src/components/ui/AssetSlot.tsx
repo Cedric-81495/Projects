@@ -16,6 +16,16 @@ interface AssetSlotProps {
   src?: string;
   alt?: string;
   className?: string;
+  /**
+   * What to show when there is no image, or the one named cannot be loaded.
+   *
+   * `'placeholder'` is the default and names the file still needed, which is
+   * how the shot list stays visible on the page. `'none'` renders nothing,
+   * for a slot that is an enhancement rather than a gap — a hover layer that
+   * falls back to a grey placeholder would reveal a placeholder *over* a
+   * photograph, which is worse than not reacting at all.
+   */
+  fallback?: 'placeholder' | 'none';
 }
 
 /** A filename and nothing else: no spaces, no slashes, a known image extension. */
@@ -67,6 +77,7 @@ export function AssetSlot({
   src,
   alt,
   className,
+  fallback = 'placeholder',
 }: AssetSlotProps) {
   /**
    * The address that failed to load, if one did.
@@ -111,6 +122,8 @@ export function AssetSlot({
       </div>
     );
   }
+
+  if (fallback === 'none') return null;
 
   return (
     <div

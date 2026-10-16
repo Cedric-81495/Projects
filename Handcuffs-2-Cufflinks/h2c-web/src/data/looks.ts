@@ -5,6 +5,15 @@ export interface SeedLook {
   n: string;
   title: string;
   note: string;
+  /**
+   * A second frame for the look, shown on hover.
+   *
+   * Optional: a look with one delivered photograph simply does not swap. The
+   * tabs already move between the eight looks, so this must not become a
+   * second set of controls — a hover is invisible until used and costs the
+   * layout nothing.
+   */
+  altSpec?: string;
   /** The individual pieces that make up the look. */
   pieces: string[];
 }

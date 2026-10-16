@@ -65,12 +65,27 @@ export function PhotoshootLooks() {
           id={`look-panel-${look.n}`}
           aria-labelledby={`look-tab-${look.n}`}
         >
-          <AssetSlot
-            ratio="3x4"
-            tone={active % 3 === 2 ? 'em' : active % 3 === 1 ? 'warm' : ''}
-            label="PHOTO"
-            spec={`H2C_Looks_Look${look.n}_Full_3x4.jpg`}
-          />
+          <div className="look-fig">
+            <AssetSlot
+              ratio="3x4"
+              tone={active % 3 === 2 ? 'em' : active % 3 === 1 ? 'warm' : ''}
+              label="PHOTO"
+              spec={`H2C_Looks_Look${look.n}_Full_3x4.jpg`}
+            />
+            {look.altSpec && (
+              /* Same pattern as the apparel grid: a second angle on hover,
+                 hidden from assistive technology because it is the same look. */
+              <div className="pcard-alt" aria-hidden="true">
+                <AssetSlot
+                  ratio="3x4"
+                  tone={active % 3 === 2 ? 'em' : active % 3 === 1 ? 'warm' : ''}
+                  label="PHOTO"
+                  spec={look.altSpec}
+                  fallback="none"
+                />
+              </div>
+            )}
+          </div>
 
           <div>
             <p className="micro">Look {look.n}</p>

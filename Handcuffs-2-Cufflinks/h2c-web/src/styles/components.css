@@ -340,7 +340,6 @@
 
 /* Note / callout */
 /* note / callout */
-.note strong { color: var(--accent); font-weight: 500 }
 .note{border:1px solid var(--rule);border-left:2px solid var(--accent);
   padding:20px 22px;display:grid;gap:8px;background:rgba(200,163,74,.05)}
 .note b{font-size:.63rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}

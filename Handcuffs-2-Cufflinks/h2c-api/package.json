@@ -19,7 +19,8 @@
     "verify-db": "tsx --env-file-if-exists=.env scripts/verify-db.ts",
     "prebuild": "tsc --noEmit",
     "reset-engagement": "tsx --env-file-if-exists=.env scripts/reset-engagement.ts",
-    "fix-gwop-programmes": "tsx --env-file-if-exists=.env scripts/fix-gwop-programmes.ts"
+    "fix-gwop-programmes": "tsx --env-file-if-exists=.env scripts/fix-gwop-programmes.ts",
+    "sync-apparel": "tsx --env-file-if-exists=.env scripts/sync-apparel.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
